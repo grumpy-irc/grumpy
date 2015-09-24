@@ -1,0 +1,3 @@
+[submodule "src/libirc"]
+	path = src/libirc
+	url = http://github.com/grumpy-irc/libirc
