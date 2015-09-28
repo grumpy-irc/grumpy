@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     corewrapper.cpp \
     inputbox.cpp \
     scrollbacksmanager.cpp \
-    scrollbacklist_itemmodel.cpp
+    grumpyeventhandler.cpp \
+    scrollbacklist_node.cpp
 
 HEADERS  += mainwindow.h \
     scrollbackframe.h \
@@ -29,7 +30,8 @@ HEADERS  += mainwindow.h \
     corewrapper.h \
     inputbox.h \
     scrollbacksmanager.h \
-    scrollbacklist_itemmodel.h
+    grumpyeventhandler.h \
+    scrollbacklist_node.h
 
 FORMS    += mainwindow.ui \
     scrollbackframe.ui \

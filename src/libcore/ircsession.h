@@ -13,14 +13,36 @@
 #ifndef IRCSESSION_H
 #define IRCSESSION_H
 
+#include <QMutex>
+#include <QString>
 #include "libcore_global.h"
+#include "../libirc/libircclient/user.h"
+#include "../libirc/libircclient/channel.h"
+#include "../libirc/libircclient/network.h"
 
 namespace GrumpyIRC
 {
+    class Scrollback;
     class LIBCORESHARED_EXPORT IRCSession
     {
         public:
-            IRCSession();
+            static IRCSession *Open(Scrollback *system_window, QString hostname, QString network = "", QString nick = "", QString password = "", bool ssl = false);
+            static QMutex Sessions_Lock;
+			static QList<IRCSession*> Sessions;
+			
+            /*!
+             * \brief IRCSession Creates a new uninitialized session, you should always create new sessions
+             *                   with IRCSession::Open() instead of calling this directly
+             */
+            IRCSession(Scrollback *system);
+            virtual ~IRCSession();
+            virtual Scrollback *GetSystemWindow();
+            virtual libircclient::Network *GetNetwork();
+            virtual void Connect(libircclient::Network *Network);
+            bool IsConnected();
+        private:
+            libircclient::Network *network;
+            Scrollback *systemWindow;
     };
 }
 

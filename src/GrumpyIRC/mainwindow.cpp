@@ -17,7 +17,10 @@
 #include "scrollbackframe.h"
 #include "syslogwindow.h"
 #include "scrollbacksmanager.h"
+#include "../libcore/eventhandler.h"
+#include "../libcore/ircsession.h"
 #include "../libcore/core.h"
+#include "../libcore/configuration.h"
 #include "../libcore/commandprocessor.h"
 
 using namespace GrumpyIRC;
@@ -26,6 +29,9 @@ MainWindow *MainWindow::Main;
 
 static void Exit()
 {
+    GCFG->SetValue("mainwindow_state", QVariant(MainWindow::Main->saveState()));
+    GCFG->SetValue("mainwindow_geometry", QVariant(MainWindow::Main->saveGeometry()));
+    GCFG->Save();
     QApplication::exit(0);
 }
 
@@ -36,6 +42,19 @@ static int SystemCommand_Exit(SystemCommand *command, CommandArgs args)
     QString quit_msg = args.ParameterLine;
     Exit();
     return 0;
+}
+
+static int SystemCommand_Server(SystemCommand *command, CommandArgs command_args)
+{
+	// if there is no parameter we throw some error
+	if (command_args.Parameters.count() < 1)
+	{
+		GRUMPY_ERROR(QObject::tr("This command requires a parameter"));
+		return 0;
+	}
+	// get the server host
+    MainWindow::Main->OpenServer(command_args.Parameters[0]);
+	return 0;
 }
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -53,8 +72,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->systemWindow = this->scrollbackWindow->CreateWindow("System Window", NULL, true, false);
     // Register built-in commands
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("quit", (SC_Callback)SystemCommand_Exit));
+	CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("server", (SC_Callback)SystemCommand_Server));
     // Welcome user
-    this->systemWindow->InsertText(QString("Grumpy irc"));
+    this->systemWindow->InsertText(QString("Grumpy irc version " + GCFG->GetVersion()));
+    // Try to restore geometry
+    this->restoreGeometry(GCFG->GetValue("mainwindow_geometry").toByteArray());
+    this->restoreState(GCFG->GetValue("mainwindow_state").toByteArray());
 }
 
 MainWindow::~MainWindow()
@@ -70,6 +93,22 @@ ScrollbacksManager *MainWindow::GetScrollbackManager()
 ScrollbackList *MainWindow::GetScrollbackList()
 {
     return this->windowList;
+}
+
+void MainWindow::WriteToSystemWindow(QString text)
+{
+    this->systemWindow->InsertText(text);
+}
+
+void MainWindow::OpenServer(QString hostname, QString network, QString nick, QString password, bool ssl)
+{
+    QString network_name = network;
+    if (network.isEmpty())
+        network_name = hostname;
+    // We need to create a new scrollback for system window
+    ScrollbackFrame *system = this->GetScrollbackManager()->CreateWindow(network_name, NULL, true);
+
+    IRCSession::Open(system, hostname, network, nick, password, ssl);
 }
 
 void MainWindow::on_actionExit_triggered()

@@ -10,6 +10,7 @@ else()
 endif()
 
 file (GLOB src "*.cpp")
+file (GLOB headers "*.h")
 file (GLOB resources "*.qrc")
 
 if(QT5_BUILD)
@@ -27,5 +28,5 @@ endif()
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 ADD_DEFINITIONS( -DLIBCORE_LIBRARY -DQT_USE_QSTRINGBUILDER )
 
-ADD_LIBRARY(core SHARED ${src})
+ADD_LIBRARY(core SHARED ${src} ${headers})
 TARGET_LINK_LIBRARIES(core ircclient ${QT_LIBRARIES})

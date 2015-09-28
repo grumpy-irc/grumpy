@@ -16,3 +16,17 @@ using namespace GrumpyIRC;
 
 
 
+
+bool Generic::String2Bool(QString string)
+{
+    if (string.toLower() == "true")
+        return true;
+    return false;
+}
+
+QString Generic::Bool2String(bool boolean)
+{
+    if (boolean)
+        return "true";
+    return "false";
+}

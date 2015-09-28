@@ -16,15 +16,18 @@
 #include "ui_scrollbacklist.h"
 #include "scrollbackframe.h"
 #include "scrollbacksmanager.h"
+#include "scrollbacklist_node.h"
 
 using namespace GrumpyIRC;
 
 ScrollbackList::ScrollbackList(QWidget *parent) : QDockWidget(parent), ui(new Ui::ScrollbackList)
 {
     this->ui->setupUi(this);
-    this->model = new ScrollbackList_ItemModel(this);
+    this->model = new QStandardItemModel(0, 2, this);
+	this->root = this->model->invisibleRootItem();
     this->ui->treeView->setModel(this->model);
     this->ui->treeView->setColumnHidden(1, true);
+	this->ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     this->ui->treeView->setHeaderHidden(true);
 }
 
@@ -33,29 +36,29 @@ ScrollbackList::~ScrollbackList()
     delete this->ui;
 }
 
-void ScrollbackList::RegisterWindow(ScrollbackFrame *scrollback, ScrollbackFrame *parentWindow)
+void ScrollbackList::RegisterWindow(ScrollbackFrame *scrollback, QStandardItem *parent_node)
 {
-    ScrollbackFrame *root;
-    if (parentWindow != NULL)
-        root = parentWindow;
+    QStandardItem *root;
+	if (parent_node != NULL)
+		root = parent_node;
     else
-        root = this->model->GetRoot();
-    if (!scrollback->GetParent())
-    {
-        // Windows that were created before scrollbacklist are probably missing the parent, we can fix them, by giving tree root as parent to them
-        scrollback->SetParent(this->model->GetRoot());
-    }
-    root->InsertChild(scrollback);
+        root = this->GetRootTreeItem();
+	QStandardItem *node = new ScrollbackList_Node(scrollback);
+	scrollback->TreeNode = node;
+    root->appendRow(node);
 }
 
-ScrollbackFrame *ScrollbackList::GetRootTreeItem()
+QStandardItem *ScrollbackList::GetRootTreeItem()
 {
-    return this->model->GetRoot();
+    return this->root;
 }
 
 void GrumpyIRC::ScrollbackList::on_treeView_activated(const QModelIndex &index)
 {
-    QMap<int, QVariant> data = this->model->itemData(index);
-    //qWarning() << data[0].toString();
-    MainWindow::Main->GetScrollbackManager()->SwitchWindow(data[1].toULongLong());
+	if (this->model->itemFromIndex(index) == this->root)
+		return;
+	ScrollbackList_Node *node = (ScrollbackList_Node*)this->model->itemFromIndex(index);
+	if (!node)
+		return;
+    MainWindow::Main->GetScrollbackManager()->SwitchWindow(node->GetScrollback());
 }

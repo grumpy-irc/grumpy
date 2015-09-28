@@ -13,8 +13,8 @@
 #ifndef SCROLLBACKLIST_H
 #define SCROLLBACKLIST_H
 
-#include "scrollbacklist_itemmodel.h"
 #include <QDockWidget>
+#include <QStandardItemModel>
 
 namespace Ui
 {
@@ -30,14 +30,15 @@ namespace GrumpyIRC
         public:
             explicit ScrollbackList(QWidget *parent = 0);
             ~ScrollbackList();
-            void RegisterWindow(ScrollbackFrame *scrollback, ScrollbackFrame *parentWindow = NULL);
-            ScrollbackFrame *GetRootTreeItem();
+			void RegisterWindow(ScrollbackFrame *scrollback, QStandardItem *parent_node = NULL);
+            QStandardItem *GetRootTreeItem();
 
         private slots:
             void on_treeView_activated(const QModelIndex &index);
 
         private:
-            ScrollbackList_ItemModel *model;
+			QStandardItem *root;
+            QStandardItemModel *model;
             Ui::ScrollbackList *ui;
     };
 }

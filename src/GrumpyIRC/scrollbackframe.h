@@ -15,6 +15,7 @@
 
 #include <QFrame>
 #include "../libcore/scrollback.h"
+#include <QStandardItemModel>
 
 namespace Ui
 {
@@ -36,20 +37,17 @@ namespace GrumpyIRC
             QString GetWindowName() const;
             void InsertText(ScrollbackItem item);
             void SetWindowName(QString title);
-            void InsertChild(ScrollbackFrame *child);
-            ScrollbackFrame *Child(int row);
-            int ChildCount() const;
-            int ModelRow() const;
-            ScrollbackFrame *GetParent();
-            void SetParent(ScrollbackFrame* parentWindow);
+			ScrollbackFrame *GetParent();
+            //void SetParent(ScrollbackFrame* parentWindow);
             bool IsDeletable;
+			QStandardItem *TreeNode;
 
         private:
+			//QStandardItem *treeNode;
             QString buffer;
             QString _name;
             InputBox *inputBox;
             Ui::ScrollbackFrame *ui;
-            QList<ScrollbackFrame*> childItems;
             ScrollbackFrame *_parent;
     };
 }

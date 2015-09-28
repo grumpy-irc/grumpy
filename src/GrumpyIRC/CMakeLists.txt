@@ -16,6 +16,7 @@ else()
 endif()
 
 file (GLOB ui "*.ui")
+file (GLOB headers "*.h")
 file (GLOB src "*.cpp")
 file (GLOB resources "*.qrc")
 
@@ -36,7 +37,7 @@ endif()
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 ADD_DEFINITIONS( -DQT_USE_QSTRINGBUILDER )
 
-ADD_EXECUTABLE(grumpy ${src} ${grumpy_HEADERS_MOC} ${grumpy_FORMS_HEADERS})
+ADD_EXECUTABLE(grumpy ${src} ${grumpy_HEADERS_MOC} ${headers} ${grumpy_FORMS_HEADERS})
 if (QT5_BUILD)
     qt5_use_modules(grumpy Core Multimedia Gui Widgets Xml)
 endif()

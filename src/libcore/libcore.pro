@@ -21,7 +21,10 @@ SOURCES += core.cpp \
     ircsession.cpp \
     scrollback.cpp \
     commandprocessor.cpp \
-    generic.cpp
+    generic.cpp \
+    configuration.cpp \
+    exception.cpp \
+    factory.cpp
 
 HEADERS += core.h\
         libcore_global.h \
@@ -32,7 +35,11 @@ HEADERS += core.h\
     ircsession.h \
     scrollback.h \
     commandprocessor.h \
-    generic.h
+    generic.h \
+    configuration.h \
+    definitions.h \
+    exception.h \
+    factory.h
 
 unix {
     target.path = /usr/lib

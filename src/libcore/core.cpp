@@ -10,6 +10,7 @@
 
 // Copyright (c) Petr Bena 2015
 
+#include "configuration.h"
 #include "core.h"
 #include "commandprocessor.h"
 #include "eventhandler.h"
@@ -19,6 +20,7 @@ GrumpyIRC::Core *GrumpyIRC::Core::GrumpyCore = NULL;
 GrumpyIRC::Core::Core()
 {
     this->commandProcessor = new CommandProcessor();
+    this->config = NULL;
     this->eventHandler = NULL;
     GrumpyCore = this;
 }
@@ -29,6 +31,12 @@ GrumpyIRC::Core::~Core()
     delete this->eventHandler;
 }
 
+void GrumpyIRC::Core::InitCfg()
+{
+    this->config = new Configuration();
+	this->config->Load();
+}
+
 GrumpyIRC::CommandProcessor *GrumpyIRC::Core::GetCommandProcessor()
 {
     return this->commandProcessor;
@@ -36,10 +44,16 @@ GrumpyIRC::CommandProcessor *GrumpyIRC::Core::GetCommandProcessor()
 
 void GrumpyIRC::Core::SetSystemEventHandler(GrumpyIRC::EventHandler *e)
 {
+	delete this->eventHandler;
     this->eventHandler = e;
 }
 
 GrumpyIRC::EventHandler *GrumpyIRC::Core::GetCurrentEventHandler()
 {
     return this->eventHandler;
+}
+
+GrumpyIRC::Configuration *GrumpyIRC::Core::GetConfiguration()
+{
+    return this->config;
 }

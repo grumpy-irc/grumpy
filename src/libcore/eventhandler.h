@@ -28,7 +28,7 @@
 
 namespace GrumpyIRC
 {
-    class EventHandler : libirc::IRCEventHandler
+    class LIBCORESHARED_EXPORT EventHandler : libircclient::IRCEventHandler
     {
         public:
             EventHandler();

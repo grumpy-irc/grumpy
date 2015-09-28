@@ -39,6 +39,8 @@ namespace GrumpyIRC
             ScrollbacksManager *GetScrollbackManager();
             //! Return a pointer to widget that contains list of all windows
             ScrollbackList *GetScrollbackList();
+            void WriteToSystemWindow(QString text);
+            void OpenServer(QString hostname, QString network = "", QString nick = "", QString password = "", bool ssl = false);
 
         private slots:
             void on_actionExit_triggered();

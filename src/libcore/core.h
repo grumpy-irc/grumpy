@@ -17,6 +17,7 @@
 
 namespace GrumpyIRC
 {
+    class Configuration;
     class CommandProcessor;
     class EventHandler;
     class LIBCORESHARED_EXPORT Core
@@ -26,10 +27,14 @@ namespace GrumpyIRC
 
             Core();
             virtual ~Core();
+            void InitCfg();
             CommandProcessor *GetCommandProcessor();
             void SetSystemEventHandler(EventHandler *e);
             EventHandler *GetCurrentEventHandler();
+            Configuration *GetConfiguration();
         private:
+            bool isLoaded;
+            Configuration *config;
             EventHandler *eventHandler;
             CommandProcessor *commandProcessor;
     };

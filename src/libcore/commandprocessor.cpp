@@ -29,6 +29,7 @@ CommandProcessor::~CommandProcessor()
 
 void CommandProcessor::RegisterCommand(SystemCommand *sc)
 {
+	GRUMPY_DEBUG("Registering system command: " + sc->GetName(), 2);
     QString name = sc->GetName().toLower();
     this->CommandList.insert(name, sc);
 }
@@ -40,7 +41,7 @@ int CommandProcessor::ProcessText(QString text)
     foreach (QString line, items)
     {
         int return_code = this->ProcessItem(line);
-        switch (return_code)
+        switch (-return_code)
         {
             case COMMANDPROCESSOR_ENOTEXIST:
                 GRUMPY_ERROR("Unknown command");
@@ -59,6 +60,7 @@ int CommandProcessor::ProcessItem(QString command)
     if (command.startsWith(this->CommandPrefix) && !(command.length() > 2 && command[1] == this->CommandPrefix))
     {
         // This is a system command
+		command = command.mid(1);
         CommandArgs parameters;
         QString command_name = command.toLower();
         // Get parameters

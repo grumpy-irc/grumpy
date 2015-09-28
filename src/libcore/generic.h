@@ -13,12 +13,16 @@
 #ifndef GENERIC_H
 #define GENERIC_H
 
+#include <QString>
+#include "libcore_global.h"
+#include <QList>
 
 namespace GrumpyIRC
 {
     namespace Generic
     {
-
+        LIBCORESHARED_EXPORT bool String2Bool(QString string);
+        LIBCORESHARED_EXPORT QString Bool2String(bool boolean);
     }
 }
 

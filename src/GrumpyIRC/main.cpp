@@ -12,6 +12,7 @@
 
 #include "mainwindow.h"
 #include "corewrapper.h"
+#include "grumpyeventhandler.h"
 #include "../libcore/core.h"
 #include <QApplication>
 
@@ -23,6 +24,8 @@ int main(int argc, char *argv[])
 
     // Initialize core first
     CoreWrapper::GrumpyCore = new Core();
+	CoreWrapper::GrumpyCore->InitCfg();
+	CoreWrapper::GrumpyCore->SetSystemEventHandler(new GrumpyEventHandler());
 
     MainWindow w;
     w.show();

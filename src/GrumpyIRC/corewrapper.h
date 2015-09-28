@@ -13,6 +13,8 @@
 #ifndef COREWRAPPER_H
 #define COREWRAPPER_H
 
+#define GCFG CoreWrapper::GrumpyCore->GetConfiguration()
+
 namespace GrumpyIRC
 {
     class Core;

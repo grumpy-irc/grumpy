@@ -20,6 +20,7 @@ using namespace GrumpyIRC;
 
 ScrollbacksManager::ScrollbacksManager(QWidget *parent) : QFrame(parent), ui(new Ui::ScrollbacksManager)
 {
+	this->currentWidget = NULL;
     this->ui->setupUi(this);
 }
 
@@ -39,8 +40,11 @@ ScrollbackFrame *ScrollbacksManager::CreateWindow(QString name, ScrollbackFrame 
     if (focus)
         this->SwitchWindow(window);
     ScrollbackList *scrollbacks = MainWindow::Main->GetScrollbackList();
+	QStandardItem *parent_tree = NULL;
+	if (parent)
+		parent_tree = parent->TreeNode;
     if (scrollbacks)
-        scrollbacks->RegisterWindow(window, parent);
+        scrollbacks->RegisterWindow(window, parent_tree);
     return window;
 }
 
@@ -75,9 +79,27 @@ void ScrollbacksManager::SwitchWindow(ScrollbackFrame *window)
     if (this->currentWidget == window)
         return;
 
-    if (this->currentWidget != NULL)
-        this->ui->verticalLayout_2->removeWidget(this->currentWidget);
+	if (this->currentWidget != NULL)
+	{
+		QLayoutItem *container = this->ui->verticalLayout_2->itemAt(0);
+		this->ui->verticalLayout_2->removeItem(this->ui->verticalLayout_2->itemAt(0));
+		//delete this->ui->verticalLayout_2;
+		//this->ui->verticalLayout_2 = new QVBoxLayout(this);
+		//this->ui->verticalLayout_2->setSpacing(0);
+		//this->ui->verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
+		//this->ui->verticalLayout_2->setContentsMargins(0, 0, 0, 0);
+		//this->ui->verticalLayout_2->addLayout(this->ui->verticalLayout);
+		//this->ui->verticalLayout_2->replaceWidget(this->currentWidget, window);
+		this->ui->verticalLayout_2->removeWidget(this->currentWidget);
+		this->currentWidget->hide();
+		this->ui->verticalLayout_2->addWidget(window);
+		window->show();
+		delete container;
+	}
+	else
+	{
+		this->ui->verticalLayout_2->addWidget(window);
+	}
 
     this->currentWidget = window;
-    this->ui->verticalLayout_2->addWidget(window);
 }

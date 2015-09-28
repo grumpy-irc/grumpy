@@ -26,6 +26,8 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent)
 
 ScrollbackFrame::~ScrollbackFrame()
 {
+	//! \todo Handle deletion of TreeNode from list of scbs
+	//delete this->TreeNode;
     delete this->ui;
 }
 
@@ -46,35 +48,8 @@ void ScrollbackFrame::SetWindowName(QString title)
     this->_name = title;
 }
 
-void ScrollbackFrame::InsertChild(ScrollbackFrame *child)
-{
-    this->childItems.append(child);
-}
-
-ScrollbackFrame *ScrollbackFrame::Child(int row)
-{
-    return this->childItems.at(row);
-}
-
-int ScrollbackFrame::ChildCount() const
-{
-    return this->childItems.count();
-}
-
-int ScrollbackFrame::ModelRow() const
-{
-    if (this->_parent)
-        return this->_parent->childItems.indexOf(const_cast<ScrollbackFrame*>(this));
-
-    return 0;
-}
-
 ScrollbackFrame *ScrollbackFrame::GetParent()
 {
     return this->_parent;
 }
 
-void ScrollbackFrame::SetParent(ScrollbackFrame *parentWindow)
-{
-    this->_parent = parentWindow;
-}
