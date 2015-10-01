@@ -35,12 +35,20 @@ QVariant Configuration::GetValue(QString key)
     return this->Options[key];
 }
 
-QString Configuration::GetValueAsBool(QString key, bool none)
+bool Configuration::GetValueAsBool(QString key, bool none)
 {
     if (!this->Options.contains(key))
         return none;
 
     return this->Options[key].toBool();
+}
+
+QString Configuration::GetValueAsString(QString key, QString default_value)
+{
+    if (!this->Options.contains(key))
+        return default_value;
+
+    return this->Options[key].toString();
 }
 
 void Configuration::SetValue(QString key, QVariant value)

@@ -20,13 +20,19 @@
 #include "../libirc/libircclient/channel.h"
 #include "../libirc/libircclient/network.h"
 
+namespace libirc
+{
+    class ServerAddress;
+}
+
 namespace GrumpyIRC
 {
     class Scrollback;
-    class LIBCORESHARED_EXPORT IRCSession
+    class LIBCORESHARED_EXPORT IRCSession : public QObject
     {
+            Q_OBJECT
         public:
-            static IRCSession *Open(Scrollback *system_window, QString hostname, QString network = "", QString nick = "", QString password = "", bool ssl = false);
+            static IRCSession *Open(Scrollback *system_window, libirc::ServerAddress &server, QString network = "");
             static QMutex Sessions_Lock;
 			static QList<IRCSession*> Sessions;
 			
@@ -40,6 +46,9 @@ namespace GrumpyIRC
             virtual libircclient::Network *GetNetwork();
             virtual void Connect(libircclient::Network *Network);
             bool IsConnected();
+        private slots:
+            void OnIncomingRawMessage(QByteArray message);
+            void OnConnectionFail(QAbstractSocket::SocketError er);
         private:
             libircclient::Network *network;
             Scrollback *systemWindow;

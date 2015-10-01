@@ -20,6 +20,11 @@ namespace Ui
     class MainWindow;
 }
 
+namespace libirc
+{
+    class ServerAddress;
+}
+
 namespace GrumpyIRC
 {
     class InputBox;
@@ -40,7 +45,7 @@ namespace GrumpyIRC
             //! Return a pointer to widget that contains list of all windows
             ScrollbackList *GetScrollbackList();
             void WriteToSystemWindow(QString text);
-            void OpenServer(QString hostname, QString network = "", QString nick = "", QString password = "", bool ssl = false);
+            void OpenServer(libirc::ServerAddress &server);
 
         private slots:
             void on_actionExit_triggered();

@@ -10,24 +10,29 @@
 
 // Copyright (c) Petr Bena 2015
 
-#include "exception.h"
+#ifndef PREFERENCESWIN_H
+#define PREFERENCESWIN_H
 
-GrumpyIRC::Exception::Exception()
+#include <QDialog>
+
+namespace Ui
 {
-
+    class PreferencesWin;
 }
 
-GrumpyIRC::Exception::Exception(QString Message, QString function_id)
+namespace GrumpyIRC
 {
-    this->message = Message;
+    class PreferencesWin : public QDialog
+    {
+            Q_OBJECT
+
+        public:
+            explicit PreferencesWin(QWidget *parent = 0);
+            ~PreferencesWin();
+
+        private:
+            Ui::PreferencesWin *ui;
+    };
 }
 
-QString GrumpyIRC::Exception::GetMessage()
-{
-    return this->message;
-}
-
-GrumpyIRC::NullPointerException::NullPointerException(QString pointer, QString signature)
-{
-
-}
+#endif // PREFERENCESWIN_H

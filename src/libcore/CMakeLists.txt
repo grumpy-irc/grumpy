@@ -1,4 +1,5 @@
 PROJECT (core)
+SET(CMAKE_AUTOMOC ON)
 
 if(QT5_BUILD)
   find_package(Qt5Core REQUIRED)

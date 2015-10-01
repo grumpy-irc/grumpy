@@ -29,7 +29,8 @@ namespace GrumpyIRC
 
             Configuration();
             QVariant GetValue(QString key);
-            QString GetValueAsBool(QString key, bool none = false);
+            bool GetValueAsBool(QString key, bool none = false);
+            QString GetValueAsString(QString key, QString default_value = "");
             void SetValue(QString key, QVariant value);
             void SetValue(QString key, bool value);
             void SetValue(QString key, int value);

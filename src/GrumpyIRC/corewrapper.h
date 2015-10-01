@@ -13,7 +13,13 @@
 #ifndef COREWRAPPER_H
 #define COREWRAPPER_H
 
+#ifdef GCFG
+#undef GCFG
+#endif
 #define GCFG CoreWrapper::GrumpyCore->GetConfiguration()
+// This macro expands to nickname as a QString taken from ini file
+#define CONFIG_NICK GCFG->GetValueAsString("nick", "GrumpyUser")
+#define SET_CONFIG_NICK(nick) GCFG->SetValue("nick", QVariant(nick))
 
 namespace GrumpyIRC
 {

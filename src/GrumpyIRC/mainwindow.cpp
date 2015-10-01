@@ -17,6 +17,7 @@
 #include "scrollbackframe.h"
 #include "syslogwindow.h"
 #include "scrollbacksmanager.h"
+#include "../libirc/libirc/serveraddress.h"
 #include "../libcore/eventhandler.h"
 #include "../libcore/ircsession.h"
 #include "../libcore/core.h"
@@ -53,7 +54,7 @@ static int SystemCommand_Server(SystemCommand *command, CommandArgs command_args
 		return 0;
 	}
 	// get the server host
-    MainWindow::Main->OpenServer(command_args.Parameters[0]);
+    MainWindow::Main->OpenServer(libirc::ServerAddress(command_args.Parameters[0]));
 	return 0;
 }
 
@@ -100,15 +101,14 @@ void MainWindow::WriteToSystemWindow(QString text)
     this->systemWindow->InsertText(text);
 }
 
-void MainWindow::OpenServer(QString hostname, QString network, QString nick, QString password, bool ssl)
+void MainWindow::OpenServer(libirc::ServerAddress &server)
 {
-    QString network_name = network;
-    if (network.isEmpty())
-        network_name = hostname;
+    if (server.GetNick().isEmpty)
+        server.SetNick(CONFIG_NICK);
+    QString network_name = server.GetHost();
     // We need to create a new scrollback for system window
     ScrollbackFrame *system = this->GetScrollbackManager()->CreateWindow(network_name, NULL, true);
-
-    IRCSession::Open(system, hostname, network, nick, password, ssl);
+    IRCSession::Open(system, server, network_name);
 }
 
 void MainWindow::on_actionExit_triggered()

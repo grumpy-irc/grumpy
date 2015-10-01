@@ -11,6 +11,7 @@
 // Copyright (c) Petr Bena 2015
 
 #include "ircsession.h"
+#include "../libirc/libirc/serveraddress.h"
 #include "scrollback.h"
 #include "exception.h"
 
@@ -19,13 +20,15 @@ using namespace GrumpyIRC;
 QMutex IRCSession::Sessions_Lock;
 QList<IRCSession*> IRCSession::Sessions;
 
-IRCSession *IRCSession::Open(Scrollback *system_window, QString hostname, QString network, QString nick, QString password, bool ssl)
+IRCSession *IRCSession::Open(Scrollback *system_window, libirc::ServerAddress &server, QString network)
 {
+    if (!server.IsValid())
+        throw new GrumpyIRC::Exception("Server object is not valid", BOOST_CURRENT_FUNCTION);
     IRCSession *sx = new IRCSession(system_window);
     QString network_name = network;
     if (network.isEmpty())
-        network_name = hostname;
-    sx->Connect(new libircclient::Network(network_name, hostname, nick, ssl, password));
+        network_name = server.GetHost();
+    sx->Connect(new libircclient::Network(server, network_name));
     return sx;
 }
 
@@ -43,6 +46,7 @@ IRCSession::~IRCSession()
     IRCSession::Sessions_Lock.lock();
     IRCSession::Sessions.removeOne(this);
     IRCSession::Sessions_Lock.unlock();
+    delete this->network;
 }
 
 Scrollback *IRCSession::GetSystemWindow()
@@ -58,14 +62,16 @@ libircclient::Network *IRCSession::GetNetwork()
 void IRCSession::Connect(libircclient::Network *Network)
 {
     if (this->IsConnected())
-		throw new Exception();
+		throw new Exception("You can't connect to ircsession that is active, disconnect first", BOOST_CURRENT_FUNCTION);
 
 	this->systemWindow->InsertText("Connecting to " + Network->GetHost());
+
 	if (this->network)
-	{
-		throw new GrumpyIRC::Exception("You can't connect to ircsession that is active, disconnect first");
-	}
+        delete this->network;
+
 	this->network = Network;
+    connect(this->network, SIGNAL(Event_ConnectionFailure(QAbstractSocket::SocketError)), this, SLOT(OnConnectionFail(QAbstractSocket::SocketError)));
+    connect(this->network, SIGNAL(Event_RawIncoming(QByteArray)), this, SLOT(OnIncomingRawMessage(QByteArray)));
     this->network->Connect();
 }
 
@@ -75,5 +81,15 @@ bool IRCSession::IsConnected()
         return true;
 
     return false;
+}
+
+void IRCSession::OnIncomingRawMessage(QByteArray message)
+{
+    this->systemWindow->InsertText(QString(message));
+}
+
+void IRCSession::OnConnectionFail(QAbstractSocket::SocketError er)
+{
+    this->systemWindow->InsertText("Connection failed");
 }
 

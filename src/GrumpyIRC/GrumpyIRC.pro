@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     inputbox.cpp \
     scrollbacksmanager.cpp \
     grumpyeventhandler.cpp \
-    scrollbacklist_node.cpp
+    scrollbacklist_node.cpp \
+    preferenceswin.cpp
 
 HEADERS  += mainwindow.h \
     scrollbackframe.h \
@@ -31,14 +32,16 @@ HEADERS  += mainwindow.h \
     inputbox.h \
     scrollbacksmanager.h \
     grumpyeventhandler.h \
-    scrollbacklist_node.h
+    scrollbacklist_node.h \
+    preferenceswin.h
 
 FORMS    += mainwindow.ui \
     scrollbackframe.ui \
     syslogwindow.ui \
     scrollbacklist.ui \
     inputbox.ui \
-    scrollbacksmanager.ui
+    scrollbacksmanager.ui \
+    preferenceswin.ui
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../libirc/libirc/build-libirc-Desktop_Qt_5_4_2_MinGW_32bit-Debug/release/ -llibirc
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../libirc/libirc/build-libirc-Desktop_Qt_5_4_2_MinGW_32bit-Debug/debug/ -llibirc
