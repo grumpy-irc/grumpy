@@ -32,9 +32,9 @@ ScrollbacksManager::~ScrollbacksManager()
     delete this->ui;
 }
 
-ScrollbackFrame *ScrollbacksManager::CreateWindow(QString name, ScrollbackFrame *parent, bool focus, bool is_deletable)
+ScrollbackFrame *ScrollbacksManager::CreateWindow(QString name, ScrollbackFrame *parent, bool focus, bool is_deletable, Scrollback *scrollback)
 {
-    ScrollbackFrame *window = new ScrollbackFrame(parent);
+    ScrollbackFrame *window = new ScrollbackFrame(parent, NULL, scrollback);
     window->SetWindowName(name);
     this->Scrollbacks.append(window);
     window->IsDeletable = is_deletable;
@@ -57,6 +57,18 @@ ScrollbackFrame *ScrollbacksManager::GetWindowFromID(unsigned long long id)
             return sb;
     }
 
+    return NULL;
+}
+
+ScrollbackFrame *ScrollbacksManager::GetWindowFromScrollback(Scrollback *scrollback)
+{
+    if (scrollback == NULL)
+        return NULL;
+    foreach (ScrollbackFrame *xx, this->Scrollbacks)
+    {
+        if (xx->GetScrollback() == scrollback)
+            return xx;
+    }
     return NULL;
 }
 
@@ -96,6 +108,7 @@ void ScrollbacksManager::SwitchWindow(ScrollbackFrame *window)
 	}
 
     this->currentWidget = window;
+    this->currentWidget->Focus();
 }
 
 ScrollbackFrame *ScrollbacksManager::GetCurrentScrollback() const

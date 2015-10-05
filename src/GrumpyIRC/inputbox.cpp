@@ -39,3 +39,8 @@ void InputBox::ProcessInput()
     CoreWrapper::GrumpyCore->GetCommandProcessor()->ProcessText(this->ui->textEdit->toPlainText(), this->parent->GetScrollback());
     this->ui->textEdit->setText("");
 }
+
+void InputBox::Focus()
+{
+    this->ui->textEdit->setFocus();
+}

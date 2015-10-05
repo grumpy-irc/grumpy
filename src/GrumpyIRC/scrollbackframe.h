@@ -34,7 +34,7 @@ namespace GrumpyIRC
             Q_OBJECT
 
         public:
-            explicit ScrollbackFrame(ScrollbackFrame *parentWindow = NULL, QWidget *parent = NULL);
+            explicit ScrollbackFrame(ScrollbackFrame *parentWindow = NULL, QWidget *parent = NULL, Scrollback *_scrollback = NULL);
             ~ScrollbackFrame();
             QString GetWindowName() const;
             void InsertText(ScrollbackItem item);
@@ -43,6 +43,7 @@ namespace GrumpyIRC
             unsigned long GetID();
             IRCSession *GetSession();
             Scrollback *GetScrollback();
+            void Focus();
             //void SetParent(ScrollbackFrame* parentWindow);
             bool IsDeletable;
 			QStandardItem *TreeNode;

@@ -17,14 +17,17 @@
 
 using namespace GrumpyIRC;
 
-ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent) : QFrame(parent), ui(new Ui::ScrollbackFrame)
+ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent, Scrollback *_scrollback) : QFrame(parent), ui(new Ui::ScrollbackFrame)
 {
     this->ui->setupUi(this);
     this->inputBox = new InputBox(this);
     this->ui->splitter->addWidget(this->inputBox);
     this->ui->textEdit->setPalette(Skin::Default->Palette());
     this->_parent = parentWindow;
-    this->scrollback = new Scrollback();
+    if (_scrollback == NULL)
+        this->scrollback = new Scrollback();
+    else
+        this->scrollback = _scrollback;
     connect(this->scrollback, SIGNAL(Event_InsertText(ScrollbackItem)), this, SLOT(_insertText_(ScrollbackItem)));
 }
 
@@ -75,5 +78,10 @@ IRCSession *ScrollbackFrame::GetSession()
 Scrollback *ScrollbackFrame::GetScrollback()
 {
     return this->scrollback;
+}
+
+void ScrollbackFrame::Focus()
+{
+    this->inputBox->Focus();
 }
 

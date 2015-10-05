@@ -20,13 +20,14 @@ QList<Scrollback*> Scrollback::ScrollbackList;
 QMutex Scrollback::ScrollbackList_Mutex;
 unsigned long long Scrollback::lastID = 1;
 
-Scrollback::Scrollback()
+Scrollback::Scrollback(ScrollbackType Type)
 {
     this->_maxItems = 800000;
     ScrollbackList_Mutex.lock();
     ScrollbackList.append(this);
     ScrollbackList_Mutex.unlock();
     this->session = NULL;
+    this->type = Type;
     this->_id = lastID++;
 }
 
@@ -45,6 +46,11 @@ unsigned long long Scrollback::GetMaxItemsSize()
 unsigned long long Scrollback::GetID()
 {
     return this->_id;
+}
+
+ScrollbackType Scrollback::GetType() const
+{
+    return this->type;
 }
 
 void Scrollback::SetMaxItemsSize(unsigned long long size)

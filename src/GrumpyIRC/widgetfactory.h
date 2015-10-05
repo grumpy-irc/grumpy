@@ -10,33 +10,19 @@
 
 // Copyright (c) Petr Bena 2015
 
-#ifndef INPUTBOX_H
-#define INPUTBOX_H
+#ifndef WIDGETFACTORY_H
+#define WIDGETFACTORY_H
 
-#include <QFrame>
-
-namespace Ui
-{
-    class InputBox;
-}
+#include "../libcore/factory.h"
 
 namespace GrumpyIRC
 {
-    class ScrollbackFrame;
-    class InputBox : public QFrame
+    class WidgetFactory : public Factory
     {
-            Q_OBJECT
-
         public:
-            explicit InputBox(ScrollbackFrame *parent = 0);
-            ~InputBox();
-            void ProcessInput();
-            void Focus();
-
-        private:
-            ScrollbackFrame *parent;
-            Ui::InputBox *ui;
+            WidgetFactory();
+            Scrollback *NewScrollback(Scrollback *parent, QString name);
     };
 }
 
-#endif // INPUTBOX_H
+#endif // WIDGETFACTORY_H

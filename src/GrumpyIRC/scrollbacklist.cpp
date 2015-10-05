@@ -48,6 +48,7 @@ void ScrollbackList::RegisterWindow(ScrollbackFrame *scrollback, QStandardItem *
 	QStandardItem *node = new ScrollbackList_Node(scrollback);
 	scrollback->TreeNode = node;
     root->appendRow(node);
+    this->ui->treeView->expand(root->index());
 }
 
 QStandardItem *ScrollbackList::GetRootTreeItem()

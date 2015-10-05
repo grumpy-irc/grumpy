@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     scrollbacklist_node.cpp \
     preferenceswin.cpp \
     skin.cpp \
-    keyfilter.cpp
+    keyfilter.cpp \
+    widgetfactory.cpp
 
 HEADERS  += mainwindow.h \
     scrollbackframe.h \
@@ -37,7 +38,8 @@ HEADERS  += mainwindow.h \
     scrollbacklist_node.h \
     preferenceswin.h \
     skin.h \
-    keyfilter.h
+    keyfilter.h \
+    widgetfactory.h
 
 FORMS    += mainwindow.ui \
     scrollbackframe.ui \

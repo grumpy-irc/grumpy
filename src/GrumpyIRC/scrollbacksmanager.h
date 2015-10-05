@@ -23,6 +23,7 @@ namespace Ui
 
 namespace GrumpyIRC
 {
+    class Scrollback;
     class ScrollbackFrame;
 
     /*!
@@ -41,8 +42,9 @@ namespace GrumpyIRC
              * \param focus
              * \return
              */
-            ScrollbackFrame *CreateWindow(QString name, ScrollbackFrame *parent = NULL, bool focus = false, bool is_deletable = true);
+            ScrollbackFrame *CreateWindow(QString name, ScrollbackFrame *parent = NULL, bool focus = false, bool is_deletable = true, Scrollback *scrollback = NULL);
             ScrollbackFrame *GetWindowFromID(unsigned long long id);
+            ScrollbackFrame *GetWindowFromScrollback(Scrollback *scrollback);
             void DestroyWindow(ScrollbackFrame *window);
             void SwitchWindow(unsigned long long id);
             void SwitchWindow(ScrollbackFrame *window);

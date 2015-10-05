@@ -22,6 +22,13 @@
 
 namespace GrumpyIRC
 {
+    enum ScrollbackType
+    {
+        ScrollbackType_Channel,
+        ScrollbackType_User,
+        ScrollbackType_System
+    };
+
     enum ScrollbackItemType
     {
         ScrollbackItemType_Unknown,
@@ -65,7 +72,7 @@ namespace GrumpyIRC
             static QList<Scrollback*> ScrollbackList;
             static QMutex ScrollbackList_Mutex;
 
-            Scrollback();
+            Scrollback(ScrollbackType Type = ScrollbackType_System);
             virtual ~Scrollback();
             unsigned long long GetMaxItemsSize();
             unsigned long long GetID();
@@ -73,6 +80,7 @@ namespace GrumpyIRC
             virtual void InsertText(QString text, ScrollbackItemType type = ScrollbackItemType_System);
             virtual void InsertText(ScrollbackItem item);
             IRCSession *GetSession();
+            ScrollbackType GetType() const;
             void SetSession(IRCSession *Session);
 
         signals:
@@ -80,6 +88,7 @@ namespace GrumpyIRC
 
         private:
             IRCSession *session;
+            ScrollbackType type;
             static unsigned long long lastID;
             QList<ScrollbackItem> items;
             unsigned long long _id;
