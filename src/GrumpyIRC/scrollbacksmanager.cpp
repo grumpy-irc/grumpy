@@ -14,6 +14,7 @@
 #include "scrollbackframe.h"
 #include "scrollbacklist.h"
 #include "mainwindow.h"
+#include "../libcore/exception.h"
 #include "ui_scrollbacksmanager.h"
 
 using namespace GrumpyIRC;
@@ -83,13 +84,6 @@ void ScrollbacksManager::SwitchWindow(ScrollbackFrame *window)
 	{
 		QLayoutItem *container = this->ui->verticalLayout_2->itemAt(0);
 		this->ui->verticalLayout_2->removeItem(this->ui->verticalLayout_2->itemAt(0));
-		//delete this->ui->verticalLayout_2;
-		//this->ui->verticalLayout_2 = new QVBoxLayout(this);
-		//this->ui->verticalLayout_2->setSpacing(0);
-		//this->ui->verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
-		//this->ui->verticalLayout_2->setContentsMargins(0, 0, 0, 0);
-		//this->ui->verticalLayout_2->addLayout(this->ui->verticalLayout);
-		//this->ui->verticalLayout_2->replaceWidget(this->currentWidget, window);
 		this->ui->verticalLayout_2->removeWidget(this->currentWidget);
 		this->currentWidget->hide();
 		this->ui->verticalLayout_2->addWidget(window);
@@ -102,4 +96,13 @@ void ScrollbacksManager::SwitchWindow(ScrollbackFrame *window)
 	}
 
     this->currentWidget = window;
+}
+
+ScrollbackFrame *ScrollbacksManager::GetCurrentScrollback() const
+{
+    if (this->currentWidget == NULL)
+        throw new GrumpyIRC::NullPointerException("this->currentWidget", BOOST_CURRENT_FUNCTION);
+
+    // Return a currently selected window
+    return this->currentWidget;
 }

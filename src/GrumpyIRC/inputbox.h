@@ -22,18 +22,18 @@ namespace Ui
 
 namespace GrumpyIRC
 {
+    class ScrollbackFrame;
     class InputBox : public QFrame
     {
             Q_OBJECT
 
         public:
-            explicit InputBox(QWidget *parent = 0);
+            explicit InputBox(ScrollbackFrame *parent = 0);
             ~InputBox();
-
-        private slots:
-            void on_lineEdit_returnPressed();
+            void ProcessInput();
 
         private:
+            ScrollbackFrame *parent;
             Ui::InputBox *ui;
     };
 }

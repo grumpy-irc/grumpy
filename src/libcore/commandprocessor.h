@@ -23,6 +23,7 @@
 
 namespace GrumpyIRC
 {
+    class Scrollback;
     class SystemCommand;
 
     class LIBCORESHARED_EXPORT CommandArgs
@@ -54,10 +55,10 @@ namespace GrumpyIRC
             ~CommandProcessor();
             void RegisterCommand(SystemCommand *sc);
             //! Simple idiot proof processor for text that is input by a user
-            int ProcessText(QString text);
+            int ProcessText(QString text, Scrollback *window);
             char CommandPrefix;
         private:
-            int ProcessItem(QString command);
+            int ProcessItem(QString command, Scrollback *window);
             QHash<QString, SystemCommand*> CommandList;
 
     };

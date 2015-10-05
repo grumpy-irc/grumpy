@@ -17,8 +17,11 @@
 #include "scrollbackframe.h"
 #include "syslogwindow.h"
 #include "scrollbacksmanager.h"
+#include "skin.h"
+#include "../libirc/libircclient/network.h"
 #include "../libirc/libirc/serveraddress.h"
 #include "../libcore/eventhandler.h"
+#include "../libcore/exception.h"
 #include "../libcore/ircsession.h"
 #include "../libcore/core.h"
 #include "../libcore/configuration.h"
@@ -43,6 +46,31 @@ static int SystemCommand_Exit(SystemCommand *command, CommandArgs args)
     QString quit_msg = args.ParameterLine;
     Exit();
     return 0;
+}
+
+static int SystemCommand_Nick(SystemCommand *command, CommandArgs args)
+{
+    Q_UNUSED(command);
+    // get a current scrollback
+    ScrollbackFrame *scrollback = MainWindow::Main->GetScrollbackManager()->GetCurrentScrollback();
+    if (!scrollback)
+        throw new GrumpyIRC::NullPointerException("scrollback", BOOST_CURRENT_FUNCTION);
+    if (args.Parameters.count() != 1)
+    {
+        GRUMPY_ERROR(QObject::tr("This command requires precisely 1 parameter"));
+        return 1;
+    }
+    if (scrollback->GetSession())
+    {
+        scrollback->GetSession()->GetNetwork()->TransferRaw("NICK " + args.Parameters[0]);
+        return 0;
+    }
+    else
+    {
+        SET_CONFIG_NICK(args.Parameters[0]);
+        scrollback->InsertText(QString("Your default nick was changed to " + args.Parameters[0]));
+        return 0;
+    }
 }
 
 static int SystemCommand_Server(SystemCommand *command, CommandArgs command_args)
@@ -74,6 +102,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // Register built-in commands
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("quit", (SC_Callback)SystemCommand_Exit));
 	CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("server", (SC_Callback)SystemCommand_Server));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("nick", (SC_Callback)SystemCommand_Nick));
     // Welcome user
     this->systemWindow->InsertText(QString("Grumpy irc version " + GCFG->GetVersion()));
     // Try to restore geometry
@@ -103,15 +132,20 @@ void MainWindow::WriteToSystemWindow(QString text)
 
 void MainWindow::OpenServer(libirc::ServerAddress &server)
 {
-    if (server.GetNick().isEmpty)
+    if (server.GetNick().isEmpty())
         server.SetNick(CONFIG_NICK);
     QString network_name = server.GetHost();
     // We need to create a new scrollback for system window
     ScrollbackFrame *system = this->GetScrollbackManager()->CreateWindow(network_name, NULL, true);
-    IRCSession::Open(system, server, network_name);
+    IRCSession::Open(system->GetScrollback(), server, network_name);
 }
 
 void MainWindow::on_actionExit_triggered()
+{
+    Exit();
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
 {
     Exit();
 }

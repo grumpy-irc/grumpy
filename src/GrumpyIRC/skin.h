@@ -10,17 +10,23 @@
 
 // Copyright (c) Petr Bena 2015
 
-#include "factory.h"
-#include "scrollback.h"
+#ifndef SKIN_H
+#define SKIN_H
 
-using namespace GrumpyIRC;
+#include <QPalette>
 
-Factory::Factory()
+namespace GrumpyIRC
 {
+    class Skin
+    {
+        public:
+            static Skin *Default;
 
+            Skin();
+            QPalette Palette();
+            QColor TextColor;
+            QColor BackgroundColor;
+    };
 }
 
-Scrollback *Factory::NewScrollback(Scrollback *parent, QString name)
-{
-    return new Scrollback();
-}
+#endif // SKIN_H

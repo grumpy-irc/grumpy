@@ -10,8 +10,12 @@
 
 // Copyright (c) Petr Bena 2015
 
+#include "core.h"
 #include "ircsession.h"
 #include "../libirc/libirc/serveraddress.h"
+#include "../libirc/libircclient/network.h"
+#include "../libirc/libircclient/user.h"
+#include "../libirc/libircclient/channel.h"
 #include "scrollback.h"
 #include "exception.h"
 
@@ -35,6 +39,7 @@ IRCSession *IRCSession::Open(Scrollback *system_window, libirc::ServerAddress &s
 IRCSession::IRCSession(Scrollback *system)
 {
     this->systemWindow = system;
+    this->systemWindow->SetSession(this);
 	this->network = NULL;
     IRCSession::Sessions_Lock.lock();
     IRCSession::Sessions.append(this);
@@ -81,6 +86,18 @@ bool IRCSession::IsConnected()
         return true;
 
     return false;
+}
+
+void IRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
+{
+    if (channel->GetName().isEmpty())
+        throw new GrumpyIRC::Exception("Invalid channel name", BOOST_CURRENT_FUNCTION);
+    if (this->channels.contains(channel->GetName()))
+        throw new GrumpyIRC::Exception("This window name already exists", BOOST_CURRENT_FUNCTION);
+    // we just joined a new channel, let's add a scrollback for it
+    Scrollback *window = Core::GrumpyCore->NewScrollback(this->systemWindow, channel->GetName());
+    this->channels.insert(channel->GetName(), window);
+    
 }
 
 void IRCSession::OnIncomingRawMessage(QByteArray message)

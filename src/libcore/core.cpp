@@ -13,6 +13,7 @@
 #include "configuration.h"
 #include "core.h"
 #include "commandprocessor.h"
+#include "factory.h"
 #include "eventhandler.h"
 
 GrumpyIRC::Core *GrumpyIRC::Core::GrumpyCore = NULL;
@@ -23,12 +24,25 @@ GrumpyIRC::Core::Core()
     this->config = NULL;
     this->eventHandler = NULL;
     GrumpyCore = this;
+    this->factory = new Factory();
 }
 
 GrumpyIRC::Core::~Core()
 {
+    delete this->factory;
     delete this->commandProcessor;
     delete this->eventHandler;
+}
+
+GrumpyIRC::Scrollback *GrumpyIRC::Core::NewScrollback(GrumpyIRC::Scrollback *parent, QString name)
+{
+    return this->factory->NewScrollback(parent, name);
+}
+
+void GrumpyIRC::Core::InstallFactory(Factory *f)
+{
+    delete this->factory;
+    this->factory = f;
 }
 
 void GrumpyIRC::Core::InitCfg()

@@ -31,6 +31,7 @@ namespace GrumpyIRC
     class ScrollbackFrame;
     class ScrollbackList;
     class ScrollbacksManager;
+    class Skin;
     class SyslogWindow;
 
     class MainWindow : public QMainWindow
@@ -51,6 +52,7 @@ namespace GrumpyIRC
             void on_actionExit_triggered();
 
         private:
+            void closeEvent(QCloseEvent *event);
             ScrollbackFrame *systemWindow;
             ScrollbackList *windowList;
             SyslogWindow *syslogWindow;

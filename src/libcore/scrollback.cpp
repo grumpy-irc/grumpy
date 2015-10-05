@@ -11,6 +11,8 @@
 // Copyright (c) Petr Bena 2015
 
 #include "scrollback.h"
+#include "exception.h"
+#include "ircsession.h"
 
 using namespace GrumpyIRC;
 
@@ -24,6 +26,7 @@ Scrollback::Scrollback()
     ScrollbackList_Mutex.lock();
     ScrollbackList.append(this);
     ScrollbackList_Mutex.unlock();
+    this->session = NULL;
     this->_id = lastID++;
 }
 
@@ -49,9 +52,24 @@ void Scrollback::SetMaxItemsSize(unsigned long long size)
     this->_maxItems = size;
 }
 
+void Scrollback::SetSession(IRCSession *Session)
+{
+    if (this->session)
+        throw new GrumpyIRC::Exception("This scrollback already has an IrcSession", BOOST_CURRENT_FUNCTION);
+
+    // We can store the pointer now
+    this->session = Session;
+}
+
+IRCSession *Scrollback::GetSession()
+{
+    return this->session;
+}
+
 void Scrollback::InsertText(ScrollbackItem item)
 {
     this->items.append(item);
+    emit Event_InsertText(item);
 }
 
 void Scrollback::InsertText(QString text, ScrollbackItemType type)

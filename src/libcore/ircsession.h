@@ -14,20 +14,28 @@
 #define IRCSESSION_H
 
 #include <QMutex>
+#include <QObject>
 #include <QString>
+#include <QAbstractSocket>
 #include "libcore_global.h"
-#include "../libirc/libircclient/user.h"
-#include "../libirc/libircclient/channel.h"
-#include "../libirc/libircclient/network.h"
 
 namespace libirc
 {
     class ServerAddress;
 }
 
+namespace libircclient
+{
+    class Channel;
+    class Network;
+    class User;
+    class Mode;
+}
+
 namespace GrumpyIRC
 {
     class Scrollback;
+
     class LIBCORESHARED_EXPORT IRCSession : public QObject
     {
             Q_OBJECT
@@ -49,7 +57,9 @@ namespace GrumpyIRC
         private slots:
             void OnIncomingRawMessage(QByteArray message);
             void OnConnectionFail(QAbstractSocket::SocketError er);
+            void OnIRCSelfJoin(libircclient::Channel *channel);
         private:
+            QHash<QString, Scrollback*> channels;
             libircclient::Network *network;
             Scrollback *systemWindow;
     };

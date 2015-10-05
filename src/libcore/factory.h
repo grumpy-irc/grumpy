@@ -17,11 +17,14 @@
 
 namespace GrumpyIRC
 {
+    class Scrollback;
+
     class LIBCORESHARED_EXPORT Factory
     {
         public:
             Factory();
             virtual ~Factory() {}
+            virtual Scrollback *NewScrollback(Scrollback *parent, QString name);
     };
 }
 

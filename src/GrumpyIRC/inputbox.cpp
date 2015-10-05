@@ -14,13 +14,19 @@
 #include "corewrapper.h"
 #include "../libcore/core.h"
 #include "inputbox.h"
+#include "skin.h"
+#include "keyfilter.h"
 #include "ui_inputbox.h"
+#include "scrollbackframe.h"
 
 using namespace GrumpyIRC;
 
-InputBox::InputBox(QWidget *parent) : QFrame(parent), ui(new Ui::InputBox)
+InputBox::InputBox(ScrollbackFrame *parent) : QFrame(parent), ui(new Ui::InputBox)
 {
     this->ui->setupUi(this);
+    this->ui->textEdit->setPalette(Skin::Default->Palette());
+    this->ui->textEdit->installEventFilter(new KeyFilter(this));
+    this->parent = parent;
 }
 
 InputBox::~InputBox()
@@ -28,8 +34,8 @@ InputBox::~InputBox()
     delete this->ui;
 }
 
-void GrumpyIRC::InputBox::on_lineEdit_returnPressed()
+void InputBox::ProcessInput()
 {
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->ProcessText(this->ui->lineEdit->text());
-    this->ui->lineEdit->setText("");
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->ProcessText(this->ui->textEdit->toPlainText(), this->parent->GetScrollback());
+    this->ui->textEdit->setText("");
 }

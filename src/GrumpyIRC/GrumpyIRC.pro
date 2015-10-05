@@ -22,7 +22,9 @@ SOURCES += main.cpp\
     scrollbacksmanager.cpp \
     grumpyeventhandler.cpp \
     scrollbacklist_node.cpp \
-    preferenceswin.cpp
+    preferenceswin.cpp \
+    skin.cpp \
+    keyfilter.cpp
 
 HEADERS  += mainwindow.h \
     scrollbackframe.h \
@@ -33,7 +35,9 @@ HEADERS  += mainwindow.h \
     scrollbacksmanager.h \
     grumpyeventhandler.h \
     scrollbacklist_node.h \
-    preferenceswin.h
+    preferenceswin.h \
+    skin.h \
+    keyfilter.h
 
 FORMS    += mainwindow.ui \
     scrollbackframe.ui \

@@ -12,6 +12,9 @@
 
 #include "commandprocessor.h"
 #include "core.h"
+#include "scrollback.h"
+#include "ircsession.h"
+#include "../libirc/libircclient/network.h"
 #include "eventhandler.h"
 
 using namespace GrumpyIRC;
@@ -34,13 +37,13 @@ void CommandProcessor::RegisterCommand(SystemCommand *sc)
     this->CommandList.insert(name, sc);
 }
 
-int CommandProcessor::ProcessText(QString text)
+int CommandProcessor::ProcessText(QString text, Scrollback *window)
 {
     text.replace("\r", "");
     QStringList items = text.split("\n");
     foreach (QString line, items)
     {
-        int return_code = this->ProcessItem(line);
+        int return_code = this->ProcessItem(line, window);
         switch (-return_code)
         {
             case COMMANDPROCESSOR_ENOTEXIST:
@@ -51,7 +54,7 @@ int CommandProcessor::ProcessText(QString text)
     return 0;
 }
 
-int CommandProcessor::ProcessItem(QString command)
+int CommandProcessor::ProcessItem(QString command, Scrollback *window)
 {
     command = command.trimmed();
     if (command.isEmpty())
@@ -73,6 +76,16 @@ int CommandProcessor::ProcessItem(QString command)
         }
         if (!this->CommandList.contains(command_name))
         {
+            if (window && window->GetSession())
+            {
+                // We are connected to some IRC network, we will transfer this as IRC command
+                command_name = command_name.toUpper();
+                if (parameters.ParameterLine.isEmpty())
+                    window->GetSession()->GetNetwork()->TransferRaw(command_name);
+                else
+                    window->GetSession()->GetNetwork()->TransferRaw(command_name + " " + parameters.ParameterLine);
+                return 0;
+            }
             return -COMMANDPROCESSOR_ENOTEXIST;
         }
         return this->CommandList[command_name]->Run(parameters);

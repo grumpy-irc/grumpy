@@ -13,6 +13,7 @@
 #include <QDebug>
 #include "mainwindow.h"
 #include "scrollbacklist.h"
+#include "skin.h"
 #include "ui_scrollbacklist.h"
 #include "scrollbackframe.h"
 #include "scrollbacksmanager.h"
@@ -29,6 +30,7 @@ ScrollbackList::ScrollbackList(QWidget *parent) : QDockWidget(parent), ui(new Ui
     this->ui->treeView->setColumnHidden(1, true);
 	this->ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     this->ui->treeView->setHeaderHidden(true);
+    this->ui->treeView->setPalette(Skin::Default->Palette());
 }
 
 ScrollbackList::~ScrollbackList()
@@ -61,4 +63,9 @@ void GrumpyIRC::ScrollbackList::on_treeView_activated(const QModelIndex &index)
 	if (!node)
 		return;
     MainWindow::Main->GetScrollbackManager()->SwitchWindow(node->GetScrollback());
+}
+
+void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPoint &pos)
+{
+
 }

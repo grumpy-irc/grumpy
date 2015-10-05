@@ -10,17 +10,22 @@
 
 // Copyright (c) Petr Bena 2015
 
-#include "factory.h"
-#include "scrollback.h"
+#include "skin.h"
 
 using namespace GrumpyIRC;
 
-Factory::Factory()
-{
+Skin *Skin::Default = new Skin();
 
+Skin::Skin()
+{
+    this->BackgroundColor = QColor(0, 0, 0);
+    this->TextColor = QColor(255, 255, 255);
 }
 
-Scrollback *Factory::NewScrollback(Scrollback *parent, QString name)
+QPalette GrumpyIRC::Skin::Palette()
 {
-    return new Scrollback();
+    QPalette px;
+    px.setColor(QPalette::ColorRole::Text, this->TextColor);
+    px.setColor(QPalette::ColorRole::Base, this->BackgroundColor);
+    return px;
 }

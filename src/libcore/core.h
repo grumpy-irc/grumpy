@@ -20,6 +20,8 @@ namespace GrumpyIRC
     class Configuration;
     class CommandProcessor;
     class EventHandler;
+    class Factory;
+    class Scrollback;
     class LIBCORESHARED_EXPORT Core
     {
         public:
@@ -32,7 +34,10 @@ namespace GrumpyIRC
             void SetSystemEventHandler(EventHandler *e);
             EventHandler *GetCurrentEventHandler();
             Configuration *GetConfiguration();
+            void InstallFactory(Factory *f);
+            Scrollback *NewScrollback(Scrollback *parent, QString name);
         private:
+            Factory *factory;
             bool isLoaded;
             Configuration *config;
             EventHandler *eventHandler;

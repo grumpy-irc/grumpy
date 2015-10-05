@@ -15,6 +15,7 @@
 
 #include "libcore_global.h"
 #include <QString>
+#include <QObject>
 #include <QDateTime>
 #include <QMutex>
 #include <QList>
@@ -52,11 +53,14 @@ namespace GrumpyIRC
             ScrollbackItemType _type;
     };
 
+    class IRCSession;
+
     /*!
      * \brief The Scrollback class represent a buffer used to store all items in a window
      */
-    class LIBCORESHARED_EXPORT Scrollback
+    class LIBCORESHARED_EXPORT Scrollback : public QObject
     {
+            Q_OBJECT
         public:
             static QList<Scrollback*> ScrollbackList;
             static QMutex ScrollbackList_Mutex;
@@ -68,8 +72,14 @@ namespace GrumpyIRC
             void SetMaxItemsSize(unsigned long long size);
             virtual void InsertText(QString text, ScrollbackItemType type = ScrollbackItemType_System);
             virtual void InsertText(ScrollbackItem item);
+            IRCSession *GetSession();
+            void SetSession(IRCSession *Session);
+
+        signals:
+            void Event_InsertText(ScrollbackItem item);
 
         private:
+            IRCSession *session;
             static unsigned long long lastID;
             QList<ScrollbackItem> items;
             unsigned long long _id;

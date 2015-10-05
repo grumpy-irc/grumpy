@@ -10,17 +10,29 @@
 
 // Copyright (c) Petr Bena 2015
 
-#include "factory.h"
-#include "scrollback.h"
+#include <QKeyEvent>
+#include <QEvent>
+#include "inputbox.h"
+#include "keyfilter.h"
 
 using namespace GrumpyIRC;
 
-Factory::Factory()
+KeyFilter::KeyFilter(InputBox *parent) : QObject(parent)
 {
-
+    this->parentInput = parent;
 }
 
-Scrollback *Factory::NewScrollback(Scrollback *parent, QString name)
+bool KeyFilter::eventFilter(QObject *obj, QEvent *event)
 {
-    return new Scrollback();
+    if (event->type() == QEvent::KeyPress)
+    {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Return)
+        {
+            this->parentInput->ProcessInput();
+            return true;
+        }
+    }
+    return QObject::eventFilter(obj, event);
 }
+

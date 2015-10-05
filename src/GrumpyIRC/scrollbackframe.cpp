@@ -10,6 +10,7 @@
 
 // Copyright (c) Petr Bena 2015
 
+#include "skin.h"
 #include "scrollbackframe.h"
 #include "inputbox.h"
 #include "ui_scrollbackframe.h"
@@ -21,11 +22,15 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent)
     this->ui->setupUi(this);
     this->inputBox = new InputBox(this);
     this->ui->splitter->addWidget(this->inputBox);
+    this->ui->textEdit->setPalette(Skin::Default->Palette());
     this->_parent = parentWindow;
+    this->scrollback = new Scrollback();
+    connect(this->scrollback, SIGNAL(Event_InsertText(ScrollbackItem)), this, SLOT(_insertText_(ScrollbackItem)));
 }
 
 ScrollbackFrame::~ScrollbackFrame()
 {
+    delete this->scrollback;
 	//! \todo Handle deletion of TreeNode from list of scbs
 	//delete this->TreeNode;
     delete this->ui;
@@ -38,9 +43,13 @@ QString ScrollbackFrame::GetWindowName() const
 
 void ScrollbackFrame::InsertText(ScrollbackItem item)
 {
+    this->scrollback->InsertText(item);
+}
+
+void ScrollbackFrame::_insertText_(ScrollbackItem item)
+{
     this->buffer += item.GetTime().toString() + ": " + item.GetText() + "<br>";
     this->ui->textEdit->setHtml(buffer);
-    Scrollback::InsertText(item);
 }
 
 void ScrollbackFrame::SetWindowName(QString title)
@@ -51,5 +60,20 @@ void ScrollbackFrame::SetWindowName(QString title)
 ScrollbackFrame *ScrollbackFrame::GetParent()
 {
     return this->_parent;
+}
+
+unsigned long ScrollbackFrame::GetID()
+{
+    return this->scrollback->GetID();
+}
+
+IRCSession *ScrollbackFrame::GetSession()
+{
+    return this->scrollback->GetSession();
+}
+
+Scrollback *ScrollbackFrame::GetScrollback()
+{
+    return this->scrollback;
 }
 
