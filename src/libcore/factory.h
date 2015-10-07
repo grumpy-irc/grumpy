@@ -14,6 +14,7 @@
 #define FACTORY_H
 
 #include "libcore_global.h"
+#include "scrollback.h"
 
 namespace GrumpyIRC
 {
@@ -24,7 +25,7 @@ namespace GrumpyIRC
         public:
             Factory();
             virtual ~Factory() {}
-            virtual Scrollback *NewScrollback(Scrollback *parent, QString name);
+            virtual Scrollback *NewScrollback(Scrollback *parent, QString name, ScrollbackType type);
     };
 }
 

@@ -13,6 +13,7 @@
 #ifndef SKIN_H
 #define SKIN_H
 
+#include <QHash>
 #include <QPalette>
 
 namespace GrumpyIRC
@@ -26,6 +27,7 @@ namespace GrumpyIRC
             QPalette Palette();
             QColor TextColor;
             QColor BackgroundColor;
+            QHash<char, QColor> ModeColors;
     };
 }
 

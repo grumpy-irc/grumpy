@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>img/arrow.png</file>
+        <file>img/at.png</file>
+        <file>img/at-s.png</file>
+        <file>img/exclamation mark.png</file>
+        <file>img/exclamation-mark-s.png</file>
+        <file>img/hash.png</file>
+        <file>img/hash-s.png</file>
+        <file>img/icon.png</file>
+        <file>img/icon_hash.png</file>
+        <file>img/Letter S.png</file>
+    </qresource>
+</RCC>

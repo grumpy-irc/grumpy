@@ -34,9 +34,9 @@ GrumpyIRC::Core::~Core()
     delete this->eventHandler;
 }
 
-GrumpyIRC::Scrollback *GrumpyIRC::Core::NewScrollback(GrumpyIRC::Scrollback *parent, QString name)
+GrumpyIRC::Scrollback *GrumpyIRC::Core::NewScrollback(GrumpyIRC::Scrollback *parent, QString name, ScrollbackType type)
 {
-    return this->factory->NewScrollback(parent, name);
+    return this->factory->NewScrollback(parent, name, type);
 }
 
 void GrumpyIRC::Core::InstallFactory(Factory *f)

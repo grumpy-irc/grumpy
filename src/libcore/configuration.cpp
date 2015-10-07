@@ -27,6 +27,11 @@ Configuration::Configuration()
 	this->Verbosity = 60;
 }
 
+Configuration::~Configuration()
+{
+    this->Options.clear();
+}
+
 QVariant Configuration::GetValue(QString key)
 {
     if (!this->Options.contains(key))
@@ -41,6 +46,16 @@ bool Configuration::GetValueAsBool(QString key, bool none)
         return none;
 
     return this->Options[key].toBool();
+}
+
+void Configuration::RemoveValue(QString key)
+{
+    if (!this->Options.contains(key))
+    {
+        return;
+    }
+
+    this->Options.remove(key);
 }
 
 QString Configuration::GetValueAsString(QString key, QString default_value)

@@ -14,9 +14,6 @@
 
 using namespace GrumpyIRC;
 
-
-
-
 bool Generic::String2Bool(QString string)
 {
     if (string.toLower() == "true")

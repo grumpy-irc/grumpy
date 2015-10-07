@@ -21,7 +21,7 @@ namespace GrumpyIRC
     {
         public:
             WidgetFactory();
-            Scrollback *NewScrollback(Scrollback *parent, QString name);
+            Scrollback *NewScrollback(Scrollback *parent, QString name, ScrollbackType type);
     };
 }
 

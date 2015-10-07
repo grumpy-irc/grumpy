@@ -11,8 +11,10 @@
 // Copyright (c) Petr Bena 2015
 
 #include "scrollbacksmanager.h"
-#include "scrollbackframe.h"
 #include "scrollbacklist.h"
+#include "scrollbackframe.h"
+#include "userframe.h"
+#include "userwidget.h"
 #include "mainwindow.h"
 #include "../libcore/exception.h"
 #include "ui_scrollbacksmanager.h"
@@ -107,6 +109,17 @@ void ScrollbacksManager::SwitchWindow(ScrollbackFrame *window)
 		this->ui->verticalLayout_2->addWidget(window);
 	}
 
+    // Switch the user widget
+    UserWidget *usrw = MainWindow::Main->GetUsers();
+    usrw->SetFrame(window->GetUserFrame());
+    if (window->GetScrollback()->GetType() == ScrollbackType_System)
+    {
+        // Hide the user widget
+        usrw->hide();
+    } else
+    {
+        usrw->show();
+    }
     this->currentWidget = window;
     this->currentWidget->Focus();
 }

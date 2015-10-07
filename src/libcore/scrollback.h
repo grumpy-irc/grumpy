@@ -14,11 +14,17 @@
 #define SCROLLBACK_H
 
 #include "libcore_global.h"
+#include "../libirc/libircclient/user.h"
 #include <QString>
 #include <QObject>
 #include <QDateTime>
 #include <QMutex>
 #include <QList>
+
+namespace libircclient
+{
+    class User;
+}
 
 namespace GrumpyIRC
 {
@@ -36,9 +42,12 @@ namespace GrumpyIRC
         ScrollbackItemType_Join,
         ScrollbackItemType_Part,
         ScrollbackItemType_Kick,
+        ScrollbackItemType_Nick,
         ScrollbackItemType_Quit,
+        ScrollbackItemType_Notice,
         ScrollbackItemType_Act,
-        ScrollbackItemType_System
+        ScrollbackItemType_System,
+        ScrollbackItemType_Topic
     };
 
     /*!
@@ -48,16 +57,28 @@ namespace GrumpyIRC
     {
         public:
             ScrollbackItem(QString text);
+            ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User *user = NULL);
             virtual ~ScrollbackItem();
             virtual QString GetText() const;
             virtual ScrollbackItemType GetType() const;
             virtual QDateTime GetTime() const;
             virtual void SetType(ScrollbackItemType type);
             virtual void SetText(QString text);
+            virtual void SetUser(libircclient::User *user);
+            virtual libircclient::User GetUser() const;
         private:
+            libircclient::User _user;
             QString _text;
             QDateTime _datetime;
             ScrollbackItemType _type;
+    };
+
+    enum UserListChangeType
+    {
+        UserListChange_Insert,
+        UserListChange_Alter,
+        UserListChange_Remove,
+        UserListChange_Refresh
     };
 
     class IRCSession;
@@ -79,14 +100,29 @@ namespace GrumpyIRC
             void SetMaxItemsSize(unsigned long long size);
             virtual void InsertText(QString text, ScrollbackItemType type = ScrollbackItemType_System);
             virtual void InsertText(ScrollbackItem item);
-            IRCSession *GetSession();
-            ScrollbackType GetType() const;
-            void SetSession(IRCSession *Session);
+            virtual void SetTarget(QString target);
+            virtual QString GetTarget() const;
+            virtual IRCSession *GetSession();
+            //! Called by IRC session or any other object if there is any change to user list associated to this scrollback
+            void UserListChange(QString nick, libircclient::User *user, UserListChangeType change_type);
+            virtual ScrollbackType GetType() const;
+            virtual void SetSession(IRCSession *Session);
+            virtual bool IsDead() const;
+            void SetDead(bool dead);
 
         signals:
             void Event_InsertText(ScrollbackItem item);
+            void Event_UserInserted(libircclient::User *user);
+            void Event_UserAltered(QString original_name, libircclient::User *user);
+            void Event_SessionModified(IRCSession *Session);
+            void Event_UserRemoved(QString name);
+            //! Called when some meta-information for user is changed, such as away status
+            //! so that it can be updated in associated widgets
+            void Event_UserRefresh(libircclient::User *user);
 
         private:
+            bool _dead;
+            QString _target;
             IRCSession *session;
             ScrollbackType type;
             static unsigned long long lastID;

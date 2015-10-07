@@ -27,6 +27,7 @@ Scrollback::Scrollback(ScrollbackType Type)
     ScrollbackList.append(this);
     ScrollbackList_Mutex.unlock();
     this->session = NULL;
+    this->_dead = false;
     this->type = Type;
     this->_id = lastID++;
 }
@@ -65,6 +66,22 @@ void Scrollback::SetSession(IRCSession *Session)
 
     // We can store the pointer now
     this->session = Session;
+    emit this->Event_SessionModified(Session);
+}
+
+bool Scrollback::IsDead() const
+{
+    return this->_dead;
+}
+
+void Scrollback::SetDead(bool dead)
+{
+    this->_dead = dead;
+}
+
+void Scrollback::SetTarget(QString target)
+{
+    this->_target = target;
 }
 
 IRCSession *Scrollback::GetSession()
@@ -72,10 +89,34 @@ IRCSession *Scrollback::GetSession()
     return this->session;
 }
 
+void Scrollback::UserListChange(QString nick, libircclient::User *user, UserListChangeType change_type)
+{
+    switch (change_type)
+    {
+        case UserListChange_Alter:
+            emit this->Event_UserAltered(nick, user);
+            break;
+        case UserListChange_Refresh:
+            emit this->Event_UserRefresh(user);
+            break;
+        case UserListChange_Insert:
+            emit this->Event_UserInserted(user);
+            break;
+        case UserListChange_Remove:
+            emit this->Event_UserRemoved(nick);
+            break;
+    }
+}
+
 void Scrollback::InsertText(ScrollbackItem item)
 {
     this->items.append(item);
     emit Event_InsertText(item);
+}
+
+QString Scrollback::GetTarget() const
+{
+    return this->_target;
 }
 
 void Scrollback::InsertText(QString text, ScrollbackItemType type)
@@ -92,9 +133,17 @@ ScrollbackItem::ScrollbackItem(QString text)
     this->_datetime = QDateTime::currentDateTime();
 }
 
+ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User *user)
+{
+    this->_type = type;
+    this->_text = text;
+    this->_datetime = QDateTime::currentDateTime();
+    this->_user = libircclient::User(user);
+}
+
 ScrollbackItem::~ScrollbackItem()
 {
-
+    
 }
 
 QString ScrollbackItem::GetText() const
@@ -120,4 +169,14 @@ void ScrollbackItem::SetType(ScrollbackItemType type)
 void ScrollbackItem::SetText(QString text)
 {
     this->_text = text;
+}
+
+void ScrollbackItem::SetUser(libircclient::User *user)
+{
+    this->_user = libircclient::User(user);
+}
+
+libircclient::User ScrollbackItem::GetUser() const
+{
+    return this->_user;
 }

@@ -22,11 +22,17 @@ namespace Ui
     class ScrollbackFrame;
 }
 
+namespace libircclient
+{
+    class User;
+}
+
 namespace GrumpyIRC
 {
     class InputBox;
     class Scrollback;
     class ScrollbackList_Window;
+    class UserFrame;
     class IRCSession;
 
     class ScrollbackFrame : public QFrame
@@ -43,16 +49,22 @@ namespace GrumpyIRC
             unsigned long GetID();
             IRCSession *GetSession();
             Scrollback *GetScrollback();
+            UserFrame *GetUserFrame();
             void Focus();
             //void SetParent(ScrollbackFrame* parentWindow);
             bool IsDeletable;
 			QStandardItem *TreeNode;
         private slots:
             void _insertText_(ScrollbackItem item);
+            void UserList_Insert(libircclient::User *ux);
+            void UserList_Remove(QString user);
+            void UserList_Rename(QString old, libircclient::User *us);
+            void SessionChanged(IRCSession *session);
         private:
             Scrollback *scrollback;
 			//QStandardItem *treeNode;
             QString buffer;
+            UserFrame *userFrame;
             QString _name;
             InputBox *inputBox;
             Ui::ScrollbackFrame *ui;

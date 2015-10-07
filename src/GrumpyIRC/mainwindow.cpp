@@ -14,8 +14,10 @@
 #include "mainwindow.h"
 #include "scrollbacklist.h"
 #include "ui_mainwindow.h"
+#include "userwidget.h"
 #include "scrollbackframe.h"
 #include "syslogwindow.h"
+#include "defaultconfig.h"
 #include "scrollbacksmanager.h"
 #include "skin.h"
 #include "../libirc/libircclient/network.h"
@@ -45,6 +47,18 @@ static int SystemCommand_Exit(SystemCommand *command, CommandArgs args)
     // quit message
     QString quit_msg = args.ParameterLine;
     Exit();
+    return 0;
+}
+
+static int SystemCommand_NextSessionNick(SystemCommand *command, CommandArgs args)
+{
+    Q_UNUSED(command);
+    if (args.Parameters.count() != 1)
+    {
+        GRUMPY_ERROR(QObject::tr("This command requires precisely 1 parameter"));
+        return 1;
+    }
+    GCFG->SetValue("next-session-nick", args.ParameterLine);
     return 0;
 }
 
@@ -93,9 +107,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->syslogWindow = new SyslogWindow(this);
     this->windowList = new ScrollbackList(this);
     this->scrollbackWindow = new ScrollbacksManager(this);
+    this->userWidget = new UserWidget(this);
     this->setCentralWidget(this->scrollbackWindow);
     this->addDockWidget(Qt::LeftDockWidgetArea, this->windowList);
     this->addDockWidget(Qt::BottomDockWidgetArea, this->syslogWindow);
+    this->addDockWidget(Qt::RightDockWidgetArea, this->userWidget);
     this->syslogWindow->hide();
     // Create a system scrollback
     this->systemWindow = this->scrollbackWindow->CreateWindow("System Window", NULL, true, false);
@@ -103,11 +119,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("quit", (SC_Callback)SystemCommand_Exit));
 	CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("server", (SC_Callback)SystemCommand_Server));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("nick", (SC_Callback)SystemCommand_Nick));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.next_session_nick", (SC_Callback)SystemCommand_NextSessionNick));
     // Welcome user
     this->systemWindow->InsertText(QString("Grumpy irc version " + GCFG->GetVersion()));
     // Try to restore geometry
     this->restoreGeometry(GCFG->GetValue("mainwindow_geometry").toByteArray());
     this->restoreState(GCFG->GetValue("mainwindow_state").toByteArray());
+    this->userWidget->hide();
 }
 
 MainWindow::~MainWindow()
@@ -130,10 +148,28 @@ void MainWindow::WriteToSystemWindow(QString text)
     this->systemWindow->InsertText(text);
 }
 
+UserWidget *MainWindow::GetUsers()
+{
+    return this->userWidget;
+}
+
+void MainWindow::OpenIRCNetworkLink(QString link)
+{
+    MainWindow::Main->OpenServer(libirc::ServerAddress(link));
+}
+
 void MainWindow::OpenServer(libirc::ServerAddress &server)
 {
     if (server.GetNick().isEmpty())
-        server.SetNick(CONFIG_NICK);
+    {
+        QString nick = CONFIG_NICK;
+        if (GCFG->GetValueAsString("next-session-nick", nick) != nick)
+        {
+            nick = GCFG->GetValueAsString("next-session-nick");
+            GCFG->RemoveValue("next-session-nick");
+        }
+        server.SetNick(nick);
+    }
     QString network_name = server.GetHost();
     // We need to create a new scrollback for system window
     ScrollbackFrame *system = this->GetScrollbackManager()->CreateWindow(network_name, NULL, true);

@@ -20,7 +20,7 @@ Factory::Factory()
 
 }
 
-Scrollback *Factory::NewScrollback(Scrollback *parent, QString name)
+Scrollback *Factory::NewScrollback(Scrollback *parent, QString name, ScrollbackType type)
 {
-    return new Scrollback();
+    return new Scrollback(type);
 }

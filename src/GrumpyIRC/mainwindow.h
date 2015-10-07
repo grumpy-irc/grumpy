@@ -29,6 +29,7 @@ namespace GrumpyIRC
 {
     class InputBox;
     class ScrollbackFrame;
+    class UserWidget;
     class ScrollbackList;
     class ScrollbacksManager;
     class Skin;
@@ -46,6 +47,8 @@ namespace GrumpyIRC
             //! Return a pointer to widget that contains list of all windows
             ScrollbackList *GetScrollbackList();
             void WriteToSystemWindow(QString text);
+            UserWidget *GetUsers();
+            void OpenIRCNetworkLink(QString link);
             void OpenServer(libirc::ServerAddress &server);
 
         private slots:
@@ -55,6 +58,7 @@ namespace GrumpyIRC
             void closeEvent(QCloseEvent *event);
             ScrollbackFrame *systemWindow;
             ScrollbackList *windowList;
+            UserWidget *userWidget;
             SyslogWindow *syslogWindow;
             ScrollbacksManager *scrollbackWindow;
             Ui::MainWindow *ui;

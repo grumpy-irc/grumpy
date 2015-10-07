@@ -20,6 +20,11 @@ Skin::Skin()
 {
     this->BackgroundColor = QColor(0, 0, 0);
     this->TextColor = QColor(255, 255, 255);
+    this->ModeColors.insert('v', QColor(244, 254, 10));
+    this->ModeColors.insert('h', QColor(212, 250, 145));
+    this->ModeColors.insert('o', QColor(92, 247, 14));
+    this->ModeColors.insert('a', QColor(255, 156, 190));
+    this->ModeColors.insert('q', QColor(255, 206, 156));
 }
 
 QPalette GrumpyIRC::Skin::Palette()

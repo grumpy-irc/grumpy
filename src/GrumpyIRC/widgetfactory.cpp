@@ -26,9 +26,9 @@ WidgetFactory::WidgetFactory()
 
 // This function is called by core when a new scrollback is created
 // because here we have a gui, we need to create a wrapper for it
-Scrollback *WidgetFactory::NewScrollback(Scrollback *parent, QString name)
+Scrollback *WidgetFactory::NewScrollback(Scrollback *parent, QString name, ScrollbackType type)
 {
-    Scrollback *sx = Factory::NewScrollback(parent, name);
+    Scrollback *sx = Factory::NewScrollback(parent, name, type);
     if (MainWindow::Main == NULL)
         throw new GrumpyIRC::NullPointerException("MainWindow *MainWindow::Main", BOOST_CURRENT_FUNCTION);
     // Create a new scrollback wrapper for this one

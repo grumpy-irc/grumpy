@@ -49,6 +49,9 @@ int CommandProcessor::ProcessText(QString text, Scrollback *window)
             case COMMANDPROCESSOR_ENOTEXIST:
                 GRUMPY_ERROR("Unknown command");
                 break;
+            case COMMANDPROCESSOR_ENOTCONNECTED:
+                GRUMPY_ERROR("Not connected");
+                break;
         }
     }
     return 0;
@@ -63,7 +66,7 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
     if (command.startsWith(this->CommandPrefix) && !(command.length() > 2 && command[1] == this->CommandPrefix))
     {
         // This is a system command
-		command = command.mid(1);
+        command = command.mid(1);
         CommandArgs parameters;
         QString command_name = command.toLower();
         // Get parameters
@@ -78,6 +81,8 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
         {
             if (window && window->GetSession())
             {
+                if (!window->GetSession()->IsConnected())
+                    return -COMMANDPROCESSOR_ENOTCONNECTED;
                 // We are connected to some IRC network, we will transfer this as IRC command
                 command_name = command_name.toUpper();
                 if (parameters.ParameterLine.isEmpty())
@@ -90,7 +95,16 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
         }
         return this->CommandList[command_name]->Run(parameters);
     }
-    // It's not a command, let's do something with this, probably send it to active channel as message?
+    // It's not a command, let's do something with this
+    if (window->IsDead() != true && (window->GetType() == ScrollbackType_Channel || window->GetType() == ScrollbackType_User))
+    {
+        // This is a channel window, so we send this as a message to the channel
+        window->GetSession()->SendMessage(window, command);
+    }
+    else
+    {
+        window->InsertText("You can't send messages to this window");
+    }
     return 0;
 }
 

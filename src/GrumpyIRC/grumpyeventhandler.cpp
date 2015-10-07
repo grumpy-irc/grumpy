@@ -14,6 +14,7 @@
 #include "../libcore/configuration.h"
 #include <QDebug>
 #include "corewrapper.h"
+#include "defaultconfig.h"
 #include "mainwindow.h"
 #include "grumpyeventhandler.h"
 

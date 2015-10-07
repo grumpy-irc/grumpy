@@ -24,7 +24,8 @@ SOURCES += core.cpp \
     generic.cpp \
     configuration.cpp \
     exception.cpp \
-    factory.cpp
+    factory.cpp \
+    autocompletionengine.cpp
 
 HEADERS += core.h\
         libcore_global.h \
@@ -39,7 +40,8 @@ HEADERS += core.h\
     configuration.h \
     definitions.h \
     exception.h \
-    factory.h
+    factory.h \
+    autocompletionengine.h
 
 unix {
     target.path = /usr/lib

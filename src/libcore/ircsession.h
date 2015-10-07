@@ -28,6 +28,7 @@ namespace libircclient
 {
     class Channel;
     class Network;
+    class Parser;
     class User;
     class Mode;
 }
@@ -53,14 +54,32 @@ namespace GrumpyIRC
             virtual Scrollback *GetSystemWindow();
             virtual libircclient::Network *GetNetwork();
             virtual void Connect(libircclient::Network *Network);
-            bool IsConnected();
+            virtual void SendMessage(Scrollback *window, QString text);
+            virtual bool IsConnected();
+            virtual Scrollback *GetScrollbackForChannel(QString channel);
+            Scrollback *GetScrollbackForUser(QString user);
         private slots:
             void OnIncomingRawMessage(QByteArray message);
             void OnConnectionFail(QAbstractSocket::SocketError er);
+            void OnMessage(libircclient::Parser *px);
+            void OnIRCJoin(libircclient::Parser *px, libircclient::User *user, libircclient::Channel *channel);
+            void OnUnknown(libircclient::Parser *px);
+            void OnNICK(libircclient::Parser *px, QString old_, QString new_);
             void OnIRCSelfJoin(libircclient::Channel *channel);
+            void OnIRCSelfNICK(libircclient::Parser *px, QString previous, QString nick);
+            void OnKICK(libircclient::Parser *px, libircclient::Channel *channel);
+            void OnPart(libircclient::Parser *px, libircclient::Channel *channel);
+            void OnSelf_KICK(libircclient::Parser *px, libircclient::Channel *channel);
+            void OnTOPIC(libircclient::Parser *px, libircclient::Channel *channel, QString previous_one);
+            void OnQuit(libircclient::Parser *px, libircclient::Channel *channel);
+            void OnSelfPart(libircclient::Parser *px, libircclient::Channel *channel);
+            void OnTopicInfo(libircclient::Parser *px, libircclient::Channel *channel);
+            void OnEndOfNames(libircclient::Parser *px);
+            void OnNotice(libircclient::Parser *px);
         private:
             QHash<QString, Scrollback*> channels;
             libircclient::Network *network;
+            QHash<QString, Scrollback*> users;
             Scrollback *systemWindow;
     };
 }

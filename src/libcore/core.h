@@ -14,6 +14,7 @@
 #define CORE_H
 
 #include "libcore_global.h"
+#include "scrollback.h"
 
 namespace GrumpyIRC
 {
@@ -35,7 +36,7 @@ namespace GrumpyIRC
             EventHandler *GetCurrentEventHandler();
             Configuration *GetConfiguration();
             void InstallFactory(Factory *f);
-            Scrollback *NewScrollback(Scrollback *parent, QString name);
+            Scrollback *NewScrollback(Scrollback *parent, QString name, ScrollbackType type);
         private:
             Factory *factory;
             bool isLoaded;

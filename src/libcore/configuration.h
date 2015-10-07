@@ -28,15 +28,17 @@ namespace GrumpyIRC
             static QString GetVersion();
 
             Configuration();
-            QVariant GetValue(QString key);
-            bool GetValueAsBool(QString key, bool none = false);
-            QString GetValueAsString(QString key, QString default_value = "");
-            void SetValue(QString key, QVariant value);
-            void SetValue(QString key, bool value);
-            void SetValue(QString key, int value);
-            void SetValue(QString key, QString value);
-            void Load();
-            void Save();
+            virtual ~Configuration();
+            virtual QVariant GetValue(QString key);
+            virtual bool GetValueAsBool(QString key, bool none = false);
+            virtual QString GetValueAsString(QString key, QString default_value = "");
+            virtual void RemoveValue(QString key);
+            virtual void SetValue(QString key, QVariant value);
+            virtual void SetValue(QString key, bool value);
+            virtual void SetValue(QString key, int value);
+            virtual void SetValue(QString key, QString value);
+            virtual void Load();
+            virtual void Save();
 			unsigned int Verbosity;
 
         private:
