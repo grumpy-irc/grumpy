@@ -11,9 +11,13 @@ TEMPLATE = lib
 
 DEFINES += LIBGP_LIBRARY
 
-SOURCES += main.cpp
+SOURCES += \
+    datablock.cpp
 
 
 unix {
     target.path = /usr/lib
     INSTALLS += target
+
+HEADERS += \
+    datablock.h

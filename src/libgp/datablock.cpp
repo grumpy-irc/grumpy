@@ -10,9 +10,36 @@
 
 // Copyright (c) Petr Bena 2015
 
-#include "syslog.h"
+#include "datablock.h"
 
-Syslog::Syslog()
+using namespace GrumpyProtocol;
+
+DataBlock::DataBlock()
+{
+
+}
+
+unsigned long DataBlock::GetHSize()
+{
+
+}
+
+unsigned long long DataBlock::GetSize()
+{
+
+}
+
+QByteArray DataBlock::GetHeader()
+{
+    QVariant::
+}
+
+QByteArray DataBlock::ToArray()
+{
+
+}
+
+void DataBlock::InsertData(QString key, QVariant value)
 {
 
 }

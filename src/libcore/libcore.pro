@@ -25,7 +25,8 @@ SOURCES += core.cpp \
     configuration.cpp \
     exception.cpp \
     factory.cpp \
-    autocompletionengine.cpp
+    autocompletionengine.cpp \
+    terminalparser.cpp
 
 HEADERS += core.h\
         libcore_global.h \
@@ -41,7 +42,8 @@ HEADERS += core.h\
     definitions.h \
     exception.h \
     factory.h \
-    autocompletionengine.h
+    autocompletionengine.h \
+    terminalparser.h
 
 unix {
     target.path = /usr/lib

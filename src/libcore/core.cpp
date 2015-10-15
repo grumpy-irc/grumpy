@@ -22,7 +22,7 @@ GrumpyIRC::Core::Core()
 {
     this->commandProcessor = new CommandProcessor();
     this->config = NULL;
-    this->eventHandler = NULL;
+    this->eventHandler = new EventHandler();
     GrumpyCore = this;
     this->factory = new Factory();
 }

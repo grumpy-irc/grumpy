@@ -10,36 +10,12 @@
 
 // Copyright (c) Petr Bena 2015
 
-#include <QDebug>
-#include "eventhandler.h"
+#include "grumpyd.h"
 
-GrumpyIRC::EventHandler::EventHandler()
+using namespace GrumpyIRC;
+
+Grumpyd::Grumpyd()
 {
 
-}
-
-GrumpyIRC::EventHandler::~EventHandler()
-{
-
-}
-
-void GrumpyIRC::EventHandler::OnMessage(unsigned long long ScrollbackID)
-{
-    //qDebug() << "Message: " +
-}
-
-void GrumpyIRC::EventHandler::OnDebug(QString text, unsigned int verbosity)
-{
-    qDebug() << "DEBUG: " + text;
-}
-
-void GrumpyIRC::EventHandler::OnError(QString text)
-{
-    qDebug() << "ERROR: " + text;
-}
-
-void GrumpyIRC::EventHandler::OnSystemLog(QString text)
-{
-    qDebug() << "INFO:  " + text;
 }
 

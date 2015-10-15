@@ -9,9 +9,9 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     corewrapper.cpp \
-    syslog.cpp
+    grumpyd.cpp
 
 HEADERS += \
     corewrapper.h \
-    syslog.h
+    grumpyd.h
 

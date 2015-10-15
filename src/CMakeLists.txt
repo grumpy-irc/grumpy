@@ -11,4 +11,5 @@ add_subdirectory (libirc/libircclient/)
 # GrumpyIRC client itself
 
 add_subdirectory (libcore)
+add_subdirectory (grumpyd)
 add_subdirectory (GrumpyIRC)

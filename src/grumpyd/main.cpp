@@ -12,14 +12,28 @@
 
 #include <QCoreApplication>
 #include "corewrapper.h"
-#include "syslog.h"
+#include "../libcore/configuration.h"
+#include "../libcore/core.h"
+#include "../libcore/terminalparser.h"
 #include "../libcore/eventhandler.h"
+#include "../libcore/exception.h"
+#include "../libcore/generic.h"
 
 int main(int argc, char *argv[])
 {
+    // First of all we need to process the arguments and then do other stuff
+    GrumpyIRC::TerminalParser *tp = new GrumpyIRC::TerminalParser();
+    if (!tp->Parse(argc, argv))
+    {
+        // We processed some argument which requires the application to exit
+        delete tp;
+        return 0;
+    }
+    delete tp;
     GrumpyIRC::CoreWrapper::GrumpyCore = new GrumpyIRC::Core();
     GrumpyIRC::CoreWrapper::GrumpyCore->InitCfg();
     GRUMPY_LOG("Grumpyd starting...");
+    //GRUMPY_LOG("Version: " + GCFG->)
     QCoreApplication a(argc, argv);
 
     return a.exec();
