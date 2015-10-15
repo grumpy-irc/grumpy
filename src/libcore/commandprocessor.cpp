@@ -32,7 +32,7 @@ CommandProcessor::~CommandProcessor()
 
 void CommandProcessor::RegisterCommand(SystemCommand *sc)
 {
-	GRUMPY_DEBUG("Registering system command: " + sc->GetName(), 2);
+    GRUMPY_DEBUG("Registering system command: " + sc->GetName(), 2);
     QString name = sc->GetName().toLower();
     this->CommandList.insert(name, sc);
 }

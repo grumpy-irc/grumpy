@@ -42,7 +42,7 @@ IRCSession::IRCSession(Scrollback *system)
 {
     this->systemWindow = system;
     this->systemWindow->SetSession(this);
-	this->network = NULL;
+    this->network = NULL;
     IRCSession::Sessions_Lock.lock();
     IRCSession::Sessions.append(this);
     IRCSession::Sessions_Lock.unlock();
@@ -69,14 +69,14 @@ libircclient::Network *IRCSession::GetNetwork()
 void IRCSession::Connect(libircclient::Network *Network)
 {
     if (this->IsConnected())
-		throw new Exception("You can't connect to ircsession that is active, disconnect first", BOOST_CURRENT_FUNCTION);
+        throw new Exception("You can't connect to ircsession that is active, disconnect first", BOOST_CURRENT_FUNCTION);
 
-	this->systemWindow->InsertText("Connecting to " + Network->GetServerAddress());
+    this->systemWindow->InsertText("Connecting to " + Network->GetServerAddress());
 
-	if (this->network)
+    if (this->network)
         delete this->network;
 
-	this->network = Network;
+    this->network = Network;
     connect(this->network, SIGNAL(Event_ConnectionFailure(QAbstractSocket::SocketError)), this, SLOT(OnConnectionFail(QAbstractSocket::SocketError)));
     connect(this->network, SIGNAL(Event_RawIncoming(QByteArray)), this, SLOT(OnIncomingRawMessage(QByteArray)));
     connect(this->network, SIGNAL(Event_Unknown(libircclient::Parser*)), this, SLOT(OnUnknown(libircclient::Parser*)));

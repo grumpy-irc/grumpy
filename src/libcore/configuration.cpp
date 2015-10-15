@@ -24,7 +24,7 @@ QString Configuration::GetVersion()
 
 Configuration::Configuration()
 {
-	this->Verbosity = 60;
+    this->Verbosity = 60;
 }
 
 Configuration::~Configuration()
@@ -78,16 +78,16 @@ void Configuration::SetValue(QString key, QVariant value)
 
 void Configuration::Load()
 {
-	QSettings::setDefaultFormat(QSettings::Format::IniFormat);
+    QSettings::setDefaultFormat(QSettings::Format::IniFormat);
     QSettings settings(CONFIGURATION_FILE, QSettings::IniFormat);
     foreach (QString key, settings.allKeys())
         this->SetValue(key, settings.value(key));
-	qDebug() << (QString("Configuration path: ") + settings.fileName());
+    qDebug() << (QString("Configuration path: ") + settings.fileName());
 }
 
 void Configuration::Save()
 {
-	QSettings settings(CONFIGURATION_FILE, QSettings::IniFormat);
+    QSettings settings(CONFIGURATION_FILE, QSettings::IniFormat);
     foreach (QString key, this->Options.keys())
         settings.setValue(key, this->Options[key]);
 }

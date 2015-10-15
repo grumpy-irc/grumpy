@@ -32,21 +32,21 @@ void GrumpyEventHandler::OnMessage(unsigned long long ScrollbackID)
 
 void GrumpyEventHandler::OnDebug(QString text, unsigned int verbosity)
 {
-	if (GCFG->Verbosity < verbosity)
-		return;
+    if (GCFG->Verbosity < verbosity)
+        return;
 
-	qDebug() << text;
+    qDebug() << text;
 
-	if (!MainWindow::Main)
-		return;
+    if (!MainWindow::Main)
+        return;
 
-	// Write message to system window
-	MainWindow::Main->WriteToSystemWindow("DEBUG(" + QString::number(verbosity) + "): " + text);
+    // Write message to system window
+    MainWindow::Main->WriteToSystemWindow("DEBUG(" + QString::number(verbosity) + "): " + text);
 }
 
 void GrumpyEventHandler::OnError(QString text)
 {
-	qWarning() << text;
+    qWarning() << text;
     if (!MainWindow::Main)
         return;
 
@@ -56,6 +56,6 @@ void GrumpyEventHandler::OnError(QString text)
 
 void GrumpyEventHandler::OnSystemLog(QString text)
 {
-	qDebug() << "LOG: " + text;
+    qDebug() << "LOG: " + text;
 }
 

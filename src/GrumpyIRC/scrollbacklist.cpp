@@ -25,10 +25,10 @@ ScrollbackList::ScrollbackList(QWidget *parent) : QDockWidget(parent), ui(new Ui
 {
     this->ui->setupUi(this);
     this->model = new QStandardItemModel(0, 2, this);
-	this->root = this->model->invisibleRootItem();
+    this->root = this->model->invisibleRootItem();
     this->ui->treeView->setModel(this->model);
     this->ui->treeView->setColumnHidden(1, true);
-	this->ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    this->ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     this->ui->treeView->setHeaderHidden(true);
     this->ui->treeView->setPalette(Skin::Default->Palette());
 }
@@ -41,12 +41,12 @@ ScrollbackList::~ScrollbackList()
 void ScrollbackList::RegisterWindow(ScrollbackFrame *scrollback, QStandardItem *parent_node)
 {
     QStandardItem *root;
-	if (parent_node != NULL)
-		root = parent_node;
+    if (parent_node != NULL)
+        root = parent_node;
     else
         root = this->GetRootTreeItem();
-	QStandardItem *node = new ScrollbackList_Node(scrollback);
-	scrollback->TreeNode = node;
+    QStandardItem *node = new ScrollbackList_Node(scrollback);
+    scrollback->TreeNode = node;
     root->appendRow(node);
     this->ui->treeView->expand(root->index());
 }
@@ -58,11 +58,11 @@ QStandardItem *ScrollbackList::GetRootTreeItem()
 
 void GrumpyIRC::ScrollbackList::on_treeView_activated(const QModelIndex &index)
 {
-	if (this->model->itemFromIndex(index) == this->root)
-		return;
-	ScrollbackList_Node *node = (ScrollbackList_Node*)this->model->itemFromIndex(index);
-	if (!node)
-		return;
+    if (this->model->itemFromIndex(index) == this->root)
+        return;
+    ScrollbackList_Node *node = (ScrollbackList_Node*)this->model->itemFromIndex(index);
+    if (!node)
+        return;
     MainWindow::Main->GetScrollbackManager()->SwitchWindow(node->GetScrollback());
 }
 

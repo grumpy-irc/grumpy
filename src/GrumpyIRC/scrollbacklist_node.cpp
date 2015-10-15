@@ -17,10 +17,10 @@ using namespace GrumpyIRC;
 
 ScrollbackList_Node::ScrollbackList_Node(ScrollbackFrame *sb) : QStandardItem(sb->GetWindowName())
 {
-	this->scrollback = sb;
+    this->scrollback = sb;
 }
 
 ScrollbackFrame *ScrollbackList_Node::GetScrollback()
 {
-	return this->scrollback;
+    return this->scrollback;
 }

@@ -89,15 +89,15 @@ static int SystemCommand_Nick(SystemCommand *command, CommandArgs args)
 
 static int SystemCommand_Server(SystemCommand *command, CommandArgs command_args)
 {
-	// if there is no parameter we throw some error
-	if (command_args.Parameters.count() < 1)
-	{
-		GRUMPY_ERROR(QObject::tr("This command requires a parameter"));
-		return 0;
-	}
-	// get the server host
+    // if there is no parameter we throw some error
+    if (command_args.Parameters.count() < 1)
+    {
+        GRUMPY_ERROR(QObject::tr("This command requires a parameter"));
+        return 0;
+    }
+    // get the server host
     MainWindow::Main->OpenServer(libirc::ServerAddress(command_args.Parameters[0]));
-	return 0;
+    return 0;
 }
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -117,7 +117,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->systemWindow = this->scrollbackWindow->CreateWindow("System Window", NULL, true, false);
     // Register built-in commands
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("quit", (SC_Callback)SystemCommand_Exit));
-	CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("server", (SC_Callback)SystemCommand_Server));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("server", (SC_Callback)SystemCommand_Server));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("nick", (SC_Callback)SystemCommand_Nick));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.next_session_nick", (SC_Callback)SystemCommand_NextSessionNick));
     // Welcome user

@@ -48,7 +48,7 @@ void GrumpyIRC::Core::InstallFactory(Factory *f)
 void GrumpyIRC::Core::InitCfg()
 {
     this->config = new Configuration();
-	this->config->Load();
+    this->config->Load();
 }
 
 GrumpyIRC::CommandProcessor *GrumpyIRC::Core::GetCommandProcessor()
@@ -58,7 +58,7 @@ GrumpyIRC::CommandProcessor *GrumpyIRC::Core::GetCommandProcessor()
 
 void GrumpyIRC::Core::SetSystemEventHandler(GrumpyIRC::EventHandler *e)
 {
-	delete this->eventHandler;
+    delete this->eventHandler;
     this->eventHandler = e;
 }
 

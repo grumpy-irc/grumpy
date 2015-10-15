@@ -49,8 +49,8 @@ ScrollbackFrame::~ScrollbackFrame()
 {
     delete this->scrollback;
     delete this->userFrame;
-	//! \todo Handle deletion of TreeNode from list of scbs
-	//delete this->TreeNode;
+    //! \todo Handle deletion of TreeNode from list of scbs
+    //delete this->TreeNode;
     delete this->ui;
 }
 

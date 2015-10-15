@@ -25,8 +25,8 @@ int main(int argc, char *argv[])
 
     // Initialize core first
     CoreWrapper::GrumpyCore = new Core();
-	CoreWrapper::GrumpyCore->InitCfg();
-	CoreWrapper::GrumpyCore->SetSystemEventHandler(new GrumpyEventHandler());
+    CoreWrapper::GrumpyCore->InitCfg();
+    CoreWrapper::GrumpyCore->SetSystemEventHandler(new GrumpyEventHandler());
     CoreWrapper::GrumpyCore->InstallFactory(new WidgetFactory());
     MainWindow w;
     w.show();
