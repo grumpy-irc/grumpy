@@ -10,12 +10,23 @@
 
 // Copyright (c) Petr Bena 2015
 
-#include "serverlistener.h"
+#ifndef SESSION_H
+#define SESSION_H
 
-using namespace GrumpyIRC;
+#include <QHash>
+#include <QString>
 
-ServerListener::ServerListener()
+namespace GrumpyIRC
 {
+    class Session
+    {
+        public:
+            Session();
 
+        signals:
+
+        public slots:
+    };
 }
 
+#endif // SESSION_H

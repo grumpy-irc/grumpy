@@ -31,7 +31,6 @@ namespace GrumpyIRC
     class UserFrame : public QFrame
     {
             Q_OBJECT
-
         public:
             explicit UserFrame(QWidget *parent = 0);
             ~UserFrame();

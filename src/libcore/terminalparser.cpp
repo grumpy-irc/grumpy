@@ -125,7 +125,7 @@ void TerminalParser::Register(char ch, QString string, QString help, int paramet
 
 QList<TerminalItem> TerminalParser::GetItems()
 {
-    return this->GetItems();
+    return this->_items;
 }
 
 TerminalItem::TerminalItem(char symbol, QString String, QString Help, int ParametersRequired, TP_Callback callback)

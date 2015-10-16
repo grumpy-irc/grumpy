@@ -10,19 +10,12 @@
 
 // Copyright (c) Petr Bena 2015
 
-#ifndef SERVERLISTENER_H
-#define SERVERLISTENER_H
+#include "listener.h"
 
-#include "libcore_global.h"
+using namespace GrumpyIRC;
 
-namespace GrumpyIRC
+Listener::Listener()
 {
-    class LIBCORESHARED_EXPORT ServerListener
-    {
-        public:
-            ServerListener();
 
-    };
 }
 
-#endif // SERVERLISTENER_H

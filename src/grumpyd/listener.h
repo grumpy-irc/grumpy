@@ -10,19 +10,21 @@
 
 // Copyright (c) Petr Bena 2015
 
-#ifndef SERVERSESSION_H
-#define SERVERSESSION_H
+#ifndef LISTENER_H
+#define LISTENER_H
 
-#include "libcore_global.h"
+#include <QString>
+#include <QObject>
 
 namespace GrumpyIRC
 {
-    class LIBCORESHARED_EXPORT ServerSession
+    class Listener
     {
         public:
-            ServerSession();
+            Listener();
+
 
     };
 }
 
-#endif // SERVERSESSION_H
+#endif // LISTENER_H

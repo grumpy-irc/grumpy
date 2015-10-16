@@ -58,6 +58,16 @@ QStandardItem *ScrollbackList::GetRootTreeItem()
 
 void GrumpyIRC::ScrollbackList::on_treeView_activated(const QModelIndex &index)
 {
+    this->switchWindow(index);
+}
+
+void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPoint &pos)
+{
+
+}
+
+void ScrollbackList::switchWindow(const QModelIndex &index)
+{
     if (this->model->itemFromIndex(index) == this->root)
         return;
     ScrollbackList_Node *node = (ScrollbackList_Node*)this->model->itemFromIndex(index);
@@ -66,7 +76,7 @@ void GrumpyIRC::ScrollbackList::on_treeView_activated(const QModelIndex &index)
     MainWindow::Main->GetScrollbackManager()->SwitchWindow(node->GetScrollback());
 }
 
-void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPoint &pos)
+void GrumpyIRC::ScrollbackList::on_treeView_clicked(const QModelIndex &index)
 {
-
+    this->switchWindow(index);
 }

@@ -37,7 +37,10 @@ namespace GrumpyIRC
             void on_treeView_activated(const QModelIndex &index);
             void on_treeView_customContextMenuRequested(const QPoint &pos);
 
+            void on_treeView_clicked(const QModelIndex &index);
+
         private:
+            void switchWindow(const QModelIndex &index);
 			QStandardItem *root;
             QStandardItemModel *model;
             Ui::ScrollbackList *ui;

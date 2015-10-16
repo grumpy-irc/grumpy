@@ -14,8 +14,6 @@ TEMPLATE = lib
 DEFINES += LIBCORE_LIBRARY
 
 SOURCES += core.cpp \
-    serversession.cpp \
-    serverlistener.cpp \
     usersession.cpp \
     eventhandler.cpp \
     ircsession.cpp \
@@ -26,12 +24,12 @@ SOURCES += core.cpp \
     exception.cpp \
     factory.cpp \
     autocompletionengine.cpp \
-    terminalparser.cpp
+    terminalparser.cpp \
+    grumpydsession.cpp \
+    gp.cpp
 
 HEADERS += core.h\
         libcore_global.h \
-    serversession.h \
-    serverlistener.h \
     usersession.h \
     eventhandler.h \
     ircsession.h \
@@ -43,7 +41,9 @@ HEADERS += core.h\
     exception.h \
     factory.h \
     autocompletionengine.h \
-    terminalparser.h
+    terminalparser.h \
+    grumpydsession.h \
+    gp.h
 
 unix {
     target.path = /usr/lib

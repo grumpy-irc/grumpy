@@ -10,11 +10,39 @@
 
 // Copyright (c) Petr Bena 2015
 
-#include "serversession.h"
+#include "grumpydsession.h"
+#include "exception.h"
+#include <QTcpSocket>
+#include <QDataStream>
 
 using namespace GrumpyIRC;
 
-ServerSession::ServerSession()
+GrumpydSession::GrumpydSession(QString Hostname, QString UserName, QString Pass, int Port)
+{
+    this->hostname = Hostname;
+    this->socket = NULL;
+    this->port = Port;
+    this->username = UserName;
+    this->password = Pass;
+    this->SSL = false;
+}
+
+GrumpydSession::~GrumpydSession()
+{
+    delete this->socket;
+}
+
+void GrumpydSession::Connect()
+{
+
+}
+
+void GrumpydSession::OnConnected()
+{
+
+}
+
+void GrumpydSession::OnTimeout()
 {
 
 }

@@ -9,9 +9,13 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     corewrapper.cpp \
-    grumpyd.cpp
+    grumpyd.cpp \
+    listener.cpp \
+    session.cpp
 
 HEADERS += \
     corewrapper.h \
-    grumpyd.h
+    grumpyd.h \
+    listener.h \
+    session.h
 

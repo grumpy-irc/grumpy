@@ -10,36 +10,11 @@
 
 // Copyright (c) Petr Bena 2015
 
-#include "datablock.h"
+#include "session.h"
 
-using namespace GrumpyProtocol;
+using namespace GrumpyIRC;
 
-DataBlock::DataBlock()
-{
-
-}
-
-unsigned long DataBlock::GetHSize()
-{
-
-}
-
-unsigned long long DataBlock::GetSize()
-{
-
-}
-
-QByteArray DataBlock::GetHeader()
-{
-    QVariant::
-}
-
-QByteArray DataBlock::ToArray()
-{
-
-}
-
-void DataBlock::InsertData(QString key, QVariant value)
+Session::Session()
 {
 
 }
