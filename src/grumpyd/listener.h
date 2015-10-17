@@ -14,16 +14,17 @@
 #define LISTENER_H
 
 #include <QString>
+#include <QTcpServer>
 #include <QObject>
 
 namespace GrumpyIRC
 {
-    class Listener
+    class Listener : public QTcpServer
     {
         public:
             Listener();
-
-
+        protected:
+            void incomingConnection(qintptr socketDescriptor) Q_DECL_OVERRIDE;
     };
 }
 

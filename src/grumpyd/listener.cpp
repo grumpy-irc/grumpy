@@ -19,3 +19,8 @@ Listener::Listener()
 
 }
 
+void Listener::incomingConnection(qintptr socketDescriptor)
+{
+
+}
+

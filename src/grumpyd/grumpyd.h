@@ -13,6 +13,8 @@
 #ifndef GRUMPYD_H
 #define GRUMPYD_H
 
+#include <QString>
+
 namespace GrumpyIRC
 {
     class Grumpyd
