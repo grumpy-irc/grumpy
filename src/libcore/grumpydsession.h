@@ -72,6 +72,7 @@ namespace GrumpyIRC
             void OnIncomingCommand(QString text, QHash<QString, QVariant> parameters);
 
         private:
+            void closeError(QString error);
             Scrollback *systemWindow;
             bool SSL;
             QString hostname;

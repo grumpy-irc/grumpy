@@ -6,6 +6,7 @@ SET(CMAKE_AUTOMOC ON)
 
 if(QT5_BUILD)
   find_package(Qt5Core REQUIRED)
+  find_package(Qt5Xml REQUIRED)
   find_package(Qt5Network REQUIRED)
   set(QT_INCLUDES ${Qt5Network_INCLUDE_DIRS})
   include_directories(${QT_INCLUDES})

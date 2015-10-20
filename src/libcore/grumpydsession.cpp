@@ -10,6 +10,8 @@
 
 // Copyright (c) Petr Bena 2015
 
+#include "core.h"
+#include "eventhandler.h"
 #include "grumpydsession.h"
 #include "exception.h"
 #include "scrollback.h"
@@ -87,6 +89,7 @@ void GrumpydSession::OnTimeout()
 
 void GrumpydSession::OnConnected()
 {
+    this->systemWindow->InsertText("Connected to remote server, sending HELLO packet");
     QHash<QString, QVariant> parameters;
     parameters.insert("version", QString(GRUMPY_VERSION_STRING));
     this->SendProtocolCommand("HELLO", parameters);
@@ -94,6 +97,45 @@ void GrumpydSession::OnConnected()
 
 void GrumpydSession::OnIncomingCommand(QString text, QHash<QString, QVariant> parameters)
 {
+    if (text == "UNKNOWN")
+    {
+        if (parameters.contains("unrecognized"))
+            this->systemWindow->InsertText(QString("Grumpyd didn't recognize this command: ") + parameters["unrecognized"].toString());
+        return;
+    } else if (text == "HELLO")
+    {
+        if (!parameters.contains("version"))
+            return;
+        if (!parameters.contains("authentication_required"))
+        {
+            this->closeError("Remote doesn't support any authentication mechanism");
+            return;
+        }
+        bool authentication_required = parameters["authentication_required"].toBool();
+        if (authentication_required && this->username.isEmpty())
+        {
+            this->closeError("Remote require authentication, but you didn't provide any credentials needed to login");
+            return;
+        }
+        this->systemWindow->InsertText("Received HELLO from remote system, version of server is: " + parameters["version"].toString());
+        QHash<QString, QVariant> parameters;
+        parameters.insert("pass", this->password);
+        parameters.insert("user", this->username);
+        this->SendProtocolCommand("LOGIN", parameters);
+    } else if (text == "LOGIN_FAIL")
+    {
+        this->closeError("Invalid username or password provided");
+        return;
+    } else if (text == "LOGIN_OK")
+    {
+        this->systemWindow->InsertText("Synchronizing networks");
+        this->SendProtocolCommand("NETWORK_INFO");
+    }
+}
 
+void GrumpydSession::closeError(QString error)
+{
+    this->Disconnect();
+    this->systemWindow->InsertText("Connection failure: " + error);
 }
 

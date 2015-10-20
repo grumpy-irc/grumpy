@@ -12,6 +12,7 @@
 
 #include "grumpyd.h"
 #include "corewrapper.h"
+#include "databasexml.h"
 #include "sleeper.h"
 #include "listener.h"
 #include "../libcore/core.h"
@@ -33,6 +34,9 @@ Grumpyd::~Grumpyd()
 
 void Grumpyd::Main()
 {
+    GRUMPY_LOG("Loading database");
+    this->databaseBackend = new DatabaseXML();
+    this->databaseBackend->LoadUsers();
     GRUMPY_LOG("Starting listeners");
     this->listener->listen(QHostAddress::Any, GP_DEFAULT_PORT);
     GRUMPY_LOG("Listener open on port " + QString::number(GP_DEFAULT_PORT));

@@ -13,6 +13,7 @@
 #ifndef SESSION_H
 #define SESSION_H
 
+#include "../libcore/definitions.h"
 #include <QObject>
 #include <QHash>
 #include <QThread>
@@ -24,6 +25,8 @@
 
 namespace GrumpyIRC
 {
+    class User;
+
     class Session : public QThread
     {
             enum State
@@ -43,6 +46,9 @@ namespace GrumpyIRC
             ~Session();
             void run();
             unsigned long GetSID();
+            bool IsAuthorized(QString permission);
+            void TransferError(QString source, QString description, int id);
+            bool IsRunning;
             State SessionState;
 
         public slots:
@@ -52,12 +58,13 @@ namespace GrumpyIRC
             void OnError(int error, QString text);
 
         private:
-            QTcpSocket *socket;
-            GP *protocol;
             static unsigned long lSID;
             static QList<Session*> SessionList;
             static QMutex *sessions_lock;
 
+            QTcpSocket *socket;
+            User *loggedUser;
+            GP *protocol;
             unsigned long SID;
     };
 }

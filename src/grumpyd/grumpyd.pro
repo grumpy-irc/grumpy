@@ -1,4 +1,4 @@
-QT += core network
+QT += core network xml
 QT -= gui
 
 TARGET = grumpyd
@@ -12,12 +12,18 @@ SOURCES += main.cpp \
     grumpyd.cpp \
     listener.cpp \
     session.cpp \
-    sleeper.cpp
+    sleeper.cpp \
+    databasebackend.cpp \
+    databasexml.cpp \
+    user.cpp
 
 HEADERS += \
     corewrapper.h \
     grumpyd.h \
     listener.h \
     session.h \
-    sleeper.h
+    sleeper.h \
+    databasebackend.h \
+    databasexml.h \
+    user.h
 

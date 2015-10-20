@@ -21,11 +21,6 @@
 #include <QMutex>
 #include <QList>
 
-namespace libircclient
-{
-    class User;
-}
-
 namespace GrumpyIRC
 {
     enum ScrollbackType

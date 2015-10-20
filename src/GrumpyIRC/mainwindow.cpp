@@ -91,13 +91,14 @@ static int SystemCommand_Nick(SystemCommand *command, CommandArgs args)
 
 static int SystemCommand_Grumpy(SystemCommand *command, CommandArgs command_args)
 {
+    Q_UNUSED(command);
     // if there is no parameter we throw some error
-    if (command_args.Parameters.count() < 1)
+    if (command_args.Parameters.count() < 3)
     {
-        GRUMPY_ERROR(QObject::tr("This command requires a parameter"));
+        GRUMPY_ERROR(QObject::tr("This command requires exactly 3 parameters"));
         return 0;
     }
-    MainWindow::Main->OpenGrumpy(command_args.Parameters[0], GP_DEFAULT_PORT);
+    MainWindow::Main->OpenGrumpy(command_args.Parameters[0], GP_DEFAULT_PORT, command_args.Parameters[1], command_args.Parameters[2]);
     return 0;
 }
 
@@ -168,10 +169,10 @@ UserWidget *MainWindow::GetUsers()
     return this->userWidget;
 }
 
-void MainWindow::OpenGrumpy(QString hostname, int port)
+void MainWindow::OpenGrumpy(QString hostname, int port, QString username, QString password)
 {
     ScrollbackFrame *system = this->GetScrollbackManager()->CreateWindow(hostname, NULL, true);
-    GrumpydSession *session = new GrumpydSession(system->GetScrollback(), hostname, "", "", port);
+    GrumpydSession *session = new GrumpydSession(system->GetScrollback(), hostname, username, password, port);
     session->Connect();
 }
 

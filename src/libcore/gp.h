@@ -20,6 +20,9 @@
 #include <QAbstractSocket>
 #include <QString>
 
+#define GP_EALREADYLOGGEDIN      -1
+#define GP_EINVALIDLOGINPARAMS   -2
+
 #define GP_MAGIC 0x010000
 #define GP_HEADER_SIZE 8
 #define GP_DEFAULT_PORT 6200
@@ -54,12 +57,13 @@ namespace GrumpyIRC
             GP(QTcpSocket *tcp_socket = 0);
             virtual ~GP();
             virtual bool IsConnected() const;
-            void SendPacket(QHash<QString, QVariant> packet);
-            void SendProtocolCommand(QString command);
-            void SendProtocolCommand(QString command, QHash<QString, QVariant> parameters);
+            virtual void SendPacket(QHash<QString, QVariant> packet);
+            virtual void SendProtocolCommand(QString command);
+            virtual void SendProtocolCommand(QString command, QHash<QString, QVariant> parameters);
             //! Perform connection of Qt signals to internal functions,
             //! use this only if you aren't overriding this class
-            void ResolveSignals();
+            virtual void ResolveSignals();
+            virtual void Disconnect();
             unsigned long MaxIncomingCacheSize;
 
         signals:

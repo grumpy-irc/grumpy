@@ -10,35 +10,21 @@
 
 // Copyright (c) Petr Bena 2015
 
-#ifndef GRUMPYD_H
-#define GRUMPYD_H
+#ifndef DATABASEXML_H
+#define DATABASEXML_H
 
-#include <QString>
-#include "../libcore/exception.h"
-#include "listener.h"
-#include <QObject>
-#include <QTimer>
+//#include <QtXml>
+#include "databasebackend.h"
 
 namespace GrumpyIRC
 {
-    class DatabaseBackend;
-
-    class Grumpyd : public QObject
+    class DatabaseXML : public DatabaseBackend
     {
-            Q_OBJECT
         public:
-            Grumpyd();
-            ~Grumpyd();
+            DatabaseXML();
 
-        public slots:
-            void Main();
-
-        private:
-            DatabaseBackend *databaseBackend;
-            Listener *listener;
-            bool running;
-
+            void LoadUsers();
     };
 }
 
-#endif // GRUMPYD_H
+#endif // DATABASEXML_H

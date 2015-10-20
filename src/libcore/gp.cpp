@@ -223,4 +223,13 @@ void GP::ResolveSignals()
     connect(this->socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(OnError(QAbstractSocket::SocketError)));
 }
 
+void GP::Disconnect()
+{
+    if (!this->socket)
+        return;
+    this->socket->close();
+    delete this->socket;
+    this->socket = NULL;
+}
+
 

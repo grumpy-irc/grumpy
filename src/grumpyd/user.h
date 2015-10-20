@@ -10,35 +10,36 @@
 
 // Copyright (c) Petr Bena 2015
 
-#ifndef GRUMPYD_H
-#define GRUMPYD_H
+#ifndef GDUSER_H
+#define GDUSER_H
 
+#include <QList>
 #include <QString>
-#include "../libcore/exception.h"
-#include "listener.h"
-#include <QObject>
-#include <QTimer>
 
 namespace GrumpyIRC
 {
-    class DatabaseBackend;
+    class IRCSession;
 
-    class Grumpyd : public QObject
+    class User
     {
-            Q_OBJECT
         public:
-            Grumpyd();
-            ~Grumpyd();
+            static QList<User*> UserInfo;
+            /*!
+             * \brief Login try to login user using the provided credentials, if login is successful a pointer is returned
+             * \param user
+             * \param pw
+             * \return
+             */
+            static User *Login(QString user, QString pw);
 
-        public slots:
-            void Main();
+            User(QString Name, QString Password);
+            bool IsAuthorized(QString perm);
 
         private:
-            DatabaseBackend *databaseBackend;
-            Listener *listener;
-            bool running;
-
+            QList<IRCSession*> sessions;
+            QString username;
+            QString password;
     };
 }
 
-#endif // GRUMPYD_H
+#endif // USER_H

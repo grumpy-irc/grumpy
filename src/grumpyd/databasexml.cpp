@@ -10,35 +10,19 @@
 
 // Copyright (c) Petr Bena 2015
 
-#ifndef GRUMPYD_H
-#define GRUMPYD_H
+#include "databasexml.h"
+#include "user.h"
 
-#include <QString>
-#include "../libcore/exception.h"
-#include "listener.h"
-#include <QObject>
-#include <QTimer>
+using namespace GrumpyIRC;
 
-namespace GrumpyIRC
+DatabaseXML::DatabaseXML()
 {
-    class DatabaseBackend;
 
-    class Grumpyd : public QObject
-    {
-            Q_OBJECT
-        public:
-            Grumpyd();
-            ~Grumpyd();
-
-        public slots:
-            void Main();
-
-        private:
-            DatabaseBackend *databaseBackend;
-            Listener *listener;
-            bool running;
-
-    };
 }
 
-#endif // GRUMPYD_H
+void DatabaseXML::LoadUsers()
+{
+    User::UserInfo.clear();
+    User::UserInfo.append(new User("system", "ab"));
+}
+
