@@ -26,7 +26,8 @@ SOURCES += core.cpp \
     autocompletionengine.cpp \
     terminalparser.cpp \
     grumpydsession.cpp \
-    gp.cpp
+    gp.cpp \
+    networksession.cpp
 
 HEADERS += core.h\
         libcore_global.h \
@@ -43,7 +44,8 @@ HEADERS += core.h\
     autocompletionengine.h \
     terminalparser.h \
     grumpydsession.h \
-    gp.h
+    gp.h \
+    networksession.h
 
 unix {
     target.path = /usr/lib

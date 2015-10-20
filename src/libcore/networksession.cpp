@@ -10,20 +10,17 @@
 
 // Copyright (c) Petr Bena 2015
 
-#include "listener.h"
-#include "session.h"
+#include "networksession.h"
 
 using namespace GrumpyIRC;
 
-Listener::Listener()
+NetworkSession::NetworkSession()
 {
 
 }
 
-void Listener::incomingConnection(qintptr socketDescriptor)
+NetworkSession::~NetworkSession()
 {
-    Session *session = new Session(socketDescriptor);
-    connect(session, SIGNAL(finished()), session, SLOT(deleteLater()));
-    session->start();
+
 }
 

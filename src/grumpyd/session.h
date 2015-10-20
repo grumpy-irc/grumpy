@@ -13,19 +13,52 @@
 #ifndef SESSION_H
 #define SESSION_H
 
+#include <QObject>
 #include <QHash>
+#include <QThread>
+#include <QList>
+#include <QTcpSocket>
 #include <QString>
+#include <QMutex>
+#include "../libcore/gp.h"
 
 namespace GrumpyIRC
 {
-    class Session
+    class Session : public QThread
     {
-        public:
-            Session();
+            enum State
+            {
+                State_Login,
+                State_Open,
+                State_Killing,
+                State_Exiting,
+                State_Offline
+            };
 
-        signals:
+            Q_OBJECT
+        public:
+            static QList<Session*> Sessions();
+
+            Session(qintptr SocketPtr);
+            ~Session();
+            void run();
+            unsigned long GetSID();
+            State SessionState;
 
         public slots:
+            void OnCommand(QString text, QHash<QString, QVariant> parameters);
+
+        signals:
+            void OnError(int error, QString text);
+
+        private:
+            QTcpSocket *socket;
+            GP *protocol;
+            static unsigned long lSID;
+            static QList<Session*> SessionList;
+            static QMutex *sessions_lock;
+
+            unsigned long SID;
     };
 }
 

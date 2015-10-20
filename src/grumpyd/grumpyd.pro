@@ -11,11 +11,13 @@ SOURCES += main.cpp \
     corewrapper.cpp \
     grumpyd.cpp \
     listener.cpp \
-    session.cpp
+    session.cpp \
+    sleeper.cpp
 
 HEADERS += \
     corewrapper.h \
     grumpyd.h \
     listener.h \
-    session.h
+    session.h \
+    sleeper.h
 

@@ -79,7 +79,7 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
         }
         if (!this->CommandList.contains(command_name))
         {
-            if (window && window->GetSession())
+            if (window && window->GetSession() && window->GetSession()->GetNetwork())
             {
                 if (!window->GetSession()->IsConnected())
                     return -COMMANDPROCESSOR_ENOTCONNECTED;

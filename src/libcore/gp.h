@@ -16,12 +16,14 @@
 #include "libcore_global.h"
 #include <QObject>
 #include <QHash>
+#include <QMutex>
 #include <QAbstractSocket>
 #include <QString>
 
 #define GP_MAGIC 0x010000
 #define GP_HEADER_SIZE 8
 #define GP_DEFAULT_PORT 6200
+#define GP_TYPE_SYSTEM 0
 
 namespace libirc
 {
@@ -41,28 +43,48 @@ class QTcpSocket;
 
 namespace GrumpyIRC
 {
+    //! Grumpy protocol
+
+    //! This class is able to handle server or client connection using
+    //! grumpy's network protocol
     class LIBCORESHARED_EXPORT GP : public QObject
     {
             Q_OBJECT
         public:
-            GP();
+            GP(QTcpSocket *tcp_socket = 0);
             virtual ~GP();
             virtual bool IsConnected() const;
             void SendPacket(QHash<QString, QVariant> packet);
+            void SendProtocolCommand(QString command);
+            void SendProtocolCommand(QString command, QHash<QString, QVariant> parameters);
+            //! Perform connection of Qt signals to internal functions,
+            //! use this only if you aren't overriding this class
+            void ResolveSignals();
+            unsigned long MaxIncomingCacheSize;
 
         signals:
             void Event_Connected();
             void Event_Disconnected();
             void Event_Timeout();
+            void Event_Incoming(QHash<QString, QVariant> packet);
+            void Event_IncomingCommand(QString text, QHash<QString, QVariant> parameters);
 
         public slots:
-            void OnPing();
-            void OnPingSend();
-            void OnError(QAbstractSocket::SocketError er);
-            void OnReceive();
-            void OnConnected();
+            virtual void OnPing();
+            virtual void OnPingSend();
+            virtual void OnError(QAbstractSocket::SocketError er);
+            virtual void OnReceive();
+            virtual void OnConnected();
 
-        private:
+        protected:
+            virtual void OnIncomingCommand(QString text, QHash<QString, QVariant> parameters);
+            void processPacket(QHash<QString, QVariant> pack);
+            void processIncoming(QByteArray data);
+            QHash<QString, QVariant> packetFromIncomingCache();
+            void processHeader(QByteArray data);
+            QMutex mutex;
+            qint64 incomingPacketSize;
+            QByteArray incomingCache;
             QTcpSocket *socket;
 
     };

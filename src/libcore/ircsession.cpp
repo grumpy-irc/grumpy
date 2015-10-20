@@ -97,7 +97,7 @@ void IRCSession::Connect(libircclient::Network *Network)
     this->network->Connect();
 }
 
-bool IRCSession::IsConnected()
+bool IRCSession::IsConnected() const
 {
     if (this->network && this->network->IsConnected())
         return true;

@@ -10,20 +10,21 @@
 
 // Copyright (c) Petr Bena 2015
 
-#include "listener.h"
-#include "session.h"
+#ifndef SLEEPER_H
+#define SLEEPER_H
 
-using namespace GrumpyIRC;
+#include <QThread>
 
-Listener::Listener()
+class Sleeper : public QThread
 {
+    public:
+        static void Sleep(unsigned long msecs) { QThread::sleep(msecs); }
+        Sleeper();
 
-}
 
-void Listener::incomingConnection(qintptr socketDescriptor)
-{
-    Session *session = new Session(socketDescriptor);
-    connect(session, SIGNAL(finished()), session, SLOT(deleteLater()));
-    session->start();
-}
+    signals:
 
+    public slots:
+};
+
+#endif // SLEEPER_H

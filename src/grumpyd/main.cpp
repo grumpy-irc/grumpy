@@ -12,6 +12,7 @@
 
 #include <QCoreApplication>
 #include "corewrapper.h"
+#include "grumpyd.h"
 #include "../libcore/configuration.h"
 #include "../libcore/core.h"
 #include "../libcore/terminalparser.h"
@@ -33,9 +34,9 @@ int main(int argc, char *argv[])
     GrumpyIRC::CoreWrapper::GrumpyCore = new GrumpyIRC::Core();
     GrumpyIRC::CoreWrapper::GrumpyCore->InitCfg();
     GRUMPY_LOG("Grumpyd starting...");
-    //GRUMPY_LOG("Version: " + GCFG->)
+    GrumpyIRC::Grumpyd *daemon = new GrumpyIRC::Grumpyd();
+    QTimer::singleShot(0, daemon, SLOT(Main()));
     QCoreApplication a(argc, argv);
-
     return a.exec();
 }
 

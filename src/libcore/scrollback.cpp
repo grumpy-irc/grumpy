@@ -59,7 +59,7 @@ void Scrollback::SetMaxItemsSize(unsigned long long size)
     this->_maxItems = size;
 }
 
-void Scrollback::SetSession(IRCSession *Session)
+void Scrollback::SetSession(NetworkSession *Session)
 {
     if (this->session)
         throw new GrumpyIRC::Exception("This scrollback already has an IrcSession", BOOST_CURRENT_FUNCTION);
@@ -84,7 +84,7 @@ void Scrollback::SetTarget(QString target)
     this->_target = target;
 }
 
-IRCSession *Scrollback::GetSession()
+NetworkSession *Scrollback::GetSession()
 {
     return this->session;
 }

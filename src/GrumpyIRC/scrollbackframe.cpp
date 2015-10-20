@@ -159,7 +159,7 @@ void ScrollbackFrame::UserList_Rename(QString old, libircclient::User *us)
     this->userFrame->ChangeNick(us->GetNick(), old);
 }
 
-void ScrollbackFrame::SessionChanged(IRCSession *session)
+void ScrollbackFrame::SessionChanged(NetworkSession *session)
 {
     this->userFrame->SetNetwork(session->GetNetwork());
 }
@@ -179,7 +179,7 @@ unsigned long ScrollbackFrame::GetID()
     return this->scrollback->GetID();
 }
 
-IRCSession *ScrollbackFrame::GetSession()
+NetworkSession *ScrollbackFrame::GetSession()
 {
     return this->scrollback->GetSession();
 }

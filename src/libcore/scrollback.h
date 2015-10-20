@@ -81,7 +81,7 @@ namespace GrumpyIRC
         UserListChange_Refresh
     };
 
-    class IRCSession;
+    class NetworkSession;
 
     /*!
      * \brief The Scrollback class represent a buffer used to store all items in a window
@@ -102,11 +102,11 @@ namespace GrumpyIRC
             virtual void InsertText(ScrollbackItem item);
             virtual void SetTarget(QString target);
             virtual QString GetTarget() const;
-            virtual IRCSession *GetSession();
+            virtual NetworkSession *GetSession();
             //! Called by IRC session or any other object if there is any change to user list associated to this scrollback
             void UserListChange(QString nick, libircclient::User *user, UserListChangeType change_type);
             virtual ScrollbackType GetType() const;
-            virtual void SetSession(IRCSession *Session);
+            virtual void SetSession(NetworkSession *Session);
             virtual bool IsDead() const;
             void SetDead(bool dead);
 
@@ -114,7 +114,7 @@ namespace GrumpyIRC
             void Event_InsertText(ScrollbackItem item);
             void Event_UserInserted(libircclient::User *user);
             void Event_UserAltered(QString original_name, libircclient::User *user);
-            void Event_SessionModified(IRCSession *Session);
+            void Event_SessionModified(NetworkSession *Session);
             void Event_UserRemoved(QString name);
             //! Called when some meta-information for user is changed, such as away status
             //! so that it can be updated in associated widgets
@@ -123,7 +123,7 @@ namespace GrumpyIRC
         private:
             bool _dead;
             QString _target;
-            IRCSession *session;
+            NetworkSession *session;
             ScrollbackType type;
             static unsigned long long lastID;
             QList<ScrollbackItem> items;

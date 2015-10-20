@@ -17,6 +17,7 @@
 #include <QObject>
 #include <QString>
 #include <QAbstractSocket>
+#include "networksession.h"
 #include "libcore_global.h"
 
 namespace libirc
@@ -37,7 +38,7 @@ namespace GrumpyIRC
 {
     class Scrollback;
 
-    class LIBCORESHARED_EXPORT IRCSession : public QObject
+    class LIBCORESHARED_EXPORT IRCSession : public QObject, public NetworkSession
     {
             Q_OBJECT
         public:
@@ -52,10 +53,10 @@ namespace GrumpyIRC
             IRCSession(Scrollback *system);
             virtual ~IRCSession();
             virtual Scrollback *GetSystemWindow();
-            virtual libircclient::Network *GetNetwork();
+            libircclient::Network *GetNetwork();
             virtual void Connect(libircclient::Network *Network);
-            virtual void SendMessage(Scrollback *window, QString text);
-            virtual bool IsConnected();
+            void SendMessage(Scrollback *window, QString text);
+            bool IsConnected() const;
             virtual Scrollback *GetScrollbackForChannel(QString channel);
             Scrollback *GetScrollbackForUser(QString user);
         private slots:
@@ -76,7 +77,7 @@ namespace GrumpyIRC
             void OnTopicInfo(libircclient::Parser *px, libircclient::Channel *channel);
             void OnEndOfNames(libircclient::Parser *px);
             void OnNotice(libircclient::Parser *px);
-        private:
+        protected:
             QHash<QString, Scrollback*> channels;
             libircclient::Network *network;
             QHash<QString, Scrollback*> users;

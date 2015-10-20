@@ -10,20 +10,33 @@
 
 // Copyright (c) Petr Bena 2015
 
-#include "listener.h"
-#include "session.h"
+#ifndef NETWORKSESSION_H
+#define NETWORKSESSION_H
 
-using namespace GrumpyIRC;
+#include <QString>
 
-Listener::Listener()
+namespace libircclient
 {
-
+    class Network;
 }
 
-void Listener::incomingConnection(qintptr socketDescriptor)
+namespace GrumpyIRC
 {
-    Session *session = new Session(socketDescriptor);
-    connect(session, SIGNAL(finished()), session, SLOT(deleteLater()));
-    session->start();
+    class Scrollback;
+
+    class NetworkSession
+    {
+        public:
+            NetworkSession();
+            virtual ~NetworkSession();
+            virtual bool IsConnected() const=0;
+            virtual libircclient::Network *GetNetwork()=0;
+            virtual void SendMessage(Scrollback *window, QString text)=0;
+
+        //signals:
+
+        //public slots:
+    };
 }
 
+#endif // NETWORKSESSION_H

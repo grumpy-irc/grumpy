@@ -14,8 +14,56 @@
 
 using namespace GrumpyIRC;
 
-Session::Session()
+QMutex *Session::sessions_lock = new QMutex();
+QList<Session*> Session::SessionList;
+unsigned long Session::lSID = 0;
+
+QList<Session *> Session::Sessions()
+{
+    return SessionList;
+}
+
+Session::Session(qintptr SocketPtr)
+{
+    this->socket = new QTcpSocket();
+    this->socket->setSocketDescriptor(SocketPtr);
+    this->protocol = new GP(socket);
+    this->SessionState = State_Login;
+    sessions_lock->lock();
+    this->SID = lSID++;
+    SessionList.append(this);
+    sessions_lock->unlock();
+    connect(this->protocol, SIGNAL(Event_IncomingCommand(QString,QHash<QString,QVariant>)), this, SLOT(OnCommand(QString,QHash<QString,QVariant>)));
+    this->protocol->ResolveSignals();
+}
+
+Session::~Session()
+{
+    // deletion of socket is performed by destructor of protocol
+    delete this->protocol;
+    sessions_lock->lock();
+    SessionList.removeOne(this);
+    sessions_lock->unlock();
+}
+
+void Session::run()
 {
 
 }
+
+unsigned long Session::GetSID()
+{
+    return this->SID;
+}
+
+void Session::OnCommand(QString text, QHash<QString, QVariant> parameters)
+{
+    if (text == "HELLO")
+    {
+        // respond to HELLO which is a first command that is meant to be sent by a client to server and only server
+        // can respond to it
+        this->protocol->SendProtocolCommand("HELLO");
+    }
+}
+
 

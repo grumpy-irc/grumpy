@@ -23,6 +23,8 @@
 #include "../libirc/libircclient/network.h"
 #include "../libirc/libirc/serveraddress.h"
 #include "../libcore/eventhandler.h"
+#include "../libcore/gp.h"
+#include "../libcore/grumpydsession.h"
 #include "../libcore/exception.h"
 #include "../libcore/ircsession.h"
 #include "../libcore/core.h"
@@ -87,6 +89,18 @@ static int SystemCommand_Nick(SystemCommand *command, CommandArgs args)
     }
 }
 
+static int SystemCommand_Grumpy(SystemCommand *command, CommandArgs command_args)
+{
+    // if there is no parameter we throw some error
+    if (command_args.Parameters.count() < 1)
+    {
+        GRUMPY_ERROR(QObject::tr("This command requires a parameter"));
+        return 0;
+    }
+    MainWindow::Main->OpenGrumpy(command_args.Parameters[0], GP_DEFAULT_PORT);
+    return 0;
+}
+
 static int SystemCommand_Server(SystemCommand *command, CommandArgs command_args)
 {
     // if there is no parameter we throw some error
@@ -120,6 +134,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("server", (SC_Callback)SystemCommand_Server));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("nick", (SC_Callback)SystemCommand_Nick));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.next_session_nick", (SC_Callback)SystemCommand_NextSessionNick));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpyd", (SC_Callback)SystemCommand_Grumpy));
     // Welcome user
     this->systemWindow->InsertText(QString("Grumpy irc version " + GCFG->GetVersion()));
     // Try to restore geometry
@@ -151,6 +166,13 @@ void MainWindow::WriteToSystemWindow(QString text)
 UserWidget *MainWindow::GetUsers()
 {
     return this->userWidget;
+}
+
+void MainWindow::OpenGrumpy(QString hostname, int port)
+{
+    ScrollbackFrame *system = this->GetScrollbackManager()->CreateWindow(hostname, NULL, true);
+    GrumpydSession *session = new GrumpydSession(system->GetScrollback(), hostname, "", "", port);
+    session->Connect();
 }
 
 void MainWindow::OpenIRCNetworkLink(QString link)

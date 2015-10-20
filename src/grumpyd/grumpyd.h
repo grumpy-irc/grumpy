@@ -14,13 +14,26 @@
 #define GRUMPYD_H
 
 #include <QString>
+#include "../libcore/exception.h"
+#include "listener.h"
+#include <QObject>
+#include <QTimer>
 
 namespace GrumpyIRC
 {
-    class Grumpyd
+    class Grumpyd : public QObject
     {
+            Q_OBJECT
         public:
             Grumpyd();
+            ~Grumpyd();
+
+        public slots:
+            void Main();
+
+        private:
+            Listener *listener;
+            bool running;
 
     };
 }

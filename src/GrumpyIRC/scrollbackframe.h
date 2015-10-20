@@ -33,7 +33,7 @@ namespace GrumpyIRC
     class Scrollback;
     class ScrollbackList_Window;
     class UserFrame;
-    class IRCSession;
+    class NetworkSession;
 
     class ScrollbackFrame : public QFrame
     {
@@ -47,7 +47,7 @@ namespace GrumpyIRC
             void SetWindowName(QString title);
 			ScrollbackFrame *GetParent();
             unsigned long GetID();
-            IRCSession *GetSession();
+            NetworkSession *GetSession();
             Scrollback *GetScrollback();
             UserFrame *GetUserFrame();
             void Focus();
@@ -59,7 +59,7 @@ namespace GrumpyIRC
             void UserList_Insert(libircclient::User *ux);
             void UserList_Remove(QString user);
             void UserList_Rename(QString old, libircclient::User *us);
-            void SessionChanged(IRCSession *session);
+            void SessionChanged(NetworkSession *session);
         private:
             Scrollback *scrollback;
 			//QStandardItem *treeNode;

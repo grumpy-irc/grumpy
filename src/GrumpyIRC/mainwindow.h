@@ -48,6 +48,7 @@ namespace GrumpyIRC
             ScrollbackList *GetScrollbackList();
             void WriteToSystemWindow(QString text);
             UserWidget *GetUsers();
+            void OpenGrumpy(QString hostname, int port);
             void OpenIRCNetworkLink(QString link);
             void OpenServer(libirc::ServerAddress &server);
 

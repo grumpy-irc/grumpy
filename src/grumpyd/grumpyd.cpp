@@ -11,11 +11,30 @@
 // Copyright (c) Petr Bena 2015
 
 #include "grumpyd.h"
+#include "corewrapper.h"
+#include "sleeper.h"
+#include "listener.h"
+#include "../libcore/core.h"
+#include "../libcore/eventhandler.h"
+#include "../libcore/gp.h"
 
 using namespace GrumpyIRC;
 
 Grumpyd::Grumpyd()
 {
+    running = true;
+    this->listener = new Listener();
+}
 
+Grumpyd::~Grumpyd()
+{
+    delete this->listener;
+}
+
+void Grumpyd::Main()
+{
+    GRUMPY_LOG("Starting listeners");
+    this->listener->listen(QHostAddress::Any, GP_DEFAULT_PORT);
+    GRUMPY_LOG("Listener open on port " + QString::number(GP_DEFAULT_PORT));
 }
 
