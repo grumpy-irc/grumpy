@@ -18,6 +18,7 @@
 #include <QString>
 #include <QObject>
 #include <QDateTime>
+#include "../libirc/libirc/serializableitem.h"
 #include <QMutex>
 #include <QList>
 
@@ -48,9 +49,10 @@ namespace GrumpyIRC
     /*!
      * \brief The ScrollbackItem class is a one item in scrollback buffer
      */
-    class LIBCORESHARED_EXPORT ScrollbackItem
+    class LIBCORESHARED_EXPORT ScrollbackItem : public libirc::SerializableItem
     {
         public:
+            ScrollbackItem(QHash<QString, QVariant> hash);
             ScrollbackItem(QString text);
             ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User *user = NULL);
             virtual ~ScrollbackItem();
@@ -61,6 +63,8 @@ namespace GrumpyIRC
             virtual void SetText(QString text);
             virtual void SetUser(libircclient::User *user);
             virtual libircclient::User GetUser() const;
+            void LoadHash(QHash<QString, QVariant> hash);
+            QHash<QString, QVariant> ToHash();
         private:
             libircclient::User _user;
             QString _text;
@@ -80,8 +84,13 @@ namespace GrumpyIRC
 
     /*!
      * \brief The Scrollback class represent a buffer used to store all items in a window
+              It's one of core items that grumpy is built on. Basically every window you
+              can see in grumpy is a scrollback. You can write messages to it and they
+              may be synchronized over network as well.
+
+              Scrollback can be a system window, channel window or any other text buffer used in program
      */
-    class LIBCORESHARED_EXPORT Scrollback : public QObject
+    class LIBCORESHARED_EXPORT Scrollback : public QObject, public libirc::SerializableItem
     {
             Q_OBJECT
         public:
@@ -97,13 +106,16 @@ namespace GrumpyIRC
             virtual void InsertText(ScrollbackItem item);
             virtual void SetTarget(QString target);
             virtual QString GetTarget() const;
+            //! If this scrollback is associated to some session this function returns the pointer to it, in case it's not NULL is returned
             virtual NetworkSession *GetSession();
             //! Called by IRC session or any other object if there is any change to user list associated to this scrollback
-            void UserListChange(QString nick, libircclient::User *user, UserListChangeType change_type);
+            virtual void UserListChange(QString nick, libircclient::User *user, UserListChangeType change_type);
             virtual ScrollbackType GetType() const;
             virtual void SetSession(NetworkSession *Session);
             virtual bool IsDead() const;
-            void SetDead(bool dead);
+            virtual void SetDead(bool dead);
+            QHash<QString, QVariant> ToHash();
+            void LoadHash(QHash<QString, QVariant> hash);
 
         signals:
             void Event_InsertText(ScrollbackItem item);

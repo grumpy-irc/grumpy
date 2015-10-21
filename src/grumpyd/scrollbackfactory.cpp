@@ -10,19 +10,18 @@
 
 // Copyright (c) Petr Bena 2015
 
-#ifndef DATABASEBACKEND_H
-#define DATABASEBACKEND_H
+#include "virtualscrollback.h"
+#include "scrollbackfactory.h"
 
-namespace GrumpyIRC
+using namespace GrumpyIRC;
+
+ScrollbackFactory::ScrollbackFactory()
 {
-    class DatabaseBackend
-    {
-        public:
-            DatabaseBackend();
-            virtual ~DatabaseBackend();
-            virtual void LoadRoles()=0;
-            virtual void LoadUsers()=0;
-    };
+
 }
 
-#endif // DATABASEBACKEND_H
+Scrollback *ScrollbackFactory::NewScrollback(Scrollback *parent, QString name, ScrollbackType type)
+{
+    return new VirtualScrollback(type);
+}
+

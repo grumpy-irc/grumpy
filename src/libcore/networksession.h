@@ -22,6 +22,12 @@ namespace libircclient
 
 namespace GrumpyIRC
 {
+    enum SessionType
+    {
+        SessionType_IRC,
+        SessionType_Grumpyd
+    };
+
     class Scrollback;
 
     class NetworkSession
@@ -32,6 +38,7 @@ namespace GrumpyIRC
             virtual bool IsConnected() const=0;
             virtual libircclient::Network *GetNetwork()=0;
             virtual void SendMessage(Scrollback *window, QString text)=0;
+            virtual SessionType GetType()=0;
 
         //signals:
 

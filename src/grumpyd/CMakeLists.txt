@@ -1,6 +1,7 @@
 PROJECT(grumpyd)
 
 SET(QT_USE_QTNETWORK TRUE)
+SET(QT_USE_QTXML TRUE)
 SET(CMAKE_BUILD_TYPE Release)
 SET(CMAKE_AUTOMOC ON)
 
@@ -8,7 +9,7 @@ if(QT5_BUILD)
   find_package(Qt5Core REQUIRED)
   find_package(Qt5Xml REQUIRED)
   find_package(Qt5Network REQUIRED)
-  set(QT_INCLUDES ${Qt5Network_INCLUDE_DIRS})
+  set(QT_INCLUDES ${Qt5Xml_INCLUDE_DIRS} ${Qt5Network_INCLUDE_DIRS})
   include_directories(${QT_INCLUDES})
 else()
   find_package(Qt4 REQUIRED)

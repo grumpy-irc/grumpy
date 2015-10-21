@@ -15,7 +15,10 @@ SOURCES += main.cpp \
     sleeper.cpp \
     databasebackend.cpp \
     databasexml.cpp \
-    user.cpp
+    user.cpp \
+    security.cpp \
+    virtualscrollback.cpp \
+    scrollbackfactory.cpp
 
 HEADERS += \
     corewrapper.h \
@@ -25,5 +28,8 @@ HEADERS += \
     sleeper.h \
     databasebackend.h \
     databasexml.h \
-    user.h
+    user.h \
+    security.h \
+    virtualscrollback.h \
+    scrollbackfactory.h
 

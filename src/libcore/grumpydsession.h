@@ -14,8 +14,9 @@
 #define GRUMPYDSESSION_H
 
 #include "libcore_global.h"
-#include "gp.h"
+#include "../libgp/gp.h"
 #include "definitions.h"
+#include "../libirc/libirc/serveraddress.h"
 #include "networksession.h"
 #include <QMutex>
 #include <QObject>
@@ -44,8 +45,9 @@ class QTcpSocket;
 namespace GrumpyIRC
 {
     class Scrollback;
+    class IRCSession;
 
-    class LIBCORESHARED_EXPORT GrumpydSession : public GP, public NetworkSession
+    class LIBCORESHARED_EXPORT GrumpydSession : public libgp::GP, public NetworkSession
     {
             Q_OBJECT
         public:
@@ -55,10 +57,13 @@ namespace GrumpyIRC
             GrumpydSession(Scrollback *System, QString Hostname, QString UserName, QString Pass, int Port = GP_DEFAULT_PORT);
             virtual ~GrumpydSession();
             virtual Scrollback *GetSystemWindow();
+            virtual void Open(libirc::ServerAddress server);
             bool IsConnected() const;
             void SendMessage(Scrollback *window, QString text);
             libircclient::Network *GetNetwork();
+            SessionType GetType();
             void Connect();
+            QList<IRCSession*> SessionsIrc;
 
         signals:
             void Event_IncomingData(QByteArray data);
@@ -72,6 +77,7 @@ namespace GrumpyIRC
             void OnIncomingCommand(QString text, QHash<QString, QVariant> parameters);
 
         private:
+            void processNetwork(QHash<QString, QVariant> hash);
             void closeError(QString error);
             Scrollback *systemWindow;
             bool SSL;

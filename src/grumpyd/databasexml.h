@@ -13,7 +13,7 @@
 #ifndef DATABASEXML_H
 #define DATABASEXML_H
 
-//#include <QtXml>
+#include <QtXml>
 #include "databasebackend.h"
 
 namespace GrumpyIRC
@@ -23,6 +23,7 @@ namespace GrumpyIRC
         public:
             DatabaseXML();
 
+            void LoadRoles();
             void LoadUsers();
     };
 }

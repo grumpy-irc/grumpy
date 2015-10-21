@@ -13,6 +13,7 @@
 #include "core.h"
 #include "eventhandler.h"
 #include "grumpydsession.h"
+#include "ircsession.h"
 #include "exception.h"
 #include "scrollback.h"
 #include <QTcpSocket>
@@ -50,6 +51,13 @@ Scrollback *GrumpydSession::GetSystemWindow()
     return this->systemWindow;
 }
 
+void GrumpydSession::Open(libirc::ServerAddress server)
+{
+    QHash<QString, QVariant> parameters;
+    parameters.insert("server", QVariant(server.ToHash()));
+    this->SendProtocolCommand("SERVER", parameters);
+}
+
 bool GrumpydSession::IsConnected() const
 {
     return GP::IsConnected();
@@ -63,6 +71,11 @@ void GrumpydSession::SendMessage(Scrollback *window, QString text)
 libircclient::Network *GrumpydSession::GetNetwork()
 {
     return NULL;
+}
+
+SessionType GrumpydSession::GetType()
+{
+    return SessionType_Grumpyd;
 }
 
 void GrumpydSession::Connect()
@@ -101,7 +114,6 @@ void GrumpydSession::OnIncomingCommand(QString text, QHash<QString, QVariant> pa
     {
         if (parameters.contains("unrecognized"))
             this->systemWindow->InsertText(QString("Grumpyd didn't recognize this command: ") + parameters["unrecognized"].toString());
-        return;
     } else if (text == "HELLO")
     {
         if (!parameters.contains("version"))
@@ -118,24 +130,54 @@ void GrumpydSession::OnIncomingCommand(QString text, QHash<QString, QVariant> pa
             return;
         }
         this->systemWindow->InsertText("Received HELLO from remote system, version of server is: " + parameters["version"].toString());
-        QHash<QString, QVariant> parameters;
-        parameters.insert("pass", this->password);
-        parameters.insert("user", this->username);
-        this->SendProtocolCommand("LOGIN", parameters);
+        QHash<QString, QVariant> params;
+        params.insert("password", this->password);
+        params.insert("username", this->username);
+        this->SendProtocolCommand("LOGIN", params);
     } else if (text == "LOGIN_FAIL")
     {
         this->closeError("Invalid username or password provided");
-        return;
     } else if (text == "LOGIN_OK")
     {
         this->systemWindow->InsertText("Synchronizing networks");
         this->SendProtocolCommand("NETWORK_INFO");
+    } else if (text == "NETWORK_INFO")
+    {
+        this->processNetwork(parameters);
+    } else if (text == "PERMDENY")
+    {
+        QString source = "unknown request";
+        if (parameters.contains("source"))
+            source = parameters["source"].toString();
+        this->systemWindow->InsertText("Permission denied: " + source);
+    } else
+    {
+        QHash<QString, QVariant> params;
+        params.insert("source", text);
+        this->SendProtocolCommand("UNKNOWN", params);
+        this->systemWindow->InsertText("Unknown command from grumpyd " + text);
     }
+}
+
+void GrumpydSession::processNetwork(QHash<QString, QVariant> hash)
+{
+    if (!hash.contains("sessions"))
+        return;
+
+    // Deserialize all irc sessions
+    QList<QVariant> session_list = hash["sessions"].toList();
+    foreach (QVariant session_hash, session_list)
+    {
+        IRCSession *session = new IRCSession(session_hash.toHash());
+        this->SessionsIrc.append(session);
+    }
+    this->systemWindow->InsertText("Synced networks: " + QString::number(session_list.count()));
 }
 
 void GrumpydSession::closeError(QString error)
 {
     this->Disconnect();
+    this->systemWindow->SetDead(true);
     this->systemWindow->InsertText("Connection failure: " + error);
 }
 

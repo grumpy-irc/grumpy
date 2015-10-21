@@ -9,6 +9,7 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 add_subdirectory (libirc2htmlcode)
 add_subdirectory (libirc/libirc/)
 add_subdirectory (libirc/libircclient/)
+add_subdirectory (libgp)
 
 # GrumpyIRC client itself
 

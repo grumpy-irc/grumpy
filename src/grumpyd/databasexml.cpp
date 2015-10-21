@@ -11,6 +11,7 @@
 // Copyright (c) Petr Bena 2015
 
 #include "databasexml.h"
+#include "security.h"
 #include "user.h"
 
 using namespace GrumpyIRC;
@@ -20,9 +21,22 @@ DatabaseXML::DatabaseXML()
 
 }
 
+void DatabaseXML::LoadRoles()
+{
+    Role::CreateRole("root");
+    Role::CreateRole("system");
+    Role::CreateRole("user");
+    Role::Roles["root"]->GrantRole(Role::Roles["system"]);
+    Role::Roles["root"]->GrantRole(Role::Roles["user"]);
+    Role::Roles["user"]->Grant(PRIVILEGE_LOGIN);
+    Role::Roles["user"]->Grant(PRIVILEGE_USE_IRC);
+}
+
 void DatabaseXML::LoadUsers()
 {
     User::UserInfo.clear();
-    User::UserInfo.append(new User("system", "ab"));
+    User *test = new User("user", "pw");
+    test->SetRole(Role::Roles["root"]);
+    User::UserInfo.append(test);
 }
 

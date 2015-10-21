@@ -10,19 +10,19 @@
 
 // Copyright (c) Petr Bena 2015
 
-#ifndef DATABASEBACKEND_H
-#define DATABASEBACKEND_H
+#ifndef SCROLLBACKFACTORY_H
+#define SCROLLBACKFACTORY_H
+
+#include "../libcore/factory.h"
 
 namespace GrumpyIRC
 {
-    class DatabaseBackend
+    class ScrollbackFactory : public Factory
     {
         public:
-            DatabaseBackend();
-            virtual ~DatabaseBackend();
-            virtual void LoadRoles()=0;
-            virtual void LoadUsers()=0;
+            ScrollbackFactory();
+            Scrollback *NewScrollback(Scrollback *parent, QString name, ScrollbackType type);
     };
 }
 
-#endif // DATABASEBACKEND_H
+#endif // SCROLLBACKFACTORY_H

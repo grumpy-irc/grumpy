@@ -21,7 +21,7 @@
 #include <QTcpSocket>
 #include <QString>
 #include <QMutex>
-#include "../libcore/gp.h"
+#include "../libgp/gp.h"
 
 namespace GrumpyIRC
 {
@@ -47,7 +47,10 @@ namespace GrumpyIRC
             void run();
             unsigned long GetSID();
             bool IsAuthorized(QString permission);
+            //! Transfer data to every session this user has, so that every session connected as this user receives it
+            void SendToEverySession(QString command, QHash<QString, QVariant> parameters);
             void TransferError(QString source, QString description, int id);
+            void PermissionDeny(QString source);
             bool IsRunning;
             State SessionState;
 
@@ -62,9 +65,13 @@ namespace GrumpyIRC
             static QList<Session*> SessionList;
             static QMutex *sessions_lock;
 
+            void processNetworks();
+            //! Called when user wants to connect to new IRC server
+            void processNew(QHash<QString, QVariant> info);
+
             QTcpSocket *socket;
             User *loggedUser;
-            GP *protocol;
+            libgp::GP *protocol;
             unsigned long SID;
     };
 }

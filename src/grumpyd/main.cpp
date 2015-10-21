@@ -12,6 +12,7 @@
 
 #include <QCoreApplication>
 #include "corewrapper.h"
+#include "scrollbackfactory.h"
 #include "grumpyd.h"
 #include "../libcore/configuration.h"
 #include "../libcore/core.h"
@@ -32,6 +33,8 @@ int main(int argc, char *argv[])
     }
     delete tp;
     GrumpyIRC::CoreWrapper::GrumpyCore = new GrumpyIRC::Core();
+    // Install our own scrollback factory that creates scrollbacks which are automagically network synced
+    GrumpyIRC::CoreWrapper::GrumpyCore->InstallFactory(new GrumpyIRC::ScrollbackFactory());
     GrumpyIRC::CoreWrapper::GrumpyCore->InitCfg();
     GRUMPY_LOG("Grumpyd starting...");
     GrumpyIRC::Grumpyd *daemon = new GrumpyIRC::Grumpyd();

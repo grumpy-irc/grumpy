@@ -79,6 +79,19 @@ void Scrollback::SetDead(bool dead)
     this->_dead = dead;
 }
 
+QHash<QString, QVariant> Scrollback::ToHash()
+{
+    QHash<QString, QVariant> hash;
+    SERIALIZE(_dead);
+    return hash;
+}
+
+void Scrollback::LoadHash(QHash<QString, QVariant> hash)
+{
+    UNSERIALIZE_STRING(_target);
+    UNSERIALIZE_BOOL(_dead);
+}
+
 void Scrollback::SetTarget(QString target)
 {
     this->_target = target;
@@ -124,6 +137,12 @@ void Scrollback::InsertText(QString text, ScrollbackItemType type)
     ScrollbackItem item(text);
     item.SetType(type);
     this->InsertText(item);
+}
+
+ScrollbackItem::ScrollbackItem(QHash<QString, QVariant> hash)
+{
+    this->_type = ScrollbackItemType_System;
+    this->LoadHash(hash);
 }
 
 ScrollbackItem::ScrollbackItem(QString text)
@@ -179,4 +198,19 @@ void ScrollbackItem::SetUser(libircclient::User *user)
 libircclient::User ScrollbackItem::GetUser() const
 {
     return this->_user;
+}
+
+void ScrollbackItem::LoadHash(QHash<QString, QVariant> hash)
+{
+    UNSERIALIZE_STRING(_text);
+}
+
+QHash<QString, QVariant> ScrollbackItem::ToHash()
+{
+    QHash<QString, QVariant> hash;
+    SERIALIZE(_text);
+    hash.insert("_user", QVariant(this->_user.ToHash()));
+    SERIALIZE(_datetime);
+    hash.insert("_type", QVariant(static_cast<int>(this->_type)));
+    return hash;
 }

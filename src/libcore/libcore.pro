@@ -26,7 +26,6 @@ SOURCES += core.cpp \
     autocompletionengine.cpp \
     terminalparser.cpp \
     grumpydsession.cpp \
-    gp.cpp \
     networksession.cpp
 
 HEADERS += core.h\
@@ -44,7 +43,6 @@ HEADERS += core.h\
     autocompletionengine.h \
     terminalparser.h \
     grumpydsession.h \
-    gp.h \
     networksession.h
 
 unix {

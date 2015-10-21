@@ -10,7 +10,10 @@
 
 // Copyright (c) Petr Bena 2015
 
+#include "corewrapper.h"
 #include "user.h"
+#include "security.h"
+#include "../libcore/scrollback.h"
 #include "../libcore/core.h"
 #include "../libcore/ircsession.h"
 
@@ -38,11 +41,48 @@ User *User::Login(QString user, QString pw)
 User::User(QString Name, QString Password)
 {
     this->username = Name;
+    this->DefaultNick = "Grumpyd user";
+    this->role = NULL;
     this->password = Password;
+}
+
+void User::InsertSession(Session *sx)
+{
+    this->sessions_gp.append(sx);
+}
+
+void User::RemoveSession(Session *sx)
+{
+    this->sessions_gp.removeAll(sx);
+}
+
+void User::SetRole(Role *rx)
+{
+    this->role = rx;
+}
+
+IRCSession *User::ConnectToIRCServer(libirc::ServerAddress info)
+{
+    Scrollback *system_window = CoreWrapper::GrumpyCore->NewScrollback(NULL, info.GetHost(), ScrollbackType_System);
+    IRCSession *session = IRCSession::Open(system_window, info);
+    this->sessions.append(session);
+    return session;
 }
 
 bool User::IsAuthorized(QString perm)
 {
-    return true;
+    if (!this->role)
+        return false;
+    return this->role->IsAuthorized(perm);
+}
+
+QList<Session*> User::GetGPSessions()
+{
+    return this->sessions_gp;
+}
+
+QList<IRCSession*> User::GetSessions()
+{
+    return this->sessions;
 }
 

@@ -17,7 +17,7 @@
 #include "listener.h"
 #include "../libcore/core.h"
 #include "../libcore/eventhandler.h"
-#include "../libcore/gp.h"
+#include "../libgp/gp.h"
 
 using namespace GrumpyIRC;
 

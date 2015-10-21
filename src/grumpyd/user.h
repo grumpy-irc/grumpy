@@ -15,9 +15,12 @@
 
 #include <QList>
 #include <QString>
+#include "../libirc/libirc/serveraddress.h"
 
 namespace GrumpyIRC
 {
+    class Session;
+    class Role;
     class IRCSession;
 
     class User
@@ -33,9 +36,18 @@ namespace GrumpyIRC
             static User *Login(QString user, QString pw);
 
             User(QString Name, QString Password);
+            void InsertSession(Session *sx);
+            void RemoveSession(Session *sx);
+            IRCSession *ConnectToIRCServer(libirc::ServerAddress info);
             bool IsAuthorized(QString perm);
+            QList<Session*> GetGPSessions();
+            QList<IRCSession*> GetSessions();
+            void SetRole(Role *rx);
+            QString DefaultNick;
 
         private:
+            Role *role;
+            QList<Session*> sessions_gp;
             QList<IRCSession*> sessions;
             QString username;
             QString password;

@@ -30,4 +30,7 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 ADD_DEFINITIONS( -DLIBCORE_LIBRARY -DQT_USE_QSTRINGBUILDER )
 
 ADD_LIBRARY(core SHARED ${src} ${headers})
-TARGET_LINK_LIBRARIES(core ircclient ${QT_LIBRARIES})
+if (QT5_BUILD)
+    qt5_use_modules(core Core Network)
+endif()
+TARGET_LINK_LIBRARIES(core gp ircclient ${QT_LIBRARIES})

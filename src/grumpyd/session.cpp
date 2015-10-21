@@ -14,7 +14,11 @@
 #include <QHash>
 #include "corewrapper.h"
 #include "user.h"
+#include "security.h"
 #include "session.h"
+#include "../libirc/libirc/serveraddress.h"
+#include "../libirc/libircclient/network.h"
+#include "../libcore/ircsession.h"
 #include "../libcore/core.h"
 #include "../libcore/eventhandler.h"
 
@@ -51,6 +55,11 @@ Session::~Session()
     // deletion of socket is performed by destructor of protocol
     GRUMPY_LOG("Session for " + this->socket->peerAddress().toString() + " destroyed");
     delete this->protocol;
+    if (this->loggedUser)
+    {
+        // Remove the session from list of sessions this user has open
+        this->loggedUser->RemoveSession(this);
+    }
     sessions_lock->lock();
     SessionList.removeOne(this);
     sessions_lock->unlock();
@@ -77,6 +86,15 @@ bool Session::IsAuthorized(QString permission)
     return true;
 }
 
+void Session::SendToEverySession(QString command, QHash<QString, QVariant> parameters)
+{
+    if (!this->loggedUser)
+        return;
+
+    foreach (Session *xx, this->loggedUser->GetGPSessions())
+        xx->protocol->SendProtocolCommand(command, parameters);
+}
+
 void Session::TransferError(QString source, QString description, int id)
 {
     QHash<QString, QVariant> params;
@@ -84,6 +102,56 @@ void Session::TransferError(QString source, QString description, int id)
     params.insert("description", QVariant(description));
     params.insert("source", QVariant(source));
     this->protocol->SendProtocolCommand("ERROR", params);
+}
+
+void Session::PermissionDeny(QString source)
+{
+    QHash<QString, QVariant> params;
+    params.insert("source", QVariant(source));
+    this->protocol->SendProtocolCommand("PERMDENY", params);
+}
+
+void Session::processNetworks()
+{
+    if (!this->IsAuthorized(PRIVILEGE_USE_IRC))
+    {
+        this->PermissionDeny("NETWORK_INFO");
+        return;
+    }
+
+    // Send list of serialized irc sessions
+    QList<QVariant> sessions;
+    QList<IRCSession*> network_info = this->loggedUser->GetSessions();
+    foreach (IRCSession *session, network_info)
+        sessions.append(QVariant(session->ToHash()));
+    QHash<QString, QVariant> params;
+    params.insert("sessions", sessions);
+    this->protocol->SendProtocolCommand("NETWORK_INFO", params);
+}
+
+void Session::processNew(QHash<QString, QVariant> info)
+{
+    if (!this->IsAuthorized(PRIVILEGE_USE_IRC))
+    {
+        this->PermissionDeny("SERVER");
+        return;
+    }
+
+    // User wants to connect to some server
+    if (!info.contains("server"))
+    {
+        this->TransferError("SERVER", "No server host provided", GP_ENOSERVER);
+        return;
+    }
+
+    libirc::ServerAddress server(info["server"].toHash());
+    IRCSession * session = this->loggedUser->ConnectToIRCServer(server);
+    // now we need to deliver message to every session that new connection to a server was open
+    QList<QVariant> network_info;
+    QHash<QString, QVariant> parameters;
+    network_info.append(QVariant(session->ToHash()));
+    parameters.insert("sessions", network_info);
+    this->SendToEverySession("NETWORK_INFO", parameters);
 }
 
 void Session::OnCommand(QString text, QHash<QString, QVariant> parameters)
@@ -99,7 +167,6 @@ void Session::OnCommand(QString text, QHash<QString, QVariant> parameters)
         params.insert("version", QVariant(QString("Grumpyd ") + GRUMPY_VERSION_STRING));
         params.insert("authentication_required", QVariant(true));
         this->protocol->SendProtocolCommand("HELLO", params);
-        return;
     } else if (text == "UNKNOWN")
     {
         if (!parameters.contains("unrecognized"))
@@ -120,16 +187,31 @@ void Session::OnCommand(QString text, QHash<QString, QVariant> parameters)
         }
         this->loggedUser = User::Login(parameters["username"].toString(), parameters["password"].toString());
         if (this->loggedUser)
+        {
+            if (!this->IsAuthorized(PRIVILEGE_LOGIN))
+            {
+                this->PermissionDeny("LOGIN");
+                return;
+            }
             this->protocol->SendProtocolCommand("LOGIN_OK");
-        else
+            this->loggedUser->InsertSession(this);
+        } else
+        {
             this->protocol->SendProtocolCommand("LOGIN_FAIL");
-        return;
+        }
+    } else if (text == "NETWORK_INFO")
+    {
+        this->processNetworks();
+    } else if (text == "SERVER")
+    {
+        this->processNew(parameters);
+    } else
+    {
+        // We received some unknown packet, send it back to client so that it at least knows we don't support this
+        QHash<QString, QVariant> params;
+        params.insert("unrecognized", QVariant(text));
+        this->protocol->SendProtocolCommand("UNKNOWN", params);
     }
-
-    // We received some unknown packet, send it back to client so that it at least knows we don't support this
-    QHash<QString, QVariant> params;
-    params.insert("unrecognized", QVariant(text));
-    this->protocol->SendProtocolCommand("UNKNOWN", params);
 }
 
 

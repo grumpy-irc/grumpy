@@ -17,6 +17,7 @@
 #include <QObject>
 #include <QString>
 #include <QAbstractSocket>
+#include "../libirc/libirc/serializableitem.h"
 #include "networksession.h"
 #include "libcore_global.h"
 
@@ -38,13 +39,16 @@ namespace GrumpyIRC
 {
     class Scrollback;
 
-    class LIBCORESHARED_EXPORT IRCSession : public QObject, public NetworkSession
+    class LIBCORESHARED_EXPORT IRCSession : public QObject, public NetworkSession, public libirc::SerializableItem
     {
             Q_OBJECT
         public:
-            static IRCSession *Open(Scrollback *system_window, libirc::ServerAddress &server, QString network = "");
+            static IRCSession *Open(Scrollback *system_window, libirc::ServerAddress &server, QString network = "", QString nick = "",
+                                    QString ident = "", QString username = "");
             static QMutex Sessions_Lock;
 			static QList<IRCSession*> Sessions;
+
+            IRCSession(QHash<QString, QVariant> sx);
 			
             /*!
              * \brief IRCSession Creates a new uninitialized session, you should always create new sessions
@@ -58,7 +62,10 @@ namespace GrumpyIRC
             void SendMessage(Scrollback *window, QString text);
             bool IsConnected() const;
             virtual Scrollback *GetScrollbackForChannel(QString channel);
+            SessionType GetType();
             Scrollback *GetScrollbackForUser(QString user);
+            QHash<QString, QVariant> ToHash();
+            void LoadHash(QHash<QString, QVariant> hash);
         private slots:
             void OnIncomingRawMessage(QByteArray message);
             void OnConnectionFail(QAbstractSocket::SocketError er);

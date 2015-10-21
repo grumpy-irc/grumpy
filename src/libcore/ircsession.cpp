@@ -26,7 +26,7 @@ using namespace GrumpyIRC;
 QMutex IRCSession::Sessions_Lock;
 QList<IRCSession*> IRCSession::Sessions;
 
-IRCSession *IRCSession::Open(Scrollback *system_window, libirc::ServerAddress &server, QString network)
+IRCSession *IRCSession::Open(Scrollback *system_window, libirc::ServerAddress &server, QString network, QString nick, QString ident, QString username)
 {
     if (!server.IsValid())
         throw new GrumpyIRC::Exception("Server object is not valid", BOOST_CURRENT_FUNCTION);
@@ -34,8 +34,25 @@ IRCSession *IRCSession::Open(Scrollback *system_window, libirc::ServerAddress &s
     QString network_name = network;
     if (network.isEmpty())
         network_name = server.GetHost();
-    sx->Connect(new libircclient::Network(server, network_name));
+    libircclient::Network *nx = new libircclient::Network(server, network_name);
+    if (!nick.isEmpty())
+        nx->SetDefaultNick(nick);
+    if (!ident.isEmpty())
+        nx->SetDefaultIdent(ident);
+    if (!username.isEmpty())
+        nx->SetDefaultUsername(username);
+    sx->Connect(nx);
     return sx;
+}
+
+IRCSession::IRCSession(QHash<QString, QVariant> sx)
+{
+    this->systemWindow = NULL;
+    this->network = NULL;
+    this->LoadHash(sx);
+    IRCSession::Sessions_Lock.lock();
+    IRCSession::Sessions.append(this);
+    IRCSession::Sessions_Lock.unlock();
 }
 
 IRCSession::IRCSession(Scrollback *system)
@@ -113,6 +130,11 @@ Scrollback *IRCSession::GetScrollbackForChannel(QString channel)
     return this->channels[channel.toLower()];
 }
 
+SessionType IRCSession::GetType()
+{
+    return SessionType_IRC;
+}
+
 Scrollback *IRCSession::GetScrollbackForUser(QString user)
 {
     user = user.toLower();
@@ -120,6 +142,29 @@ Scrollback *IRCSession::GetScrollbackForUser(QString user)
         return NULL;
 
     return this->users[user];
+}
+
+QHash<QString, QVariant> IRCSession::ToHash()
+{
+    QHash<QString, QVariant> hash;
+    if (this->network)
+        hash.insert("network", QVariant(this->network->ToHash()));
+    QHash<QString, QVariant> channels_hash;
+    foreach (QString channel, this->channels.keys())
+        channels_hash.insert(channel, QVariant(this->channels[channel]->ToHash()));
+    hash.insert("channels", QVariant(channels_hash));
+    return hash;
+}
+
+void IRCSession::LoadHash(QHash<QString, QVariant> hash)
+{
+    if (hash.contains("network"))
+        this->network = new libircclient::Network(hash["network"].toHash());
+
+    if (hash.contains("channels"))
+    {
+
+    }
 }
 
 void IRCSession::SendMessage(Scrollback *window, QString text)

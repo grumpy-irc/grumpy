@@ -23,7 +23,7 @@
 #include "../libirc/libircclient/network.h"
 #include "../libirc/libirc/serveraddress.h"
 #include "../libcore/eventhandler.h"
-#include "../libcore/gp.h"
+#include "../libgp/gp.h"
 #include "../libcore/grumpydsession.h"
 #include "../libcore/exception.h"
 #include "../libcore/ircsession.h"
@@ -110,6 +110,20 @@ static int SystemCommand_Server(SystemCommand *command, CommandArgs command_args
         GRUMPY_ERROR(QObject::tr("This command requires a parameter"));
         return 0;
     }
+    // This command is much more tricky that you think
+    // we need to first check if we are going to open
+    // new server within Grumpy itself, or in grumpyd
+    Scrollback *sx = MainWindow::Main->GetCurrentScrollbackFrame()->GetScrollback();
+    if (sx->GetSession() && sx->GetSession()->GetType() == SessionType_Grumpyd)
+    {
+        // Current window belongs to grumpyd
+        GrumpydSession *session = (GrumpydSession*)sx->GetSession();
+        // Connect to IRC
+        session->Open(libirc::ServerAddress(command_args.Parameters[0]));
+        sx->InsertText("Requested connection to IRC server from grumpyd, please wait.");
+        return 0;
+    }
+
     // get the server host
     MainWindow::Main->OpenServer(libirc::ServerAddress(command_args.Parameters[0]));
     return 0;
@@ -162,6 +176,11 @@ ScrollbackList *MainWindow::GetScrollbackList()
 void MainWindow::WriteToSystemWindow(QString text)
 {
     this->systemWindow->InsertText(text);
+}
+
+ScrollbackFrame *MainWindow::GetCurrentScrollbackFrame()
+{
+    return this->GetScrollbackManager()->GetCurrentScrollback();
 }
 
 UserWidget *MainWindow::GetUsers()
