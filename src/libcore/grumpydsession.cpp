@@ -168,7 +168,7 @@ void GrumpydSession::processNetwork(QHash<QString, QVariant> hash)
     QList<QVariant> session_list = hash["sessions"].toList();
     foreach (QVariant session_hash, session_list)
     {
-        IRCSession *session = new IRCSession(session_hash.toHash());
+        IRCSession *session = new IRCSession(session_hash.toHash(), this->systemWindow);
         this->SessionsIrc.append(session);
     }
     this->systemWindow->InsertText("Synced networks: " + QString::number(session_list.count()));

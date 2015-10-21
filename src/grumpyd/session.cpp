@@ -37,7 +37,7 @@ Session::Session(qintptr SocketPtr)
 {
     this->socket = new QTcpSocket();
     this->socket->setSocketDescriptor(SocketPtr);
-    this->protocol = new GP(socket);
+    this->protocol = new libgp::GP(socket);
     this->SessionState = State_Login;
     sessions_lock->lock();
     this->SID = lSID++;

@@ -10,5 +10,6 @@
         <file>img/icon.png</file>
         <file>img/icon_hash.png</file>
         <file>img/Letter S.png</file>
+        <file>img/grumpy_logo.jpg</file>
     </qresource>
 </RCC>

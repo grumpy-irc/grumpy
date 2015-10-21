@@ -48,13 +48,13 @@ namespace GrumpyIRC
             static QMutex Sessions_Lock;
 			static QList<IRCSession*> Sessions;
 
-            IRCSession(QHash<QString, QVariant> sx);
+            IRCSession(QHash<QString, QVariant> sx, Scrollback *root = NULL);
 			
             /*!
              * \brief IRCSession Creates a new uninitialized session, you should always create new sessions
              *                   with IRCSession::Open() instead of calling this directly
              */
-            IRCSession(Scrollback *system);
+            IRCSession(Scrollback *system, Scrollback *root = NULL);
             virtual ~IRCSession();
             virtual Scrollback *GetSystemWindow();
             libircclient::Network *GetNetwork();
@@ -66,6 +66,7 @@ namespace GrumpyIRC
             Scrollback *GetScrollbackForUser(QString user);
             QHash<QString, QVariant> ToHash();
             void LoadHash(QHash<QString, QVariant> hash);
+            Scrollback *Root;
         private slots:
             void OnIncomingRawMessage(QByteArray message);
             void OnConnectionFail(QAbstractSocket::SocketError er);

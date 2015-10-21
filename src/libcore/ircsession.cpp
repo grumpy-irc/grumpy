@@ -45,18 +45,20 @@ IRCSession *IRCSession::Open(Scrollback *system_window, libirc::ServerAddress &s
     return sx;
 }
 
-IRCSession::IRCSession(QHash<QString, QVariant> sx)
+IRCSession::IRCSession(QHash<QString, QVariant> sx, Scrollback *root)
 {
     this->systemWindow = NULL;
     this->network = NULL;
+    this->Root = root;
     this->LoadHash(sx);
     IRCSession::Sessions_Lock.lock();
     IRCSession::Sessions.append(this);
     IRCSession::Sessions_Lock.unlock();
 }
 
-IRCSession::IRCSession(Scrollback *system)
+IRCSession::IRCSession(Scrollback *system, Scrollback *root)
 {
+    this->Root = root;
     this->systemWindow = system;
     this->systemWindow->SetSession(this);
     this->network = NULL;
@@ -153,6 +155,7 @@ QHash<QString, QVariant> IRCSession::ToHash()
     foreach (QString channel, this->channels.keys())
         channels_hash.insert(channel, QVariant(this->channels[channel]->ToHash()));
     hash.insert("channels", QVariant(channels_hash));
+    hash.insert("systemWindow", QVariant(this->systemWindow->ToHash()));
     return hash;
 }
 
@@ -164,6 +167,16 @@ void IRCSession::LoadHash(QHash<QString, QVariant> hash)
     if (hash.contains("channels"))
     {
 
+    }
+
+    if (hash.contains("systemWindow"))
+    {
+        // we register a new system window and then we load it
+        QString name = "Unknown host";
+        if (this->network)
+            name = this->network->GetHost();
+        this->systemWindow = Core::GrumpyCore->NewScrollback(this->Root, name, ScrollbackType_System);
+        this->systemWindow->LoadHash(hash["systemWindow"].toHash());
     }
 }
 
