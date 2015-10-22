@@ -19,10 +19,13 @@
 
 namespace GrumpyIRC
 {
+    class Scrollback;
+
     namespace Generic
     {
         LIBCORESHARED_EXPORT bool String2Bool(QString string);
         LIBCORESHARED_EXPORT QString Bool2String(bool boolean);
+        LIBCORESHARED_EXPORT bool IsGrumpy(Scrollback *window);
     }
 }
 

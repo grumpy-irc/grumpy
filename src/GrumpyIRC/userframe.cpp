@@ -57,6 +57,8 @@ static QColor getColor(libircclient::User *ux)
 
 void UserFrame::InsertUser(libircclient::User *user)
 {
+    if (!this->network)
+        return;
     QString name = user->GetNick().toLower();
     if (this->users.contains(name))
         this->RemoveUser(name);

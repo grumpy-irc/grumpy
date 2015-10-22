@@ -73,9 +73,33 @@ libircclient::Network *GrumpydSession::GetNetwork()
     return NULL;
 }
 
+void GrumpydSession::DelegateCommand(QString command, QString pm, Scrollback *source)
+{
+    IRCSession *ircs = this->GetSessionFromWindow(source);
+    if (!ircs)
+        return;
+
+    QHash<QString, QVariant> parameters;
+    parameters.insert("network", QVariant(ircs->GetSID()));
+    parameters.insert("command", QVariant(command));
+    parameters.insert("parameters", QVariant(pm));
+    this->SendProtocolCommand("RAW", parameters);
+}
+
 SessionType GrumpydSession::GetType()
 {
     return SessionType_Grumpyd;
+}
+
+IRCSession *GrumpydSession::GetSessionFromWindow(Scrollback *scrollback)
+{
+    if (this->sessionList.contains(scrollback))
+        return this->sessionList[scrollback];
+    if (scrollback->GetParentScrollback() && this->sessionList.contains(scrollback->GetParentScrollback()))
+        return this->sessionList[scrollback->GetParentScrollback()];
+
+    // There seem to be no irc session associated to this window, it's not our window?
+    return NULL;
 }
 
 void GrumpydSession::Connect()
@@ -141,6 +165,9 @@ void GrumpydSession::OnIncomingCommand(QString text, QHash<QString, QVariant> pa
     {
         this->systemWindow->InsertText("Synchronizing networks");
         this->SendProtocolCommand("NETWORK_INFO");
+    } else if (text == "SCROLLBACK_LOAD_NEW_ITEM")
+    {
+        this->processNewScrollbackItem(parameters);
     } else if (text == "NETWORK_INFO")
     {
         this->processNetwork(parameters);
@@ -159,6 +186,36 @@ void GrumpydSession::OnIncomingCommand(QString text, QHash<QString, QVariant> pa
     }
 }
 
+void GrumpydSession::processNewScrollbackItem(QHash<QString, QVariant> hash)
+{
+    if (!hash.contains("network_id"))
+        return;
+    // Fetch the network this item belongs to
+    IRCSession *session = NULL;
+    unsigned int sid = hash["network_id"].toUInt();
+    foreach (IRCSession *sx, this->sessionList.values())
+    {
+        if (sx->GetSID() == sid)
+        {
+            session = sx;
+            break;
+        }
+    }
+    if (!session)
+    {
+        this->systemWindow->InsertText("Received scrollback item for scrollback for which network couldn't be found, SID: " + QString::number(sid));
+        return;
+    }
+    // Now we need to find the widget
+    Scrollback *window = session->GetScrollback(hash["scrollback_name"].toString());
+    if (!window)
+    {
+        this->systemWindow->InsertText("Received scrollback item for scrollback which couldn't be found, name: " + hash["scrollback_name"].toString());
+        return;
+    }
+    window->InsertText(ScrollbackItem(hash["item"].toHash()));
+}
+
 void GrumpydSession::processNetwork(QHash<QString, QVariant> hash)
 {
     if (!hash.contains("sessions"))
@@ -169,7 +226,8 @@ void GrumpydSession::processNetwork(QHash<QString, QVariant> hash)
     foreach (QVariant session_hash, session_list)
     {
         IRCSession *session = new IRCSession(session_hash.toHash(), this->systemWindow);
-        this->SessionsIrc.append(session);
+        session->GetSystemWindow()->SetSession(this);
+        this->sessionList.insert(session->GetSystemWindow(), session);
     }
     this->systemWindow->InsertText("Synced networks: " + QString::number(session_list.count()));
 }

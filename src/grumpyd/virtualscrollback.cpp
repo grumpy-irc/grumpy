@@ -10,7 +10,12 @@
 
 // Copyright (c) Petr Bena 2015
 
+#include "../libcore/exception.h"
+#include "../libcore/ircsession.h"
+#include "../libcore/networksession.h"
 #include "virtualscrollback.h"
+#include "user.h"
+#include "session.h"
 
 using namespace GrumpyIRC;
 
@@ -22,5 +27,34 @@ VirtualScrollback::VirtualScrollback(ScrollbackType Type) : Scrollback(Type)
 VirtualScrollback::~VirtualScrollback()
 {
 
+}
+
+User *VirtualScrollback::GetOwner() const
+{
+    return this->owner;
+}
+
+void VirtualScrollback::SetOwner(User *user)
+{
+    this->owner = user;
+}
+
+void VirtualScrollback::InsertText(ScrollbackItem item)
+{
+    Scrollback::InsertText(item);
+    // let's check if this window belongs to a user which has clients
+    if (!this->owner)
+        throw new Exception("VirtualScrollback NULL owner", BOOST_CURRENT_FUNCTION);
+    Session * xx = this->owner->GetAnyGPSession();
+    if (!xx)
+        return;
+    // Deliver information about this message to everyone
+    QHash<QString, QVariant> parameters;
+    parameters.insert("scrollback", QVariant(this->GetID()));
+    parameters.insert("scrollback_name", QVariant(this->GetTarget()));
+    if (this->GetSession() && this->GetSession()->GetType() == SessionType_IRC)
+        parameters.insert("network_id", QVariant(((IRCSession*)this->GetSession())->GetSID()));
+    parameters.insert("item", QVariant(item.ToHash()));
+    xx->SendToEverySession("SCROLLBACK_LOAD_NEW_ITEM", parameters);
 }
 

@@ -22,5 +22,7 @@ Factory::Factory()
 
 Scrollback *Factory::NewScrollback(Scrollback *parent, QString name, ScrollbackType type)
 {
-    return new Scrollback(type);
+    Scrollback *scrollback = new Scrollback(type, parent);
+    scrollback->SetTarget(name);
+    return scrollback;
 }

@@ -20,9 +20,10 @@ QList<Scrollback*> Scrollback::ScrollbackList;
 QMutex Scrollback::ScrollbackList_Mutex;
 unsigned long long Scrollback::lastID = 1;
 
-Scrollback::Scrollback(ScrollbackType Type)
+Scrollback::Scrollback(ScrollbackType Type, Scrollback *parent)
 {
     this->_maxItems = 800000;
+    this->parentSx = parent;
     ScrollbackList_Mutex.lock();
     ScrollbackList.append(this);
     ScrollbackList_Mutex.unlock();
@@ -79,10 +80,22 @@ void Scrollback::SetDead(bool dead)
     this->_dead = dead;
 }
 
+Scrollback *Scrollback::GetParentScrollback()
+{
+    return this->parentSx;
+}
+
 QHash<QString, QVariant> Scrollback::ToHash()
 {
     QHash<QString, QVariant> hash;
     SERIALIZE(_dead);
+    SERIALIZE(_id);
+    SERIALIZE(_maxItems);
+    SERIALIZE(_target);
+    QList<QVariant> variant_items_list;
+    foreach (ScrollbackItem xx, this->items)
+        variant_items_list.append(QVariant(xx.ToHash()));
+    hash.insert("items", QVariant(variant_items_list));
     return hash;
 }
 
@@ -90,6 +103,16 @@ void Scrollback::LoadHash(QHash<QString, QVariant> hash)
 {
     UNSERIALIZE_STRING(_target);
     UNSERIALIZE_BOOL(_dead);
+    UNSERIALIZE_ULONGLONG(_maxItems);
+    UNSERIALIZE_ULONGLONG(_id);
+    if (hash.contains("items"))
+    {
+        QList<QVariant> items_l;
+        items_l = hash["items"].toList();
+        foreach (QVariant item, items_l)
+            items.append(item.toHash());
+        emit this->Event_Reload();
+    }
 }
 
 void Scrollback::SetTarget(QString target)
@@ -100,6 +123,11 @@ void Scrollback::SetTarget(QString target)
 NetworkSession *Scrollback::GetSession()
 {
     return this->session;
+}
+
+QList<ScrollbackItem> Scrollback::GetItems()
+{
+    return this->items;
 }
 
 void Scrollback::UserListChange(QString nick, libircclient::User *user, UserListChangeType change_type)
@@ -202,7 +230,12 @@ libircclient::User ScrollbackItem::GetUser() const
 
 void ScrollbackItem::LoadHash(QHash<QString, QVariant> hash)
 {
+    if (hash.contains("_user"))
+        this->_user = libircclient::User(hash["_user"].toHash());
+    if (hash.contains("_type"))
+        this->_type = static_cast<ScrollbackItemType>(hash["_type"].toInt());
     UNSERIALIZE_STRING(_text);
+    UNSERIALIZE_DATETIME(_datetime);
 }
 
 QHash<QString, QVariant> ScrollbackItem::ToHash()

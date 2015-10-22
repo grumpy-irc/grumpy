@@ -97,7 +97,7 @@ namespace GrumpyIRC
             static QList<Scrollback*> ScrollbackList;
             static QMutex ScrollbackList_Mutex;
 
-            Scrollback(ScrollbackType Type = ScrollbackType_System);
+            Scrollback(ScrollbackType Type = ScrollbackType_System, Scrollback *parent = NULL);
             virtual ~Scrollback();
             unsigned long long GetMaxItemsSize();
             unsigned long long GetID();
@@ -108,12 +108,14 @@ namespace GrumpyIRC
             virtual QString GetTarget() const;
             //! If this scrollback is associated to some session this function returns the pointer to it, in case it's not NULL is returned
             virtual NetworkSession *GetSession();
+            QList<ScrollbackItem> GetItems();
             //! Called by IRC session or any other object if there is any change to user list associated to this scrollback
             virtual void UserListChange(QString nick, libircclient::User *user, UserListChangeType change_type);
             virtual ScrollbackType GetType() const;
             virtual void SetSession(NetworkSession *Session);
             virtual bool IsDead() const;
             virtual void SetDead(bool dead);
+            virtual Scrollback *GetParentScrollback();
             QHash<QString, QVariant> ToHash();
             void LoadHash(QHash<QString, QVariant> hash);
 
@@ -122,12 +124,14 @@ namespace GrumpyIRC
             void Event_UserInserted(libircclient::User *user);
             void Event_UserAltered(QString original_name, libircclient::User *user);
             void Event_SessionModified(NetworkSession *Session);
+            void Event_Reload();
             void Event_UserRemoved(QString name);
             //! Called when some meta-information for user is changed, such as away status
             //! so that it can be updated in associated widgets
             void Event_UserRefresh(libircclient::User *user);
 
         private:
+            Scrollback *parentSx;
             bool _dead;
             QString _target;
             NetworkSession *session;

@@ -18,7 +18,7 @@
 #include "session.h"
 #include "../libirc/libirc/serveraddress.h"
 #include "../libirc/libircclient/network.h"
-#include "../libcore/ircsession.h"
+#include "syncableircsession.h"
 #include "../libcore/core.h"
 #include "../libcore/eventhandler.h"
 
@@ -121,8 +121,8 @@ void Session::processNetworks()
 
     // Send list of serialized irc sessions
     QList<QVariant> sessions;
-    QList<IRCSession*> network_info = this->loggedUser->GetSessions();
-    foreach (IRCSession *session, network_info)
+    QList<SyncableIRCSession*> network_info = this->loggedUser->GetSIRCSessions();
+    foreach (SyncableIRCSession *session, network_info)
         sessions.append(QVariant(session->ToHash()));
     QHash<QString, QVariant> params;
     params.insert("sessions", sessions);
@@ -145,7 +145,7 @@ void Session::processNew(QHash<QString, QVariant> info)
     }
 
     libirc::ServerAddress server(info["server"].toHash());
-    IRCSession * session = this->loggedUser->ConnectToIRCServer(server);
+    SyncableIRCSession *session = this->loggedUser->ConnectToIRCServer(server);
     // now we need to deliver message to every session that new connection to a server was open
     QList<QVariant> network_info;
     QHash<QString, QVariant> parameters;

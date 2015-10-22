@@ -13,7 +13,9 @@
 #include "commandprocessor.h"
 #include "core.h"
 #include "scrollback.h"
+#include "grumpydsession.h"
 #include "ircsession.h"
+#include "generic.h"
 #include "../libirc/libircclient/network.h"
 #include "eventhandler.h"
 
@@ -79,7 +81,12 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
         }
         if (!this->CommandList.contains(command_name))
         {
-            if (window && window->GetSession() && window->GetSession()->GetNetwork())
+            if (Generic::IsGrumpy(window))
+            {
+                // This window belongs to a grumpyd session so we need to delegate this command to the grumpyd itself
+                ((GrumpydSession*)window->GetSession())->DelegateCommand(command_name, parameters.ParameterLine, window);
+                return 0;
+            } else if (window && window->GetSession() && window->GetSession()->GetNetwork())
             {
                 if (!window->GetSession()->IsConnected())
                     return -COMMANDPROCESSOR_ENOTCONNECTED;

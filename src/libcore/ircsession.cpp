@@ -18,11 +18,14 @@
 #include "../libirc/libircclient/network.h"
 #include "../libirc/libircclient/user.h"
 #include "../libirc/libircclient/channel.h"
+#include "generic.h"
 #include "scrollback.h"
 #include "exception.h"
 
 using namespace GrumpyIRC;
 
+
+unsigned int IRCSession::lastID = 2;
 QMutex IRCSession::Sessions_Lock;
 QList<IRCSession*> IRCSession::Sessions;
 
@@ -53,6 +56,7 @@ IRCSession::IRCSession(QHash<QString, QVariant> sx, Scrollback *root)
     this->LoadHash(sx);
     IRCSession::Sessions_Lock.lock();
     IRCSession::Sessions.append(this);
+    this->SID = lastID++;
     IRCSession::Sessions_Lock.unlock();
 }
 
@@ -64,6 +68,7 @@ IRCSession::IRCSession(Scrollback *system, Scrollback *root)
     this->network = NULL;
     IRCSession::Sessions_Lock.lock();
     IRCSession::Sessions.append(this);
+    this->SID = lastID++;
     IRCSession::Sessions_Lock.unlock();
 }
 
@@ -80,9 +85,39 @@ Scrollback *IRCSession::GetSystemWindow()
     return this->systemWindow;
 }
 
+Scrollback *IRCSession::GetScrollback(QString name)
+{
+    if (this->systemWindow->GetTarget() == name)
+        return this->systemWindow;
+
+    foreach (Scrollback *scrollback, this->users.values())
+    {
+        if (scrollback->GetTarget() == name)
+            return scrollback;
+    }
+
+    foreach (Scrollback *scrollback, this->channels.values())
+    {
+        if (scrollback->GetTarget() == name)
+            return scrollback;
+    }
+
+    return NULL;
+}
+
+Scrollback *IRCSession::GetScrollback(unsigned long long sid)
+{
+    return NULL;
+}
+
 libircclient::Network *IRCSession::GetNetwork()
 {
     return this->network;
+}
+
+unsigned int IRCSession::GetSID()
+{
+    return this->SID;
 }
 
 void IRCSession::Connect(libircclient::Network *Network)
@@ -103,7 +138,7 @@ void IRCSession::Connect(libircclient::Network *Network)
     connect(this->network, SIGNAL(Event_Join(libircclient::Parser*, libircclient::User*, libircclient::Channel*)), this, SLOT(OnIRCJoin(libircclient::Parser*, libircclient::User*, libircclient::Channel*)));
     connect(this->network, SIGNAL(Event_Kick(libircclient::Parser*,libircclient::Channel*)), this, SLOT(OnKICK(libircclient::Parser*,libircclient::Channel*)));
     connect(this->network, SIGNAL(Event_PRIVMSG(libircclient::Parser*)), this, SLOT(OnMessage(libircclient::Parser*)));
-    connect(this->network, SIGNAL(Event_NICK(libircclient::Parser*)), this, SLOT(OnNICK(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_NICK(libircclient::Parser*,QString,QString)), this, SLOT(OnNICK(libircclient::Parser*,QString,QString)));
     connect(this->network, SIGNAL(Event_PerChannelQuit(libircclient::Parser*,libircclient::Channel*)), this, SLOT(OnQuit(libircclient::Parser*,libircclient::Channel*)));
     connect(this->network, SIGNAL(Event_Part(libircclient::Parser*,libircclient::Channel*)), this, SLOT(OnPart(libircclient::Parser*,libircclient::Channel*)));
     connect(this->network, SIGNAL(Event_NOTICE(libircclient::Parser*)), this, SLOT(OnNotice(libircclient::Parser*)));
@@ -137,6 +172,27 @@ SessionType IRCSession::GetType()
     return SessionType_IRC;
 }
 
+void IRCSession::SyncWindows(QHash<QString, QVariant> windows, QHash<QString, Scrollback*> *hash)
+{
+    foreach (QVariant xx, windows.values())
+    {
+        // this is most likely a remote IRC session managed by grumpyd because nothing else would
+        // deserialize it, but just to be sure we check once more and grab the pointer to grumpyd
+        // in case it really is that
+        NetworkSession *window_session = this;
+        if (this->Root && this->Root->GetParentScrollback() && Generic::IsGrumpy(this->Root->GetParentScrollback()))
+            window_session = this->Root->GetParentScrollback()->GetSession();
+        QString name = "unknown_channel";
+        QHash<QString, QVariant> scrollback_h = xx.toHash();
+        if (scrollback_h.contains("name"))
+            name = scrollback_h["name"].toString();
+        Scrollback *scrollback = Core::GrumpyCore->NewScrollback(this->systemWindow, name, ScrollbackType_System);
+        scrollback->LoadHash(scrollback_h);
+        scrollback->SetSession(window_session);
+        hash->insert(name.toLower(), scrollback);
+    }
+}
+
 Scrollback *IRCSession::GetScrollbackForUser(QString user)
 {
     user = user.toLower();
@@ -149,6 +205,7 @@ Scrollback *IRCSession::GetScrollbackForUser(QString user)
 QHash<QString, QVariant> IRCSession::ToHash()
 {
     QHash<QString, QVariant> hash;
+    SERIALIZE(SID);
     if (this->network)
         hash.insert("network", QVariant(this->network->ToHash()));
     QHash<QString, QVariant> channels_hash;
@@ -161,23 +218,24 @@ QHash<QString, QVariant> IRCSession::ToHash()
 
 void IRCSession::LoadHash(QHash<QString, QVariant> hash)
 {
+    UNSERIALIZE_UINT(SID);
     if (hash.contains("network"))
         this->network = new libircclient::Network(hash["network"].toHash());
 
+    if (!hash.contains("systemWindow"))
+        throw new Exception("Network is missing a root window", BOOST_CURRENT_FUNCTION);
+
+    // we register a new system window and then we load it
+    QString name = "Unknown host";
+    if (this->network)
+        name = this->network->GetServerAddress();
+    this->systemWindow = Core::GrumpyCore->NewScrollback(this->Root, name, ScrollbackType_System);
+    this->systemWindow->LoadHash(hash["systemWindow"].toHash());
+
+    if (hash.contains("users"))
+        this->SyncWindows(hash["users"].toHash(), &this->users);
     if (hash.contains("channels"))
-    {
-
-    }
-
-    if (hash.contains("systemWindow"))
-    {
-        // we register a new system window and then we load it
-        QString name = "Unknown host";
-        if (this->network)
-            name = this->network->GetHost();
-        this->systemWindow = Core::GrumpyCore->NewScrollback(this->Root, name, ScrollbackType_System);
-        this->systemWindow->LoadHash(hash["systemWindow"].toHash());
-    }
+        this->SyncWindows(hash["channels"].toHash(), &this->channels);
 }
 
 void IRCSession::SendMessage(Scrollback *window, QString text)
@@ -203,7 +261,7 @@ void IRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
     // we just joined a new channel, let's add a scrollback for it
     Scrollback *window = Core::GrumpyCore->NewScrollback(this->systemWindow, channel->GetName(), ScrollbackType_Channel);
     window->SetSession(this);
-    window->SetTarget(channel->GetName());
+    emit this->Event_ScrollbackIsOpen(window);
     this->channels.insert(channel->GetName().toLower(), window);
 }
 

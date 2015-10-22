@@ -18,7 +18,8 @@ SOURCES += main.cpp \
     user.cpp \
     security.cpp \
     virtualscrollback.cpp \
-    scrollbackfactory.cpp
+    scrollbackfactory.cpp \
+    syncableircsession.cpp
 
 HEADERS += \
     corewrapper.h \
@@ -31,5 +32,6 @@ HEADERS += \
     user.h \
     security.h \
     virtualscrollback.h \
-    scrollbackfactory.h
+    scrollbackfactory.h \
+    syncableircsession.h
 

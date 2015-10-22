@@ -15,7 +15,7 @@
 #include "security.h"
 #include "../libcore/scrollback.h"
 #include "../libcore/core.h"
-#include "../libcore/ircsession.h"
+#include "syncableircsession.h"
 
 using namespace GrumpyIRC;
 
@@ -61,10 +61,10 @@ void User::SetRole(Role *rx)
     this->role = rx;
 }
 
-IRCSession *User::ConnectToIRCServer(libirc::ServerAddress info)
+SyncableIRCSession *User::ConnectToIRCServer(libirc::ServerAddress info)
 {
     Scrollback *system_window = CoreWrapper::GrumpyCore->NewScrollback(NULL, info.GetHost(), ScrollbackType_System);
-    IRCSession *session = IRCSession::Open(system_window, info);
+    SyncableIRCSession *session = SyncableIRCSession::Open(system_window, info, this);
     this->sessions.append(session);
     return session;
 }
@@ -81,8 +81,17 @@ QList<Session*> User::GetGPSessions()
     return this->sessions_gp;
 }
 
-QList<IRCSession*> User::GetSessions()
+QList<SyncableIRCSession *> User::GetSIRCSessions()
 {
     return this->sessions;
+}
+
+Session *User::GetAnyGPSession()
+{
+    if (!this->sessions_gp.count())
+        return NULL;
+
+    // Return first session
+    return this->sessions_gp.at(0);
 }
 

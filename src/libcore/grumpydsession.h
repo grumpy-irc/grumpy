@@ -61,9 +61,11 @@ namespace GrumpyIRC
             bool IsConnected() const;
             void SendMessage(Scrollback *window, QString text);
             libircclient::Network *GetNetwork();
+            // Send a raw IRC command to grumpyd for processing
+            void DelegateCommand(QString command, QString pm, Scrollback *source);
             SessionType GetType();
+            IRCSession *GetSessionFromWindow(Scrollback *scrollback);
             void Connect();
-            QList<IRCSession*> SessionsIrc;
 
         signals:
             void Event_IncomingData(QByteArray data);
@@ -77,15 +79,17 @@ namespace GrumpyIRC
             void OnIncomingCommand(QString text, QHash<QString, QVariant> parameters);
 
         private:
+            void processNewScrollbackItem(QHash<QString, QVariant> hash);
             void processNetwork(QHash<QString, QVariant> hash);
             void closeError(QString error);
+            //! Irc sessions associated with their ROOT window so that we can figure out the network just from parent window
+            QHash<Scrollback*, IRCSession*> sessionList;
             Scrollback *systemWindow;
             bool SSL;
             QString hostname;
             QString username;
             QString password;
             int port;
-
     };
 }
 

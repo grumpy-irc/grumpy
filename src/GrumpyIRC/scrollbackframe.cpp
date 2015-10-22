@@ -38,8 +38,9 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
         this->scrollback = new Scrollback();
     else
         this->scrollback = _scrollback;
-    connect(this->scrollback, SIGNAL(Event_SessionModified(IRCSession*)), this, SLOT(SessionChanged(IRCSession*)));
+    connect(this->scrollback, SIGNAL(Event_SessionModified(NetworkSession*)), this, SLOT(SessionChanged(NetworkSession*)));
     connect(this->scrollback, SIGNAL(Event_UserInserted(libircclient::User*)), this, SLOT(UserList_Insert(libircclient::User*)));
+    connect(this->scrollback, SIGNAL(Event_Reload()), this, SLOT(Refresh()));
     connect(this->scrollback, SIGNAL(Event_UserAltered(QString,libircclient::User*)), this, SLOT(UserList_Rename(QString,libircclient::User*)));
     connect(this->scrollback, SIGNAL(Event_UserRemoved(QString)), this, SLOT(UserList_Remove(QString)));
     connect(this->scrollback, SIGNAL(Event_InsertText(ScrollbackItem)), this, SLOT(_insertText_(ScrollbackItem)));
@@ -157,6 +158,13 @@ void ScrollbackFrame::UserList_Remove(QString user)
 void ScrollbackFrame::UserList_Rename(QString old, libircclient::User *us)
 {
     this->userFrame->ChangeNick(us->GetNick(), old);
+}
+
+void ScrollbackFrame::Refresh()
+{
+    this->buffer.clear();
+    foreach (ScrollbackItem item, this->scrollback->GetItems())
+        this->_insertText_(item);
 }
 
 void ScrollbackFrame::SessionChanged(NetworkSession *session)

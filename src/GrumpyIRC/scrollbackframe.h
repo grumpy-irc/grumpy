@@ -59,6 +59,7 @@ namespace GrumpyIRC
             void UserList_Insert(libircclient::User *ux);
             void UserList_Remove(QString user);
             void UserList_Rename(QString old, libircclient::User *us);
+            void Refresh();
             void SessionChanged(NetworkSession *session);
         private:
             Scrollback *scrollback;

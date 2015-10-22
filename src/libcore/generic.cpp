@@ -11,6 +11,8 @@
 // Copyright (c) Petr Bena 2015
 
 #include "generic.h"
+#include "networksession.h"
+#include "scrollback.h"
 
 using namespace GrumpyIRC;
 
@@ -26,4 +28,15 @@ QString Generic::Bool2String(bool boolean)
     if (boolean)
         return "true";
     return "false";
+}
+
+bool Generic::IsGrumpy(Scrollback *window)
+{
+    if (!window)
+        return false;
+    if (window->GetSession())
+    {
+        return window->GetSession()->GetType() == SessionType_Grumpyd;
+    }
+    return false;
 }

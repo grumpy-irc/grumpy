@@ -21,7 +21,7 @@ namespace GrumpyIRC
 {
     class Session;
     class Role;
-    class IRCSession;
+    class SyncableIRCSession;
 
     class User
     {
@@ -38,17 +38,18 @@ namespace GrumpyIRC
             User(QString Name, QString Password);
             void InsertSession(Session *sx);
             void RemoveSession(Session *sx);
-            IRCSession *ConnectToIRCServer(libirc::ServerAddress info);
+            SyncableIRCSession *ConnectToIRCServer(libirc::ServerAddress info);
             bool IsAuthorized(QString perm);
             QList<Session*> GetGPSessions();
-            QList<IRCSession*> GetSessions();
+            QList<SyncableIRCSession*> GetSIRCSessions();
+            Session *GetAnyGPSession();
             void SetRole(Role *rx);
             QString DefaultNick;
 
         private:
             Role *role;
             QList<Session*> sessions_gp;
-            QList<IRCSession*> sessions;
+            QList<SyncableIRCSession*> sessions;
             QString username;
             QString password;
     };
