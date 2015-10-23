@@ -38,7 +38,7 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
         this->scrollback = new Scrollback();
     else
         this->scrollback = _scrollback;
-    connect(this->scrollback, SIGNAL(Event_SessionModified(NetworkSession*)), this, SLOT(SessionChanged(NetworkSession*)));
+    connect(this->scrollback, SIGNAL(Event_NetworkModified(libircclient::Network*)), this, SLOT(NetworkChanged(libircclient::Network*)));
     connect(this->scrollback, SIGNAL(Event_UserInserted(libircclient::User*)), this, SLOT(UserList_Insert(libircclient::User*)));
     connect(this->scrollback, SIGNAL(Event_Reload()), this, SLOT(Refresh()));
     connect(this->scrollback, SIGNAL(Event_UserAltered(QString,libircclient::User*)), this, SLOT(UserList_Rename(QString,libircclient::User*)));
@@ -167,9 +167,9 @@ void ScrollbackFrame::Refresh()
         this->_insertText_(item);
 }
 
-void ScrollbackFrame::SessionChanged(NetworkSession *session)
+void ScrollbackFrame::NetworkChanged(libircclient::Network *network)
 {
-    this->userFrame->SetNetwork(session->GetNetwork());
+    this->userFrame->SetNetwork(network);
 }
 
 void ScrollbackFrame::SetWindowName(QString title)

@@ -22,6 +22,8 @@ ScrollbackFactory::ScrollbackFactory()
 
 Scrollback *ScrollbackFactory::NewScrollback(Scrollback *parent, QString name, ScrollbackType type)
 {
-    return new VirtualScrollback(type);
+    VirtualScrollback *vs = new VirtualScrollback(type, parent);
+    vs->SetTarget(name);
+    return vs;
 }
 

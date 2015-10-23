@@ -28,9 +28,10 @@ namespace GrumpyIRC
     {
             Q_OBJECT
         public:
-            VirtualScrollback(ScrollbackType Type = ScrollbackType_System);
+            VirtualScrollback(ScrollbackType Type = ScrollbackType_System, Scrollback *parent = NULL);
             ~VirtualScrollback();
             User *GetOwner() const;
+            void Sync();
             void SetOwner(User *user);
             void InsertText(ScrollbackItem item);
 

@@ -27,6 +27,16 @@ bool KeyFilter::eventFilter(QObject *obj, QEvent *event)
     if (event->type() == QEvent::KeyPress)
     {
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Down)
+        {
+            this->parentInput->History();
+            return true;
+        }
+        if (keyEvent->key() == Qt::Key_Up)
+        {
+            this->parentInput->History(true);
+            return true;
+        }
         if (keyEvent->key() == Qt::Key_Return)
         {
             this->parentInput->ProcessInput();

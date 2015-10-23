@@ -65,7 +65,9 @@ namespace GrumpyIRC
             static QList<Session*> SessionList;
             static QMutex *sessions_lock;
 
+            void processLogin(QHash<QString, QVariant> parameters);
             void processNetworks();
+            void processCommand(QHash<QString, QVariant> parameters);
             //! Called when user wants to connect to new IRC server
             void processNew(QHash<QString, QVariant> info);
 

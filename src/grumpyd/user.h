@@ -37,12 +37,14 @@ namespace GrumpyIRC
 
             User(QString Name, QString Password);
             void InsertSession(Session *sx);
+            QString GetName() const;
             void RemoveSession(Session *sx);
             SyncableIRCSession *ConnectToIRCServer(libirc::ServerAddress info);
             bool IsAuthorized(QString perm);
             QList<Session*> GetGPSessions();
-            QList<SyncableIRCSession*> GetSIRCSessions();
             Session *GetAnyGPSession();
+            SyncableIRCSession *GetSIRCSession(unsigned int sid);
+            QList<SyncableIRCSession*> GetSIRCSessions();
             void SetRole(Role *rx);
             QString DefaultNick;
 

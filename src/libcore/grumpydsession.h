@@ -64,6 +64,8 @@ namespace GrumpyIRC
             // Send a raw IRC command to grumpyd for processing
             void DelegateCommand(QString command, QString pm, Scrollback *source);
             SessionType GetType();
+            Scrollback *GetScrollback(unsigned long long original_id);
+            IRCSession *GetSession(unsigned int nsid);
             IRCSession *GetSessionFromWindow(Scrollback *scrollback);
             void Connect();
 
@@ -81,9 +83,14 @@ namespace GrumpyIRC
         private:
             void processNewScrollbackItem(QHash<QString, QVariant> hash);
             void processNetwork(QHash<QString, QVariant> hash);
+            void processChannelResync(QHash<QString, QVariant> hash);
+            void processSResync(QHash<QString, QVariant> parameters);
             void closeError(QString error);
             //! Irc sessions associated with their ROOT window so that we can figure out the network just from parent window
             QHash<Scrollback*, IRCSession*> sessionList;
+            //! This is a persistent storage which contains all scrollbacks that are meant to belong to this grumpyd
+            //! it's used to fasten up the resolution of scrollbacks by the original id
+            QHash<unsigned long long, Scrollback*> scrollbackHash;
             Scrollback *systemWindow;
             bool SSL;
             QString hostname;

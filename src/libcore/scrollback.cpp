@@ -29,8 +29,10 @@ Scrollback::Scrollback(ScrollbackType Type, Scrollback *parent)
     ScrollbackList_Mutex.unlock();
     this->session = NULL;
     this->_dead = false;
+    this->_network = NULL;
     this->type = Type;
     this->_id = lastID++;
+    this->_original_id = this->_id;
 }
 
 Scrollback::~Scrollback()
@@ -50,6 +52,16 @@ unsigned long long Scrollback::GetID()
     return this->_id;
 }
 
+void Scrollback::Close()
+{
+    emit this->Event_Closed();
+}
+
+unsigned long long Scrollback::GetOriginalID()
+{
+    return this->_original_id;
+}
+
 ScrollbackType Scrollback::GetType() const
 {
     return this->type;
@@ -65,6 +77,9 @@ void Scrollback::SetSession(NetworkSession *Session)
     if (this->session)
         throw new GrumpyIRC::Exception("This scrollback already has an IrcSession", BOOST_CURRENT_FUNCTION);
 
+    if (Session->GetType() == SessionType_IRC)
+        this->SetNetwork(Session->GetNetwork());
+
     // We can store the pointer now
     this->session = Session;
     emit this->Event_SessionModified(Session);
@@ -73,6 +88,17 @@ void Scrollback::SetSession(NetworkSession *Session)
 bool Scrollback::IsDead() const
 {
     return this->_dead;
+}
+
+void Scrollback::SetNetwork(libircclient::Network *Network)
+{
+    this->_network = Network;
+    emit this->Event_NetworkModified(Network);
+}
+
+libircclient::Network *Scrollback::GetNetwork() const
+{
+    return this->_network;
 }
 
 void Scrollback::SetDead(bool dead)
@@ -89,11 +115,12 @@ QHash<QString, QVariant> Scrollback::ToHash()
 {
     QHash<QString, QVariant> hash;
     SERIALIZE(_dead);
-    SERIALIZE(_id);
+    SERIALIZE(_original_id);
     SERIALIZE(_maxItems);
     SERIALIZE(_target);
     QList<QVariant> variant_items_list;
-    foreach (ScrollbackItem xx, this->items)
+    hash.insert("type", static_cast<int>(this->type));
+    foreach (ScrollbackItem xx, this->_items)
         variant_items_list.append(QVariant(xx.ToHash()));
     hash.insert("items", QVariant(variant_items_list));
     return hash;
@@ -104,13 +131,15 @@ void Scrollback::LoadHash(QHash<QString, QVariant> hash)
     UNSERIALIZE_STRING(_target);
     UNSERIALIZE_BOOL(_dead);
     UNSERIALIZE_ULONGLONG(_maxItems);
-    UNSERIALIZE_ULONGLONG(_id);
+    if (hash.contains("type"))
+        this->type = static_cast<ScrollbackType>(hash["type"].toInt());
+    UNSERIALIZE_ULONGLONG(_original_id);
     if (hash.contains("items"))
     {
         QList<QVariant> items_l;
         items_l = hash["items"].toList();
         foreach (QVariant item, items_l)
-            items.append(item.toHash());
+            _items.append(item.toHash());
         emit this->Event_Reload();
     }
 }
@@ -127,7 +156,7 @@ NetworkSession *Scrollback::GetSession()
 
 QList<ScrollbackItem> Scrollback::GetItems()
 {
-    return this->items;
+    return this->_items;
 }
 
 void Scrollback::UserListChange(QString nick, libircclient::User *user, UserListChangeType change_type)
@@ -151,7 +180,7 @@ void Scrollback::UserListChange(QString nick, libircclient::User *user, UserList
 
 void Scrollback::InsertText(ScrollbackItem item)
 {
-    this->items.append(item);
+    this->_items.append(item);
     emit Event_InsertText(item);
 }
 

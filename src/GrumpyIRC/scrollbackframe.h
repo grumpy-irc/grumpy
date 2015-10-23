@@ -24,6 +24,7 @@ namespace Ui
 
 namespace libircclient
 {
+    class Network;
     class User;
 }
 
@@ -60,7 +61,7 @@ namespace GrumpyIRC
             void UserList_Remove(QString user);
             void UserList_Rename(QString old, libircclient::User *us);
             void Refresh();
-            void SessionChanged(NetworkSession *session);
+            void NetworkChanged(libircclient::Network *network);
         private:
             Scrollback *scrollback;
 			//QStandardItem *treeNode;

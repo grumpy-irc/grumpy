@@ -51,6 +51,11 @@ void User::InsertSession(Session *sx)
     this->sessions_gp.append(sx);
 }
 
+QString User::GetName() const
+{
+    return this->username;
+}
+
 void User::RemoveSession(Session *sx)
 {
     this->sessions_gp.removeAll(sx);
@@ -84,6 +89,17 @@ QList<Session*> User::GetGPSessions()
 QList<SyncableIRCSession *> User::GetSIRCSessions()
 {
     return this->sessions;
+}
+
+SyncableIRCSession *User::GetSIRCSession(unsigned int sid)
+{
+    foreach (SyncableIRCSession *xx, this->sessions)
+    {
+        if (xx->GetSID() == sid)
+            return xx;
+    }
+
+    return NULL;
 }
 
 Session *User::GetAnyGPSession()

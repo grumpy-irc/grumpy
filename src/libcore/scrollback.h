@@ -22,6 +22,11 @@
 #include <QMutex>
 #include <QList>
 
+namespace libircclient
+{
+    class Network;
+}
+
 namespace GrumpyIRC
 {
     enum ScrollbackType
@@ -99,8 +104,13 @@ namespace GrumpyIRC
 
             Scrollback(ScrollbackType Type = ScrollbackType_System, Scrollback *parent = NULL);
             virtual ~Scrollback();
-            unsigned long long GetMaxItemsSize();
+            virtual void Close();
+            virtual unsigned long long GetMaxItemsSize();
+            //! Unique ID of this scrollback for this grumpy, this is newer synced over network
             unsigned long long GetID();
+            //! Original ID of this scrollback as it was on grumpy instance which created it
+            //! synced ower network
+            unsigned long long GetOriginalID();
             void SetMaxItemsSize(unsigned long long size);
             virtual void InsertText(QString text, ScrollbackItemType type = ScrollbackItemType_System);
             virtual void InsertText(ScrollbackItem item);
@@ -108,19 +118,29 @@ namespace GrumpyIRC
             virtual QString GetTarget() const;
             //! If this scrollback is associated to some session this function returns the pointer to it, in case it's not NULL is returned
             virtual NetworkSession *GetSession();
-            QList<ScrollbackItem> GetItems();
+            virtual QList<ScrollbackItem> GetItems();
             //! Called by IRC session or any other object if there is any change to user list associated to this scrollback
             virtual void UserListChange(QString nick, libircclient::User *user, UserListChangeType change_type);
             virtual ScrollbackType GetType() const;
             virtual void SetSession(NetworkSession *Session);
             virtual bool IsDead() const;
+            void SetNetwork(libircclient::Network *Network);
+            virtual libircclient::Network *GetNetwork() const;
             virtual void SetDead(bool dead);
             virtual Scrollback *GetParentScrollback();
             QHash<QString, QVariant> ToHash();
             void LoadHash(QHash<QString, QVariant> hash);
 
         signals:
+            void Event_Closed();
             void Event_InsertText(ScrollbackItem item);
+            //! Called when internal pointer to a network was modified, this is required by some wrappers
+            //!
+            //! If you are rendering a user list (which is associated with Channel scrollbacks) you need to have a pointer
+            //! to a network that owns this channel because users in a list require access to some network functions
+            //!
+            //! this event is called when a network is associated with the scrollback so that wrappers can update
+            void Event_NetworkModified(libircclient::Network *network);
             void Event_UserInserted(libircclient::User *user);
             void Event_UserAltered(QString original_name, libircclient::User *user);
             void Event_SessionModified(NetworkSession *Session);
@@ -130,15 +150,18 @@ namespace GrumpyIRC
             //! so that it can be updated in associated widgets
             void Event_UserRefresh(libircclient::User *user);
 
-        private:
+        protected:
+            static unsigned long long lastID;
+
+            libircclient::Network *_network;
             Scrollback *parentSx;
             bool _dead;
             QString _target;
             NetworkSession *session;
             ScrollbackType type;
-            static unsigned long long lastID;
-            QList<ScrollbackItem> items;
+            QList<ScrollbackItem> _items;
             unsigned long long _id;
+            unsigned long long _original_id;
             unsigned long long _maxItems;
     };
 }

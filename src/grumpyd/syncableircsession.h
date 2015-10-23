@@ -28,10 +28,22 @@ namespace GrumpyIRC
 
             SyncableIRCSession(QHash<QString, QVariant> sx, User *user, Scrollback *root = NULL);
             SyncableIRCSession(Scrollback *system, User *user, Scrollback *root = NULL);
+            void ResyncChannel(libircclient::Channel* channel);
             ~SyncableIRCSession();
         //signals:
         public slots:
-
+            void OnIRCSelfJoin(libircclient::Channel *channel);
+            void OnIRCJoin(libircclient::Parser *px, libircclient::User *user, libircclient::Channel *channel);
+            void OnNICK(libircclient::Parser *px, QString old_, QString new_);
+            void OnIRCSelfNICK(libircclient::Parser *px, QString previous, QString nick);
+            void OnKICK(libircclient::Parser *px, libircclient::Channel *channel);
+            void OnPart(libircclient::Parser *px, libircclient::Channel *channel);
+            void OnSelf_KICK(libircclient::Parser *px, libircclient::Channel *channel);
+            void OnTOPIC(libircclient::Parser *px, libircclient::Channel *channel, QString previous_one);
+            void OnQuit(libircclient::Parser *px, libircclient::Channel *channel);
+            void OnSelfPart(libircclient::Parser *px, libircclient::Channel *channel);
+            void OnTopicInfo(libircclient::Parser *px, libircclient::Channel *channel);
+            void OnEndOfNames(libircclient::Parser *px);
         private:
             //! User who owns this session
             User *owner;

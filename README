@@ -1,0 +1,18 @@
+                              Grumpy IRC
+
+
+                           Hackers themselves
+===============================================================================
+
+Grumpy is a very advanced IRC client. It takes the best out of every major IRC client and leaves out the bad. It's designed for old school IRC users who need to be able to take most out of IRC.
+
+Some features:
+
+* Written in C++ (Qt) portable to every major platform
+* Distributed core (grumpyd) similar to Quassel IRC
+* Modular design, you can take the core library and build a different interface on top of it
+* Very scalable and extendable
+* Support all IRC standards and networks
+* Extensible and very powerfull auto-completion mechanism
+
+Grumpy is currently a work in progress and is unfinished. Use on your own risk. There is no manual yet. You can ask for help at #grumpy on network irc.tm-irc.org

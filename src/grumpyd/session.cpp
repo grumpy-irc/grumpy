@@ -101,21 +101,21 @@ void Session::TransferError(QString source, QString description, int id)
     params.insert("id", QVariant(id));
     params.insert("description", QVariant(description));
     params.insert("source", QVariant(source));
-    this->protocol->SendProtocolCommand("ERROR", params);
+    this->protocol->SendProtocolCommand(GP_CMD_ERROR, params);
 }
 
 void Session::PermissionDeny(QString source)
 {
     QHash<QString, QVariant> params;
     params.insert("source", QVariant(source));
-    this->protocol->SendProtocolCommand("PERMDENY", params);
+    this->protocol->SendProtocolCommand(GP_CMD_PERMDENY, params);
 }
 
 void Session::processNetworks()
 {
     if (!this->IsAuthorized(PRIVILEGE_USE_IRC))
     {
-        this->PermissionDeny("NETWORK_INFO");
+        this->PermissionDeny(GP_CMD_NETWORK_INFO);
         return;
     }
 
@@ -126,21 +126,40 @@ void Session::processNetworks()
         sessions.append(QVariant(session->ToHash()));
     QHash<QString, QVariant> params;
     params.insert("sessions", sessions);
-    this->protocol->SendProtocolCommand("NETWORK_INFO", params);
+    this->protocol->SendProtocolCommand(GP_CMD_NETWORK_INFO, params);
+}
+
+void Session::processCommand(QHash<QString, QVariant> parameters)
+{
+    if (!this->IsAuthorized(PRIVILEGE_USE_IRC))
+    {
+        this->PermissionDeny(GP_CMD_RAW);
+        return;
+    }
+
+    unsigned int nsid = parameters["network"].toUInt();
+    // let's find the network
+    SyncableIRCSession* irc = this->loggedUser->GetSIRCSession(nsid);
+    if (!irc)
+        return;
+    QString rx = parameters["command"].toString();
+    if (parameters.contains("parameters"))
+        rx += " " + parameters["parameters"].toString();
+    irc->GetNetwork()->TransferRaw(rx);
 }
 
 void Session::processNew(QHash<QString, QVariant> info)
 {
     if (!this->IsAuthorized(PRIVILEGE_USE_IRC))
     {
-        this->PermissionDeny("SERVER");
+        this->PermissionDeny(GP_CMD_SERVER);
         return;
     }
 
     // User wants to connect to some server
     if (!info.contains("server"))
     {
-        this->TransferError("SERVER", "No server host provided", GP_ENOSERVER);
+        this->TransferError(GP_CMD_SERVER, "No server host provided", GP_ENOSERVER);
         return;
     }
 
@@ -151,13 +170,13 @@ void Session::processNew(QHash<QString, QVariant> info)
     QHash<QString, QVariant> parameters;
     network_info.append(QVariant(session->ToHash()));
     parameters.insert("sessions", network_info);
-    this->SendToEverySession("NETWORK_INFO", parameters);
+    this->SendToEverySession(GP_CMD_NETWORK_INFO, parameters);
 }
 
 void Session::OnCommand(QString text, QHash<QString, QVariant> parameters)
 {
     text = text.toUpper();
-    if (text == "HELLO")
+    if (text == GP_CMD_HELLO)
     {
         if (parameters.contains("version"))
             GRUMPY_DEBUG(QString("SID ") + QString::number(this->SID) + QString(" version ") + parameters["version"].toString(), 1);
@@ -166,43 +185,22 @@ void Session::OnCommand(QString text, QHash<QString, QVariant> parameters)
         QHash<QString, QVariant> params;
         params.insert("version", QVariant(QString("Grumpyd ") + GRUMPY_VERSION_STRING));
         params.insert("authentication_required", QVariant(true));
-        this->protocol->SendProtocolCommand("HELLO", params);
-    } else if (text == "UNKNOWN")
+        this->protocol->SendProtocolCommand(GP_CMD_HELLO, params);
+    } else if (text == GP_CMD_UNKNOWN)
     {
         if (!parameters.contains("unrecognized"))
             return;
         GRUMPY_DEBUG(QString("SID ") + QString::number(this->SID) + QString(" doesn't understand protocol ") + parameters["unrecognized"].toString(), 2);
-    } else if (text == "LOGIN")
+    } else if (text == GP_CMD_RAW)
     {
-        // User wants to login
-        if (this->loggedUser)
-        {
-            this->TransferError("LOGIN", "You are already logged in", GP_EALREADYLOGGEDIN);
-            return;
-        }
-        if (!parameters.contains("username") || !parameters.contains("password"))
-        {
-            this->TransferError("LOGIN", "Invalid parameters", GP_EINVALIDLOGINPARAMS);
-            return;
-        }
-        this->loggedUser = User::Login(parameters["username"].toString(), parameters["password"].toString());
-        if (this->loggedUser)
-        {
-            if (!this->IsAuthorized(PRIVILEGE_LOGIN))
-            {
-                this->PermissionDeny("LOGIN");
-                return;
-            }
-            this->protocol->SendProtocolCommand("LOGIN_OK");
-            this->loggedUser->InsertSession(this);
-        } else
-        {
-            this->protocol->SendProtocolCommand("LOGIN_FAIL");
-        }
-    } else if (text == "NETWORK_INFO")
+        this->processCommand(parameters);
+    } else if (text == GP_CMD_LOGIN)
+    {
+        this->processLogin(parameters);
+    } else if (text == GP_CMD_NETWORK_INFO)
     {
         this->processNetworks();
-    } else if (text == "SERVER")
+    } else if (text == GP_CMD_SERVER)
     {
         this->processNew(parameters);
     } else
@@ -210,7 +208,38 @@ void Session::OnCommand(QString text, QHash<QString, QVariant> parameters)
         // We received some unknown packet, send it back to client so that it at least knows we don't support this
         QHash<QString, QVariant> params;
         params.insert("unrecognized", QVariant(text));
-        this->protocol->SendProtocolCommand("UNKNOWN", params);
+        this->protocol->SendProtocolCommand(GP_CMD_UNKNOWN, params);
+    }
+}
+
+void Session::processLogin(QHash<QString, QVariant> parameters)
+{
+    // User wants to login
+    if (this->loggedUser)
+    {
+        this->TransferError(GP_CMD_LOGIN, "You are already logged in", GP_EALREADYLOGGEDIN);
+        return;
+    }
+    if (!parameters.contains("username") || !parameters.contains("password"))
+    {
+        this->TransferError(GP_CMD_LOGIN, "Invalid parameters", GP_EINVALIDLOGINPARAMS);
+        return;
+    }
+    this->loggedUser = User::Login(parameters["username"].toString(), parameters["password"].toString());
+    if (this->loggedUser)
+    {
+        if (!this->IsAuthorized(PRIVILEGE_LOGIN))
+        {
+            this->PermissionDeny(GP_CMD_LOGIN);
+            return;
+        }
+        this->protocol->SendProtocolCommand(GP_CMD_LOGIN_OK);
+        GRUMPY_LOG("SID " + QString::number(this->SID) + " identified to " + this->loggedUser->GetName());
+        this->loggedUser->InsertSession(this);
+    } else
+    {
+        GRUMPY_LOG("SID " + QString::number(this->SID) + " failed to login to name " + parameters["username"].toString());
+        this->protocol->SendProtocolCommand(GP_CMD_LOGIN_FAIL);
     }
 }
 

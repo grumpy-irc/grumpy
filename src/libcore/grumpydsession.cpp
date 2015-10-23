@@ -13,6 +13,9 @@
 #include "core.h"
 #include "eventhandler.h"
 #include "grumpydsession.h"
+#include "../libirc/libircclient/network.h"
+#include "../libirc/libircclient/user.h"
+#include "../libirc/libircclient/channel.h"
 #include "ircsession.h"
 #include "exception.h"
 #include "scrollback.h"
@@ -91,6 +94,32 @@ SessionType GrumpydSession::GetType()
     return SessionType_Grumpyd;
 }
 
+Scrollback *GrumpydSession::GetScrollback(unsigned long long original_id)
+{
+    if (this->scrollbackHash.contains(original_id))
+        return this->scrollbackHash[original_id];
+    foreach (IRCSession* session, this->sessionList.values())
+    {
+        Scrollback *sx = session->GetScrollbackByOriginal(original_id);
+        if (sx)
+        {
+            this->scrollbackHash.insert(sx->GetOriginalID(), sx);
+            return sx;
+        }
+    }
+    return NULL;
+}
+
+IRCSession *GrumpydSession::GetSession(unsigned int nsid)
+{
+    foreach (IRCSession *session, this->sessionList.values())
+    {
+        if (session->GetSID() == nsid)
+            return session;
+    }
+    return NULL;
+}
+
 IRCSession *GrumpydSession::GetSessionFromWindow(Scrollback *scrollback)
 {
     if (this->sessionList.contains(scrollback))
@@ -129,16 +158,16 @@ void GrumpydSession::OnConnected()
     this->systemWindow->InsertText("Connected to remote server, sending HELLO packet");
     QHash<QString, QVariant> parameters;
     parameters.insert("version", QString(GRUMPY_VERSION_STRING));
-    this->SendProtocolCommand("HELLO", parameters);
+    this->SendProtocolCommand(GP_CMD_HELLO, parameters);
 }
 
 void GrumpydSession::OnIncomingCommand(QString text, QHash<QString, QVariant> parameters)
 {
-    if (text == "UNKNOWN")
+    if (text == GP_CMD_UNKNOWN)
     {
         if (parameters.contains("unrecognized"))
             this->systemWindow->InsertText(QString("Grumpyd didn't recognize this command: ") + parameters["unrecognized"].toString());
-    } else if (text == "HELLO")
+    } else if (text == GP_CMD_HELLO)
     {
         if (!parameters.contains("version"))
             return;
@@ -158,20 +187,26 @@ void GrumpydSession::OnIncomingCommand(QString text, QHash<QString, QVariant> pa
         params.insert("password", this->password);
         params.insert("username", this->username);
         this->SendProtocolCommand("LOGIN", params);
-    } else if (text == "LOGIN_FAIL")
+    } else if (text == GP_CMD_LOGIN_FAIL)
     {
         this->closeError("Invalid username or password provided");
-    } else if (text == "LOGIN_OK")
+    } else if (text == GP_CMD_CHANNEL_RESYNC)
+    {
+        this->processChannelResync(parameters);
+    } else if (text == GP_CMD_SCROLLBACK_RESYNC)
+    {
+        this->processSResync(parameters);
+    } else if (text == GP_CMD_LOGIN_OK)
     {
         this->systemWindow->InsertText("Synchronizing networks");
-        this->SendProtocolCommand("NETWORK_INFO");
-    } else if (text == "SCROLLBACK_LOAD_NEW_ITEM")
+        this->SendProtocolCommand(GP_CMD_NETWORK_INFO);
+    } else if (text == GP_CMD_SCROLLBACK_LOAD_NEW_ITEM)
     {
         this->processNewScrollbackItem(parameters);
-    } else if (text == "NETWORK_INFO")
+    } else if (text == GP_CMD_NETWORK_INFO)
     {
         this->processNetwork(parameters);
-    } else if (text == "PERMDENY")
+    } else if (text == GP_CMD_PERMDENY)
     {
         QString source = "unknown request";
         if (parameters.contains("source"))
@@ -181,7 +216,7 @@ void GrumpydSession::OnIncomingCommand(QString text, QHash<QString, QVariant> pa
     {
         QHash<QString, QVariant> params;
         params.insert("source", text);
-        this->SendProtocolCommand("UNKNOWN", params);
+        this->SendProtocolCommand(GP_CMD_UNKNOWN, params);
         this->systemWindow->InsertText("Unknown command from grumpyd " + text);
     }
 }
@@ -193,21 +228,13 @@ void GrumpydSession::processNewScrollbackItem(QHash<QString, QVariant> hash)
     // Fetch the network this item belongs to
     IRCSession *session = NULL;
     unsigned int sid = hash["network_id"].toUInt();
-    foreach (IRCSession *sx, this->sessionList.values())
+    if (!hash.contains("scrollback"))
     {
-        if (sx->GetSID() == sid)
-        {
-            session = sx;
-            break;
-        }
-    }
-    if (!session)
-    {
-        this->systemWindow->InsertText("Received scrollback item for scrollback for which network couldn't be found, SID: " + QString::number(sid));
+        GRUMPY_DEBUG("Missing scrollback id for item", 2);
         return;
     }
-    // Now we need to find the widget
-    Scrollback *window = session->GetScrollback(hash["scrollback_name"].toString());
+    unsigned long long id = hash["scrollback"].toULongLong();
+    Scrollback *window = this->GetScrollback(id);
     if (!window)
     {
         this->systemWindow->InsertText("Received scrollback item for scrollback which couldn't be found, name: " + hash["scrollback_name"].toString());
@@ -230,6 +257,85 @@ void GrumpydSession::processNetwork(QHash<QString, QVariant> hash)
         this->sessionList.insert(session->GetSystemWindow(), session);
     }
     this->systemWindow->InsertText("Synced networks: " + QString::number(session_list.count()));
+}
+
+void GrumpydSession::processChannelResync(QHash<QString, QVariant> hash)
+{
+    IRCSession *session = this->GetSession(hash["network_id"].toUInt());
+    if (!session)
+        return;
+    libircclient::Channel resynced_channel(hash["channel"].toHash());
+    libircclient::Channel *channel = session->GetNetwork()->GetChannel(resynced_channel.GetName());
+    // Find a scrollback that is associated to this channel if there is some
+    Scrollback *window = session->GetScrollback(resynced_channel.GetName());
+    if (!channel)
+    {
+        // There is no such a channel, so let's insert it to network structure
+        channel = session->GetNetwork()->InsertChannel(&resynced_channel);
+        // Resync the users with scrollback and quit
+        foreach (libircclient::User *user, channel->GetUsers())
+        {
+            if (window)
+                window->UserListChange(user->GetNick(), user, UserListChange_Insert);
+        }
+        return;
+    }
+
+    if (window)
+    {
+        // Remove all users from the window's internal user list
+        foreach (libircclient::User *user, channel->GetUsers())
+            window->UserListChange(user->GetNick(), user, UserListChange_Remove);
+    } else
+    {
+        GRUMPY_ERROR("request to resync an existing channel for which there is no window: " + channel->GetName());
+    }
+
+    channel->ClearUsers();
+
+    foreach (libircclient::User *user, resynced_channel.GetUsers())
+    {
+        // we need to insert a copy of user, not just a pointer because the base class will be destroyed on end
+        // of this function and so will all its subclasses
+        channel->InsertUser(new libircclient::User(user));
+        if (window)
+            window->UserListChange(user->GetNick(), user, UserListChange_Insert);
+    }
+}
+
+void GrumpydSession::processSResync(QHash<QString, QVariant> parameters)
+{
+    // Let's register this scrollback to this session
+    Scrollback *root = this->systemWindow;
+    unsigned long long parent = this->systemWindow->GetID();
+    if (parameters.contains("parent_sid"))
+    {
+        parent = parameters["parent_sid"].toULongLong();
+        root = this->GetScrollback(parent);
+        if (!root)
+            root = this->systemWindow;
+    }
+    Scrollback *result = Core::GrumpyCore->NewScrollback(root, parameters["name"].toString(), ScrollbackType_User);
+    result->SetSession(this);
+    result->LoadHash(parameters["scrollback"].toHash());
+    this->scrollbackHash.insert(result->GetOriginalID(), result);
+    if (result->GetType() == ScrollbackType_Channel)
+    {
+        // if this is a channel we also need to fill up some information about the user list
+        unsigned int network_id = parameters["network_id"].toUInt();
+        // find the network that belongs to this channel
+        IRCSession *session = this->GetSession(network_id);
+        if (!session)
+            return;
+        // get a pointer to channel
+        result->SetNetwork(session->GetNetwork());
+        libircclient::Channel *channel = session->GetNetwork()->GetChannel(result->GetTarget());
+        if (!channel)
+            return;
+        // get a list of users in this channel and fill them up to scrollback info
+        foreach (libircclient::User *user, channel->GetUsers())
+            result->UserListChange(user->GetNick(), user, UserListChange_Insert);
+    }
 }
 
 void GrumpydSession::closeError(QString error)

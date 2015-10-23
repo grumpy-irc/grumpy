@@ -107,6 +107,41 @@ Scrollback *IRCSession::GetScrollback(QString name)
 
 Scrollback *IRCSession::GetScrollback(unsigned long long sid)
 {
+    if (this->systemWindow->GetID() == sid)
+        return this->systemWindow;
+
+    foreach (Scrollback *scrollback, this->users.values())
+    {
+        if (scrollback->GetID() == sid)
+            return scrollback;
+    }
+
+    foreach (Scrollback *scrollback, this->channels.values())
+    {
+        if (scrollback->GetID() == sid)
+            return scrollback;
+    }
+
+    return NULL;
+}
+
+Scrollback *IRCSession::GetScrollbackByOriginal(unsigned long long original_sid)
+{
+    if (this->systemWindow->GetOriginalID() == original_sid)
+        return this->systemWindow;
+
+    foreach (Scrollback *scrollback, this->users.values())
+    {
+        if (scrollback->GetOriginalID() == original_sid)
+            return scrollback;
+    }
+
+    foreach (Scrollback *scrollback, this->channels.values())
+    {
+        if (scrollback->GetOriginalID() == original_sid)
+            return scrollback;
+    }
+
     return NULL;
 }
 
@@ -182,12 +217,25 @@ void IRCSession::SyncWindows(QHash<QString, QVariant> windows, QHash<QString, Sc
         NetworkSession *window_session = this;
         if (this->Root && this->Root->GetParentScrollback() && Generic::IsGrumpy(this->Root->GetParentScrollback()))
             window_session = this->Root->GetParentScrollback()->GetSession();
-        QString name = "unknown_channel";
+        QString name = "unknown_scrollback";
         QHash<QString, QVariant> scrollback_h = xx.toHash();
-        if (scrollback_h.contains("name"))
-            name = scrollback_h["name"].toString();
+        if (scrollback_h.contains("_target"))
+            name = scrollback_h["_target"].toString();
         Scrollback *scrollback = Core::GrumpyCore->NewScrollback(this->systemWindow, name, ScrollbackType_System);
         scrollback->LoadHash(scrollback_h);
+        // Set a pointer to this network so that wrappers that render the user lists can have some direct access to it
+        scrollback->SetNetwork(this->GetNetwork());
+        if (scrollback->GetType() == ScrollbackType_Channel)
+        {
+            // This is a channel so we need to insert all users to list
+            // first get a respective channel from network structure
+            libircclient::Channel *channel = this->GetNetwork()->GetChannel(scrollback->GetTarget());
+            if (channel)
+            {
+                foreach (libircclient::User *user, channel->GetUsers())
+                    scrollback->UserListChange(user->GetNick(), user, UserListChange_Insert);
+            }
+        }
         scrollback->SetSession(window_session);
         hash->insert(name.toLower(), scrollback);
     }

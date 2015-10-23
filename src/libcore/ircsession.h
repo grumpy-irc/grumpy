@@ -61,6 +61,7 @@ namespace GrumpyIRC
             //! instance use SID of the give scrollback
             virtual Scrollback *GetScrollback(QString name);
             virtual Scrollback *GetScrollback(unsigned long long sid);
+            virtual Scrollback *GetScrollbackByOriginal(unsigned long long original_sid);
             virtual libircclient::Network *GetNetwork();
             virtual unsigned int GetSID();
             virtual void Connect(libircclient::Network *Network);
@@ -76,7 +77,7 @@ namespace GrumpyIRC
             //! Emited when a new window for this session is open, needed by grumpyd for network sync
             void Event_ScrollbackIsOpen(Scrollback *window);
             void Event_ScrollbackIsClosed(Scrollback *window);
-        private slots:
+        protected slots:
             virtual void OnIncomingRawMessage(QByteArray message);
             virtual void OnConnectionFail(QAbstractSocket::SocketError er);
             virtual void OnMessage(libircclient::Parser *px);

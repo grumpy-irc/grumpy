@@ -22,18 +22,27 @@ namespace Ui
 
 namespace GrumpyIRC
 {
+    class AutocompletionEngine;
     class ScrollbackFrame;
     class InputBox : public QFrame
     {
             Q_OBJECT
 
         public:
+            static AutocompletionEngine *AE;
+
             explicit InputBox(ScrollbackFrame *parent = 0);
             ~InputBox();
             void ProcessInput();
+            void Complete();
             void Focus();
+            void History(bool up = false);
 
         private:
+            void insertToHistory();
+            int historyPosition;
+            unsigned int historySize;
+            QStringList history;
             ScrollbackFrame *parent;
             Ui::InputBox *ui;
     };

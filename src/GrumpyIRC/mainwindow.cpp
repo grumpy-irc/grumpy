@@ -16,6 +16,7 @@
 #include "ui_mainwindow.h"
 #include "userwidget.h"
 #include "scrollbackframe.h"
+#include "../libcore/generic.h"
 #include "syslogwindow.h"
 #include "defaultconfig.h"
 #include "scrollbacksmanager.h"
@@ -78,7 +79,10 @@ static int SystemCommand_Nick(SystemCommand *command, CommandArgs args)
     }
     if (scrollback->GetSession())
     {
-        scrollback->GetSession()->GetNetwork()->TransferRaw("NICK " + args.Parameters[0]);
+        if (!Generic::IsGrumpy(scrollback->GetScrollback()))
+            scrollback->GetSession()->GetNetwork()->TransferRaw("NICK " + args.Parameters[0]);
+        else
+            ((GrumpydSession*)scrollback->GetSession())->DelegateCommand("NICK", args.Parameters[0], scrollback->GetScrollback());
         return 0;
     }
     else

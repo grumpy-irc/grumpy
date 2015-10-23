@@ -19,7 +19,7 @@
 
 using namespace GrumpyIRC;
 
-VirtualScrollback::VirtualScrollback(ScrollbackType Type) : Scrollback(Type)
+VirtualScrollback::VirtualScrollback(ScrollbackType Type, Scrollback *parent) : Scrollback(Type, parent)
 {
     this->owner = NULL;
 }
@@ -32,6 +32,25 @@ VirtualScrollback::~VirtualScrollback()
 User *VirtualScrollback::GetOwner() const
 {
     return this->owner;
+}
+
+void VirtualScrollback::Sync()
+{
+    if (this->owner == NULL)
+        throw new NullPointerException("this->owner", BOOST_CURRENT_FUNCTION);
+
+    // Let's get all sessions who need to be informed about creation of this scrollback
+    Session *session = this->owner->GetAnyGPSession();
+    if (!session)
+        return;
+    QHash<QString, QVariant> parameters;
+    parameters.insert("name", this->GetTarget());
+    if (this->parentSx)
+        parameters.insert("parent_sid", QVariant(this->parentSx->GetID()));
+    if (this->GetSession() && this->GetSession()->GetType() == SessionType_IRC)
+        parameters.insert("network_id", QVariant(((IRCSession*)this->GetSession())->GetSID()));
+    parameters.insert("scrollback", QVariant(this->ToHash()));
+    session->SendToEverySession("SCROLLBACK_RESYNC", parameters);
 }
 
 void VirtualScrollback::SetOwner(User *user)

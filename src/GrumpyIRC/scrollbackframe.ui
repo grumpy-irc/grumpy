@@ -186,6 +186,9 @@
         </disabled>
        </palette>
       </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
       <property name="readOnly">
        <bool>true</bool>
       </property>

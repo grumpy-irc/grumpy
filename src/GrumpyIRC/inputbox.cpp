@@ -10,6 +10,7 @@
 
 // Copyright (c) Petr Bena 2015
 
+#include "../libcore/autocompletionengine.h"
 #include "../libcore/commandprocessor.h"
 #include "corewrapper.h"
 #include "../libcore/core.h"
@@ -21,11 +22,15 @@
 
 using namespace GrumpyIRC;
 
+AutocompletionEngine *InputBox::AE = NULL;
+
 InputBox::InputBox(ScrollbackFrame *parent) : QFrame(parent), ui(new Ui::InputBox)
 {
     this->ui->setupUi(this);
     this->ui->textEdit->setPalette(Skin::Default->Palette());
     this->ui->textEdit->installEventFilter(new KeyFilter(this));
+    this->historySize = 800;
+    this->historyPosition = 0;
     this->parent = parent;
 }
 
@@ -37,10 +42,59 @@ InputBox::~InputBox()
 void InputBox::ProcessInput()
 {
     CoreWrapper::GrumpyCore->GetCommandProcessor()->ProcessText(this->ui->textEdit->toPlainText(), this->parent->GetScrollback());
+    this->insertToHistory();
+    this->historyPosition = this->history.count();
     this->ui->textEdit->setText("");
+}
+
+void InputBox::Complete()
+{
+    if (!InputBox::AE)
+        return;
+
+    AutocompletionInformation input;
+    input.Position = this->ui->textEdit->textCursor().position();
+    input.FullText = this->ui->textEdit->toPlainText();
+
+    AutocompletionInformation result = AE->Execute(input);
+    this->ui->textEdit->setText(result.FullText);
+    this->ui->textEdit->textCursor().setPosition(result.Position);
 }
 
 void InputBox::Focus()
 {
     this->ui->textEdit->setFocus();
+}
+
+void InputBox::History(bool up)
+{
+    if (up)
+    {
+        if (this->historyPosition <= 0)
+            return;
+        if (!this->history.contains(this->ui->textEdit->toPlainText()))
+        {
+            this->insertToHistory();
+        }
+        this->ui->textEdit->setText(this->history[--this->historyPosition]);
+    } else
+    {
+        if (this->historyPosition >= (this->history.count()-1))
+            return;
+        this->ui->textEdit->setText(this->history[++this->historyPosition]);
+    }
+}
+
+void InputBox::insertToHistory()
+{
+    foreach (QString line, this->ui->textEdit->toPlainText().split("\n"))
+    {
+        if (line.trimmed().isEmpty())
+            continue;
+        while ((unsigned int)this->history.size() > this->historySize)
+        {
+            this->history.removeAt(0);
+        }
+        this->history.append(line);
+    }
 }

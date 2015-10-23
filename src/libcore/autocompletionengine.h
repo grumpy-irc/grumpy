@@ -15,11 +15,12 @@
 
 #include <QChar>
 #include <QList>
+#include "libcore_global.h"
 #include <QString>
 
 namespace GrumpyIRC
 {
-    class AutocompletionInformation
+    class LIBCORESHARED_EXPORT AutocompletionInformation
     {
         public:
             AutocompletionInformation();
@@ -27,7 +28,7 @@ namespace GrumpyIRC
             unsigned int Position;
     };
 
-    class AutocompletionEngine
+    class LIBCORESHARED_EXPORT AutocompletionEngine
     {
         public:
             AutocompletionEngine();
