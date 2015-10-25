@@ -144,4 +144,8 @@ void SyncableIRCSession::OnTopicInfo(libircclient::Parser *px, libircclient::Cha
 void SyncableIRCSession::OnEndOfNames(libircclient::Parser *px)
 {
     IRCSession::OnEndOfNames(px);
+    libircclient::Channel *channel = this->GetNetwork()->GetChannel(px->GetParameters()[1]);
+    if (!channel)
+        return;
+    this->ResyncChannel(channel);
 }
