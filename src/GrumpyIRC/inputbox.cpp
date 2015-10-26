@@ -57,8 +57,21 @@ void InputBox::Complete()
     input.FullText = this->ui->textEdit->toPlainText();
 
     AutocompletionInformation result = AE->Execute(input);
+    if (!result.Success)
+        return;
     this->ui->textEdit->setText(result.FullText);
-    this->ui->textEdit->textCursor().setPosition(result.Position);
+    QTextCursor cursor = this->ui->textEdit->textCursor();
+    cursor.setPosition(result.Position);
+    this->ui->textEdit->setTextCursor(cursor);
+    if (result.Suggestions.count())
+    {
+        QString suggestions;
+        foreach(QString sx, result.Suggestions)
+            suggestions += sx + ", ";
+        if (suggestions.endsWith(", "))
+            suggestions = suggestions.mid(0, suggestions.size() - 2);
+        this->parent->InsertText(QString("Multiple results: ") + suggestions);
+    }
 }
 
 void InputBox::Focus()

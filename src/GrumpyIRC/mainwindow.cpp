@@ -93,6 +93,19 @@ static int SystemCommand_Nick(SystemCommand *command, CommandArgs args)
     }
 }
 
+static int SystemCommand_Netstat(SystemCommand *command, CommandArgs command_args)
+{
+    Q_UNUSED(command_args);
+    Q_UNUSED(command);
+    Scrollback *sx = MainWindow::Main->GetCurrentScrollbackFrame()->GetScrollback();
+    if (!sx->GetSession() || Generic::IsGrumpy(sx))
+        return 2;
+    GrumpydSession *session = (GrumpydSession*)sx->GetSession();
+    sx->InsertText("Bytes rcvd:" + QString::number(session->GetBytesRcvd()));
+    sx->InsertText("Bytes sent:" + QString::number(session->GetBytesSent()));
+    return 0;
+}
+
 static int SystemCommand_Grumpy(SystemCommand *command, CommandArgs command_args)
 {
     Q_UNUSED(command);
@@ -102,12 +115,13 @@ static int SystemCommand_Grumpy(SystemCommand *command, CommandArgs command_args
         GRUMPY_ERROR(QObject::tr("This command requires exactly 3 parameters"));
         return 0;
     }
-    MainWindow::Main->OpenGrumpy(command_args.Parameters[0], GP_DEFAULT_PORT, command_args.Parameters[1], command_args.Parameters[2]);
+    MainWindow::Main->OpenGrumpy(command_args.Parameters[0], GP_DEFAULT_SSL_PORT, command_args.Parameters[1], command_args.Parameters[2], true);
     return 0;
 }
 
 static int SystemCommand_Server(SystemCommand *command, CommandArgs command_args)
 {
+    Q_UNUSED(command);
     // if there is no parameter we throw some error
     if (command_args.Parameters.count() < 1)
     {
@@ -145,6 +159,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->addDockWidget(Qt::LeftDockWidgetArea, this->windowList);
     this->addDockWidget(Qt::BottomDockWidgetArea, this->syslogWindow);
     this->addDockWidget(Qt::RightDockWidgetArea, this->userWidget);
+    ScrollbacksManager::Global = this->scrollbackWindow;
     this->syslogWindow->hide();
     // Create a system scrollback
     this->systemWindow = this->scrollbackWindow->CreateWindow("System Window", NULL, true, false);
@@ -152,6 +167,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("quit", (SC_Callback)SystemCommand_Exit));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("server", (SC_Callback)SystemCommand_Server));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("nick", (SC_Callback)SystemCommand_Nick));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.netstat", (SC_Callback)SystemCommand_Netstat));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.next_session_nick", (SC_Callback)SystemCommand_NextSessionNick));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpyd", (SC_Callback)SystemCommand_Grumpy));
     // Welcome user
@@ -164,6 +180,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 MainWindow::~MainWindow()
 {
+    ScrollbacksManager::Global = NULL;
     delete this->ui;
 }
 
@@ -192,10 +209,10 @@ UserWidget *MainWindow::GetUsers()
     return this->userWidget;
 }
 
-void MainWindow::OpenGrumpy(QString hostname, int port, QString username, QString password)
+void MainWindow::OpenGrumpy(QString hostname, int port, QString username, QString password, bool ssl)
 {
     ScrollbackFrame *system = this->GetScrollbackManager()->CreateWindow(hostname, NULL, true);
-    GrumpydSession *session = new GrumpydSession(system->GetScrollback(), hostname, username, password, port);
+    GrumpydSession *session = new GrumpydSession(system->GetScrollback(), hostname, username, password, port, ssl);
     session->Connect();
 }
 

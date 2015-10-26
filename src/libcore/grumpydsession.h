@@ -54,7 +54,7 @@ namespace GrumpyIRC
             static QMutex Sessions_Lock;
             static QList<GrumpydSession*> Sessions;
 
-            GrumpydSession(Scrollback *System, QString Hostname, QString UserName, QString Pass, int Port = GP_DEFAULT_PORT);
+            GrumpydSession(Scrollback *System, QString Hostname, QString UserName, QString Pass, int Port = GP_DEFAULT_PORT, bool ssl = false);
             virtual ~GrumpydSession();
             virtual Scrollback *GetSystemWindow();
             virtual void Open(libirc::ServerAddress server);
@@ -64,6 +64,7 @@ namespace GrumpyIRC
             // Send a raw IRC command to grumpyd for processing
             void DelegateCommand(QString command, QString pm, Scrollback *source);
             SessionType GetType();
+            bool RemoveScrollback(Scrollback *scrollback);
             Scrollback *GetScrollback(unsigned long long original_id);
             IRCSession *GetSession(unsigned int nsid);
             IRCSession *GetSessionFromWindow(Scrollback *scrollback);
@@ -73,6 +74,7 @@ namespace GrumpyIRC
             void Event_IncomingData(QByteArray data);
 
         public slots:
+            void OnSslHandshakeFailure(QList<QSslError> errors);
             void OnDisconnect();
             void OnTimeout();
             void OnConnected();
@@ -83,6 +85,9 @@ namespace GrumpyIRC
         private:
             void processNewScrollbackItem(QHash<QString, QVariant> hash);
             void processNetwork(QHash<QString, QVariant> hash);
+            void processNetworkResync(QHash<QString, QVariant> hash);
+            void processChannel(QHash<QString, QVariant> hash);
+            void processNick(QHash<QString, QVariant> hash);
             void processChannelResync(QHash<QString, QVariant> hash);
             void processSResync(QHash<QString, QVariant> parameters);
             void closeError(QString error);

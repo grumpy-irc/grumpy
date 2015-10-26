@@ -10,20 +10,12 @@
 
 // Copyright (c) Petr Bena 2015
 
-#include "listener.h"
-#include "session.h"
+#include "databasebin.h"
 
 using namespace GrumpyIRC;
 
-Listener::Listener(bool ssl)
+DatabaseBin::DatabaseBin()
 {
-    this->usingSSL = ssl;
-}
 
-void Listener::incomingConnection(qintptr socketDescriptor)
-{
-    Session *session = new Session(socketDescriptor, this->usingSSL);
-    connect(session, SIGNAL(finished()), session, SLOT(deleteLater()));
-    session->start();
 }
 

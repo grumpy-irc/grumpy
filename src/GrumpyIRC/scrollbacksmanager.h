@@ -34,6 +34,7 @@ namespace GrumpyIRC
     {
             Q_OBJECT
         public:
+            static ScrollbacksManager *Global;
             explicit ScrollbacksManager(QWidget *parent = 0);
             ~ScrollbacksManager();
             /*!

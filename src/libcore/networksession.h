@@ -35,6 +35,7 @@ namespace GrumpyIRC
         public:
             NetworkSession();
             virtual ~NetworkSession();
+            virtual bool RemoveScrollback(Scrollback *scrollback)=0;
             virtual bool IsConnected() const=0;
             virtual libircclient::Network *GetNetwork()=0;
             virtual void SendMessage(Scrollback *window, QString text)=0;

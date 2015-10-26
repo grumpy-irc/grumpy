@@ -42,7 +42,7 @@ namespace GrumpyIRC
         public:
             static QList<Session*> Sessions();
 
-            Session(qintptr SocketPtr);
+            Session(qintptr socket_ptr, bool ssl);
             ~Session();
             void run();
             unsigned long GetSID();
@@ -54,7 +54,8 @@ namespace GrumpyIRC
             bool IsRunning;
             State SessionState;
 
-        public slots:
+        private slots:
+            void OnDisconnected();
             void OnCommand(QString text, QHash<QString, QVariant> parameters);
 
         signals:
@@ -72,6 +73,7 @@ namespace GrumpyIRC
             void processNew(QHash<QString, QVariant> info);
 
             QTcpSocket *socket;
+            bool usingSsl;
             User *loggedUser;
             libgp::GP *protocol;
             unsigned long SID;

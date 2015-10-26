@@ -22,9 +22,10 @@ namespace GrumpyIRC
     class Listener : public QTcpServer
     {
         public:
-            Listener();
+            Listener(bool ssl = false);
         protected:
             void incomingConnection(qintptr socketDescriptor) Q_DECL_OVERRIDE;
+            bool usingSSL;
     };
 }
 

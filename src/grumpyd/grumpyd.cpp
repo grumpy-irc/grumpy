@@ -10,6 +10,8 @@
 
 // Copyright (c) Petr Bena 2015
 
+#include <QFile>
+#include <QSslSocket>
 #include "grumpyd.h"
 #include "corewrapper.h"
 #include "databasexml.h"
@@ -21,10 +23,41 @@
 
 using namespace GrumpyIRC;
 
+QString Grumpyd::GetPathSSLCert()
+{
+    //! TODO load this from config
+    return "C:\\Users\\petr.bena\\grumpy\\test_cert\\cert.crt";
+}
+
+QString Grumpyd::GetPathSSLKey()
+{
+    return "C:\\Users\\petr.bena\\grumpy\\test_cert\\privkey.pem";
+}
+
+bool Grumpyd::SSLIsAvailable()
+{
+    if (!QFile().exists(GetPathSSLKey()) || !QFile().exists(GetPathSSLCert()))
+    {
+        GRUMPY_ERROR("SSL not available because either SSL key or certificate couldn't be found");
+        GRUMPY_ERROR("Certificate path: " + GetPathSSLCert());
+        GRUMPY_ERROR("Key path: " + GetPathSSLKey());
+        return false;
+    }
+
+    if (!QSslSocket::supportsSsl())
+    {
+        GRUMPY_ERROR("This system doesn't support SSL (missing OpenSSL libs)");
+        return false;
+    }
+
+    return true;
+}
+
 Grumpyd::Grumpyd()
 {
     running = true;
     this->listener = new Listener();
+    this->listenerSSL = new Listener(true);
 }
 
 Grumpyd::~Grumpyd()
@@ -40,5 +73,10 @@ void Grumpyd::Main()
     GRUMPY_LOG("Starting listeners");
     this->listener->listen(QHostAddress::Any, GP_DEFAULT_PORT);
     GRUMPY_LOG("Listener open on port " + QString::number(GP_DEFAULT_PORT));
+    if (SSLIsAvailable())
+    {
+        this->listenerSSL->listen(QHostAddress::Any, GP_DEFAULT_SSL_PORT);
+        GRUMPY_LOG("Listener (SSL) open on port " + QString::number(GP_DEFAULT_SSL_PORT));
+    }
 }
 

@@ -37,6 +37,11 @@ bool KeyFilter::eventFilter(QObject *obj, QEvent *event)
             this->parentInput->History(true);
             return true;
         }
+        if (keyEvent->key() == Qt::Key_Tab)
+        {
+            this->parentInput->Complete();
+            return true;
+        }
         if (keyEvent->key() == Qt::Key_Return)
         {
             this->parentInput->ProcessInput();

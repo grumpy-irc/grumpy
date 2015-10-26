@@ -21,6 +21,8 @@
 
 using namespace GrumpyIRC;
 
+ScrollbacksManager *ScrollbacksManager::Global = NULL;
+
 ScrollbacksManager::ScrollbacksManager(QWidget *parent) : QFrame(parent), ui(new Ui::ScrollbacksManager)
 {
     this->currentWidget = NULL;
@@ -78,6 +80,13 @@ void ScrollbacksManager::DestroyWindow(ScrollbackFrame *window)
 {
     if (!window->IsDeletable)
         return;
+    if (window->TreeNode)
+    {
+        QStandardItem *parent = NULL;
+        if (window->GetParent())
+            parent = window->GetParent()->TreeNode;
+        MainWindow::Main->GetScrollbackList()->UnregisterWindow(window->TreeNode, parent);
+    }
     this->Scrollbacks.removeOne(window);
     delete window;
 }

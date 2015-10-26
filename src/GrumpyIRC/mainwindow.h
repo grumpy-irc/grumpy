@@ -49,7 +49,7 @@ namespace GrumpyIRC
             void WriteToSystemWindow(QString text);
             ScrollbackFrame *GetCurrentScrollbackFrame();
             UserWidget *GetUsers();
-            void OpenGrumpy(QString hostname, int port, QString username, QString password);
+            void OpenGrumpy(QString hostname, int port, QString username, QString password, bool ssl);
             void OpenIRCNetworkLink(QString link);
             void OpenServer(libirc::ServerAddress &server);
 

@@ -59,6 +59,11 @@ int CommandProcessor::ProcessText(QString text, Scrollback *window)
     return 0;
 }
 
+QList<QString> CommandProcessor::GetCommands()
+{
+    return this->CommandList.keys();
+}
+
 int CommandProcessor::ProcessItem(QString command, Scrollback *window)
 {
     command = command.trimmed();

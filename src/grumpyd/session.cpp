@@ -12,15 +12,17 @@
 
 #include <QHostAddress>
 #include <QHash>
+#include <QSslSocket>
+#include "../libirc/libirc/serveraddress.h"
+#include "../libirc/libircclient/network.h"
+#include "../libcore/core.h"
+#include "../libcore/eventhandler.h"
 #include "corewrapper.h"
+#include "grumpyd.h"
 #include "user.h"
 #include "security.h"
 #include "session.h"
-#include "../libirc/libirc/serveraddress.h"
-#include "../libirc/libircclient/network.h"
 #include "syncableircsession.h"
-#include "../libcore/core.h"
-#include "../libcore/eventhandler.h"
 
 using namespace GrumpyIRC;
 
@@ -33,20 +35,48 @@ QList<Session *> Session::Sessions()
     return SessionList;
 }
 
-Session::Session(qintptr SocketPtr)
+Session::Session(qintptr socket_ptr, bool ssl)
 {
-    this->socket = new QTcpSocket();
-    this->socket->setSocketDescriptor(SocketPtr);
-    this->protocol = new libgp::GP(socket);
-    this->SessionState = State_Login;
+    this->usingSsl = ssl;
+    if (ssl)
+    {
+        QSslSocket *ssl_socket = new QSslSocket();
+        ssl_socket->setLocalCertificate(Grumpyd::GetPathSSLCert());
+        ssl_socket->setPrivateKey(Grumpyd::GetPathSSLKey());
+        this->socket = ssl_socket;
+    }
+    else
+    {
+        this->socket = new QTcpSocket();
+    }
+    this->socket->setSocketDescriptor(socket_ptr);
     sessions_lock->lock();
     this->SID = lSID++;
     this->IsRunning = true;
     SessionList.append(this);
     sessions_lock->unlock();
-    connect(this->protocol, SIGNAL(Event_IncomingCommand(QString,QHash<QString,QVariant>)), this, SLOT(OnCommand(QString,QHash<QString,QVariant>)));
-    this->protocol->ResolveSignals();
     this->loggedUser = NULL;
+    if (ssl)
+    {
+        // setup handshake
+        QSslSocket *ssl_socket = (QSslSocket*)this->socket;
+        ssl_socket->startServerEncryption();
+        if (!ssl_socket->waitForEncrypted())
+        {
+            GRUMPY_ERROR("SSL handshake failed for SID " + QString::number(this->GetSID()) + " peer: "
+                         + this->socket->peerAddress().toString() + ": " + ssl_socket->errorString());
+            this->SessionState = State_Offline;
+            this->protocol = NULL;
+            this->socket->close();
+            delete this;
+            return;
+        }
+    }
+    this->protocol = new libgp::GP(socket);
+    this->SessionState = State_Login;
+    connect(this->protocol, SIGNAL(Event_IncomingCommand(QString,QHash<QString,QVariant>)), this, SLOT(OnCommand(QString,QHash<QString,QVariant>)));
+    connect(this->protocol, SIGNAL(Event_Disconnected()), this, SLOT(OnDisconnected()));
+    this->protocol->ResolveSignals();
     GRUMPY_LOG("New session (" + QString::number(this->SID) + ") from " + this->socket->peerAddress().toString());
 }
 
@@ -68,9 +98,10 @@ Session::~Session()
 void Session::run()
 {
     while(this->IsRunning)
-    {
-        sleep(20000);
-    }
+        sleep(1);
+
+    // exit the session
+    delete this;
 }
 
 unsigned long Session::GetSID()
@@ -83,7 +114,7 @@ bool Session::IsAuthorized(QString permission)
     if (!this->loggedUser)
         return false;
 
-    return true;
+    return this->loggedUser->IsAuthorized(permission);
 }
 
 void Session::SendToEverySession(QString command, QHash<QString, QVariant> parameters)
@@ -109,6 +140,11 @@ void Session::PermissionDeny(QString source)
     QHash<QString, QVariant> params;
     params.insert("source", QVariant(source));
     this->protocol->SendProtocolCommand(GP_CMD_PERMDENY, params);
+}
+
+void Session::OnDisconnected()
+{
+    this->IsRunning = false;
 }
 
 void Session::processNetworks()

@@ -10,40 +10,24 @@
 
 // Copyright (c) Petr Bena 2015
 
-#ifndef GRUMPYD_H
-#define GRUMPYD_H
+#ifndef DATABASEBIN_H
+#define DATABASEBIN_H
 
-#include <QString>
-#include "../libcore/exception.h"
-#include "listener.h"
-#include <QObject>
-#include <QTimer>
+#include "databasebackend.h"
 
 namespace GrumpyIRC
 {
-    class DatabaseBackend;
-
-    class Grumpyd : public QObject
+    class DatabaseBin : public DatabaseBackend
     {
-            Q_OBJECT
         public:
-            static QString GetPathSSLCert();
-            static QString GetPathSSLKey();
-            static bool SSLIsAvailable();
+            DatabaseBin();
+            void LoadRoles();
+            void LoadUsers();
 
-            Grumpyd();
-            ~Grumpyd();
+        signals:
 
         public slots:
-            void Main();
-
-        private:
-            DatabaseBackend *databaseBackend;
-            Listener *listener;
-            Listener *listenerSSL;
-            bool running;
-
     };
 }
 
-#endif // GRUMPYD_H
+#endif // DATABASEBIN_H

@@ -23,13 +23,7 @@ DatabaseXML::DatabaseXML()
 
 void DatabaseXML::LoadRoles()
 {
-    Role::CreateRole("root");
-    Role::CreateRole("system");
-    Role::CreateRole("user");
-    Role::Roles["root"]->GrantRole(Role::Roles["system"]);
-    Role::Roles["root"]->GrantRole(Role::Roles["user"]);
-    Role::Roles["user"]->Grant(PRIVILEGE_LOGIN);
-    Role::Roles["user"]->Grant(PRIVILEGE_USE_IRC);
+    Role::Defaults();
 }
 
 void DatabaseXML::LoadUsers()

@@ -56,6 +56,7 @@ namespace GrumpyIRC
             void RegisterCommand(SystemCommand *sc);
             //! Simple idiot proof processor for text that is input by a user
             int ProcessText(QString text, Scrollback *window);
+            QList<QString> GetCommands();
             char CommandPrefix;
         private:
             int ProcessItem(QString command, Scrollback *window);

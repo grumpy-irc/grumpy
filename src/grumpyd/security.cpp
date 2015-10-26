@@ -16,6 +16,17 @@ using namespace GrumpyIRC;
 
 QHash<QString, Role*> Role::Roles;
 
+void Role::Defaults()
+{
+    Role::CreateRole("root");
+    Role::CreateRole("system");
+    Role::CreateRole("user");
+    Role::Roles["root"]->GrantRole(Role::Roles["system"]);
+    Role::Roles["root"]->GrantRole(Role::Roles["user"]);
+    Role::Roles["user"]->Grant(PRIVILEGE_LOGIN);
+    Role::Roles["user"]->Grant(PRIVILEGE_USE_IRC);
+}
+
 void Role::CreateRole(QString name)
 {
     Roles.insert(name, new Role(name));

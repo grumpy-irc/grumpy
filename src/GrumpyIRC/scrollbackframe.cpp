@@ -20,6 +20,7 @@
 #include "defaultconfig.h"
 #include "skin.h"
 #include "scrollbackframe.h"
+#include "scrollbacksmanager.h"
 #include "userframe.h"
 #include "inputbox.h"
 #include "ui_scrollbackframe.h"
@@ -58,6 +59,11 @@ ScrollbackFrame::~ScrollbackFrame()
 QString ScrollbackFrame::GetWindowName() const
 {
     return this->_name;
+}
+
+void ScrollbackFrame::InsertText(QString text)
+{
+    this->scrollback->InsertText(text);
 }
 
 void ScrollbackFrame::InsertText(ScrollbackItem item)
@@ -165,6 +171,17 @@ void ScrollbackFrame::Refresh()
     this->buffer.clear();
     foreach (ScrollbackItem item, this->scrollback->GetItems())
         this->_insertText_(item);
+}
+
+void ScrollbackFrame::OnClosed()
+{
+    // The wrapped scrollback is being closed we must unregister this frame and delete it,
+    // before we do that we need to reset the pointer to scrollback, because the destructor
+    // of this class naturally tries to delete the scrollback, which would fail as it
+    // would already be deleted by then, this event is called from destructor of scrollback,
+    // so calling delete on it would have unexpectable results
+    this->scrollback = NULL;
+    ScrollbacksManager::Global->DestroyWindow(this);
 }
 
 void ScrollbackFrame::NetworkChanged(libircclient::Network *network)

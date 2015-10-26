@@ -194,6 +194,11 @@ bool IRCSession::IsConnected() const
     return false;
 }
 
+bool IRCSession::RemoveScrollback(Scrollback *scrollback)
+{
+    return true;
+}
+
 Scrollback *IRCSession::GetScrollbackForChannel(QString channel)
 {
     if (!this->channels.contains(channel.toLower()))
@@ -284,6 +289,13 @@ void IRCSession::LoadHash(QHash<QString, QVariant> hash)
         this->SyncWindows(hash["users"].toHash(), &this->users);
     if (hash.contains("channels"))
         this->SyncWindows(hash["channels"].toHash(), &this->channels);
+}
+
+void IRCSession::RegisterChannel(libircclient::Channel *channel, Scrollback *window)
+{
+    this->channels.insert(channel->GetName().toLower(), window);
+    if (!this->GetNetwork()->GetChannel(channel->GetName()))
+        this->GetNetwork()->InsertChannel(channel);
 }
 
 void IRCSession::SendMessage(Scrollback *window, QString text)
@@ -434,6 +446,29 @@ void IRCSession::OnNotice(libircclient::Parser *px)
         return;
     }
     sx->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Notice, px->GetSourceUserInfo()));
+}
+
+void IRCSession::_gs_ResyncNickChange(QString new_, QString old_)
+{
+    // now check all scrollbacks for this user, we don't need to write any message to scrollback itself, that was already handled
+    // by sync subsystem of internal text cache
+    // what we need to do is an update of userlist that is associated with the scrollback (in case of GUI irc client)
+    // this would be much more easier to implement if we just resynced the whole channel list structure on its every change:
+    // one function to rule them all? :) but that would be incredible overhead as we would need to resync on every change
+    // while this tiny packet is enough (let's try to be more efficient than others)
+
+    foreach (libircclient::Channel *channel, this->GetNetwork()->GetChannels())
+    {
+        if (!channel->ContainsUser(old_))
+            continue;
+        if (!this->channels.contains(channel->GetName().toLower()))
+            continue;
+        // Get a scrollback window and write a nick change message to it
+        libircclient::User *ux = channel->GetUser(old_);
+        ux->SetNick(new_);
+        Scrollback *scrollback = this->channels[channel->GetName().toLower()];
+        scrollback->UserListChange(old_, ux, UserListChange_Alter);
+    }
 }
 
 void IRCSession::OnIncomingRawMessage(QByteArray message)

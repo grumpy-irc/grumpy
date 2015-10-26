@@ -44,6 +44,7 @@ namespace GrumpyIRC
             explicit ScrollbackFrame(ScrollbackFrame *parentWindow = NULL, QWidget *parent = NULL, Scrollback *_scrollback = NULL);
             ~ScrollbackFrame();
             QString GetWindowName() const;
+            void InsertText(QString text);
             void InsertText(ScrollbackItem item);
             void SetWindowName(QString title);
 			ScrollbackFrame *GetParent();
@@ -61,6 +62,7 @@ namespace GrumpyIRC
             void UserList_Remove(QString user);
             void UserList_Rename(QString old, libircclient::User *us);
             void Refresh();
+            void OnClosed();
             void NetworkChanged(libircclient::Network *network);
         private:
             Scrollback *scrollback;

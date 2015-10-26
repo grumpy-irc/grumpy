@@ -28,6 +28,7 @@ namespace GrumpyIRC
 
             SyncableIRCSession(QHash<QString, QVariant> sx, User *user, Scrollback *root = NULL);
             SyncableIRCSession(Scrollback *system, User *user, Scrollback *root = NULL);
+            void Connect(libircclient::Network *Network);
             void ResyncChannel(libircclient::Channel* channel);
             ~SyncableIRCSession();
         //signals:
@@ -43,6 +44,7 @@ namespace GrumpyIRC
             void OnQuit(libircclient::Parser *px, libircclient::Channel *channel);
             void OnSelfPart(libircclient::Parser *px, libircclient::Channel *channel);
             void OnTopicInfo(libircclient::Parser *px, libircclient::Channel *channel);
+            void OnInfo(libircclient::Parser *px);
             void OnEndOfNames(libircclient::Parser *px);
         private:
             //! User who owns this session

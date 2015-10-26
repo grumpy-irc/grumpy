@@ -38,10 +38,12 @@ namespace libircclient
 namespace GrumpyIRC
 {
     class Scrollback;
+    class GrumpydSession;
 
     class LIBCORESHARED_EXPORT IRCSession : public QObject, public NetworkSession, public libirc::SerializableItem
     {
             Q_OBJECT
+            friend class GrumpydSession;
         public:
             static IRCSession *Open(Scrollback *system_window, libirc::ServerAddress &server, QString network = "", QString nick = "",
                                     QString ident = "", QString username = "");
@@ -67,11 +69,14 @@ namespace GrumpyIRC
             virtual void Connect(libircclient::Network *Network);
             virtual void SendMessage(Scrollback *window, QString text);
             virtual bool IsConnected() const;
+            bool RemoveScrollback(Scrollback *scrollback);
             virtual Scrollback *GetScrollbackForChannel(QString channel);
             SessionType GetType();
             virtual Scrollback *GetScrollbackForUser(QString user);
             QHash<QString, QVariant> ToHash();
             void LoadHash(QHash<QString, QVariant> hash);
+            //! Used mostly only for synchronization with grumpyd
+            void RegisterChannel(libircclient::Channel *channel, Scrollback *window);
             Scrollback *Root;
         signals:
             //! Emited when a new window for this session is open, needed by grumpyd for network sync
@@ -98,6 +103,9 @@ namespace GrumpyIRC
         protected:
             static unsigned int lastID;
 
+            //! This is only called by grumpy session, used for resync, pretty much just a performance tweaks
+            //! so that we don't need to call GP_CMD_RESYNC_CHANNEL just for a simple nick change
+            void _gs_ResyncNickChange(QString new_, QString old_);
             void SyncWindows(QHash<QString, QVariant> windows, QHash<QString, Scrollback*> *hash);
             //! Sessions have unique ID that distinct them from sessions made to same irc network
             unsigned int SID;

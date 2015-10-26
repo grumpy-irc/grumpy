@@ -47,6 +47,12 @@ SyncableIRCSession::SyncableIRCSession(Scrollback *system, User *user, Scrollbac
     ((VirtualScrollback*)this->systemWindow)->SetOwner(owner);
 }
 
+void SyncableIRCSession::Connect(libircclient::Network *Network)
+{
+    IRCSession::Connect(Network);
+    connect(this->network, SIGNAL(Event_MyInfo(libircclient::Parser*)), this, SLOT(OnInfo(libircclient::Parser*)));
+}
+
 void SyncableIRCSession::ResyncChannel(libircclient::Channel *channel)
 {
     if (!channel)
@@ -83,6 +89,18 @@ void SyncableIRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
         VirtualScrollback *sx = (VirtualScrollback*)this->channels[channel->GetName().toLower()];
         sx->SetOwner(this->owner);
         sx->Sync();
+        // Now sync the channel with all connected users, we need to do this after we sync the window so that client can assign the window pointer to chan
+        Session *session = this->owner->GetAnyGPSession();
+        if (!session)
+            return;
+        QHash<QString, QVariant> parameters;
+        parameters.insert("scrollback_id", QVariant(sx->GetID()));
+        parameters.insert("network_id", QVariant(this->GetSID()));
+        parameters.insert("channel", QVariant(channel->ToHash()));
+        session->SendToEverySession(GP_CMD_CHANNEL_JOIN, parameters);
+    } else
+    {
+        GRUMPY_ERROR("Sync error, can't resolve scrollback for channel " + channel->GetName() + " system user: " + this->owner->GetName());
     }
 }
 
@@ -95,6 +113,14 @@ void SyncableIRCSession::OnIRCJoin(libircclient::Parser *px, libircclient::User 
 void SyncableIRCSession::OnNICK(libircclient::Parser *px, QString old_, QString new_)
 {
     IRCSession::OnNICK(px, old_, new_);
+    Session *session = this->owner->GetAnyGPSession();
+    if (!session)
+        return;
+    QHash<QString, QVariant> parameters;
+    parameters.insert("new_nick", QVariant(new_));
+    parameters.insert("old_nick", QVariant(old_));
+    parameters.insert("network_id", QVariant(this->GetSID()));
+    session->SendToEverySession(GP_CMD_NICK, parameters);
 }
 
 void SyncableIRCSession::OnIRCSelfNICK(libircclient::Parser *px, QString previous, QString nick)
@@ -139,6 +165,19 @@ void SyncableIRCSession::OnSelfPart(libircclient::Parser *px, libircclient::Chan
 void SyncableIRCSession::OnTopicInfo(libircclient::Parser *px, libircclient::Channel *channel)
 {
     IRCSession::OnTopicInfo(px, channel);
+    //! \todo we need to update the topic on clients as well
+}
+
+void SyncableIRCSession::OnInfo(libircclient::Parser *px)
+{
+    Session *session = this->owner->GetAnyGPSession();
+    if (!session)
+        return;
+    // Resync the whole network
+    QHash<QString, QVariant> parameters;
+    parameters.insert("network", QVariant(this->GetNetwork()->ToHash()));
+    parameters.insert("network_id", QVariant(this->GetSID()));
+    session->SendToEverySession(GP_CMD_NETWORK_RESYNC, parameters);
 }
 
 void SyncableIRCSession::OnEndOfNames(libircclient::Parser *px)

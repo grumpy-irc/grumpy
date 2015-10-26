@@ -25,6 +25,7 @@ namespace GrumpyIRC
     class Role
     {
         public:
+            static void Defaults();
             static QHash<QString, Role*> Roles;
             static void CreateRole(QString name);
 

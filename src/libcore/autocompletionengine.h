@@ -26,6 +26,8 @@ namespace GrumpyIRC
             AutocompletionInformation();
             QString FullText;
             unsigned int Position;
+            QList<QString> Suggestions;
+            bool Success;
     };
 
     class LIBCORESHARED_EXPORT AutocompletionEngine
@@ -33,8 +35,22 @@ namespace GrumpyIRC
         public:
             AutocompletionEngine();
             virtual ~AutocompletionEngine();
-            AutocompletionInformation Execute(AutocompletionInformation input);
+            virtual void SetUsers(QList<QString> ul);
+            virtual void SetChannels(QList<QString> cl);
+            virtual AutocompletionInformation Execute(AutocompletionInformation input);
         protected:
+            virtual QString replaceWord(QString source, int start, QString sw, QString target);
+            virtual QString getIsolatedWord(AutocompletionInformation input, int *start_pos);
+            //! This function returns the part of a word that all words in a list share, so for a list of these words:
+            //! server_addr server_port server_user
+            //! this function returns "server_"
+            //! If you already know that all of these words start with something you can provide as a hint so that
+            //! it performs faster
+            virtual QString getSimilar(QList<QString> words, QString hint = "");
+            virtual AutocompletionInformation processList(QList<QString> list_of_words_cmp, bool *success, bool case_sensitive, QString word, int start, QString full_text);
+            char channelPrefix;
+            QList<QString> channels;
+            QList<QString> users;
             QList<QChar> WordSeparators;
     };
 }

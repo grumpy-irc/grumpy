@@ -27,7 +27,7 @@ using namespace GrumpyIRC;
 QMutex GrumpydSession::Sessions_Lock;
 QList<GrumpydSession*> GrumpydSession::Sessions;
 
-GrumpydSession::GrumpydSession(Scrollback *System, QString Hostname, QString UserName, QString Pass, int Port)
+GrumpydSession::GrumpydSession(Scrollback *System, QString Hostname, QString UserName, QString Pass, int Port, bool ssl)
 {
     this->systemWindow = System;
     this->hostname = Hostname;
@@ -35,7 +35,7 @@ GrumpydSession::GrumpydSession(Scrollback *System, QString Hostname, QString Use
     this->port = Port;
     this->username = UserName;
     this->password = Pass;
-    this->SSL = false;
+    this->SSL = ssl;
     GrumpydSession::Sessions_Lock.lock();
     GrumpydSession::Sessions.append(this);
     GrumpydSession::Sessions_Lock.unlock();
@@ -94,6 +94,11 @@ SessionType GrumpydSession::GetType()
     return SessionType_Grumpyd;
 }
 
+bool GrumpydSession::RemoveScrollback(Scrollback *scrollback)
+{
+    return true;
+}
+
 Scrollback *GrumpydSession::GetScrollback(unsigned long long original_id)
 {
     if (this->scrollbackHash.contains(original_id))
@@ -137,10 +142,36 @@ void GrumpydSession::Connect()
             return;
     delete this->socket;
     this->systemWindow->InsertText("Connecting to " + this->hostname);
-    this->socket = new QTcpSocket();
+    if (this->SSL)
+        this->socket = new QSslSocket();
+    else
+        this->socket = new QTcpSocket();
     this->ResolveSignals();
-    connect(this->socket, SIGNAL(connected()), this, SLOT(OnConnected()));
-    this->socket->connectToHost(this->hostname, this->port);
+    if (!this->SSL)
+    {
+        connect(this->socket, SIGNAL(connected()), this, SLOT(OnConnected()));
+        this->socket->connectToHost(this->hostname, this->port);
+    }
+    else
+    {
+        // We don't care about self signed certificates
+        connect(((QSslSocket*)this->socket), SIGNAL(encrypted()), this, SLOT(OnConnected()));
+        //QList<QSslError> errors;
+        //errors << QSslError(QSslError::SelfSignedCertificate);
+        //errors << QSslError(QSslError::HostNameMismatch);
+        ((QSslSocket*)this->socket)->ignoreSslErrors();
+        connect(((QSslSocket*)this->socket), SIGNAL(sslErrors(QList<QSslError>)), this, SLOT(OnSslHandshakeFailure(QList<QSslError>)));
+        ((QSslSocket*)this->socket)->connectToHostEncrypted(this->hostname, this->port);
+        if (!((QSslSocket*)this->socket)->waitForEncrypted())
+        {
+            this->closeError("SSL handshake failed: " + this->socket->errorString());
+        }
+    }
+}
+
+void GrumpydSession::OnSslHandshakeFailure(QList<QSslError> errors)
+{
+    ((QSslSocket*)this->socket)->ignoreSslErrors();
 }
 
 void GrumpydSession::OnDisconnect()
@@ -196,6 +227,15 @@ void GrumpydSession::OnIncomingCommand(QString text, QHash<QString, QVariant> pa
     } else if (text == GP_CMD_SCROLLBACK_RESYNC)
     {
         this->processSResync(parameters);
+    } else if (text == GP_CMD_NICK)
+    {
+        this->processNick(parameters);
+    } else if (text == GP_CMD_NETWORK_RESYNC)
+    {
+        this->processNetworkResync(parameters);
+    } else if (text == GP_CMD_CHANNEL_JOIN)
+    {
+        this->processChannel(parameters);
     } else if (text == GP_CMD_LOGIN_OK)
     {
         this->systemWindow->InsertText("Synchronizing networks");
@@ -257,6 +297,50 @@ void GrumpydSession::processNetwork(QHash<QString, QVariant> hash)
         this->sessionList.insert(session->GetSystemWindow(), session);
     }
     this->systemWindow->InsertText("Synced networks: " + QString::number(session_list.count()));
+}
+
+void GrumpydSession::processNetworkResync(QHash<QString, QVariant> hash)
+{
+    IRCSession *session = this->GetSession(hash["network_id"].toUInt());
+    if (!session)
+        return;
+    libircclient::Network resynced_network(hash["network"].toHash());
+    libircclient::Network *nt = session->GetNetwork();
+    nt->SetCUModes(resynced_network.GetCUModes());
+    nt->SetCCModes(resynced_network.GetCCModes());
+    nt->SetChannelUserPrefixes(resynced_network.GetChannelUserPrefixes());
+    nt->SetCModes(resynced_network.GetCModes());
+    nt->SetCPModes(resynced_network.GetCPModes());
+    nt->SetCRModes(resynced_network.GetCRModes());
+    nt->SetCUModes(resynced_network.GetCUModes());
+}
+
+void GrumpydSession::processChannel(QHash<QString, QVariant> hash)
+{
+    IRCSession *session = this->GetSession(hash["network_id"].toUInt());
+    if (!session)
+        return;
+    libircclient::Channel channel(hash["channel"].toHash());
+    Scrollback *window = this->GetScrollback(hash["scrollback_id"].toULongLong());
+    if (!window)
+        return;
+    session->RegisterChannel(&channel, window);
+}
+
+void GrumpydSession::processNick(QHash<QString, QVariant> hash)
+{
+    IRCSession *session = this->GetSession(hash["network_id"].toUInt());
+    if (!session)
+        return;
+    QString new_ = hash["new_nick"].toString();
+    QString old_ = hash["old_nick"].toString();
+    // Check if the nick is our own nickname in first place
+    if (session->GetNetwork()->GetNick().toLower() == old_.toLower())
+    {
+        // yup, it's our so we need to update it
+        session->GetNetwork()->SetNick(new_);
+    }
+    session->_gs_ResyncNickChange(new_, old_);
 }
 
 void GrumpydSession::processChannelResync(QHash<QString, QVariant> hash)

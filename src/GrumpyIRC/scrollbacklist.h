@@ -23,6 +23,7 @@ namespace Ui
 
 namespace GrumpyIRC
 {
+    class ScrollbackList_Node;
     class ScrollbackFrame;
     class ScrollbackList : public QDockWidget
     {
@@ -32,15 +33,16 @@ namespace GrumpyIRC
             ~ScrollbackList();
 			void RegisterWindow(ScrollbackFrame *scrollback, QStandardItem *parent_node = NULL);
             QStandardItem *GetRootTreeItem();
+            void UnregisterWindow(QStandardItem *node, QStandardItem *parent_n);
 
         private slots:
             void on_treeView_activated(const QModelIndex &index);
             void on_treeView_customContextMenuRequested(const QPoint &pos);
-
             void on_treeView_clicked(const QModelIndex &index);
 
         private:
             void switchWindow(const QModelIndex &index);
+            void closeWindow();
 			QStandardItem *root;
             QStandardItemModel *model;
             Ui::ScrollbackList *ui;
