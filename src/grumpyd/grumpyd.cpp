@@ -69,6 +69,7 @@ void Grumpyd::Main()
 {
     GRUMPY_LOG("Loading database");
     this->databaseBackend = new DatabaseXML();
+    this->databaseBackend->LoadRoles();
     this->databaseBackend->LoadUsers();
     GRUMPY_LOG("Starting listeners");
     this->listener->listen(QHostAddress::Any, GP_DEFAULT_PORT);

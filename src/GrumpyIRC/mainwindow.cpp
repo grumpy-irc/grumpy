@@ -98,7 +98,7 @@ static int SystemCommand_Netstat(SystemCommand *command, CommandArgs command_arg
     Q_UNUSED(command_args);
     Q_UNUSED(command);
     Scrollback *sx = MainWindow::Main->GetCurrentScrollbackFrame()->GetScrollback();
-    if (!sx->GetSession() || Generic::IsGrumpy(sx))
+    if (!sx->GetSession() || !Generic::IsGrumpy(sx))
         return 2;
     GrumpydSession *session = (GrumpydSession*)sx->GetSession();
     sx->InsertText("Bytes rcvd:" + QString::number(session->GetBytesRcvd()));

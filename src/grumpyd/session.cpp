@@ -101,7 +101,8 @@ void Session::run()
         sleep(1);
 
     // exit the session
-    delete this;
+    this->SessionState = State_Offline;
+    this->deleteLater();
 }
 
 unsigned long Session::GetSID()
@@ -144,6 +145,7 @@ void Session::PermissionDeny(QString source)
 
 void Session::OnDisconnected()
 {
+    this->SessionState = State_Exiting;
     this->IsRunning = false;
 }
 
