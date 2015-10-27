@@ -50,7 +50,23 @@ void VirtualScrollback::Sync()
     if (this->GetSession() && this->GetSession()->GetType() == SessionType_IRC)
         parameters.insert("network_id", QVariant(((IRCSession*)this->GetSession())->GetSID()));
     parameters.insert("scrollback", QVariant(this->ToHash()));
-    session->SendToEverySession("SCROLLBACK_RESYNC", parameters);
+    session->SendToEverySession(GP_CMD_SCROLLBACK_RESYNC, parameters);
+}
+
+void VirtualScrollback::PartialSync()
+{
+    if (this->owner == NULL)
+        throw new NullPointerException("this->owner", BOOST_CURRENT_FUNCTION);
+
+    // Let's get all sessions who need to be informed about resync of this scrollback
+    Session *session = this->owner->GetAnyGPSession();
+    if (!session)
+        return;
+    QHash<QString, QVariant> parameters;
+    if (this->GetSession() && this->GetSession()->GetType() == SessionType_IRC)
+        parameters.insert("network_id", QVariant(((IRCSession*)this->GetSession())->GetSID()));
+    parameters.insert("scrollback", QVariant(this->ToPartialHash()));
+    session->SendToEverySession(GP_CMD_SCROLLBACK_PARTIAL_RESYNC, parameters);
 }
 
 void VirtualScrollback::SetOwner(User *user)
@@ -74,6 +90,6 @@ void VirtualScrollback::InsertText(ScrollbackItem item)
     if (this->GetSession() && this->GetSession()->GetType() == SessionType_IRC)
         parameters.insert("network_id", QVariant(((IRCSession*)this->GetSession())->GetSID()));
     parameters.insert("item", QVariant(item.ToHash()));
-    xx->SendToEverySession("SCROLLBACK_LOAD_NEW_ITEM", parameters);
+    xx->SendToEverySession(GP_CMD_SCROLLBACK_LOAD_NEW_ITEM, parameters);
 }
 

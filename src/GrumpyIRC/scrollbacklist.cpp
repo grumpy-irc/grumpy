@@ -76,16 +76,48 @@ void GrumpyIRC::ScrollbackList::on_treeView_activated(const QModelIndex &index)
 
 void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPoint &pos)
 {
+    ScrollbackFrame *wx = this->selectedWindow();
+    if (!wx)
+        return;
+
+    // We have some window selected so let's display a menu
     QPoint globalPos = this->ui->treeView->viewport()->mapToGlobal(pos);
     QMenu Menu;
-    QAction *menuClose = new QAction(QString("Close"), NULL);
+    // Items
+    QAction *menuClose = new QAction(QObject::tr("Close"), &Menu);
     Menu.addAction(menuClose);
+    QAction *menuPart = NULL;
+    QAction *menuDisconnect = NULL;
+
+    if (!wx->IsDeletable)
+        menuClose->setEnabled(false);
+
+    if (wx->IsChannel())
+    {
+        menuPart = new QAction(QObject::tr("Part"), &Menu);
+        // Check if we can part the chan
+        if (wx->IsDead())
+            menuPart->setEnabled(false);
+        Menu.addAction(menuPart);
+    }
+    if (wx->IsNetwork())
+    {
+        menuDisconnect = new QAction(QObject::tr("Disconnect"), &Menu);
+        Menu.addAction(menuDisconnect);
+    }
+
     QAction* selectedItem = Menu.exec(globalPos);
     if (!selectedItem)
         return;
     if (selectedItem == menuClose)
     {
         this->closeWindow();
+    } else if (selectedItem == menuPart)
+    {
+        wx->RequestPart();
+    } else if (selectedItem == menuDisconnect)
+    {
+        wx->RequestDisconnect();
     }
 }
 
@@ -105,14 +137,16 @@ void ScrollbackList::closeWindow()
     ScrollbackList_Node *node = (ScrollbackList_Node*)this->model->itemFromIndex(index);
     if (!node)
         return;
-    if (node->GetScrollback()->GetSession())
-    {
-        // This window belongs to some session, we should let it close it
-        node->GetScrollback()->GetSession()->RemoveScrollback(node->GetScrollback()->GetScrollback());
-        // Nothing else to do if the session doesn't remove the window we need to keep it in list
-        return;
-    }
-    MainWindow::Main->GetScrollbackManager()->DestroyWindow(node->GetScrollback());
+    node->GetScrollback()->RequestClose();
+}
+
+ScrollbackFrame *ScrollbackList::selectedWindow()
+{
+    QModelIndex index = this->ui->treeView->currentIndex();
+    ScrollbackList_Node *node = (ScrollbackList_Node*)this->model->itemFromIndex(index);
+    if (node == 0)
+        return NULL;
+    return node->GetScrollback();
 }
 
 void GrumpyIRC::ScrollbackList::on_treeView_clicked(const QModelIndex &index)

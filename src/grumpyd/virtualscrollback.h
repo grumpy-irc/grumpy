@@ -32,6 +32,7 @@ namespace GrumpyIRC
             ~VirtualScrollback();
             User *GetOwner() const;
             void Sync();
+            void PartialSync();
             void SetOwner(User *user);
             void InsertText(ScrollbackItem item);
 

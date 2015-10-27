@@ -30,9 +30,26 @@ Scrollback::Scrollback(ScrollbackType Type, Scrollback *parent)
     this->session = NULL;
     this->_dead = false;
     this->_network = NULL;
+    this->_deleteOnDead = false;
     this->type = Type;
     this->_id = lastID++;
     this->_original_id = this->_id;
+}
+
+Scrollback::Scrollback(QHash<QString, QVariant> hash)
+{
+    this->_maxItems = 0;
+    this->parentSx = NULL;
+    ScrollbackList_Mutex.lock();
+    ScrollbackList.append(this);
+    ScrollbackList_Mutex.unlock();
+    this->session = NULL;
+    this->_dead = false;
+    this->_deleteOnDead = false;
+    this->_network = NULL;
+    this->_original_id = 0;
+    this->_id = 0;
+    this->LoadHash(hash);
 }
 
 Scrollback::~Scrollback()
@@ -55,6 +72,7 @@ unsigned long long Scrollback::GetID()
 void Scrollback::Close()
 {
     emit this->Event_Closed();
+    delete this;
 }
 
 unsigned long long Scrollback::GetOriginalID()
@@ -104,6 +122,8 @@ libircclient::Network *Scrollback::GetNetwork() const
 void Scrollback::SetDead(bool dead)
 {
     this->_dead = dead;
+    if (dead && this->_deleteOnDead)
+        this->Close();
 }
 
 Scrollback *Scrollback::GetParentScrollback()
@@ -113,11 +133,7 @@ Scrollback *Scrollback::GetParentScrollback()
 
 QHash<QString, QVariant> Scrollback::ToHash()
 {
-    QHash<QString, QVariant> hash;
-    SERIALIZE(_dead);
-    SERIALIZE(_original_id);
-    SERIALIZE(_maxItems);
-    SERIALIZE(_target);
+    QHash<QString, QVariant> hash = this->ToPartialHash();
     QList<QVariant> variant_items_list;
     hash.insert("type", static_cast<int>(this->type));
     foreach (ScrollbackItem xx, this->_items)
@@ -126,8 +142,20 @@ QHash<QString, QVariant> Scrollback::ToHash()
     return hash;
 }
 
+QHash<QString, QVariant> Scrollback::ToPartialHash()
+{
+    QHash<QString, QVariant> hash;
+    SERIALIZE(_dead);
+    SERIALIZE(_original_id);
+    SERIALIZE(PropertyBag);
+    SERIALIZE(_maxItems);
+    SERIALIZE(_target);
+    return hash;
+}
+
 void Scrollback::LoadHash(QHash<QString, QVariant> hash)
 {
+    UNSERIALIZE_HASH(PropertyBag);
     UNSERIALIZE_STRING(_target);
     UNSERIALIZE_BOOL(_dead);
     UNSERIALIZE_ULONGLONG(_maxItems);
@@ -142,6 +170,21 @@ void Scrollback::LoadHash(QHash<QString, QVariant> hash)
             _items.append(item.toHash());
         emit this->Event_Reload();
     }
+}
+
+void Scrollback::Resync(Scrollback *target)
+{
+    this->SetDead(target->IsDead());
+    this->SetTarget(target->GetTarget());
+    this->SetMaxItemsSize(target->GetMaxItemsSize());
+    foreach (QString key, target->PropertyBag.keys())
+    {
+        if (!this->PropertyBag.contains(key))
+            this->PropertyBag.insert(key, target->PropertyBag[key]);
+        else
+            this->PropertyBag[key] = target->PropertyBag[key];
+    }
+    emit this->Event_Resync();
 }
 
 void Scrollback::SetTarget(QString target)

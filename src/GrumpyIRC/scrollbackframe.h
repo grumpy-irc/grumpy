@@ -53,6 +53,12 @@ namespace GrumpyIRC
             Scrollback *GetScrollback();
             UserFrame *GetUserFrame();
             void Focus();
+            bool IsChannel();
+            bool IsNetwork();
+            bool IsDead();
+            void RequestClose();
+            void RequestPart();
+            void RequestDisconnect();
             //void SetParent(ScrollbackFrame* parentWindow);
             bool IsDeletable;
 			QStandardItem *TreeNode;

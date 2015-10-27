@@ -18,10 +18,27 @@
 #include "sleeper.h"
 #include "listener.h"
 #include "../libcore/core.h"
+#include "../libcore/configuration.h"
 #include "../libcore/eventhandler.h"
 #include "../libgp/gp.h"
 
 using namespace GrumpyIRC;
+
+QString Grumpyd::GetCFPath()
+{
+    QString cf = QCoreApplication::applicationDirPath() + "/" + "etc" + "/";
+    if (!QDir().exists(cf))
+        QDir().mkpath(cf);
+    return cf;
+}
+
+QString Grumpyd::GetDFPath()
+{
+    QString cf = QCoreApplication::applicationDirPath() + "/" + "var" + "/";
+    if (!QDir().exists(cf))
+        QDir().mkpath(cf);
+    return cf;
+}
 
 QString Grumpyd::GetPathSSLCert()
 {

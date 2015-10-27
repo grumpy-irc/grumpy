@@ -27,6 +27,8 @@ namespace GrumpyIRC
     {
             Q_OBJECT
         public:
+            static QString GetCFPath();
+            static QString GetDFPath();
             static QString GetPathSSLCert();
             static QString GetPathSSLKey();
             static bool SSLIsAvailable();

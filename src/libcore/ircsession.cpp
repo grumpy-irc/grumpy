@@ -24,7 +24,7 @@
 
 using namespace GrumpyIRC;
 
-
+// ID of network, we start with 2 for debugging purposes as missing id would result in 0 so that we know if it was missing or is proper id
 unsigned int IRCSession::lastID = 2;
 QMutex IRCSession::Sessions_Lock;
 QList<IRCSession*> IRCSession::Sessions;
@@ -194,11 +194,6 @@ bool IRCSession::IsConnected() const
     return false;
 }
 
-bool IRCSession::RemoveScrollback(Scrollback *scrollback)
-{
-    return true;
-}
-
 Scrollback *IRCSession::GetScrollbackForChannel(QString channel)
 {
     if (!this->channels.contains(channel.toLower()))
@@ -291,11 +286,55 @@ void IRCSession::LoadHash(QHash<QString, QVariant> hash)
         this->SyncWindows(hash["channels"].toHash(), &this->channels);
 }
 
+void IRCSession::SendRaw(Scrollback *window, QString raw)
+{
+    Q_UNUSED(window);
+    this->GetNetwork()->TransferRaw(raw);
+}
+
+void IRCSession::RequestRemove(Scrollback *window)
+{
+    if (!window->IsDead())
+        return;
+    if (window == this->systemWindow)
+    {
+        // We need to delete everything
+        foreach (Scrollback *scrollback, this->users.values())
+            this->rmWindow(scrollback);
+        foreach (Scrollback *scrollback, this->channels.values())
+            this->rmWindow(scrollback);
+        this->rmWindow(window);
+    }
+    this->rmWindow(window);
+}
+
+void IRCSession::RequestDisconnect(Scrollback *window, QString reason)
+{
+    Q_UNUSED(window);
+    if (!this->IsConnected())
+        return;
+    // Disconnect the network
+    foreach (Scrollback *sx, this->users)
+        sx->SetDead(true);
+    foreach (Scrollback *sx, this->channels)
+        sx->SetDead(true);
+    this->systemWindow->SetDead(true);
+    if (this->GetNetwork())
+        this->GetNetwork()->Disconnect(reason);
+}
+
+void IRCSession::RequestPart(Scrollback *window)
+{
+    if (window->GetType() != ScrollbackType_Channel)
+        throw new Exception("You can't request part of a window that isn't a channel", BOOST_CURRENT_FUNCTION);
+    this->GetNetwork()->RequestPart(window->GetTarget());
+}
+
 void IRCSession::RegisterChannel(libircclient::Channel *channel, Scrollback *window)
 {
     this->channels.insert(channel->GetName().toLower(), window);
     if (!this->GetNetwork()->GetChannel(channel->GetName()))
-        this->GetNetwork()->InsertChannel(channel);
+        this->GetNetwork()->_st_InsertChannel(channel);
 }
 
 void IRCSession::SendMessage(Scrollback *window, QString text)
@@ -469,6 +508,22 @@ void IRCSession::_gs_ResyncNickChange(QString new_, QString old_)
         Scrollback *scrollback = this->channels[channel->GetName().toLower()];
         scrollback->UserListChange(old_, ux, UserListChange_Alter);
     }
+}
+
+void IRCSession::rmWindow(Scrollback *window)
+{
+    if (!window->IsDead())
+        throw new Exception("You can't delete window which is live", BOOST_CURRENT_FUNCTION);
+    QString name = window->GetTarget().toLower();
+    if (this->channels.contains(name))
+        this->channels.remove(name);
+    else if (this->users.contains(name))
+        this->users.remove(name);
+    else
+        return;
+    // We removed the window from all lists
+    // now it should be safe to delete
+    delete window;
 }
 
 void IRCSession::OnIncomingRawMessage(QByteArray message)

@@ -10,17 +10,30 @@
 
 // Copyright (c) Petr Bena 2015
 
-#ifndef DEFINITIONS_H
-#define DEFINITIONS_H
+#include "grumpyconf.h"
+#include "../libcore/configuration.h"
+#include "corewrapper.h"
+#include "../libcore/core.h"
+#include "defaultconfig.h"
 
-#define GRUMPY_VERSION_STRING "1.0.0"
-#define CONFIGURATION_FILE "grumpy.ini"
-#define CONFIGURATION_PATH "grumpyirc"
-#define PRODUCTION_BUILD
+using namespace GrumpyIRC;
 
-#if defined _WIN64 || defined _WIN32
-    #define GRUMPY_WIN
-#endif
+GrumpyConf *GrumpyConf::Conf = NULL;
 
-#endif // DEFINITIONS_H
+GrumpyConf::GrumpyConf()
+{
+
+}
+
+Configuration *GrumpyConf::GetConfiguration()
+{
+    return GCFG;
+}
+
+QString GrumpyConf::GetQuitMessage()
+{
+    QString qm = GCFG->GetValueAsString("quit_message", "Grumpy IRC v. $version");
+    qm.replace("$version", GRUMPY_VERSION_STRING);
+    return qm;
+}
 

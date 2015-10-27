@@ -10,12 +10,35 @@
 
 // Copyright (c) Petr Bena 2015
 
+#include <QFile>
+#include <QDir>
+#include "../libcore/exception.h"
+#include "grumpyd.h"
 #include "databasebin.h"
+#include "security.h"
 
 using namespace GrumpyIRC;
 
 DatabaseBin::DatabaseBin()
 {
 
+}
+
+void DatabaseBin::LoadRoles()
+{
+    Role::Defaults();
+}
+
+void DatabaseBin::LoadUsers()
+{
+
+}
+
+QString DatabaseBin::getDFPath()
+{
+    QString path = Grumpyd::GetDFPath() + "db_bin/";
+    if (!QDir().exists(path))
+        QDir().mkpath(path);
+    return path;
 }
 

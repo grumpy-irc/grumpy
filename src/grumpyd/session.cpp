@@ -167,6 +167,54 @@ void Session::processNetworks()
     this->protocol->SendProtocolCommand(GP_CMD_NETWORK_INFO, params);
 }
 
+void Session::processIrcQuit(QHash<QString, QVariant> parameters)
+{
+    if (!this->IsAuthorized(PRIVILEGE_USE_IRC))
+    {
+        this->PermissionDeny(GP_CMD_IRC_QUIT);
+        return;
+    }
+
+    unsigned int nsid = parameters["network_id"].toUInt();
+    SyncableIRCSession* irc = this->loggedUser->GetSIRCSession(nsid);
+    if (!irc)
+    {
+        GRUMPY_ERROR("Unable to find network with id " + QString::number(nsid) + " network can't be disconnected for user " + this->loggedUser->GetName());
+        this->TransferError(GP_CMD_IRC_QUIT, "Network not found", GP_ENETWORKNOTFOUND);
+        return;
+    }
+    irc->RequestDisconnect(NULL, parameters["reason"].toString());
+}
+
+void Session::processMessage(QHash<QString, QVariant> parameters)
+{
+    if (!this->IsAuthorized(PRIVILEGE_USE_IRC))
+    {
+        this->PermissionDeny(GP_CMD_MESSAGE);
+        return;
+    }
+
+    // We have the original ID of scrollback so let's find it here
+    unsigned int nsid = parameters["network_id"].toUInt();
+    unsigned long long sid = parameters["scrollback_id"].toULongLong();
+    // let's find the network
+    SyncableIRCSession* irc = this->loggedUser->GetSIRCSession(nsid);
+    if (!irc)
+    {
+        GRUMPY_ERROR("Unable to find network with id " + QString::number(nsid) + " message can't be delivered for user " + this->loggedUser->GetName());
+        this->TransferError(GP_CMD_MESSAGE, "Network not found", GP_ENETWORKNOTFOUND);
+        return;
+    }
+    Scrollback *scrollback = irc->GetScrollback(sid);
+    if (!scrollback)
+    {
+        GRUMPY_ERROR("Unable to find scrollback id " + QString::number(sid) + " message can't be delivered for user " + this->loggedUser->GetName());
+        return;
+    }
+    QString rx = parameters["text"].toString();
+    irc->SendMessage(scrollback, rx);
+}
+
 void Session::processCommand(QHash<QString, QVariant> parameters)
 {
     if (!this->IsAuthorized(PRIVILEGE_USE_IRC))
@@ -175,14 +223,12 @@ void Session::processCommand(QHash<QString, QVariant> parameters)
         return;
     }
 
-    unsigned int nsid = parameters["network"].toUInt();
+    unsigned int nsid = parameters["network_id"].toUInt();
     // let's find the network
     SyncableIRCSession* irc = this->loggedUser->GetSIRCSession(nsid);
     if (!irc)
         return;
     QString rx = parameters["command"].toString();
-    if (parameters.contains("parameters"))
-        rx += " " + parameters["parameters"].toString();
     irc->GetNetwork()->TransferRaw(rx);
 }
 
@@ -235,6 +281,12 @@ void Session::OnCommand(QString text, QHash<QString, QVariant> parameters)
     } else if (text == GP_CMD_LOGIN)
     {
         this->processLogin(parameters);
+    } else if (text == GP_CMD_IRC_QUIT)
+    {
+        this->processIrcQuit(parameters);
+    } else if (text == GP_CMD_MESSAGE)
+    {
+        this->processMessage(parameters);
     } else if (text == GP_CMD_NETWORK_INFO)
     {
         this->processNetworks();

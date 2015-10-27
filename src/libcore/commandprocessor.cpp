@@ -86,21 +86,16 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
         }
         if (!this->CommandList.contains(command_name))
         {
-            if (Generic::IsGrumpy(window))
-            {
-                // This window belongs to a grumpyd session so we need to delegate this command to the grumpyd itself
-                ((GrumpydSession*)window->GetSession())->DelegateCommand(command_name, parameters.ParameterLine, window);
-                return 0;
-            } else if (window && window->GetSession() && window->GetSession()->GetNetwork())
+            if (window && window->GetSession())
             {
                 if (!window->GetSession()->IsConnected())
                     return -COMMANDPROCESSOR_ENOTCONNECTED;
                 // We are connected to some IRC network, we will transfer this as IRC command
                 command_name = command_name.toUpper();
                 if (parameters.ParameterLine.isEmpty())
-                    window->GetSession()->GetNetwork()->TransferRaw(command_name);
+                    window->GetSession()->SendRaw(window, command_name);
                 else
-                    window->GetSession()->GetNetwork()->TransferRaw(command_name + " " + parameters.ParameterLine);
+                    window->GetSession()->SendRaw(window, command_name + " " + parameters.ParameterLine);
                 return 0;
             }
             return -COMMANDPROCESSOR_ENOTEXIST;

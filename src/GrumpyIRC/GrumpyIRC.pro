@@ -28,7 +28,8 @@ SOURCES += main.cpp\
     widgetfactory.cpp \
     userwidget.cpp \
     userframe.cpp \
-    userframeitem.cpp
+    userframeitem.cpp \
+    grumpyconf.cpp
 
 HEADERS  += mainwindow.h \
     scrollbackframe.h \
@@ -46,7 +47,8 @@ HEADERS  += mainwindow.h \
     defaultconfig.h \
     userwidget.h \
     userframe.h \
-    userframeitem.h
+    userframeitem.h \
+    grumpyconf.h
 
 FORMS    += mainwindow.ui \
     scrollbackframe.ui \

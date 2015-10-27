@@ -14,6 +14,7 @@
 #define DATABASEBIN_H
 
 #include "databasebackend.h"
+#include <QString>
 
 namespace GrumpyIRC
 {
@@ -27,6 +28,8 @@ namespace GrumpyIRC
         signals:
 
         public slots:
+        private:
+            QString getDFPath();
     };
 }
 

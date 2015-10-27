@@ -10,6 +10,9 @@
 
 // Copyright (c) Petr Bena 2015
 
+// This file must be included first because it defines GRUMPY_WIN
+#include "../libcore/definitions.h"
+#include <windows.h>
 #include "mainwindow.h"
 #include "corewrapper.h"
 #include "grumpyeventhandler.h"
@@ -20,6 +23,22 @@
 #include <QApplication>
 
 using namespace GrumpyIRC;
+
+#ifdef GRUMPY_WIN
+// Normally we would compile this program so it has no console window, but because we are hackers, we want to see a boot log from its startup
+// this function hides the console once the grumpy is started up and main window is loaded
+
+// it doesn't do anything if grumpy is compiled in debug mode, because we want to see it all time in that case :)
+void HideConsole()
+{
+#ifndef _DEBUG
+    HWND Stealth;
+    AllocConsole();
+    Stealth = FindWindowA("ConsoleWindowClass", NULL);
+    ShowWindow(Stealth, 0);
+#endif
+}
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -33,6 +52,9 @@ int main(int argc, char *argv[])
     InputBox::AE = new AutocompletionEngine();
     MainWindow w;
     w.show();
+#ifdef GRUMPY_WIN
+    HideConsole();
+#endif
 
     int ReturnCode = a.exec();
     delete CoreWrapper::GrumpyCore;

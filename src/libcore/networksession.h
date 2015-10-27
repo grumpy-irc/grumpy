@@ -35,10 +35,16 @@ namespace GrumpyIRC
         public:
             NetworkSession();
             virtual ~NetworkSession();
-            virtual bool RemoveScrollback(Scrollback *scrollback)=0;
             virtual bool IsConnected() const=0;
             virtual libircclient::Network *GetNetwork()=0;
             virtual void SendMessage(Scrollback *window, QString text)=0;
+            virtual void SendRaw(Scrollback *window, QString raw)=0;
+            virtual void RequestDisconnect(Scrollback *window, QString reason)=0;
+            //! Request the selected window to be removed from window tree
+            //! the windows are never directly removed because there might be complex structures depending on them
+            //! you always need to ASK the window to delete itself
+            virtual void RequestRemove(Scrollback *window)=0;
+            virtual void RequestPart(Scrollback *window)=0;
             virtual SessionType GetType()=0;
 
         //signals:

@@ -103,6 +103,7 @@ namespace GrumpyIRC
             static QMutex ScrollbackList_Mutex;
 
             Scrollback(ScrollbackType Type = ScrollbackType_System, Scrollback *parent = NULL);
+            Scrollback(QHash<QString, QVariant> hash);
             virtual ~Scrollback();
             virtual void Close();
             virtual unsigned long long GetMaxItemsSize();
@@ -129,7 +130,11 @@ namespace GrumpyIRC
             virtual void SetDead(bool dead);
             virtual Scrollback *GetParentScrollback();
             QHash<QString, QVariant> ToHash();
+            QHash<QString, QVariant> ToPartialHash();
             void LoadHash(QHash<QString, QVariant> hash);
+            //! Used to resync most of attributes with target
+            void Resync(Scrollback *target);
+            QHash<QString, QVariant> PropertyBag;
 
         signals:
             void Event_Closed();
@@ -146,6 +151,7 @@ namespace GrumpyIRC
             void Event_SessionModified(NetworkSession *Session);
             void Event_Reload();
             void Event_UserRemoved(QString name);
+            void Event_Resync();
             //! Called when some meta-information for user is changed, such as away status
             //! so that it can be updated in associated widgets
             void Event_UserRefresh(libircclient::User *user);
@@ -154,6 +160,7 @@ namespace GrumpyIRC
             static unsigned long long lastID;
 
             libircclient::Network *_network;
+            bool _deleteOnDead;
             Scrollback *parentSx;
             bool _dead;
             QString _target;

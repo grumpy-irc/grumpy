@@ -30,6 +30,7 @@ namespace GrumpyIRC
             SyncableIRCSession(Scrollback *system, User *user, Scrollback *root = NULL);
             void Connect(libircclient::Network *Network);
             void ResyncChannel(libircclient::Channel* channel);
+            void RequestDisconnect(Scrollback *window, QString reason);
             ~SyncableIRCSession();
         //signals:
         public slots:

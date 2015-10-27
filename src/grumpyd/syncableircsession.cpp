@@ -75,6 +75,17 @@ void SyncableIRCSession::ResyncChannel(libircclient::Channel *channel)
     session->SendToEverySession(GP_CMD_CHANNEL_RESYNC, hash);
 }
 
+void SyncableIRCSession::RequestDisconnect(Scrollback *window, QString reason)
+{
+    IRCSession::RequestDisconnect(window, reason);
+    // Sync scrollbacks with the clients (at least the dead parameter must be changed)
+    foreach (Scrollback *sx, this->users)
+        ((VirtualScrollback*)sx)->PartialSync();
+    foreach (Scrollback *sx, this->channels)
+        ((VirtualScrollback*)sx)->PartialSync();
+    ((VirtualScrollback*)this->systemWindow)->PartialSync();
+}
+
 SyncableIRCSession::~SyncableIRCSession()
 {
 
@@ -160,6 +171,15 @@ void SyncableIRCSession::OnQuit(libircclient::Parser *px, libircclient::Channel 
 void SyncableIRCSession::OnSelfPart(libircclient::Parser *px, libircclient::Channel *channel)
 {
     IRCSession::OnSelfPart(px, channel);
+    if (this->channels.contains(channel->GetName().toLower()))
+    {
+        // Sync the scrollback window for all connected clients
+        VirtualScrollback *sx = (VirtualScrollback*)this->channels[channel->GetName().toLower()];
+        sx->PartialSync();
+    } else
+    {
+        GRUMPY_ERROR("Sync error, can't resolve scrollback for channel " + channel->GetName() + " system user: " + this->owner->GetName());
+    }
 }
 
 void SyncableIRCSession::OnTopicInfo(libircclient::Parser *px, libircclient::Channel *channel)

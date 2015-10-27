@@ -18,6 +18,7 @@
 #include "../libirc/libircclient/user.h"
 #include "corewrapper.h"
 #include "defaultconfig.h"
+#include "grumpyconf.h"
 #include "skin.h"
 #include "scrollbackframe.h"
 #include "scrollbacksmanager.h"
@@ -222,5 +223,44 @@ UserFrame *ScrollbackFrame::GetUserFrame()
 void ScrollbackFrame::Focus()
 {
     this->inputBox->Focus();
+}
+
+bool ScrollbackFrame::IsChannel()
+{
+    if (!this->scrollback)
+        return false;
+    return this->scrollback->GetType() == ScrollbackType_Channel;
+}
+
+bool ScrollbackFrame::IsNetwork()
+{
+    if (!this->scrollback || !this->GetSession())
+        return false;
+    if (this->scrollback->GetType() != ScrollbackType_System)
+        return false;
+    return true;
+}
+
+bool ScrollbackFrame::IsDead()
+{
+    return this->scrollback->IsDead();
+}
+
+void ScrollbackFrame::RequestClose()
+{
+    if (this->GetSession())
+        this->GetSession()->RequestRemove(this->GetScrollback());
+}
+
+void ScrollbackFrame::RequestPart()
+{
+    if (this->GetSession() && this->IsChannel())
+        this->GetSession()->RequestPart(this->GetScrollback());
+}
+
+void ScrollbackFrame::RequestDisconnect()
+{
+    if (this->GetSession())
+        this->GetSession()->RequestDisconnect(this->GetScrollback(), CONF->GetQuitMessage());
 }
 

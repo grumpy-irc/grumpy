@@ -79,10 +79,7 @@ static int SystemCommand_Nick(SystemCommand *command, CommandArgs args)
     }
     if (scrollback->GetSession())
     {
-        if (!Generic::IsGrumpy(scrollback->GetScrollback()))
-            scrollback->GetSession()->GetNetwork()->TransferRaw("NICK " + args.Parameters[0]);
-        else
-            ((GrumpydSession*)scrollback->GetSession())->DelegateCommand("NICK", args.Parameters[0], scrollback->GetScrollback());
+        scrollback->GetSession()->SendRaw(scrollback->GetScrollback(), "NICK " + args.Parameters[0]);
         return 0;
     }
     else

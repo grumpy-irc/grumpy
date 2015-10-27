@@ -58,7 +58,7 @@ void GrumpydSession::Open(libirc::ServerAddress server)
 {
     QHash<QString, QVariant> parameters;
     parameters.insert("server", QVariant(server.ToHash()));
-    this->SendProtocolCommand("SERVER", parameters);
+    this->SendProtocolCommand(GP_CMD_SERVER, parameters);
 }
 
 bool GrumpydSession::IsConnected() const
@@ -68,7 +68,14 @@ bool GrumpydSession::IsConnected() const
 
 void GrumpydSession::SendMessage(Scrollback *window, QString text)
 {
-
+    IRCSession *ircs = this->GetSessionFromWindow(window);
+    if (!ircs)
+        return;
+    QHash<QString, QVariant> parameters;
+    parameters.insert("network_id", QVariant(ircs->GetSID()));
+    parameters.insert("scrollback_id", QVariant(window->GetOriginalID()));
+    parameters.insert("text", QVariant(text));
+    this->SendProtocolCommand(GP_CMD_MESSAGE, parameters);
 }
 
 libircclient::Network *GrumpydSession::GetNetwork()
@@ -76,17 +83,16 @@ libircclient::Network *GrumpydSession::GetNetwork()
     return NULL;
 }
 
-void GrumpydSession::DelegateCommand(QString command, QString pm, Scrollback *source)
+void GrumpydSession::SendRaw(Scrollback *window, QString raw)
 {
-    IRCSession *ircs = this->GetSessionFromWindow(source);
+    IRCSession *ircs = this->GetSessionFromWindow(window);
     if (!ircs)
         return;
 
     QHash<QString, QVariant> parameters;
-    parameters.insert("network", QVariant(ircs->GetSID()));
-    parameters.insert("command", QVariant(command));
-    parameters.insert("parameters", QVariant(pm));
-    this->SendProtocolCommand("RAW", parameters);
+    parameters.insert("network_id", QVariant(ircs->GetSID()));
+    parameters.insert("command", QVariant(raw));
+    this->SendProtocolCommand(GP_CMD_RAW, parameters);
 }
 
 SessionType GrumpydSession::GetType()
@@ -94,9 +100,43 @@ SessionType GrumpydSession::GetType()
     return SessionType_Grumpyd;
 }
 
-bool GrumpydSession::RemoveScrollback(Scrollback *scrollback)
+void GrumpydSession::RequestRemove(Scrollback *window)
 {
-    return true;
+    if (!window->IsDead())
+        return;
+
+    // This is fairly complex, we can't remove window here and keep it in grumpyd, so we need to remotely request its removal
+
+}
+
+void GrumpydSession::RequestDisconnect(Scrollback *window, QString reason)
+{
+    if (!this->IsConnected())
+        return;
+    if (window == this->systemWindow)
+    {
+        // User wants to disconnect whole grumpyd session
+        this->systemWindow->SetDead(true);
+        this->Disconnect();
+    } else
+    {
+        IRCSession *ircs = this->GetSessionFromWindow(window);
+        if (!ircs)
+            return;
+        QHash<QString, QVariant> parameters;
+        parameters.insert("network_id", QVariant(ircs->GetSID()));
+        parameters.insert("reason", QVariant(reason));
+        this->SendProtocolCommand(GP_CMD_IRC_QUIT, parameters);
+    }
+}
+
+void GrumpydSession::RequestPart(Scrollback *window)
+{
+    if (window->GetType() != ScrollbackType_Channel)
+        throw new Exception("You can't request part of a window that isn't a channel", BOOST_CURRENT_FUNCTION);
+
+    // Let's just send a part command, no point in having an extra protocol command for this
+    this->SendRaw(window, "PART " + window->GetTarget());
 }
 
 Scrollback *GrumpydSession::GetScrollback(unsigned long long original_id)
@@ -217,7 +257,7 @@ void GrumpydSession::OnIncomingCommand(QString text, QHash<QString, QVariant> pa
         QHash<QString, QVariant> params;
         params.insert("password", this->password);
         params.insert("username", this->username);
-        this->SendProtocolCommand("LOGIN", params);
+        this->SendProtocolCommand(GP_CMD_LOGIN, params);
     } else if (text == GP_CMD_LOGIN_FAIL)
     {
         this->closeError("Invalid username or password provided");
@@ -233,6 +273,9 @@ void GrumpydSession::OnIncomingCommand(QString text, QHash<QString, QVariant> pa
     } else if (text == GP_CMD_NETWORK_RESYNC)
     {
         this->processNetworkResync(parameters);
+    } else if (text == GP_CMD_SCROLLBACK_PARTIAL_RESYNC)
+    {
+        this->processPSResync(parameters);
     } else if (text == GP_CMD_CHANNEL_JOIN)
     {
         this->processChannel(parameters);
@@ -355,7 +398,7 @@ void GrumpydSession::processChannelResync(QHash<QString, QVariant> hash)
     if (!channel)
     {
         // There is no such a channel, so let's insert it to network structure
-        channel = session->GetNetwork()->InsertChannel(&resynced_channel);
+        channel = session->GetNetwork()->_st_InsertChannel(&resynced_channel);
         // Resync the users with scrollback and quit
         foreach (libircclient::User *user, channel->GetUsers())
         {
@@ -420,6 +463,20 @@ void GrumpydSession::processSResync(QHash<QString, QVariant> parameters)
         foreach (libircclient::User *user, channel->GetUsers())
             result->UserListChange(user->GetNick(), user, UserListChange_Insert);
     }
+}
+
+void GrumpydSession::processPSResync(QHash<QString, QVariant> parameters)
+{
+    Scrollback scrollback(parameters["scrollback"].toHash());
+    // find a scrollback with this id
+    Scrollback *origin = this->GetScrollback(scrollback.GetOriginalID());
+    if (!origin)
+    {
+        this->systemWindow->InsertText("RESYNC ERROR: Failed to resync scrollback with id " + QString::number(scrollback.GetOriginalID()));
+        return;
+    }
+    // let's resync most of the stuff
+    origin->Resync(&scrollback);
 }
 
 void GrumpydSession::closeError(QString error)

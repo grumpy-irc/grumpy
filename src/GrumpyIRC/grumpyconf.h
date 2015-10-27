@@ -10,17 +10,29 @@
 
 // Copyright (c) Petr Bena 2015
 
-#ifndef DEFINITIONS_H
-#define DEFINITIONS_H
 
-#define GRUMPY_VERSION_STRING "1.0.0"
-#define CONFIGURATION_FILE "grumpy.ini"
-#define CONFIGURATION_PATH "grumpyirc"
-#define PRODUCTION_BUILD
+#ifndef GRUMPYCONF_H
+#define GRUMPYCONF_H
 
-#if defined _WIN64 || defined _WIN32
-    #define GRUMPY_WIN
+#ifdef CONF
+#error "CONF is already defined, redefinig is not supported, grumpy can't be compiled with libraries that define their own CONF option"
 #endif
+#define CONF GrumpyIRC::GrumpyConf::Conf
 
-#endif // DEFINITIONS_H
+#include <QVariant>
 
+namespace GrumpyIRC
+{
+    class Configuration;
+    class GrumpyConf
+    {
+        public:
+            static GrumpyConf *Conf;
+            GrumpyConf();
+            Configuration *GetConfiguration();
+            QString GetQuitMessage();
+
+    };
+}
+
+#endif // GRUMPYCONF_H
