@@ -304,11 +304,12 @@ void IRCSession::RequestRemove(Scrollback *window)
         foreach (Scrollback *scrollback, this->channels.values())
             this->rmWindow(scrollback);
         this->rmWindow(window);
+        return;
     }
     this->rmWindow(window);
 }
 
-void IRCSession::RequestDisconnect(Scrollback *window, QString reason)
+void IRCSession::RequestDisconnect(Scrollback *window, QString reason, bool auto_delete)
 {
     Q_UNUSED(window);
     if (!this->IsConnected())
@@ -321,6 +322,8 @@ void IRCSession::RequestDisconnect(Scrollback *window, QString reason)
     this->systemWindow->SetDead(true);
     if (this->GetNetwork())
         this->GetNetwork()->Disconnect(reason);
+    if (auto_delete)
+        delete this;
 }
 
 void IRCSession::RequestPart(Scrollback *window)
@@ -519,11 +522,12 @@ void IRCSession::rmWindow(Scrollback *window)
         this->channels.remove(name);
     else if (this->users.contains(name))
         this->users.remove(name);
+    else if (window == this->systemWindow)
+        this->systemWindow = NULL;
     else
         return;
     // We removed the window from all lists
-    // now it should be safe to delete
-    delete window;
+    window->Close();
 }
 
 void IRCSession::OnIncomingRawMessage(QByteArray message)

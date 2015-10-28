@@ -39,7 +39,8 @@ namespace GrumpyIRC
             virtual libircclient::Network *GetNetwork()=0;
             virtual void SendMessage(Scrollback *window, QString text)=0;
             virtual void SendRaw(Scrollback *window, QString raw)=0;
-            virtual void RequestDisconnect(Scrollback *window, QString reason)=0;
+            virtual Scrollback *GetSystemWindow()=0;
+            virtual void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete) = 0;
             //! Request the selected window to be removed from window tree
             //! the windows are never directly removed because there might be complex structures depending on them
             //! you always need to ASK the window to delete itself

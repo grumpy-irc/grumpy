@@ -148,6 +148,7 @@ namespace GrumpyIRC
             void Event_NetworkModified(libircclient::Network *network);
             void Event_UserInserted(libircclient::User *user);
             void Event_UserAltered(QString original_name, libircclient::User *user);
+            void Event_ChangedDeadStatus();
             void Event_SessionModified(NetworkSession *Session);
             void Event_Reload();
             void Event_UserRemoved(QString name);
@@ -160,7 +161,6 @@ namespace GrumpyIRC
             static unsigned long long lastID;
 
             libircclient::Network *_network;
-            bool _deleteOnDead;
             Scrollback *parentSx;
             bool _dead;
             QString _target;

@@ -196,6 +196,11 @@ void MainWindow::WriteToSystemWindow(QString text)
     this->systemWindow->InsertText(text);
 }
 
+ScrollbackFrame *MainWindow::GetSystem()
+{
+    return this->systemWindow;
+}
+
 ScrollbackFrame *MainWindow::GetCurrentScrollbackFrame()
 {
     return this->GetScrollbackManager()->GetCurrentScrollback();

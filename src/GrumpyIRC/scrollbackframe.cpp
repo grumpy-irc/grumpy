@@ -46,6 +46,7 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     connect(this->scrollback, SIGNAL(Event_UserAltered(QString,libircclient::User*)), this, SLOT(UserList_Rename(QString,libircclient::User*)));
     connect(this->scrollback, SIGNAL(Event_UserRemoved(QString)), this, SLOT(UserList_Remove(QString)));
     connect(this->scrollback, SIGNAL(Event_InsertText(ScrollbackItem)), this, SLOT(_insertText_(ScrollbackItem)));
+    connect(this->scrollback, SIGNAL(Event_Closed()), this, SLOT(OnClosed()));
 }
 
 ScrollbackFrame::~ScrollbackFrame()
@@ -248,8 +249,18 @@ bool ScrollbackFrame::IsDead()
 
 void ScrollbackFrame::RequestClose()
 {
-    if (this->GetSession())
-        this->GetSession()->RequestRemove(this->GetScrollback());
+	// We need to figure out if we are closing the system window, in that case we need to also delete the corresponding network session that it belonged to
+	// the check for system window needs to be done before we request it to be closed as that might remove the reference to it
+	NetworkSession *session = NULL;
+	if (this->GetSession())
+	{
+		if (this->GetSession()->GetSystemWindow() == this->GetScrollback())
+			session = this->GetSession();
+		this->GetSession()->RequestRemove(this->GetScrollback());
+		// Call to RequestRemove probably called delete on this very scrollback frame, so now we are within a deleted object, be carefull here not to access internal memory
+		if (session)
+			delete session;
+	}
 }
 
 void ScrollbackFrame::RequestPart()
@@ -261,6 +272,6 @@ void ScrollbackFrame::RequestPart()
 void ScrollbackFrame::RequestDisconnect()
 {
     if (this->GetSession())
-        this->GetSession()->RequestDisconnect(this->GetScrollback(), CONF->GetQuitMessage());
+        this->GetSession()->RequestDisconnect(this->GetScrollback(), CONF->GetQuitMessage(), false);
 }
 

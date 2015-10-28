@@ -30,7 +30,6 @@ Scrollback::Scrollback(ScrollbackType Type, Scrollback *parent)
     this->session = NULL;
     this->_dead = false;
     this->_network = NULL;
-    this->_deleteOnDead = false;
     this->type = Type;
     this->_id = lastID++;
     this->_original_id = this->_id;
@@ -45,7 +44,6 @@ Scrollback::Scrollback(QHash<QString, QVariant> hash)
     ScrollbackList_Mutex.unlock();
     this->session = NULL;
     this->_dead = false;
-    this->_deleteOnDead = false;
     this->_network = NULL;
     this->_original_id = 0;
     this->_id = 0;
@@ -122,8 +120,6 @@ libircclient::Network *Scrollback::GetNetwork() const
 void Scrollback::SetDead(bool dead)
 {
     this->_dead = dead;
-    if (dead && this->_deleteOnDead)
-        this->Close();
 }
 
 Scrollback *Scrollback::GetParentScrollback()

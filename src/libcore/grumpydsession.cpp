@@ -109,7 +109,7 @@ void GrumpydSession::RequestRemove(Scrollback *window)
 
 }
 
-void GrumpydSession::RequestDisconnect(Scrollback *window, QString reason)
+void GrumpydSession::RequestDisconnect(Scrollback *window, QString reason, bool auto_delete)
 {
     if (!this->IsConnected())
         return;
@@ -117,7 +117,13 @@ void GrumpydSession::RequestDisconnect(Scrollback *window, QString reason)
     {
         // User wants to disconnect whole grumpyd session
         this->systemWindow->SetDead(true);
+        // flag every scrollback as dead
+        foreach(Scrollback *sx, this->scrollbackHash.values())
+            sx->SetDead(true);
+        this->scrollbackHash.clear();
         this->Disconnect();
+        if (auto_delete)
+            delete this;
     } else
     {
         IRCSession *ircs = this->GetSessionFromWindow(window);

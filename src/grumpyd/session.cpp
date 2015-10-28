@@ -183,7 +183,7 @@ void Session::processIrcQuit(QHash<QString, QVariant> parameters)
         this->TransferError(GP_CMD_IRC_QUIT, "Network not found", GP_ENETWORKNOTFOUND);
         return;
     }
-    irc->RequestDisconnect(NULL, parameters["reason"].toString());
+    irc->RequestDisconnect(NULL, parameters["reason"].toString(), false);
 }
 
 void Session::processMessage(QHash<QString, QVariant> parameters)

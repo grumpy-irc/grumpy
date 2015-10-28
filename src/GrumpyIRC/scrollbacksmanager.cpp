@@ -80,6 +80,7 @@ void ScrollbacksManager::DestroyWindow(ScrollbackFrame *window)
 {
     if (!window->IsDeletable)
         return;
+    this->SwitchWindow(MainWindow::Main->GetSystem());
     if (window->TreeNode)
     {
         QStandardItem *parent = NULL;

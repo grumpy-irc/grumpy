@@ -76,7 +76,7 @@ namespace GrumpyIRC
             void LoadHash(QHash<QString, QVariant> hash);
             void SendRaw(Scrollback *window, QString raw);
             void RequestRemove(Scrollback *window);
-            void RequestDisconnect(Scrollback *window, QString reason);
+            void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete);
             void RequestPart(Scrollback *window);
             //! Used mostly only for synchronization with grumpyd
             void RegisterChannel(libircclient::Channel *channel, Scrollback *window);

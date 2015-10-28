@@ -75,9 +75,9 @@ void SyncableIRCSession::ResyncChannel(libircclient::Channel *channel)
     session->SendToEverySession(GP_CMD_CHANNEL_RESYNC, hash);
 }
 
-void SyncableIRCSession::RequestDisconnect(Scrollback *window, QString reason)
+void SyncableIRCSession::RequestDisconnect(Scrollback *window, QString reason, bool auto_delete)
 {
-    IRCSession::RequestDisconnect(window, reason);
+    IRCSession::RequestDisconnect(window, reason, auto_delete);
     // Sync scrollbacks with the clients (at least the dead parameter must be changed)
     foreach (Scrollback *sx, this->users)
         ((VirtualScrollback*)sx)->PartialSync();

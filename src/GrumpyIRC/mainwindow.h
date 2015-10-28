@@ -47,6 +47,7 @@ namespace GrumpyIRC
             //! Return a pointer to widget that contains list of all windows
             ScrollbackList *GetScrollbackList();
             void WriteToSystemWindow(QString text);
+            ScrollbackFrame *GetSystem();
             ScrollbackFrame *GetCurrentScrollbackFrame();
             UserWidget *GetUsers();
             void OpenGrumpy(QString hostname, int port, QString username, QString password, bool ssl);

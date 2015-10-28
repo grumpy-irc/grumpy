@@ -56,7 +56,7 @@ namespace GrumpyIRC
 
             GrumpydSession(Scrollback *System, QString Hostname, QString UserName, QString Pass, int Port = GP_DEFAULT_PORT, bool ssl = false);
             virtual ~GrumpydSession();
-            virtual Scrollback *GetSystemWindow();
+            Scrollback *GetSystemWindow();
             virtual void Open(libirc::ServerAddress server);
             bool IsConnected() const;
             void SendMessage(Scrollback *window, QString text);
@@ -64,7 +64,7 @@ namespace GrumpyIRC
             void SendRaw(Scrollback *window, QString raw);
             SessionType GetType();
             void RequestRemove(Scrollback *window);
-            void RequestDisconnect(Scrollback *window, QString reason);
+            void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete);
             void RequestPart(Scrollback *window);
             Scrollback *GetScrollback(unsigned long long original_id);
             IRCSession *GetSession(unsigned int nsid);
