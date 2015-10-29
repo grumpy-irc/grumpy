@@ -54,6 +54,7 @@ Session::Session(qintptr socket_ptr, bool ssl)
         GRUMPY_ERROR("Unable to set socket descriptor " + QString::number(socket_ptr) + " for new session");
         goto failure;
     }
+    this->peer = this->socket->peerAddress().toString();
     sessions_lock->lock();
     this->SID = lSID++;
     this->IsRunning = true;
@@ -68,7 +69,7 @@ Session::Session(qintptr socket_ptr, bool ssl)
         if (!ssl_socket->waitForEncrypted())
         {
             GRUMPY_ERROR("SSL handshake failed for SID " + QString::number(this->GetSID()) + " peer: "
-                         + this->socket->peerAddress().toString() + ": " + ssl_socket->errorString());
+                         + this->peer + ": " + ssl_socket->errorString());
             goto failure;
         }
     }
@@ -77,7 +78,7 @@ Session::Session(qintptr socket_ptr, bool ssl)
     connect(this->protocol, SIGNAL(Event_IncomingCommand(QString,QHash<QString,QVariant>)), this, SLOT(OnCommand(QString,QHash<QString,QVariant>)));
     connect(this->protocol, SIGNAL(Event_Disconnected()), this, SLOT(OnDisconnected()));
     this->protocol->ResolveSignals();
-    GRUMPY_LOG("New session (" + QString::number(this->SID) + ") from " + this->socket->peerAddress().toString());
+    GRUMPY_LOG("New session (" + QString::number(this->SID) + ") from " + this->peer);
     return;
 
     failure:
@@ -89,7 +90,7 @@ Session::Session(qintptr socket_ptr, bool ssl)
 Session::~Session()
 {
     // deletion of socket is performed by destructor of protocol
-    GRUMPY_LOG("Session for " + this->socket->peerAddress().toString() + " destroyed");
+    GRUMPY_LOG("Session for " + this->peer + " destroyed");
     delete this->protocol;
     if (this->loggedUser)
     {

@@ -13,6 +13,7 @@
 #ifndef GENERIC_H
 #define GENERIC_H
 
+#include <QStringList>
 #include <QString>
 #include "libcore_global.h"
 #include <QList>

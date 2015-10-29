@@ -75,6 +75,7 @@ namespace GrumpyIRC
             void processNew(QHash<QString, QVariant> info);
 
             QTcpSocket *socket;
+            QString peer;
             bool usingSsl;
             User *loggedUser;
             libgp::GP *protocol;
