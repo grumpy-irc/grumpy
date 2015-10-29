@@ -49,7 +49,11 @@ Session::Session(qintptr socket_ptr, bool ssl)
     {
         this->socket = new QTcpSocket();
     }
-    this->socket->setSocketDescriptor(socket_ptr);
+    if (!this->socket->setSocketDescriptor(socket_ptr))
+    {
+        GRUMPY_ERROR("Unable to set socket descriptor " + QString::number(socket_ptr) + " for new session");
+        goto failure;
+    }
     sessions_lock->lock();
     this->SID = lSID++;
     this->IsRunning = true;
@@ -65,10 +69,7 @@ Session::Session(qintptr socket_ptr, bool ssl)
         {
             GRUMPY_ERROR("SSL handshake failed for SID " + QString::number(this->GetSID()) + " peer: "
                          + this->socket->peerAddress().toString() + ": " + ssl_socket->errorString());
-            this->SessionState = State_Offline;
-            this->protocol = NULL;
-            this->socket->close();
-            return;
+            goto failure;
         }
     }
     this->protocol = new libgp::GP(socket);
@@ -77,6 +78,12 @@ Session::Session(qintptr socket_ptr, bool ssl)
     connect(this->protocol, SIGNAL(Event_Disconnected()), this, SLOT(OnDisconnected()));
     this->protocol->ResolveSignals();
     GRUMPY_LOG("New session (" + QString::number(this->SID) + ") from " + this->socket->peerAddress().toString());
+    return;
+
+    failure:
+        this->SessionState = State_Offline;
+        this->protocol = NULL;
+        this->socket->close();
 }
 
 Session::~Session()
