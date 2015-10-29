@@ -1,5 +1,5 @@
 project(GrumpyIRC)
-cmake_minimum_required (VERSION 2.9.0)
+cmake_minimum_required (VERSION 2.8.0)
 
 # Configuration
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
