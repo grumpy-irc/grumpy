@@ -209,14 +209,14 @@ SessionType IRCSession::GetType()
 
 void IRCSession::SyncWindows(QHash<QString, QVariant> windows, QHash<QString, Scrollback*> *hash)
 {
+    // this is most likely a remote IRC session managed by grumpyd because nothing else would
+    // deserialize it, but just to be sure we check once more and grab the pointer to grumpyd
+    // in case it really is that
+    NetworkSession *window_session = this;
+    if (this->Root && Generic::IsGrumpy(this->Root))
+        window_session = this->Root->GetSession();
     foreach (QVariant xx, windows.values())
     {
-        // this is most likely a remote IRC session managed by grumpyd because nothing else would
-        // deserialize it, but just to be sure we check once more and grab the pointer to grumpyd
-        // in case it really is that
-        NetworkSession *window_session = this;
-        if (this->Root && this->Root->GetParentScrollback() && Generic::IsGrumpy(this->Root->GetParentScrollback()))
-            window_session = this->Root->GetParentScrollback()->GetSession();
         QString name = "unknown_scrollback";
         QHash<QString, QVariant> scrollback_h = xx.toHash();
         if (scrollback_h.contains("_target"))

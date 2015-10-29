@@ -31,8 +31,8 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionPreferences"/>
     <addaction name="actionConnect"/>
+    <addaction name="actionPreferences"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>

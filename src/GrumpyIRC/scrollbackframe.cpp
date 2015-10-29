@@ -17,7 +17,6 @@
 #include "../libcore/core.h"
 #include "../libirc/libircclient/user.h"
 #include "corewrapper.h"
-#include "defaultconfig.h"
 #include "grumpyconf.h"
 #include "skin.h"
 #include "scrollbackframe.h"
@@ -75,7 +74,7 @@ void ScrollbackFrame::InsertText(ScrollbackItem item)
 
 static QString FormatAction(libircclient::User user, QString action, bool full_user)
 {
-    QString result = CONFIG_ACTION_FORMAT;
+    QString result = CONF->GetActionFormat();
     QString name;
     // we don't want to display full user information for simple actions and so on
     if (full_user)
@@ -99,7 +98,7 @@ static QString ItemToString(ScrollbackItem item)
 {
     // Render the text according to our formatting
     //! \todo This needs to be precached otherwise we need to build this string every fucking time
-    QString format_string = CONFIG_LINE_FORMAT;
+    QString format_string = CONF->GetLineFormat();
     format_string.replace("$time", item.GetTime().toString());
     QString result;
     switch (item.GetType())
@@ -126,7 +125,7 @@ static QString ItemToString(ScrollbackItem item)
             result = FormatAction(item.GetUser(), QString("changed nick to ") + item.GetText(), false);
             break;
         case ScrollbackItemType_Message:
-            result = CONFIG_MESSAGE_FORMAT;
+            result = CONF->GetMessageFormat();
             result.replace("$nick", item.GetUser().GetNick());
             result.replace("$string", item.GetText());
             break;

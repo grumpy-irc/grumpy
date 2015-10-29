@@ -43,7 +43,7 @@ GrumpydSession::GrumpydSession(Scrollback *System, QString Hostname, QString Use
 
 GrumpydSession::~GrumpydSession()
 {
-    delete this->systemWindow;
+    this->systemWindow->Close();
     GrumpydSession::Sessions_Lock.lock();
     GrumpydSession::Sessions.removeAll(this);
     GrumpydSession::Sessions_Lock.unlock();

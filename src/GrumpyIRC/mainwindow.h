@@ -47,6 +47,7 @@ namespace GrumpyIRC
             //! Return a pointer to widget that contains list of all windows
             ScrollbackList *GetScrollbackList();
             void WriteToSystemWindow(QString text);
+            void WriteToCurrentWindow(QString text);
             ScrollbackFrame *GetSystem();
             ScrollbackFrame *GetCurrentScrollbackFrame();
             UserWidget *GetUsers();
@@ -56,6 +57,8 @@ namespace GrumpyIRC
 
         private slots:
             void on_actionExit_triggered();
+
+            void on_actionConnect_triggered();
 
         private:
             void closeEvent(QCloseEvent *event);

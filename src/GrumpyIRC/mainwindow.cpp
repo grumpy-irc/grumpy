@@ -12,13 +12,14 @@
 
 #include "corewrapper.h"
 #include "mainwindow.h"
+#include "connectwin.h"
 #include "scrollbacklist.h"
 #include "ui_mainwindow.h"
 #include "userwidget.h"
+#include "grumpyconf.h"
 #include "scrollbackframe.h"
 #include "../libcore/generic.h"
 #include "syslogwindow.h"
-#include "defaultconfig.h"
 #include "scrollbacksmanager.h"
 #include "skin.h"
 #include "../libirc/libircclient/network.h"
@@ -84,7 +85,7 @@ static int SystemCommand_Nick(SystemCommand *command, CommandArgs args)
     }
     else
     {
-        SET_CONFIG_NICK(args.Parameters[0]);
+        CONF->SetNick(args.Parameters[0]);
         scrollback->InsertText(QString("Your default nick was changed to " + args.Parameters[0]));
         return 0;
     }
@@ -210,6 +211,11 @@ void MainWindow::WriteToSystemWindow(QString text)
     this->systemWindow->InsertText(text);
 }
 
+void MainWindow::WriteToCurrentWindow(QString text)
+{
+    this->scrollbackWindow->GetCurrentScrollback()->InsertText(text);
+}
+
 ScrollbackFrame *MainWindow::GetSystem()
 {
     return this->systemWindow;
@@ -241,7 +247,7 @@ void MainWindow::OpenServer(libirc::ServerAddress server)
 {
     if (server.GetNick().isEmpty())
     {
-        QString nick = CONFIG_NICK;
+        QString nick = CONF->GetNick();
         if (GCFG->GetValueAsString("next-session-nick", nick) != nick)
         {
             nick = GCFG->GetValueAsString("next-session-nick");
@@ -263,4 +269,11 @@ void MainWindow::on_actionExit_triggered()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     Exit();
+}
+
+void GrumpyIRC::MainWindow::on_actionConnect_triggered()
+{
+    ConnectWin *wx = new ConnectWin(this);
+    wx->setAttribute(Qt::WA_DeleteOnClose);
+    wx->show();
 }

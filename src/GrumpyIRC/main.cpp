@@ -20,9 +20,9 @@
 #include "corewrapper.h"
 #include "grumpyeventhandler.h"
 #include "../libcore/autocompletionengine.h"
+#include "../libcore/core.h"
 #include "inputbox.h"
 #include "widgetfactory.h"
-#include "../libcore/core.h"
 #include <QApplication>
 
 using namespace GrumpyIRC;
