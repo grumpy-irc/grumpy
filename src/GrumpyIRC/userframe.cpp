@@ -49,7 +49,7 @@ void UserFrame::on_listWidget_customContextMenuRequested(const QPoint &pos)
 
 static QColor getColor(libircclient::User *ux)
 {
-    if (ux->CUMode == NULL || !Skin::Default->ModeColors.contains(ux->CUMode))
+    if (ux->CUMode == 0 || !Skin::Default->ModeColors.contains(ux->CUMode))
         return Skin::Default->TextColor;
     
     return Skin::Default->ModeColors[ux->CUMode];

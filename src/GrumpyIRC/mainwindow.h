@@ -52,7 +52,7 @@ namespace GrumpyIRC
             UserWidget *GetUsers();
             void OpenGrumpy(QString hostname, int port, QString username, QString password, bool ssl);
             void OpenIRCNetworkLink(QString link);
-            void OpenServer(libirc::ServerAddress &server);
+            void OpenServer(libirc::ServerAddress server);
 
         private slots:
             void on_actionExit_triggered();

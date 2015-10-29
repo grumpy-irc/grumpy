@@ -30,7 +30,7 @@ Skin::Skin()
 QPalette GrumpyIRC::Skin::Palette()
 {
     QPalette px;
-    px.setColor(QPalette::ColorRole::Text, this->TextColor);
-    px.setColor(QPalette::ColorRole::Base, this->BackgroundColor);
+    px.setColor(QPalette::Text, this->TextColor);
+    px.setColor(QPalette::Base, this->BackgroundColor);
     return px;
 }

@@ -223,7 +223,7 @@ void MainWindow::OpenIRCNetworkLink(QString link)
     MainWindow::Main->OpenServer(libirc::ServerAddress(link));
 }
 
-void MainWindow::OpenServer(libirc::ServerAddress &server)
+void MainWindow::OpenServer(libirc::ServerAddress server)
 {
     if (server.GetNick().isEmpty())
     {
