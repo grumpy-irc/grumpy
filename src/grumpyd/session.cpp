@@ -68,7 +68,6 @@ Session::Session(qintptr socket_ptr, bool ssl)
             this->SessionState = State_Offline;
             this->protocol = NULL;
             this->socket->close();
-            delete this;
             return;
         }
     }
@@ -97,6 +96,11 @@ Session::~Session()
 
 void Session::run()
 {
+    if (this->SessionState == State_Offline)
+    {
+        this->deleteLater();
+        return;
+    }
     while(this->IsRunning)
         sleep(1);
 
