@@ -40,3 +40,12 @@ bool Generic::IsGrumpy(Scrollback *window)
     }
     return false;
 }
+
+QStringList Generic::Trim(QStringList list)
+{
+    QStringList result;
+    foreach (QString item, list)
+        if (!item.isEmpty())
+            result << item;
+    return result;
+}
