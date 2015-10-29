@@ -26,7 +26,7 @@ ConnectWin::ConnectWin(QWidget *parent) : QDialog(parent), ui(new Ui::ConnectWin
     this->ui->comboBox->addItem("IRC");
     this->ui->comboBox->addItem("Grumpyd");
     this->ui->comboBox->setCurrentIndex(0);
-    this->ui->lineEdit_2->setText(QString::number(IRC_STANDARD_PORT_SSL));
+    this->ui->lineEdit_2->setText(CONF->GetNick());
 }
 
 ConnectWin::~ConnectWin()

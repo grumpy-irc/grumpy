@@ -248,6 +248,10 @@ bool ScrollbackFrame::IsDead()
 
 void ScrollbackFrame::RequestClose()
 {
+    if (!this->IsDead())
+    {
+        return;
+    }
 	// We need to figure out if we are closing the system window, in that case we need to also delete the corresponding network session that it belonged to
 	// the check for system window needs to be done before we request it to be closed as that might remove the reference to it
 	NetworkSession *session = NULL;

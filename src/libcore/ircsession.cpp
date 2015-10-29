@@ -161,10 +161,7 @@ void IRCSession::Connect(libircclient::Network *Network)
         throw new Exception("You can't connect to ircsession that is active, disconnect first", BOOST_CURRENT_FUNCTION);
 
     this->systemWindow->InsertText("Connecting to " + Network->GetServerAddress());
-
-    if (this->network)
-        delete this->network;
-
+    delete this->network;
     this->network = Network;
     connect(this->network, SIGNAL(Event_ConnectionFailure(QAbstractSocket::SocketError)), this, SLOT(OnConnectionFail(QAbstractSocket::SocketError)));
     connect(this->network, SIGNAL(Event_RawIncoming(QByteArray)), this, SLOT(OnIncomingRawMessage(QByteArray)));
