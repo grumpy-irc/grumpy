@@ -51,7 +51,7 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
 
 ScrollbackFrame::~ScrollbackFrame()
 {
-    delete this->scrollback;
+    //delete this->scrollback;
     delete this->userFrame;
     //! \todo Handle deletion of TreeNode from list of scbs
     //delete this->TreeNode;
