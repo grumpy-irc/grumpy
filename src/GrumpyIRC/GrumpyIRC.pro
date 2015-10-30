@@ -31,7 +31,8 @@ SOURCES += main.cpp\
     userframeitem.cpp \
     grumpyconf.cpp \
     connectwin.cpp \
-    aboutwin.cpp
+    aboutwin.cpp \
+    packetsnifferwin.cpp
 
 HEADERS  += mainwindow.h \
     scrollbackframe.h \
@@ -51,7 +52,8 @@ HEADERS  += mainwindow.h \
     userframeitem.h \
     grumpyconf.h \
     connectwin.h \
-    aboutwin.h
+    aboutwin.h \
+    packetsnifferwin.h
 
 FORMS    += mainwindow.ui \
     scrollbackframe.ui \
@@ -63,7 +65,8 @@ FORMS    += mainwindow.ui \
     userwidget.ui \
     userframe.ui \
     connectwin.ui \
-    aboutwin.ui
+    aboutwin.ui \
+    packetsnifferwin.ui
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../libirc/libirc/build-libirc-Desktop_Qt_5_4_2_MinGW_32bit-Debug/release/ -llibirc
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../libirc/libirc/build-libirc-Desktop_Qt_5_4_2_MinGW_32bit-Debug/debug/ -llibirc

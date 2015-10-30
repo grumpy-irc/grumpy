@@ -23,7 +23,7 @@
 #define GRUMPY_LOG(text)                 if (GrumpyIRC::Core::GrumpyCore && GrumpyIRC::Core::GrumpyCore->GetCurrentEventHandler()) \
                                          { GrumpyIRC::Core::GrumpyCore->GetCurrentEventHandler()->OnSystemLog(text); }
 // Error message
-#define GRUMPY_ERROR(text)    if (GrumpyIRC::Core::GrumpyCore && GrumpyIRC::Core::GrumpyCore->GetCurrentEventHandler()) \
+#define GRUMPY_ERROR(text)               if (GrumpyIRC::Core::GrumpyCore && GrumpyIRC::Core::GrumpyCore->GetCurrentEventHandler()) \
                                          { GrumpyIRC::Core::GrumpyCore->GetCurrentEventHandler()->OnError(text); }
 
 namespace GrumpyIRC

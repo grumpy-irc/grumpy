@@ -15,6 +15,7 @@
 
 #include <QMutex>
 #include <QObject>
+#include <QDateTime>
 #include <QString>
 #include <QAbstractSocket>
 #include "../libirc/libirc/serializableitem.h"
@@ -39,6 +40,15 @@ namespace GrumpyIRC
 {
     class Scrollback;
     class GrumpydSession;
+
+    class LIBCORESHARED_EXPORT NetworkSniffer_Item
+    {
+        public:
+            NetworkSniffer_Item(QByteArray data, bool is_outgoing);
+            bool _outgoing;
+            QDateTime Time;
+            QString Text;
+    };
 
     class LIBCORESHARED_EXPORT IRCSession : public QObject, public NetworkSession, public libirc::SerializableItem
     {
@@ -71,6 +81,7 @@ namespace GrumpyIRC
             virtual bool IsConnected() const;
             virtual Scrollback *GetScrollbackForChannel(QString channel);
             virtual Scrollback *GetScrollbackForUser(QString user);
+            virtual QList<NetworkSniffer_Item*> GetSniffer();
             SessionType GetType();
             QHash<QString, QVariant> ToHash();
             void LoadHash(QHash<QString, QVariant> hash);
@@ -79,13 +90,14 @@ namespace GrumpyIRC
             void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete);
             void RequestPart(Scrollback *window);
             //! Used mostly only for synchronization with grumpyd
-            void RegisterChannel(libircclient::Channel *channel, Scrollback *window);
+            virtual void RegisterChannel(libircclient::Channel *channel, Scrollback *window);
             Scrollback *Root;
         signals:
             //! Emited when a new window for this session is open, needed by grumpyd for network sync
             void Event_ScrollbackIsOpen(Scrollback *window);
             void Event_ScrollbackIsClosed(Scrollback *window);
         protected slots:
+            virtual void OnOutgoingRawMessage(QByteArray message);
             virtual void OnIncomingRawMessage(QByteArray message);
             virtual void OnConnectionFail(QAbstractSocket::SocketError er);
             virtual void OnMessage(libircclient::Parser *px);
@@ -113,6 +125,7 @@ namespace GrumpyIRC
             void SyncWindows(QHash<QString, QVariant> windows, QHash<QString, Scrollback*> *hash);
             //! Sessions have unique ID that distinct them from sessions made to same irc network
             unsigned int SID;
+            QList<NetworkSniffer_Item*> data;
             QHash<QString, Scrollback*> channels;
             libircclient::Network *network;
             QHash<QString, Scrollback*> users;

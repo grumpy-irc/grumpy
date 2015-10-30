@@ -42,6 +42,7 @@ namespace GrumpyIRC
 
         private:
             void switchWindow(const QModelIndex &index);
+            void sniffer(ScrollbackFrame *window);
             void closeWindow();
             ScrollbackFrame *selectedWindow();
 			QStandardItem *root;

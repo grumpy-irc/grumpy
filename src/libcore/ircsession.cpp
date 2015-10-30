@@ -77,6 +77,8 @@ IRCSession::~IRCSession()
     IRCSession::Sessions_Lock.lock();
     IRCSession::Sessions.removeOne(this);
     IRCSession::Sessions_Lock.unlock();
+    qDeleteAll(this->data);
+    this->data.clear();
     delete this->network;
 }
 
@@ -163,6 +165,7 @@ void IRCSession::Connect(libircclient::Network *Network)
     this->systemWindow->InsertText("Connecting to " + Network->GetServerAddress());
     delete this->network;
     this->network = Network;
+    connect(this->network, SIGNAL(Event_RawOutgoing(QByteArray)), this, SLOT(OnOutgoingRawMessage(QByteArray)));
     connect(this->network, SIGNAL(Event_ConnectionFailure(QAbstractSocket::SocketError)), this, SLOT(OnConnectionFail(QAbstractSocket::SocketError)));
     connect(this->network, SIGNAL(Event_RawIncoming(QByteArray)), this, SLOT(OnIncomingRawMessage(QByteArray)));
     connect(this->network, SIGNAL(Event_Unknown(libircclient::Parser*)), this, SLOT(OnUnknown(libircclient::Parser*)));
@@ -337,6 +340,11 @@ void IRCSession::RegisterChannel(libircclient::Channel *channel, Scrollback *win
         this->GetNetwork()->_st_InsertChannel(channel);
 }
 
+void IRCSession::OnOutgoingRawMessage(QByteArray message)
+{
+    this->data.append(new NetworkSniffer_Item(message, true));
+}
+
 void IRCSession::SendMessage(Scrollback *window, QString text)
 {
     if (!this->IsConnected())
@@ -495,7 +503,6 @@ void IRCSession::_gs_ResyncNickChange(QString new_, QString old_)
     // this would be much more easier to implement if we just resynced the whole channel list structure on its every change:
     // one function to rule them all? :) but that would be incredible overhead as we would need to resync on every change
     // while this tiny packet is enough (let's try to be more efficient than others)
-
     foreach (libircclient::Channel *channel, this->GetNetwork()->GetChannels())
     {
         if (!channel->ContainsUser(old_))
@@ -529,7 +536,7 @@ void IRCSession::rmWindow(Scrollback *window)
 
 void IRCSession::OnIncomingRawMessage(QByteArray message)
 {
-    //this->systemWindow->InsertText(QString(message));
+    this->data.append(new NetworkSniffer_Item(message, false));
 }
 
 void IRCSession::OnConnectionFail(QAbstractSocket::SocketError er)
@@ -603,3 +610,14 @@ void IRCSession::OnNICK(libircclient::Parser *px, QString old_, QString new_)
     }
 }
 
+NetworkSniffer_Item::NetworkSniffer_Item(QByteArray data, bool is_outgoing)
+{
+    this->_outgoing = is_outgoing;
+    this->Text = QString(data);
+    this->Time = QDateTime::currentDateTime();
+}
+
+QList<GrumpyIRC::NetworkSniffer_Item*> GrumpyIRC::IRCSession::GetSniffer()
+{
+    return this->data;
+}

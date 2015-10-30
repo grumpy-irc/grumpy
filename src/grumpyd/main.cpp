@@ -56,8 +56,8 @@ int daemonize()
         GRUMPY_LOG("Parent: forked to pid: " + QString::number(pid));
         return DAEMONIZE_FORKED;
     }
-    return DAEMONIZE_SUCCESS;
 #endif
+    return DAEMONIZE_SUCCESS;
 }
 
 int main(int argc, char *argv[])

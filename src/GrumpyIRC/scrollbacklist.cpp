@@ -16,8 +16,11 @@
 #include "mainwindow.h"
 #include "scrollbacklist.h"
 #include "../libcore/networksession.h"
+#include "../libcore/ircsession.h"
+#include "packetsnifferwin.h"
 #include "skin.h"
 #include "ui_scrollbacklist.h"
+#include "../libcore/generic.h"
 #include "scrollbackframe.h"
 #include "scrollbacksmanager.h"
 #include "scrollbacklist_node.h"
@@ -88,6 +91,7 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     Menu.addAction(menuClose);
     QAction *menuPart = NULL;
     QAction *menuDisconnect = NULL;
+    QAction *menuSniffer = NULL;
 
     if (!wx->IsDeletable || !wx->IsDead())
         menuClose->setEnabled(false);
@@ -104,6 +108,8 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     {
         menuDisconnect = new QAction(QObject::tr("Disconnect"), &Menu);
         Menu.addAction(menuDisconnect);
+        menuSniffer = new QAction(QObject::tr("Network sniffer"), &Menu);
+        Menu.addAction(menuSniffer);
     }
 
     QAction* selectedItem = Menu.exec(globalPos);
@@ -118,6 +124,9 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     } else if (selectedItem == menuDisconnect)
     {
         wx->RequestDisconnect();
+    } else if (selectedItem == menuSniffer)
+    {
+        this->sniffer(wx);
     }
 }
 
@@ -129,6 +138,24 @@ void ScrollbackList::switchWindow(const QModelIndex &index)
     if (!node)
         return;
     MainWindow::Main->GetScrollbackManager()->SwitchWindow(node->GetScrollback());
+}
+
+void ScrollbackList::sniffer(ScrollbackFrame *window)
+{
+    NetworkSession *session = window->GetSession();
+    if (!session)
+        return;
+    if (session->GetType() == SessionType_IRC)
+    {
+        PacketSnifferWin *wx = new PacketSnifferWin();
+        wx->setAttribute(Qt::WA_DeleteOnClose);
+        wx->Load((IRCSession*)session);
+        wx->show();
+    }
+    else
+    {
+        Generic::MessageBox("Unsupported", "This protocol doesn't support this feature", Generic::MessageBox_Type_Error);
+    }
 }
 
 void ScrollbackList::closeWindow()
