@@ -91,6 +91,7 @@ void Configuration::Save()
     QSettings settings(CONFIGURATION_FILE, QSettings::IniFormat);
     foreach (QString key, this->Options.keys())
         settings.setValue(key, this->Options[key]);
+    settings.sync();
 }
 
 
