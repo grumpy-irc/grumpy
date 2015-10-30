@@ -97,7 +97,7 @@ static DatabaseBackend *InstantiateStorage(QString type)
 
 void Grumpyd::Main()
 {
-    GRUMPY_LOG("Loading database");
+    GRUMPY_LOG("Loading storage: " + CONF->GetStorage());
     this->databaseBackend = InstantiateStorage(CONF->GetStorage());
     this->databaseBackend->LoadRoles();
     this->databaseBackend->LoadUsers();

@@ -15,18 +15,56 @@
 #include "corewrapper.h"
 #include "scrollbackfactory.h"
 #include "../libcore/exception.h"
+#include "grumpyconf.h"
 #include "grumpyd.h"
 #include "../libcore/configuration.h"
+#include "../libcore/definitions.h"
 #include "../libcore/core.h"
 #include "../libcore/terminalparser.h"
 #include "../libcore/eventhandler.h"
 #include "../libcore/exception.h"
 #include "../libcore/generic.h"
 
+#ifdef __linux__
+#include <proc/readproc.h>
+#endif
+
+#define DAEMONIZE_SUCCESS 0
+#define DAEMONIZE_FORKED  1
+#define DAEMONIZE_FAILED  2
+#define EDAEMONIZEFAILED    -1
+#define EUNHANDLEDEXCEPTION -2
+
+int daemonize()
+{
+    if (!CONF->Daemon)
+        return DAEMONIZE_SUCCESS;
+
+    // Platform specific
+#ifdef __linux__
+    pid_t pid = fork();
+
+    if (pid < 0)
+    {
+        GRUMPY_ERROR("Failed to daemonize itself, call to fork() failed with error code: " + QString::number(errno));
+        return DAEMONIZE_FAILED;
+    }
+
+    if (pid > 0)
+    {
+        GRUMPY_LOG("Parent: forked to pid: " + QString::numer(pid));
+        return DAEMONIZE_FORKED;
+    }
+    return DAEMONIZE_SUCCESS;
+#endif
+}
+
 int main(int argc, char *argv[])
 {
     try
     {
+        // This is just a wrapper around libcore configuration system so that we can easily access some global config options
+        CONF = new GrumpyIRC::GrumpyConf();
         // First of all we need to process the arguments and then do other stuff
         GrumpyIRC::TerminalParser *tp = new GrumpyIRC::TerminalParser();
         if (!tp->Parse(argc, argv))
@@ -36,6 +74,14 @@ int main(int argc, char *argv[])
             return 0;
         }
         delete tp;
+
+        // Handle daemonizing as system service
+        int dr = daemonize();
+        if (dr == DAEMONIZE_FAILED)
+            return EDAEMONIZEFAILED;
+        if (dr == DAEMONIZE_FORKED)
+            return 0;
+
         GrumpyIRC::CoreWrapper::GrumpyCore = new GrumpyIRC::Core();
         // Install our own scrollback factory that creates scrollbacks which are automagically network synced
         GrumpyIRC::CoreWrapper::GrumpyCore->InstallFactory(new GrumpyIRC::ScrollbackFactory());
@@ -50,7 +96,7 @@ int main(int argc, char *argv[])
     } catch (GrumpyIRC::Exception *exception)
     {
         GRUMPY_ERROR("FATAL: " + exception->GetMessage());
-        return 2;
+        return EUNHANDLEDEXCEPTION;
     }
 }
 

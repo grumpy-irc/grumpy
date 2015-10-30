@@ -17,25 +17,6 @@
 
 using namespace GrumpyIRC;
 
-/*
-
-
-// Nickname
-#define CONFIG_NICK GCFG->GetValueAsString("nick", "GrumpyUser")
-#define SET_CONFIG_NICK(nick) GCFG->SetValue("nick", QVariant(nick))
-
-// Default line format
-#define CONFIG_LINE_FORMAT GCFG->GetValueAsString("line_format", "($time) $string")
-#define SET_CONFIG_LINE_FORMAT(format) GCFG->SetValue("line_format", QVariant(format))
-
-// Default message format
-#define CONFIG_MESSAGE_FORMAT GCFG->GetValueAsString("message_format", "<$nick> $string")
-#define SET_CONFIG_MESSAGE_FORMAT(format) GCFG->SetValue("message_format", QVariant(format))
-
-#define CONFIG_ACTION_FORMAT GCFG->GetValueAsString("action_format", "* $nick $string")
-#define SET_CONFIG_ACTION_FORMAT(format) GCFG->SetValue("action_format", QVariant(format))
- */
-
 GrumpyConf *GrumpyConf::Conf = NULL;
 
 GrumpyConf::GrumpyConf()
