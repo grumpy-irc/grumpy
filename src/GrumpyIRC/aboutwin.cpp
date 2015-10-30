@@ -10,26 +10,18 @@
 
 // Copyright (c) Petr Bena 2015
 
-#ifndef SCROLLBACKLIST_NODE_H
-#define SCROLLBACKLIST_NODE_H
+#include "aboutwin.h"
+#include "ui_aboutwin.h"
 
-#include <QStandardItemModel>
-#include <QIcon>
+using namespace GrumpyIRC;
 
-namespace GrumpyIRC
+AboutWin::AboutWin(QWidget *parent) : QDialog(parent), ui(new Ui::AboutWin)
 {
-	class ScrollbackFrame;
-	class ScrollbackList_Node : public QStandardItem
-	{
-		public:
-			ScrollbackList_Node(ScrollbackFrame *sb);
-			ScrollbackFrame *GetScrollback();
-            void UpdateIcon();
-
-		private:
-			ScrollbackFrame *scrollback;
-
-	};
+    this->ui->setupUi(this);
+    //this->ui->label->setPixmap(QPixmap(":/icons/img/exclamation-mark-s.png"));
 }
 
-#endif // SCROLLBACKLIST_NODE_H
+AboutWin::~AboutWin()
+{
+    delete this->ui;
+}

@@ -38,9 +38,8 @@ namespace GrumpyIRC
             QString GetQuitMessage();
             void SetNick(QString nick);
             QString GetNick();
-            QString GetLineFormat();
-            QString GetMessageFormat();
-            QString GetActionFormat();
+            QString GetStorage();
+            bool Daemon;
     };
 }
 

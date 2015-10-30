@@ -10,26 +10,27 @@
 
 // Copyright (c) Petr Bena 2015
 
-#ifndef SCROLLBACKLIST_NODE_H
-#define SCROLLBACKLIST_NODE_H
+#include "databasedummy.h"
+#include "security.h"
+#include "user.h"
 
-#include <QStandardItemModel>
-#include <QIcon>
+using namespace GrumpyIRC;
 
-namespace GrumpyIRC
+DatabaseDummy::DatabaseDummy()
 {
-	class ScrollbackFrame;
-	class ScrollbackList_Node : public QStandardItem
-	{
-		public:
-			ScrollbackList_Node(ScrollbackFrame *sb);
-			ScrollbackFrame *GetScrollback();
-            void UpdateIcon();
 
-		private:
-			ScrollbackFrame *scrollback;
-
-	};
 }
 
-#endif // SCROLLBACKLIST_NODE_H
+void DatabaseDummy::LoadRoles()
+{
+    Role::Defaults();
+}
+
+void DatabaseDummy::LoadUsers()
+{
+    User::UserInfo.clear();
+    User *test = new User("user", "pw");
+    test->SetRole(Role::Roles["root"]);
+    User::UserInfo.append(test);
+}
+

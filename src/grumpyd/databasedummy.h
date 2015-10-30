@@ -10,26 +10,21 @@
 
 // Copyright (c) Petr Bena 2015
 
-#ifndef SCROLLBACKLIST_NODE_H
-#define SCROLLBACKLIST_NODE_H
+#ifndef DATABASEDUMMY_H
+#define DATABASEDUMMY_H
 
-#include <QStandardItemModel>
-#include <QIcon>
+#include "databasebackend.h"
 
 namespace GrumpyIRC
 {
-	class ScrollbackFrame;
-	class ScrollbackList_Node : public QStandardItem
-	{
-		public:
-			ScrollbackList_Node(ScrollbackFrame *sb);
-			ScrollbackFrame *GetScrollback();
-            void UpdateIcon();
+    class DatabaseDummy : public DatabaseBackend
+    {
+        public:
+            DatabaseDummy();
 
-		private:
-			ScrollbackFrame *scrollback;
-
-	};
+            void LoadRoles();
+            void LoadUsers();
+    };
 }
 
-#endif // SCROLLBACKLIST_NODE_H
+#endif // DATABASEDUMMY_H

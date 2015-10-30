@@ -10,6 +10,7 @@
 
 // Copyright (c) Petr Bena 2015
 
+#include "aboutwin.h"
 #include "corewrapper.h"
 #include "mainwindow.h"
 #include "connectwin.h"
@@ -274,6 +275,13 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void GrumpyIRC::MainWindow::on_actionConnect_triggered()
 {
     ConnectWin *wx = new ConnectWin(this);
+    wx->setAttribute(Qt::WA_DeleteOnClose);
+    wx->show();
+}
+
+void GrumpyIRC::MainWindow::on_actionAbout_triggered()
+{
+    AboutWin *wx = new AboutWin(this);
     wx->setAttribute(Qt::WA_DeleteOnClose);
     wx->show();
 }

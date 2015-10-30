@@ -14,6 +14,9 @@
 #include <QSslSocket>
 #include "grumpyd.h"
 #include "corewrapper.h"
+#include "grumpyconf.h"
+#include "databasebin.h"
+#include "databasedummy.h"
 #include "databasexml.h"
 #include "sleeper.h"
 #include "listener.h"
@@ -82,10 +85,20 @@ Grumpyd::~Grumpyd()
     delete this->listener;
 }
 
+static DatabaseBackend *InstantiateStorage(QString type)
+{
+    if (type == "DatabaseDummy")
+        return new DatabaseDummy();
+    else if (type == "DatabaseXML")
+        return new DatabaseXML();
+    else
+        return new DatabaseBin();
+}
+
 void Grumpyd::Main()
 {
     GRUMPY_LOG("Loading database");
-    this->databaseBackend = new DatabaseXML();
+    this->databaseBackend = InstantiateStorage(CONF->GetStorage());
     this->databaseBackend->LoadRoles();
     this->databaseBackend->LoadUsers();
     GRUMPY_LOG("Starting listeners");

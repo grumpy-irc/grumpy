@@ -10,26 +10,30 @@
 
 // Copyright (c) Petr Bena 2015
 
-#ifndef SCROLLBACKLIST_NODE_H
-#define SCROLLBACKLIST_NODE_H
+#ifndef ABOUTWIN_H
+#define ABOUTWIN_H
 
-#include <QStandardItemModel>
-#include <QIcon>
+#include "../libcore/definitions.h"
+#include <QDialog>
+
+namespace Ui
+{
+    class AboutWin;
+}
 
 namespace GrumpyIRC
 {
-	class ScrollbackFrame;
-	class ScrollbackList_Node : public QStandardItem
-	{
-		public:
-			ScrollbackList_Node(ScrollbackFrame *sb);
-			ScrollbackFrame *GetScrollback();
-            void UpdateIcon();
+    class AboutWin : public QDialog
+    {
+            Q_OBJECT
 
-		private:
-			ScrollbackFrame *scrollback;
+        public:
+            explicit AboutWin(QWidget *parent = 0);
+            ~AboutWin();
 
-	};
+        private:
+            Ui::AboutWin *ui;
+    };
 }
 
-#endif // SCROLLBACKLIST_NODE_H
+#endif // ABOUTWIN_H

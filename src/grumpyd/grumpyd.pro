@@ -20,7 +20,9 @@ SOURCES += main.cpp \
     virtualscrollback.cpp \
     scrollbackfactory.cpp \
     syncableircsession.cpp \
-    databasebin.cpp
+    databasebin.cpp \
+    grumpyconf.cpp \
+    databasedummy.cpp
 
 HEADERS += \
     corewrapper.h \
@@ -35,5 +37,7 @@ HEADERS += \
     virtualscrollback.h \
     scrollbackfactory.h \
     syncableircsession.h \
-    databasebin.h
+    databasebin.h \
+    grumpyconf.h \
+    databasedummy.h
 

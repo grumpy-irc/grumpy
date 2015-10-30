@@ -60,6 +60,8 @@ namespace GrumpyIRC
 
             void on_actionConnect_triggered();
 
+            void on_actionAbout_triggered();
+
         private:
             void closeEvent(QCloseEvent *event);
             ScrollbackFrame *systemWindow;

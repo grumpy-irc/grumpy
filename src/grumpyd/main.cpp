@@ -11,8 +11,10 @@
 // Copyright (c) Petr Bena 2015
 
 #include <QCoreApplication>
+//#include <iostream>
 #include "corewrapper.h"
 #include "scrollbackfactory.h"
+#include "../libcore/exception.h"
 #include "grumpyd.h"
 #include "../libcore/configuration.h"
 #include "../libcore/core.h"
@@ -23,23 +25,32 @@
 
 int main(int argc, char *argv[])
 {
-    // First of all we need to process the arguments and then do other stuff
-    GrumpyIRC::TerminalParser *tp = new GrumpyIRC::TerminalParser();
-    if (!tp->Parse(argc, argv))
+    try
     {
-        // We processed some argument which requires the application to exit
+        // First of all we need to process the arguments and then do other stuff
+        GrumpyIRC::TerminalParser *tp = new GrumpyIRC::TerminalParser();
+        if (!tp->Parse(argc, argv))
+        {
+            // We processed some argument which requires the application to exit
+            delete tp;
+            return 0;
+        }
         delete tp;
-        return 0;
+        GrumpyIRC::CoreWrapper::GrumpyCore = new GrumpyIRC::Core();
+        // Install our own scrollback factory that creates scrollbacks which are automagically network synced
+        GrumpyIRC::CoreWrapper::GrumpyCore->InstallFactory(new GrumpyIRC::ScrollbackFactory());
+        GrumpyIRC::CoreWrapper::GrumpyCore->InitCfg();
+        // Save the configuration immediately so that we have the configuration file
+        GrumpyIRC::CoreWrapper::GrumpyCore->GetConfiguration()->Save();
+        GRUMPY_LOG("Grumpyd starting...");
+        GrumpyIRC::Grumpyd *daemon = new GrumpyIRC::Grumpyd();
+        QTimer::singleShot(0, daemon, SLOT(Main()));
+        QCoreApplication a(argc, argv);
+        return a.exec();
+    } catch (GrumpyIRC::Exception *exception)
+    {
+        GRUMPY_ERROR("FATAL: " + exception->GetMessage());
+        return 2;
     }
-    delete tp;
-    GrumpyIRC::CoreWrapper::GrumpyCore = new GrumpyIRC::Core();
-    // Install our own scrollback factory that creates scrollbacks which are automagically network synced
-    GrumpyIRC::CoreWrapper::GrumpyCore->InstallFactory(new GrumpyIRC::ScrollbackFactory());
-    GrumpyIRC::CoreWrapper::GrumpyCore->InitCfg();
-    GRUMPY_LOG("Grumpyd starting...");
-    GrumpyIRC::Grumpyd *daemon = new GrumpyIRC::Grumpyd();
-    QTimer::singleShot(0, daemon, SLOT(Main()));
-    QCoreApplication a(argc, argv);
-    return a.exec();
 }
 
