@@ -89,7 +89,7 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     QAction *menuPart = NULL;
     QAction *menuDisconnect = NULL;
 
-    if (!wx->IsDeletable)
+    if (!wx->IsDeletable || !wx->IsDead())
         menuClose->setEnabled(false);
 
     if (wx->IsChannel())

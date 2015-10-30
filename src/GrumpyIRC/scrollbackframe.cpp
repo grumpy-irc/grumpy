@@ -179,6 +179,7 @@ void ScrollbackFrame::Refresh()
     this->buffer.clear();
     foreach (ScrollbackItem item, this->scrollback->GetItems())
         this->_insertText_(item);
+    this->UpdateIcon();
 }
 
 void ScrollbackFrame::OnClosed()

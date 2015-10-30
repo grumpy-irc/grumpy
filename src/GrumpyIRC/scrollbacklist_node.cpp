@@ -39,7 +39,7 @@ void ScrollbackList_Node::UpdateIcon()
         switch (this->scrollback->GetScrollback()->GetType())
         {
             case ScrollbackType_Channel:
-                this->setIcon(QIcon(":/icons/img/hash.png"));
+                this->setIcon(QIcon(":/icons/img/icon_hash.png"));
                 break;
             case ScrollbackType_System:
                 this->setIcon(QIcon(":/icons/img/exclamation mark.png"));

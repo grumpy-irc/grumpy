@@ -120,6 +120,7 @@ libircclient::Network *Scrollback::GetNetwork() const
 void Scrollback::SetDead(bool dead)
 {
     this->_dead = dead;
+    emit this->Event_ChangedDeadStatus();
 }
 
 Scrollback *Scrollback::GetParentScrollback()
