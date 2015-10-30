@@ -45,7 +45,7 @@ ScrollbackFrame *ScrollbacksManager::CreateWindow(QString name, ScrollbackFrame 
     if (focus)
         this->SwitchWindow(window);
     ScrollbackList *scrollbacks = MainWindow::Main->GetScrollbackList();
-    QStandardItem *parent_tree = NULL;
+    ScrollbackList_Node *parent_tree = NULL;
     if (parent)
         parent_tree = parent->TreeNode;
     if (scrollbacks)
@@ -83,7 +83,7 @@ void ScrollbacksManager::DestroyWindow(ScrollbackFrame *window)
     this->SwitchWindow(MainWindow::Main->GetSystem());
     if (window->TreeNode)
     {
-        QStandardItem *parent = NULL;
+        ScrollbackList_Node *parent = NULL;
         if (window->GetParent())
             parent = window->GetParent()->TreeNode;
         MainWindow::Main->GetScrollbackList()->UnregisterWindow(window->TreeNode, parent);

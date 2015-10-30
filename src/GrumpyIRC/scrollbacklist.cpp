@@ -42,14 +42,14 @@ ScrollbackList::~ScrollbackList()
     delete this->ui;
 }
 
-void ScrollbackList::RegisterWindow(ScrollbackFrame *scrollback, QStandardItem *parent_node)
+void ScrollbackList::RegisterWindow(ScrollbackFrame *scrollback, ScrollbackList_Node *parent_node)
 {
     QStandardItem *root;
     if (parent_node != NULL)
         root = parent_node;
     else
         root = this->GetRootTreeItem();
-    QStandardItem *node = new ScrollbackList_Node(scrollback);
+    ScrollbackList_Node *node = new ScrollbackList_Node(scrollback);
     scrollback->TreeNode = node;
     root->appendRow(node);
     this->ui->treeView->expand(root->index());
@@ -60,7 +60,7 @@ QStandardItem *ScrollbackList::GetRootTreeItem()
     return this->root;
 }
 
-void ScrollbackList::UnregisterWindow(QStandardItem *node, QStandardItem *parent_n)
+void ScrollbackList::UnregisterWindow(ScrollbackList_Node *node, ScrollbackList_Node *parent_n)
 {
     QModelIndex index = this->model->indexFromItem(node);
     QModelIndex parent;

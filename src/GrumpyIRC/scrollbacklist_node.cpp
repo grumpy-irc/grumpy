@@ -29,7 +29,12 @@ ScrollbackFrame *ScrollbackList_Node::GetScrollback()
 
 void ScrollbackList_Node::UpdateIcon()
 {
-    if (this->scrollback->IsDead())
+    if (!this->scrollback->IsDeletable)
+    {
+        this->setIcon(QIcon(":/icons/img/system.png"));
+        return;
+    }
+    if (!this->scrollback->IsDead())
     {
         switch (this->scrollback->GetScrollback()->GetType())
         {

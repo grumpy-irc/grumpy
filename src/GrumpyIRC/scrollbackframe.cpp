@@ -18,6 +18,7 @@
 #include "../libirc/libircclient/user.h"
 #include "corewrapper.h"
 #include "grumpyconf.h"
+#include "scrollbacklist_node.h"
 #include "skin.h"
 #include "scrollbackframe.h"
 #include "scrollbacksmanager.h"
@@ -40,6 +41,7 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     else
         this->scrollback = _scrollback;
     connect(this->scrollback, SIGNAL(Event_NetworkModified(libircclient::Network*)), this, SLOT(NetworkChanged(libircclient::Network*)));
+    connect(this->scrollback, SIGNAL(Event_ChangedDeadStatus()), this, SLOT(OnDead()));
     connect(this->scrollback, SIGNAL(Event_UserInserted(libircclient::User*)), this, SLOT(UserList_Insert(libircclient::User*)));
     connect(this->scrollback, SIGNAL(Event_Reload()), this, SLOT(Refresh()));
     connect(this->scrollback, SIGNAL(Event_UserAltered(QString,libircclient::User*)), this, SLOT(UserList_Rename(QString,libircclient::User*)));
@@ -167,6 +169,11 @@ void ScrollbackFrame::UserList_Rename(QString old, libircclient::User *us)
     this->userFrame->ChangeNick(us->GetNick(), old);
 }
 
+void ScrollbackFrame::OnDead()
+{
+    this->UpdateIcon();
+}
+
 void ScrollbackFrame::Refresh()
 {
     this->buffer.clear();
@@ -263,7 +270,13 @@ void ScrollbackFrame::RequestClose()
 		// Call to RequestRemove probably called delete on this very scrollback frame, so now we are within a deleted object, be carefull here not to access internal memory
 		if (session)
 			delete session;
-	}
+    }
+}
+
+void ScrollbackFrame::UpdateIcon()
+{
+    if (this->TreeNode)
+        this->TreeNode->UpdateIcon();
 }
 
 void ScrollbackFrame::RequestPart()

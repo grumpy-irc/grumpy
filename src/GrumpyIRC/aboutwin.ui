@@ -19,15 +19,10 @@
      <property name="text">
       <string/>
      </property>
-     <property name="pixmap">
-      <pixmap resource="icons.qrc">:/icons/img/exclamation mark.png</pixmap>
-     </property>
     </widget>
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="icons.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
