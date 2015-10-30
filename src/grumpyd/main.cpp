@@ -24,9 +24,10 @@
 #include "../libcore/eventhandler.h"
 #include "../libcore/exception.h"
 #include "../libcore/generic.h"
+#include <errno.h>
 
 #ifdef __linux__
-#include <proc/readproc.h>
+#include <unistd.h>
 #endif
 
 #define DAEMONIZE_SUCCESS 0
@@ -52,7 +53,7 @@ int daemonize()
 
     if (pid > 0)
     {
-        GRUMPY_LOG("Parent: forked to pid: " + QString::numer(pid));
+        GRUMPY_LOG("Parent: forked to pid: " + QString::number(pid));
         return DAEMONIZE_FORKED;
     }
     return DAEMONIZE_SUCCESS;
