@@ -24,6 +24,8 @@ namespace GrumpyIRC
 
             void LoadRoles();
             void LoadUsers();
+            QHash<QString, QVariant> GetConfiguration(user_id_t user);
+            void SetConfiguration(user_id_t user, QHash<QString, QVariant> data);
     };
 }
 

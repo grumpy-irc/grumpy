@@ -15,6 +15,9 @@
 
 #include <QObject>
 
+typedef unsigned int user_id_t;
+typedef unsigned long long scrollback_id_t;
+
 #define GRUMPY_VERSION_STRING "1.0.0"
 #define CONFIGURATION_FILE "grumpy.ini"
 #define CONFIGURATION_PATH "grumpyirc"

@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="icons.qrc">
-    <normaloff>:/icons/img/grumpy_logo.jpg</normaloff>:/icons/img/grumpy_logo.jpg</iconset>
+    <normaloff>:/icons/img/grumpy_logo.png</normaloff>:/icons/img/grumpy_logo.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget"/>
   <widget class="QMenuBar" name="menuBar">
@@ -67,6 +67,9 @@
   <action name="actionConnect">
    <property name="text">
     <string>Connect</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+C</string>
    </property>
   </action>
   <action name="actionExit">

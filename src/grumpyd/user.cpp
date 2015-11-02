@@ -13,6 +13,7 @@
 #include "corewrapper.h"
 #include "user.h"
 #include "security.h"
+#include "userconfiguration.h"
 #include "../libcore/scrollback.h"
 #include "../libcore/core.h"
 #include "syncableircsession.h"
@@ -38,12 +39,19 @@ User *User::Login(QString user, QString pw)
     return NULL;
 }
 
-User::User(QString Name, QString Password)
+User::User(QString Name, QString Password, user_id_t User_ID)
 {
     this->username = Name;
     this->DefaultNick = "Grumpyd user";
     this->role = NULL;
+    this->id = User_ID;
+    this->conf = new UserConf(User_ID);
     this->password = Password;
+}
+
+User::~User()
+{
+    delete this->conf;
 }
 
 void User::InsertSession(Session *sx)
@@ -89,6 +97,16 @@ QList<Session*> User::GetGPSessions()
 QList<SyncableIRCSession *> User::GetSIRCSessions()
 {
     return this->sessions;
+}
+
+UserConf *User::GetConfiguration()
+{
+    return this->conf;
+}
+
+user_id_t User::GetID()
+{
+    return this->id;
 }
 
 SyncableIRCSession *User::GetSIRCSession(unsigned int sid)

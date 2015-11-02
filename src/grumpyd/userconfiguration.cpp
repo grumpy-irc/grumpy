@@ -10,37 +10,24 @@
 
 // Copyright (c) Petr Bena 2015
 
-#include "databasexml.h"
-#include "security.h"
-#include "user.h"
+#include "userconfiguration.h"
+#include "grumpyd.h"
+#include "databasebackend.h"
 
 using namespace GrumpyIRC;
 
-DatabaseXML::DatabaseXML()
+UserConf::UserConf(user_id_t user)
 {
-
+    this->User = user;
 }
 
-void DatabaseXML::LoadRoles()
+void UserConf::Save()
 {
-    Role::Defaults();
+    Grumpyd::grumpyd->GetBackend()->SetConfiguration(this->User, this->Options);
 }
 
-void DatabaseXML::LoadUsers()
+void UserConf::Load()
 {
-    User::UserInfo.clear();
-
-}
-
-QHash<QString, QVariant> DatabaseXML::GetConfiguration(user_id_t user)
-{
-    QHash<QString, QVariant> hash;
-
-    return hash;
-}
-
-void DatabaseXML::SetConfiguration(user_id_t user, QHash<QString, QVariant> data)
-{
-
+    this->Options = Grumpyd::grumpyd->GetBackend()->GetConfiguration(this->User);
 }
 

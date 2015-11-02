@@ -27,6 +27,8 @@
 
 using namespace GrumpyIRC;
 
+Grumpyd *Grumpyd::grumpyd = NULL;
+
 QString Grumpyd::GetCFPath()
 {
     QString cf = QCoreApplication::applicationDirPath() + "/" + "etc" + "/";
@@ -76,6 +78,7 @@ bool Grumpyd::SSLIsAvailable()
 Grumpyd::Grumpyd()
 {
     running = true;
+    grumpyd = this;
     this->listener = new Listener();
     this->listenerSSL = new Listener(true);
 }
@@ -83,6 +86,11 @@ Grumpyd::Grumpyd()
 Grumpyd::~Grumpyd()
 {
     delete this->listener;
+}
+
+DatabaseBackend *Grumpyd::GetBackend()
+{
+    return this->databaseBackend;
 }
 
 static DatabaseBackend *InstantiateStorage(QString type)

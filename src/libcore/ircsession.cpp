@@ -11,6 +11,7 @@
 // Copyright (c) Petr Bena 2015
 
 #include "core.h"
+#include "configuration.h"
 #include "ircsession.h"
 #include "eventhandler.h"
 #include "../libirc/libircclient/parser.h"
@@ -243,11 +244,17 @@ void IRCSession::SyncWindows(QHash<QString, QVariant> windows, QHash<QString, Sc
 
 Scrollback *IRCSession::GetScrollbackForUser(QString user)
 {
-    user = user.toLower();
-    if (!this->users.contains(user))
-        return NULL;
+    QString user_l = user.toLower();
+    if (!this->users.contains(user_l))
+    {
+        Scrollback *sx = Core::GrumpyCore->NewScrollback(this->systemWindow, user, ScrollbackType_User);
+        sx->SetSession(this);
+        emit this->Event_ScrollbackIsOpen(sx);
+        this->users.insert(user_l, sx);
+        return sx;
+    }
 
-    return this->users[user];
+    return this->users[user_l];
 }
 
 QHash<QString, QVariant> IRCSession::ToHash()
@@ -482,7 +489,10 @@ void IRCSession::OnNotice(libircclient::Parser *px)
     // if target is current user we need to find target scrollback based on a user's nick
     if (target.toLower() == this->network->GetLocalUserInfo()->GetNick().toLower())
     {
-        sx = this->GetScrollbackForUser(px->GetSourceUserInfo()->GetNick());
+        if (this->GetConfiguration()->GetValueAsBool("write_notices_to_system", true))
+            sx = this->GetSystemWindow();
+        else
+            sx = this->GetScrollbackForUser(px->GetSourceUserInfo()->GetNick());
     } else
     {
         sx = this->GetScrollbackForChannel(target);
@@ -493,6 +503,11 @@ void IRCSession::OnNotice(libircclient::Parser *px)
         return;
     }
     sx->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Notice, px->GetSourceUserInfo()));
+}
+
+Configuration *IRCSession::GetConfiguration()
+{
+    return Core::GrumpyCore->GetConfiguration();
 }
 
 void IRCSession::_gs_ResyncNickChange(QString new_, QString old_)

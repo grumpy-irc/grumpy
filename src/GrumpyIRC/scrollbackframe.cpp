@@ -126,6 +126,11 @@ static QString ItemToString(ScrollbackItem item)
         case ScrollbackItemType_Nick:
             result = FormatAction(item.GetUser(), QString("changed nick to ") + item.GetText(), false);
             break;
+        case ScrollbackItemType_Notice:
+            result = CONF->GetNoticeFormat();
+            result.replace("$nick", item.GetUser().GetNick());
+            result.replace("$string", item.GetText());
+            break;
         case ScrollbackItemType_Message:
             result = CONF->GetMessageFormat();
             result.replace("$nick", item.GetUser().GetNick());

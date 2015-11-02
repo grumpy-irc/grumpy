@@ -41,6 +41,11 @@ void GrumpyConf::SetNick(QString nick)
     GCFG->SetValue("nick", QVariant(nick));
 }
 
+bool GrumpyConf::WriteNoticesToSystem()
+{
+    return GCFG->GetValueAsBool("write_notices_to_system", true);
+}
+
 QString GrumpyConf::GetNick()
 {
     return GCFG->GetValueAsString("nick", "GrumpyUser");
@@ -49,6 +54,11 @@ QString GrumpyConf::GetNick()
 QString GrumpyConf::GetLineFormat()
 {
     return GCFG->GetValueAsString("line_format", "($time) $string");
+}
+
+QString GrumpyConf::GetNoticeFormat()
+{
+    return GCFG->GetValueAsString("notice_format", "[$nick] $string");
 }
 
 QString GrumpyConf::GetMessageFormat()

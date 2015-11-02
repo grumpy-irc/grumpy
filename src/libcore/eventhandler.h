@@ -32,7 +32,7 @@ namespace GrumpyIRC
     {
         public:
             EventHandler();
-            ~EventHandler();
+            virtual ~EventHandler();
             virtual void OnMessage(unsigned long long ScrollbackID);
             virtual void OnDebug(QString text, unsigned int verbosity = 1);
             virtual void OnError(QString text);

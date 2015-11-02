@@ -13,6 +13,8 @@
 #ifndef DATABASEBACKEND_H
 #define DATABASEBACKEND_H
 
+#include "../libcore/definitions.h"
+
 namespace GrumpyIRC
 {
     class DatabaseBackend
@@ -22,6 +24,8 @@ namespace GrumpyIRC
             virtual ~DatabaseBackend();
             virtual void LoadRoles()=0;
             virtual void LoadUsers()=0;
+            virtual QHash<QString, QVariant> GetConfiguration(user_id_t user)=0;
+            virtual void SetConfiguration(user_id_t user, QHash<QString, QVariant> data)=0;
     };
 }
 

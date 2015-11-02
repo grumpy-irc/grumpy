@@ -22,7 +22,8 @@ SOURCES += main.cpp \
     syncableircsession.cpp \
     databasebin.cpp \
     grumpyconf.cpp \
-    databasedummy.cpp
+    databasedummy.cpp \
+    userconfiguration.cpp
 
 HEADERS += \
     corewrapper.h \
@@ -39,5 +40,6 @@ HEADERS += \
     syncableircsession.h \
     databasebin.h \
     grumpyconf.h \
-    databasedummy.h
+    databasedummy.h \
+    userconfiguration.h
 

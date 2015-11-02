@@ -29,8 +29,20 @@ void DatabaseDummy::LoadRoles()
 void DatabaseDummy::LoadUsers()
 {
     User::UserInfo.clear();
-    User *test = new User("user", "pw");
+    User *test = new User("user", "pw", 0);
     test->SetRole(Role::Roles["root"]);
     User::UserInfo.append(test);
+}
+
+QHash<QString, QVariant> DatabaseDummy::GetConfiguration(user_id_t user)
+{
+    QHash<QString, QVariant> hash;
+
+    return hash;
+}
+
+void DatabaseDummy::SetConfiguration(user_id_t user, QHash<QString, QVariant> data)
+{
+
 }
 

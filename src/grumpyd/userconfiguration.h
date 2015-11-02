@@ -10,37 +10,23 @@
 
 // Copyright (c) Petr Bena 2015
 
-#include "databasexml.h"
-#include "security.h"
-#include "user.h"
+#ifndef USERCONFIG_H
+#define USERCONFIG_H
 
-using namespace GrumpyIRC;
+#include "../libcore/definitions.h"
 
-DatabaseXML::DatabaseXML()
+#include "../libcore/configuration.h"
+
+namespace GrumpyIRC
 {
-
+    class UserConf : public Configuration
+    {
+        public:
+            UserConf(user_id_t user);
+            void Save();
+            void Load();
+            user_id_t User;
+    };
 }
 
-void DatabaseXML::LoadRoles()
-{
-    Role::Defaults();
-}
-
-void DatabaseXML::LoadUsers()
-{
-    User::UserInfo.clear();
-
-}
-
-QHash<QString, QVariant> DatabaseXML::GetConfiguration(user_id_t user)
-{
-    QHash<QString, QVariant> hash;
-
-    return hash;
-}
-
-void DatabaseXML::SetConfiguration(user_id_t user, QHash<QString, QVariant> data)
-{
-
-}
-
+#endif // USERCONFIG_H

@@ -217,6 +217,8 @@ void GrumpydSession::Connect()
 
 void GrumpydSession::OnSslHandshakeFailure(QList<QSslError> errors)
 {
+    foreach(QSslError x, errors)
+        GRUMPY_ERROR("SSL warning: " + x.errorString());
     ((QSslSocket*)this->socket)->ignoreSslErrors();
 }
 
