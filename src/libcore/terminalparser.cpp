@@ -18,21 +18,23 @@ using namespace GrumpyIRC;
 
 static int PrintHelp(TerminalParser *parser, QStringList params)
 {
-    std::cout << QCoreApplication::applicationName().toStdString() << " v. " << GRUMPY_VERSION_STRING << std::endl
+    std::cout << QCoreApplication::applicationName().toStdString() << " version " << GRUMPY_VERSION_STRING << std::endl << std::endl
               << "Following options can be used:" << std::endl << std::endl;
 
     foreach (TerminalItem i, parser->GetItems())
     {
         QString parameters = i.GetLong();
-        QString parameters_short = QString(QChar(i.GetShort()));
+        QString parameters_short;
+        if (i.GetShort() != 0)
+            parameters_short = QString(QChar(i.GetShort());
         if (!parameters.isEmpty() && !parameters_short.isEmpty())
             parameters += " | " + parameters_short;
-        else
+        else if (!parameters_short.isEmpty())
             parameters += parameters_short;
         std::cout << "  " << parameters.toStdString() << ": " << i.GetHelp().toStdString() << std::endl;
     }
 
-    std::cout << std::endl << std::endl;
+    std::cout << std::endl;
     std::cout << "This software is open source, contribute at http://github.com/grumpy-irc" << std::endl;
 
     return TP_RESULT_SHUT;
