@@ -12,9 +12,9 @@
 
 #include "../libcore/core.h"
 #include "../libcore/configuration.h"
+#include "grumpyconf.h"
 #include <QDebug>
 #include "corewrapper.h"
-#include "defaultconfig.h"
 #include "mainwindow.h"
 #include "grumpyeventhandler.h"
 
@@ -41,7 +41,7 @@ void GrumpyEventHandler::OnDebug(QString text, unsigned int verbosity)
         return;
 
     // Write message to system window
-    MainWindow::Main->WriteToSystemWindow("DEBUG(" + QString::number(verbosity) + "): " + text);
+    MainWindow::Main->WriteToCurrentWindow("DEBUG(" + QString::number(verbosity) + "): " + text);
 }
 
 void GrumpyEventHandler::OnError(QString text)
@@ -51,7 +51,7 @@ void GrumpyEventHandler::OnError(QString text)
         return;
 
     // Write error to system window
-    MainWindow::Main->WriteToSystemWindow(QObject::tr("ERROR") + ": " + text);
+    MainWindow::Main->WriteToCurrentWindow(QObject::tr("ERROR") + ": " + text);
 }
 
 void GrumpyEventHandler::OnSystemLog(QString text)

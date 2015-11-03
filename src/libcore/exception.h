@@ -65,6 +65,7 @@ namespace GrumpyIRC
             virtual QString GetMessage();
         private:
             int errc;
+            QString source;
             QString message;
             QString stack_tree;
     };

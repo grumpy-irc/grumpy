@@ -120,6 +120,7 @@ libircclient::Network *Scrollback::GetNetwork() const
 void Scrollback::SetDead(bool dead)
 {
     this->_dead = dead;
+    emit this->Event_ChangedDeadStatus();
 }
 
 Scrollback *Scrollback::GetParentScrollback()
@@ -253,7 +254,10 @@ ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclie
     this->_type = type;
     this->_text = text;
     this->_datetime = QDateTime::currentDateTime();
-    this->_user = libircclient::User(user);
+    if (user == NULL)
+        this->_user = NULL;
+    else
+        this->_user = libircclient::User(user);
 }
 
 ScrollbackItem::~ScrollbackItem()

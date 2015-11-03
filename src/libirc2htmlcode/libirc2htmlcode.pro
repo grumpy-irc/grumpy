@@ -11,10 +11,12 @@ TEMPLATE = lib
 
 DEFINES += LIBIRC2HTMLCODE_LIBRARY
 
-SOURCES += parser.cpp
+SOURCES += parser.cpp \
+    formatteditem.cpp
 
 HEADERS += parser.h\
-        libirc2htmlcode_global.h
+        libirc2htmlcode_global.h \
+    formatteditem.h
 
 unix {
     target.path = /usr/lib

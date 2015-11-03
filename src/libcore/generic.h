@@ -13,9 +13,14 @@
 #ifndef GENERIC_H
 #define GENERIC_H
 
+#include <QStringList>
 #include <QString>
 #include "libcore_global.h"
 #include <QList>
+
+#ifdef MessageBox
+    #undef MessageBox
+#endif
 
 namespace GrumpyIRC
 {
@@ -23,9 +28,19 @@ namespace GrumpyIRC
 
     namespace Generic
     {
+        enum MessageBox_Type
+        {
+            MessageBox_Type_Normal,
+            MessageBox_Type_Question,
+            MessageBox_Type_Warning,
+            MessageBox_Type_Error
+        };
+
         LIBCORESHARED_EXPORT bool String2Bool(QString string);
         LIBCORESHARED_EXPORT QString Bool2String(bool boolean);
+        LIBCORESHARED_EXPORT QStringList Trim(QStringList list);
         LIBCORESHARED_EXPORT bool IsGrumpy(Scrollback *window);
+        LIBCORESHARED_EXPORT int MessageBox(QString title, QString message, MessageBox_Type type, QObject *parent = 0);
     }
 }
 

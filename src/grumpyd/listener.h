@@ -13,6 +13,7 @@
 #ifndef LISTENER_H
 #define LISTENER_H
 
+#include "../libcore/definitions.h"
 #include <QString>
 #include <QTcpServer>
 #include <QObject>
@@ -24,7 +25,7 @@ namespace GrumpyIRC
         public:
             Listener(bool ssl = false);
         protected:
-            void incomingConnection(qintptr socketDescriptor) Q_DECL_OVERRIDE;
+            void incomingConnection(qintptr socketDescriptor);
             bool usingSSL;
     };
 }

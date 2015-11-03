@@ -13,6 +13,11 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
+#include <QObject>
+
+typedef unsigned int user_id_t;
+typedef unsigned long long scrollback_id_t;
+
 #define GRUMPY_VERSION_STRING "1.0.0"
 #define CONFIGURATION_FILE "grumpy.ini"
 #define CONFIGURATION_PATH "grumpyirc"
@@ -20,6 +25,9 @@
 
 #if defined _WIN64 || defined _WIN32
     #define GRUMPY_WIN
+#endif
+#if QT_VERSION < 0x050000
+    #define qintptr int
 #endif
 
 #endif // DEFINITIONS_H

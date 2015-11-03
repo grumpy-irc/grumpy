@@ -10,9 +10,14 @@
 
 // Copyright (c) Petr Bena 2015
 
-
 #ifndef GRUMPYCONF_H
 #define GRUMPYCONF_H
+
+#ifdef GCFG
+    #undef GCFG
+#endif
+
+#define GCFG CoreWrapper::GrumpyCore->GetConfiguration()
 
 #ifdef CONF
 #error "CONF is already defined, redefinig is not supported, grumpy can't be compiled with libraries that define their own CONF option"
@@ -31,7 +36,13 @@ namespace GrumpyIRC
             GrumpyConf();
             Configuration *GetConfiguration();
             QString GetQuitMessage();
-
+            void SetNick(QString nick);
+            bool WriteNoticesToSystem();
+            QString GetNick();
+            QString GetLineFormat();
+            QString GetNoticeFormat();
+            QString GetMessageFormat();
+            QString GetActionFormat();
     };
 }
 

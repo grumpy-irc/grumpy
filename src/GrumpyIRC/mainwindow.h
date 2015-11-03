@@ -47,15 +47,20 @@ namespace GrumpyIRC
             //! Return a pointer to widget that contains list of all windows
             ScrollbackList *GetScrollbackList();
             void WriteToSystemWindow(QString text);
+            void WriteToCurrentWindow(QString text);
             ScrollbackFrame *GetSystem();
             ScrollbackFrame *GetCurrentScrollbackFrame();
             UserWidget *GetUsers();
             void OpenGrumpy(QString hostname, int port, QString username, QString password, bool ssl);
             void OpenIRCNetworkLink(QString link);
-            void OpenServer(libirc::ServerAddress &server);
+            void OpenServer(libirc::ServerAddress server);
 
         private slots:
             void on_actionExit_triggered();
+
+            void on_actionConnect_triggered();
+
+            void on_actionAbout_triggered();
 
         private:
             void closeEvent(QCloseEvent *event);

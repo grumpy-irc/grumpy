@@ -18,21 +18,25 @@ using namespace GrumpyIRC;
 
 static int PrintHelp(TerminalParser *parser, QStringList params)
 {
-    std::cout << QCoreApplication::applicationName().toStdString() << std::endl << std::endl
+    Q_UNUSED(params);
+
+    std::cout << QCoreApplication::applicationName().toStdString() << " version " << GRUMPY_VERSION_STRING << std::endl << std::endl
               << "Following options can be used:" << std::endl << std::endl;
 
     foreach (TerminalItem i, parser->GetItems())
     {
         QString parameters = i.GetLong();
-        QString parameters_short = i.GetShort();
+        QString parameters_short;
+        if (i.GetShort() != 0)
+            parameters_short = QString(QChar(i.GetShort()));
         if (!parameters.isEmpty() && !parameters_short.isEmpty())
             parameters += " | " + parameters_short;
-        else
+        else if (!parameters_short.isEmpty())
             parameters += parameters_short;
         std::cout << "  " << parameters.toStdString() << ": " << i.GetHelp().toStdString() << std::endl;
     }
 
-    std::cout << std::endl << std::endl;
+    std::cout << std::endl;
     std::cout << "This software is open source, contribute at http://github.com/grumpy-irc" << std::endl;
 
     return TP_RESULT_SHUT;
@@ -82,6 +86,7 @@ bool TerminalParser::Parse(int argc, char **argv)
             if (item == NULL)
             {
                 std::cerr << "ERROR: unrecognized parameter: " << parameter.toStdString() << std::endl;
+                delete item;
                 return false;
             }
             expected_parameters = item->GetParameters();
@@ -97,6 +102,34 @@ bool TerminalParser::Parse(int argc, char **argv)
         else if (parameter.startsWith("-"))
         {
             // It's a single character(s), let's process them recursively
+            int symbol_px = 0;
+            while (parameter.size() > ++symbol_px)
+            {
+                char sx = parameter[symbol_px].toLatin1();
+                delete item;
+                item = this->GetItem(sx);
+                if (item == NULL)
+                {
+                    std::cerr << "ERROR: unrecognized parameter: -" << sx << std::endl;
+                    delete item;
+                    return false;
+                }
+                expected_parameters = item->GetParameters();
+                if (expected_parameters && symbol_px < parameter.size())
+                {
+                    std::cerr << "ERROR: not enough parameters provided for -" << sx << std::endl;
+                    delete item;
+                    return false;
+                }
+                if (expected_parameters)
+                    continue;
+                // let's process this item
+                if (item->Exec(this, parameter_buffer) == TP_RESULT_SHUT)
+                {
+                    delete item;
+                    return false;
+                }
+            }
         }
     }
     delete item;
@@ -128,6 +161,16 @@ QList<TerminalItem> TerminalParser::GetItems()
     return this->_items;
 }
 
+TerminalItem *TerminalParser::GetItem(char name)
+{
+    foreach(TerminalItem x, this->_items)
+    {
+        if (x.GetShort() == name)
+            return new TerminalItem(x);
+    }
+    return NULL;
+}
+
 TerminalItem::TerminalItem(char symbol, QString String, QString Help, int ParametersRequired, TP_Callback callback)
 {
     this->callb = callback;
@@ -142,18 +185,14 @@ QString TerminalItem::GetHelp()
     return this->_help;
 }
 
-QString TerminalItem::GetShort()
+char TerminalItem::GetShort()
 {
-    if (this->ch != 0)
-        return "-" + QChar(this->ch);
-    return "";
+    return this->ch;
 }
 
 QString TerminalItem::GetLong()
 {
-    if (this->string.isEmpty())
-        return "";
-    return "--" + this->string;
+    return this->string;
 }
 
 int TerminalItem::GetParameters()

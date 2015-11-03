@@ -15,6 +15,7 @@
 
 #include <QFrame>
 #include <QStandardItemModel>
+#include "../libirc2htmlcode/parser.h"
 #include "../libcore/scrollback.h"
 
 namespace Ui
@@ -32,6 +33,7 @@ namespace GrumpyIRC
 {
     class InputBox;
     class Scrollback;
+    class ScrollbackList_Node;
     class ScrollbackList_Window;
     class UserFrame;
     class NetworkSession;
@@ -41,6 +43,8 @@ namespace GrumpyIRC
             Q_OBJECT
 
         public:
+            static irc2htmlcode::Parser parser;
+
             explicit ScrollbackFrame(ScrollbackFrame *parentWindow = NULL, QWidget *parent = NULL, Scrollback *_scrollback = NULL);
             ~ScrollbackFrame();
             QString GetWindowName() const;
@@ -57,16 +61,18 @@ namespace GrumpyIRC
             bool IsNetwork();
             bool IsDead();
             void RequestClose();
+            void UpdateIcon();
             void RequestPart();
             void RequestDisconnect();
             //void SetParent(ScrollbackFrame* parentWindow);
             bool IsDeletable;
-			QStandardItem *TreeNode;
+            ScrollbackList_Node *TreeNode;
         private slots:
             void _insertText_(ScrollbackItem item);
             void UserList_Insert(libircclient::User *ux);
             void UserList_Remove(QString user);
             void UserList_Rename(QString old, libircclient::User *us);
+            void OnDead();
             void Refresh();
             void OnClosed();
             void NetworkChanged(libircclient::Network *network);

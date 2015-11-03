@@ -23,7 +23,7 @@
 #define GRUMPY_LOG(text)                 if (GrumpyIRC::Core::GrumpyCore && GrumpyIRC::Core::GrumpyCore->GetCurrentEventHandler()) \
                                          { GrumpyIRC::Core::GrumpyCore->GetCurrentEventHandler()->OnSystemLog(text); }
 // Error message
-#define GRUMPY_ERROR(text)    if (GrumpyIRC::Core::GrumpyCore && GrumpyIRC::Core::GrumpyCore->GetCurrentEventHandler()) \
+#define GRUMPY_ERROR(text)               if (GrumpyIRC::Core::GrumpyCore && GrumpyIRC::Core::GrumpyCore->GetCurrentEventHandler()) \
                                          { GrumpyIRC::Core::GrumpyCore->GetCurrentEventHandler()->OnError(text); }
 
 namespace GrumpyIRC
@@ -32,7 +32,7 @@ namespace GrumpyIRC
     {
         public:
             EventHandler();
-            ~EventHandler();
+            virtual ~EventHandler();
             virtual void OnMessage(unsigned long long ScrollbackID);
             virtual void OnDebug(QString text, unsigned int verbosity = 1);
             virtual void OnError(QString text);

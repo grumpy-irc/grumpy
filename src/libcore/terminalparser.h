@@ -16,6 +16,8 @@
 #define TP_RESULT_OK 0
 #define TP_RESULT_SHUT 1
 
+#include "definitions.h"
+
 #include "libcore_global.h"
 #include <QStringList>
 #include <QList>
@@ -32,7 +34,7 @@ namespace GrumpyIRC
         public:
             TerminalItem(char symbol, QString String, QString Help, int ParametersRequired, TP_Callback callback);
             QString GetHelp();
-            QString GetShort();
+            char GetShort();
             QString GetLong();
             int GetParameters();
             int Exec(TerminalParser *parser, QStringList parameters);
@@ -55,6 +57,7 @@ namespace GrumpyIRC
             bool Parse(int argc, char **argv);
             void Register(char ch, QString string, QString help, int parameters_required, TP_Callback callb);
             QList<TerminalItem> GetItems();
+            TerminalItem *GetItem(char name);
             TerminalItem *GetItem(QString name);
 
         private:

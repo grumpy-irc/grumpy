@@ -41,7 +41,7 @@ namespace GrumpyIRC
             virtual void Save();
 			unsigned int Verbosity;
 
-        private:
+        protected:
             QHash<QString, QVariant> Options;
     };
 

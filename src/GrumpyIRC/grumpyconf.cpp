@@ -14,7 +14,6 @@
 #include "../libcore/configuration.h"
 #include "corewrapper.h"
 #include "../libcore/core.h"
-#include "defaultconfig.h"
 
 using namespace GrumpyIRC;
 
@@ -35,5 +34,40 @@ QString GrumpyConf::GetQuitMessage()
     QString qm = GCFG->GetValueAsString("quit_message", "Grumpy IRC v. $version");
     qm.replace("$version", GRUMPY_VERSION_STRING);
     return qm;
+}
+
+void GrumpyConf::SetNick(QString nick)
+{
+    GCFG->SetValue("nick", QVariant(nick));
+}
+
+bool GrumpyConf::WriteNoticesToSystem()
+{
+    return GCFG->GetValueAsBool("write_notices_to_system", true);
+}
+
+QString GrumpyConf::GetNick()
+{
+    return GCFG->GetValueAsString("nick", "GrumpyUser");
+}
+
+QString GrumpyConf::GetLineFormat()
+{
+    return GCFG->GetValueAsString("line_format", "($time) $string");
+}
+
+QString GrumpyConf::GetNoticeFormat()
+{
+    return GCFG->GetValueAsString("notice_format", "[$nick] $string");
+}
+
+QString GrumpyConf::GetMessageFormat()
+{
+    return GCFG->GetValueAsString("message_format", "<$nick> $string");
+}
+
+QString GrumpyConf::GetActionFormat()
+{
+    return GCFG->GetValueAsString("action_format", "* $nick $string");
 }
 

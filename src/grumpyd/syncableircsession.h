@@ -32,6 +32,8 @@ namespace GrumpyIRC
             void ResyncChannel(libircclient::Channel* channel);
             void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete);
             ~SyncableIRCSession();
+        protected:
+            Configuration *GetConfiguration();
         //signals:
         public slots:
             void OnIRCSelfJoin(libircclient::Channel *channel);

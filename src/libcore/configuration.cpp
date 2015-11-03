@@ -11,6 +11,7 @@
 // Copyright (c) Petr Bena 2015
 
 #include "configuration.h"
+#include <QStringList>
 #include <QDebug>
 #include <QList>
 #include <QSettings>
@@ -78,7 +79,7 @@ void Configuration::SetValue(QString key, QVariant value)
 
 void Configuration::Load()
 {
-    QSettings::setDefaultFormat(QSettings::Format::IniFormat);
+    QSettings::setDefaultFormat(QSettings::IniFormat);
     QSettings settings(CONFIGURATION_FILE, QSettings::IniFormat);
     foreach (QString key, settings.allKeys())
         this->SetValue(key, settings.value(key));
@@ -90,6 +91,7 @@ void Configuration::Save()
     QSettings settings(CONFIGURATION_FILE, QSettings::IniFormat);
     foreach (QString key, this->Options.keys())
         settings.setValue(key, this->Options[key]);
+    settings.sync();
 }
 
 

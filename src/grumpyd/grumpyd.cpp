@@ -14,6 +14,9 @@
 #include <QSslSocket>
 #include "grumpyd.h"
 #include "corewrapper.h"
+#include "grumpyconf.h"
+#include "databasebin.h"
+#include "databasedummy.h"
 #include "databasexml.h"
 #include "sleeper.h"
 #include "listener.h"
@@ -23,6 +26,8 @@
 #include "../libgp/gp.h"
 
 using namespace GrumpyIRC;
+
+Grumpyd *Grumpyd::grumpyd = NULL;
 
 QString Grumpyd::GetCFPath()
 {
@@ -43,12 +48,12 @@ QString Grumpyd::GetDFPath()
 QString Grumpyd::GetPathSSLCert()
 {
     //! TODO load this from config
-    return "C:\\Users\\petr.bena\\grumpy\\test_cert\\cert.crt";
+    return GetCFPath() + "cert.crt";
 }
 
 QString Grumpyd::GetPathSSLKey()
 {
-    return "C:\\Users\\petr.bena\\grumpy\\test_cert\\privkey.pem";
+    return GetCFPath() + "privkey.pem";
 }
 
 bool Grumpyd::SSLIsAvailable()
@@ -73,6 +78,7 @@ bool Grumpyd::SSLIsAvailable()
 Grumpyd::Grumpyd()
 {
     running = true;
+    grumpyd = this;
     this->listener = new Listener();
     this->listenerSSL = new Listener(true);
 }
@@ -82,10 +88,25 @@ Grumpyd::~Grumpyd()
     delete this->listener;
 }
 
+DatabaseBackend *Grumpyd::GetBackend()
+{
+    return this->databaseBackend;
+}
+
+static DatabaseBackend *InstantiateStorage(QString type)
+{
+    if (type == "DatabaseDummy")
+        return new DatabaseDummy();
+    else if (type == "DatabaseXML")
+        return new DatabaseXML();
+    else
+        return new DatabaseBin();
+}
+
 void Grumpyd::Main()
 {
-    GRUMPY_LOG("Loading database");
-    this->databaseBackend = new DatabaseXML();
+    GRUMPY_LOG("Loading storage: " + CONF->GetStorage());
+    this->databaseBackend = InstantiateStorage(CONF->GetStorage());
     this->databaseBackend->LoadRoles();
     this->databaseBackend->LoadUsers();
     GRUMPY_LOG("Starting listeners");

@@ -43,7 +43,7 @@ GrumpydSession::GrumpydSession(Scrollback *System, QString Hostname, QString Use
 
 GrumpydSession::~GrumpydSession()
 {
-    delete this->systemWindow;
+    this->systemWindow->Close();
     GrumpydSession::Sessions_Lock.lock();
     GrumpydSession::Sessions.removeAll(this);
     GrumpydSession::Sessions_Lock.unlock();
@@ -185,7 +185,7 @@ IRCSession *GrumpydSession::GetSessionFromWindow(Scrollback *scrollback)
 void GrumpydSession::Connect()
 {
     if (this->IsConnected())
-            return;
+        return;
     delete this->socket;
     this->systemWindow->InsertText("Connecting to " + this->hostname);
     if (this->SSL)
@@ -217,6 +217,8 @@ void GrumpydSession::Connect()
 
 void GrumpydSession::OnSslHandshakeFailure(QList<QSslError> errors)
 {
+    foreach(QSslError x, errors)
+        GRUMPY_ERROR("SSL warning: " + x.errorString());
     ((QSslSocket*)this->socket)->ignoreSslErrors();
 }
 

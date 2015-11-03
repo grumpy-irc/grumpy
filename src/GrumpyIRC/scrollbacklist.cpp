@@ -16,8 +16,11 @@
 #include "mainwindow.h"
 #include "scrollbacklist.h"
 #include "../libcore/networksession.h"
+#include "../libcore/ircsession.h"
+#include "packetsnifferwin.h"
 #include "skin.h"
 #include "ui_scrollbacklist.h"
+#include "../libcore/generic.h"
 #include "scrollbackframe.h"
 #include "scrollbacksmanager.h"
 #include "scrollbacklist_node.h"
@@ -42,14 +45,14 @@ ScrollbackList::~ScrollbackList()
     delete this->ui;
 }
 
-void ScrollbackList::RegisterWindow(ScrollbackFrame *scrollback, QStandardItem *parent_node)
+void ScrollbackList::RegisterWindow(ScrollbackFrame *scrollback, ScrollbackList_Node *parent_node)
 {
     QStandardItem *root;
     if (parent_node != NULL)
         root = parent_node;
     else
         root = this->GetRootTreeItem();
-    QStandardItem *node = new ScrollbackList_Node(scrollback);
+    ScrollbackList_Node *node = new ScrollbackList_Node(scrollback);
     scrollback->TreeNode = node;
     root->appendRow(node);
     this->ui->treeView->expand(root->index());
@@ -60,7 +63,7 @@ QStandardItem *ScrollbackList::GetRootTreeItem()
     return this->root;
 }
 
-void ScrollbackList::UnregisterWindow(QStandardItem *node, QStandardItem *parent_n)
+void ScrollbackList::UnregisterWindow(ScrollbackList_Node *node, ScrollbackList_Node *parent_n)
 {
     QModelIndex index = this->model->indexFromItem(node);
     QModelIndex parent;
@@ -88,8 +91,9 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     Menu.addAction(menuClose);
     QAction *menuPart = NULL;
     QAction *menuDisconnect = NULL;
+    QAction *menuSniffer = NULL;
 
-    if (!wx->IsDeletable)
+    if (!wx->IsDeletable || !wx->IsDead())
         menuClose->setEnabled(false);
 
     if (wx->IsChannel())
@@ -104,6 +108,8 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     {
         menuDisconnect = new QAction(QObject::tr("Disconnect"), &Menu);
         Menu.addAction(menuDisconnect);
+        menuSniffer = new QAction(QObject::tr("Network sniffer"), &Menu);
+        Menu.addAction(menuSniffer);
     }
 
     QAction* selectedItem = Menu.exec(globalPos);
@@ -118,6 +124,9 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     } else if (selectedItem == menuDisconnect)
     {
         wx->RequestDisconnect();
+    } else if (selectedItem == menuSniffer)
+    {
+        this->sniffer(wx);
     }
 }
 
@@ -129,6 +138,24 @@ void ScrollbackList::switchWindow(const QModelIndex &index)
     if (!node)
         return;
     MainWindow::Main->GetScrollbackManager()->SwitchWindow(node->GetScrollback());
+}
+
+void ScrollbackList::sniffer(ScrollbackFrame *window)
+{
+    NetworkSession *session = window->GetSession();
+    if (!session)
+        return;
+    if (session->GetType() == SessionType_IRC)
+    {
+        PacketSnifferWin *wx = new PacketSnifferWin();
+        wx->setAttribute(Qt::WA_DeleteOnClose);
+        wx->Load((IRCSession*)session);
+        wx->show();
+    }
+    else
+    {
+        Generic::MessageBox("Unsupported", "This protocol doesn't support this feature", Generic::MessageBox_Type_Error);
+    }
 }
 
 void ScrollbackList::closeWindow()

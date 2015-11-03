@@ -29,8 +29,18 @@ void DatabaseXML::LoadRoles()
 void DatabaseXML::LoadUsers()
 {
     User::UserInfo.clear();
-    User *test = new User("user", "pw");
-    test->SetRole(Role::Roles["root"]);
-    User::UserInfo.append(test);
+
+}
+
+QHash<QString, QVariant> DatabaseXML::GetConfiguration(user_id_t user)
+{
+    QHash<QString, QVariant> hash;
+
+    return hash;
+}
+
+void DatabaseXML::SetConfiguration(user_id_t user, QHash<QString, QVariant> data)
+{
+
 }
 

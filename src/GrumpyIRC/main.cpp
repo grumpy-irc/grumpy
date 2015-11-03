@@ -12,14 +12,17 @@
 
 // This file must be included first because it defines GRUMPY_WIN
 #include "../libcore/definitions.h"
-#include <windows.h>
+
+#ifdef GRUMPY_WIN
+    #include <windows.h>
+#endif
 #include "mainwindow.h"
 #include "corewrapper.h"
 #include "grumpyeventhandler.h"
 #include "../libcore/autocompletionengine.h"
+#include "../libcore/core.h"
 #include "inputbox.h"
 #include "widgetfactory.h"
-#include "../libcore/core.h"
 #include <QApplication>
 
 using namespace GrumpyIRC;

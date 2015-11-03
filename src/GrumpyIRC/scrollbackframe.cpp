@@ -17,8 +17,8 @@
 #include "../libcore/core.h"
 #include "../libirc/libircclient/user.h"
 #include "corewrapper.h"
-#include "defaultconfig.h"
 #include "grumpyconf.h"
+#include "scrollbacklist_node.h"
 #include "skin.h"
 #include "scrollbackframe.h"
 #include "scrollbacksmanager.h"
@@ -28,6 +28,8 @@
 
 using namespace GrumpyIRC;
 
+irc2htmlcode::Parser ScrollbackFrame::parser;
+
 ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent, Scrollback *_scrollback) : QFrame(parent), ui(new Ui::ScrollbackFrame)
 {
     this->ui->setupUi(this);
@@ -35,12 +37,14 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     this->ui->splitter->addWidget(this->inputBox);
     this->ui->textEdit->setPalette(Skin::Default->Palette());
     this->_parent = parentWindow;
+    this->TreeNode = NULL;
     this->userFrame = new UserFrame();
     if (_scrollback == NULL)
         this->scrollback = new Scrollback();
     else
         this->scrollback = _scrollback;
     connect(this->scrollback, SIGNAL(Event_NetworkModified(libircclient::Network*)), this, SLOT(NetworkChanged(libircclient::Network*)));
+    connect(this->scrollback, SIGNAL(Event_ChangedDeadStatus()), this, SLOT(OnDead()));
     connect(this->scrollback, SIGNAL(Event_UserInserted(libircclient::User*)), this, SLOT(UserList_Insert(libircclient::User*)));
     connect(this->scrollback, SIGNAL(Event_Reload()), this, SLOT(Refresh()));
     connect(this->scrollback, SIGNAL(Event_UserAltered(QString,libircclient::User*)), this, SLOT(UserList_Rename(QString,libircclient::User*)));
@@ -51,7 +55,7 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
 
 ScrollbackFrame::~ScrollbackFrame()
 {
-    delete this->scrollback;
+    //delete this->scrollback;
     delete this->userFrame;
     //! \todo Handle deletion of TreeNode from list of scbs
     //delete this->TreeNode;
@@ -75,7 +79,7 @@ void ScrollbackFrame::InsertText(ScrollbackItem item)
 
 static QString FormatAction(libircclient::User user, QString action, bool full_user)
 {
-    QString result = CONFIG_ACTION_FORMAT;
+    QString result = CONF->GetActionFormat();
     QString name;
     // we don't want to display full user information for simple actions and so on
     if (full_user)
@@ -87,56 +91,62 @@ static QString FormatAction(libircclient::User user, QString action, bool full_u
     return result;
 }
 
-static QString EncodedHtml(QString text)
-{
-    text.replace("<", "&lt;");
-    text.replace(">", "&gt;");
-
-    return text;
-}
-
 static QString ItemToString(ScrollbackItem item)
 {
     // Render the text according to our formatting
     //! \todo This needs to be precached otherwise we need to build this string every fucking time
-    QString format_string = CONFIG_LINE_FORMAT;
-    format_string.replace("$time", item.GetTime().toString());
-    QString result;
+    QString format_string = CONF->GetLineFormat();
+    QString text = item.GetText();
+    QString user = item.GetUser().GetNick();
+    //format_string.replace("$time", item.GetTime().toString());
+    //QString result;
     switch (item.GetType())
     {
         case ScrollbackItemType_Act:
-            result = FormatAction(item.GetUser(), item.GetText(), false);
+            //result = FormatAction(item.GetUser(), item.GetText(), false);
+            format_string.replace("$string", CONF->GetActionFormat());
             break;
         case ScrollbackItemType_Join:
-            result = FormatAction(item.GetUser(), "joined channel", true);
+            format_string.replace("$string", CONF->GetActionFormat());
+            user = item.GetUser().ToString();
+            text = "joined channel";
+            //result = FormatAction(item.GetUser(), "joined channel", true);
             break;
         case ScrollbackItemType_Part:
+            format_string.replace("$string", CONF->GetActionFormat());
+            user = item.GetUser().ToString();
             if (item.GetText().isEmpty())
-                result = FormatAction(item.GetUser(), "left channel", true);
+                text = "left channel";
             else
-                result = FormatAction(item.GetUser(), "left channel (" + item.GetText() + ")", true);
+                text = "left channel (" + item.GetText() + ")";
             break;
         case ScrollbackItemType_Quit:
-            result = FormatAction(item.GetUser(), QString("quit (") + item.GetText() + ")", true);
+            format_string.replace("$string", CONF->GetActionFormat());
+            user = item.GetUser().ToString();
+            text = "quit (" + item.GetText() + ")";
             break;
         case ScrollbackItemType_Kick:
-            result = FormatAction(item.GetUser(), item.GetText(), true);
+            format_string.replace("$string", CONF->GetActionFormat());
+
             break;
         case ScrollbackItemType_Nick:
-            result = FormatAction(item.GetUser(), QString("changed nick to ") + item.GetText(), false);
+            format_string.replace("$string", CONF->GetActionFormat());
+            text = "changed nick to ";
+            break;
+        case ScrollbackItemType_Notice:
+            format_string.replace("$string", CONF->GetNoticeFormat());
             break;
         case ScrollbackItemType_Message:
-            result = CONFIG_MESSAGE_FORMAT;
-            result.replace("$nick", item.GetUser().GetNick());
-            result.replace("$string", item.GetText());
+            format_string.replace("$string", CONF->GetMessageFormat());
             break;
         case ScrollbackItemType_System:
         case ScrollbackItemType_Unknown:
-            result = item.GetText();
+            //result = item.GetText();
             break;
     }
-    format_string.replace("$string", result);
-    return format_string;
+    //format_string.replace("$string", result);
+    irc2htmlcode::FormattedItem results = ScrollbackFrame::parser.Process(format_string, item.GetTime(), user, text);
+    return results.source;
 }
 
 void ScrollbackFrame::_insertText_(ScrollbackItem item)
@@ -144,7 +154,7 @@ void ScrollbackFrame::_insertText_(ScrollbackItem item)
     int scroll = 0;
     if (this->ui->textEdit->verticalScrollBar()->maximum() != this->ui->textEdit->verticalScrollBar()->value())
         scroll = this->ui->textEdit->verticalScrollBar()->value();
-    this->buffer += EncodedHtml(ItemToString(item)) + "<br>\n";
+    this->buffer += ItemToString(item) + "<br>\n";
     this->ui->textEdit->setHtml(buffer);
     // Scroll to bottom
     // We need to do this only if the text was on bottom in past
@@ -168,11 +178,17 @@ void ScrollbackFrame::UserList_Rename(QString old, libircclient::User *us)
     this->userFrame->ChangeNick(us->GetNick(), old);
 }
 
+void ScrollbackFrame::OnDead()
+{
+    this->UpdateIcon();
+}
+
 void ScrollbackFrame::Refresh()
 {
     this->buffer.clear();
     foreach (ScrollbackItem item, this->scrollback->GetItems())
         this->_insertText_(item);
+    this->UpdateIcon();
 }
 
 void ScrollbackFrame::OnClosed()
@@ -249,6 +265,10 @@ bool ScrollbackFrame::IsDead()
 
 void ScrollbackFrame::RequestClose()
 {
+    if (!this->IsDead())
+    {
+        return;
+    }
 	// We need to figure out if we are closing the system window, in that case we need to also delete the corresponding network session that it belonged to
 	// the check for system window needs to be done before we request it to be closed as that might remove the reference to it
 	NetworkSession *session = NULL;
@@ -260,7 +280,13 @@ void ScrollbackFrame::RequestClose()
 		// Call to RequestRemove probably called delete on this very scrollback frame, so now we are within a deleted object, be carefull here not to access internal memory
 		if (session)
 			delete session;
-	}
+    }
+}
+
+void ScrollbackFrame::UpdateIcon()
+{
+    if (this->TreeNode)
+        this->TreeNode->UpdateIcon();
 }
 
 void ScrollbackFrame::RequestPart()

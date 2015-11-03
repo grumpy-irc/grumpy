@@ -11,6 +11,7 @@
 // Copyright (c) Petr Bena 2015
 
 #include "core.h"
+#include "configuration.h"
 #include "ircsession.h"
 #include "eventhandler.h"
 #include "../libirc/libircclient/parser.h"
@@ -77,6 +78,8 @@ IRCSession::~IRCSession()
     IRCSession::Sessions_Lock.lock();
     IRCSession::Sessions.removeOne(this);
     IRCSession::Sessions_Lock.unlock();
+    qDeleteAll(this->data);
+    this->data.clear();
     delete this->network;
 }
 
@@ -161,11 +164,9 @@ void IRCSession::Connect(libircclient::Network *Network)
         throw new Exception("You can't connect to ircsession that is active, disconnect first", BOOST_CURRENT_FUNCTION);
 
     this->systemWindow->InsertText("Connecting to " + Network->GetServerAddress());
-
-    if (this->network)
-        delete this->network;
-
+    delete this->network;
     this->network = Network;
+    connect(this->network, SIGNAL(Event_RawOutgoing(QByteArray)), this, SLOT(OnOutgoingRawMessage(QByteArray)));
     connect(this->network, SIGNAL(Event_ConnectionFailure(QAbstractSocket::SocketError)), this, SLOT(OnConnectionFail(QAbstractSocket::SocketError)));
     connect(this->network, SIGNAL(Event_RawIncoming(QByteArray)), this, SLOT(OnIncomingRawMessage(QByteArray)));
     connect(this->network, SIGNAL(Event_Unknown(libircclient::Parser*)), this, SLOT(OnUnknown(libircclient::Parser*)));
@@ -209,14 +210,14 @@ SessionType IRCSession::GetType()
 
 void IRCSession::SyncWindows(QHash<QString, QVariant> windows, QHash<QString, Scrollback*> *hash)
 {
+    // this is most likely a remote IRC session managed by grumpyd because nothing else would
+    // deserialize it, but just to be sure we check once more and grab the pointer to grumpyd
+    // in case it really is that
+    NetworkSession *window_session = this;
+    if (this->Root && Generic::IsGrumpy(this->Root))
+        window_session = this->Root->GetSession();
     foreach (QVariant xx, windows.values())
     {
-        // this is most likely a remote IRC session managed by grumpyd because nothing else would
-        // deserialize it, but just to be sure we check once more and grab the pointer to grumpyd
-        // in case it really is that
-        NetworkSession *window_session = this;
-        if (this->Root && this->Root->GetParentScrollback() && Generic::IsGrumpy(this->Root->GetParentScrollback()))
-            window_session = this->Root->GetParentScrollback()->GetSession();
         QString name = "unknown_scrollback";
         QHash<QString, QVariant> scrollback_h = xx.toHash();
         if (scrollback_h.contains("_target"))
@@ -243,11 +244,17 @@ void IRCSession::SyncWindows(QHash<QString, QVariant> windows, QHash<QString, Sc
 
 Scrollback *IRCSession::GetScrollbackForUser(QString user)
 {
-    user = user.toLower();
-    if (!this->users.contains(user))
-        return NULL;
+    QString user_l = user.toLower();
+    if (!this->users.contains(user_l))
+    {
+        Scrollback *sx = Core::GrumpyCore->NewScrollback(this->systemWindow, user, ScrollbackType_User);
+        sx->SetSession(this);
+        emit this->Event_ScrollbackIsOpen(sx);
+        this->users.insert(user_l, sx);
+        return sx;
+    }
 
-    return this->users[user];
+    return this->users[user_l];
 }
 
 QHash<QString, QVariant> IRCSession::ToHash()
@@ -338,6 +345,11 @@ void IRCSession::RegisterChannel(libircclient::Channel *channel, Scrollback *win
     this->channels.insert(channel->GetName().toLower(), window);
     if (!this->GetNetwork()->GetChannel(channel->GetName()))
         this->GetNetwork()->_st_InsertChannel(channel);
+}
+
+void IRCSession::OnOutgoingRawMessage(QByteArray message)
+{
+    this->data.append(new NetworkSniffer_Item(message, true));
 }
 
 void IRCSession::SendMessage(Scrollback *window, QString text)
@@ -477,7 +489,10 @@ void IRCSession::OnNotice(libircclient::Parser *px)
     // if target is current user we need to find target scrollback based on a user's nick
     if (target.toLower() == this->network->GetLocalUserInfo()->GetNick().toLower())
     {
-        sx = this->GetScrollbackForUser(px->GetSourceUserInfo()->GetNick());
+        if (this->GetConfiguration()->GetValueAsBool("write_notices_to_system", true))
+            sx = this->GetSystemWindow();
+        else
+            sx = this->GetScrollbackForUser(px->GetSourceUserInfo()->GetNick());
     } else
     {
         sx = this->GetScrollbackForChannel(target);
@@ -490,6 +505,11 @@ void IRCSession::OnNotice(libircclient::Parser *px)
     sx->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Notice, px->GetSourceUserInfo()));
 }
 
+Configuration *IRCSession::GetConfiguration()
+{
+    return Core::GrumpyCore->GetConfiguration();
+}
+
 void IRCSession::_gs_ResyncNickChange(QString new_, QString old_)
 {
     // now check all scrollbacks for this user, we don't need to write any message to scrollback itself, that was already handled
@@ -498,7 +518,6 @@ void IRCSession::_gs_ResyncNickChange(QString new_, QString old_)
     // this would be much more easier to implement if we just resynced the whole channel list structure on its every change:
     // one function to rule them all? :) but that would be incredible overhead as we would need to resync on every change
     // while this tiny packet is enough (let's try to be more efficient than others)
-
     foreach (libircclient::Channel *channel, this->GetNetwork()->GetChannels())
     {
         if (!channel->ContainsUser(old_))
@@ -532,7 +551,7 @@ void IRCSession::rmWindow(Scrollback *window)
 
 void IRCSession::OnIncomingRawMessage(QByteArray message)
 {
-    //this->systemWindow->InsertText(QString(message));
+    this->data.append(new NetworkSniffer_Item(message, false));
 }
 
 void IRCSession::OnConnectionFail(QAbstractSocket::SocketError er)
@@ -606,3 +625,14 @@ void IRCSession::OnNICK(libircclient::Parser *px, QString old_, QString new_)
     }
 }
 
+NetworkSniffer_Item::NetworkSniffer_Item(QByteArray data, bool is_outgoing)
+{
+    this->_outgoing = is_outgoing;
+    this->Text = QString(data);
+    this->Time = QDateTime::currentDateTime();
+}
+
+QList<GrumpyIRC::NetworkSniffer_Item*> GrumpyIRC::IRCSession::GetSniffer()
+{
+    return this->data;
+}

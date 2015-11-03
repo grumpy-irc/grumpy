@@ -13,6 +13,8 @@
 #ifndef GDUSER_H
 #define GDUSER_H
 
+#include "../libcore/definitions.h"
+
 #include <QList>
 #include <QString>
 #include "../libirc/libirc/serveraddress.h"
@@ -20,6 +22,7 @@
 namespace GrumpyIRC
 {
     class Session;
+    class UserConf;
     class Role;
     class SyncableIRCSession;
 
@@ -35,7 +38,8 @@ namespace GrumpyIRC
              */
             static User *Login(QString user, QString pw);
 
-            User(QString Name, QString Password);
+            User(QString Name, QString Password, user_id_t User_ID);
+            ~User();
             void InsertSession(Session *sx);
             QString GetName() const;
             void RemoveSession(Session *sx);
@@ -45,11 +49,15 @@ namespace GrumpyIRC
             Session *GetAnyGPSession();
             SyncableIRCSession *GetSIRCSession(unsigned int sid);
             QList<SyncableIRCSession*> GetSIRCSessions();
+            UserConf *GetConfiguration();
+            user_id_t GetID();
             void SetRole(Role *rx);
             QString DefaultNick;
 
         private:
+            user_id_t id;
             Role *role;
+            UserConf *conf;
             QList<Session*> sessions_gp;
             QList<SyncableIRCSession*> sessions;
             QString username;

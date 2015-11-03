@@ -10,15 +10,17 @@
 
 // Copyright (c) Petr Bena 2015
 
+#include "aboutwin.h"
 #include "corewrapper.h"
 #include "mainwindow.h"
+#include "connectwin.h"
 #include "scrollbacklist.h"
 #include "ui_mainwindow.h"
 #include "userwidget.h"
+#include "grumpyconf.h"
 #include "scrollbackframe.h"
 #include "../libcore/generic.h"
 #include "syslogwindow.h"
-#include "defaultconfig.h"
 #include "scrollbacksmanager.h"
 #include "skin.h"
 #include "../libirc/libircclient/network.h"
@@ -84,7 +86,7 @@ static int SystemCommand_Nick(SystemCommand *command, CommandArgs args)
     }
     else
     {
-        SET_CONFIG_NICK(args.Parameters[0]);
+        CONF->SetNick(args.Parameters[0]);
         scrollback->InsertText(QString("Your default nick was changed to " + args.Parameters[0]));
         return 0;
     }
@@ -113,6 +115,19 @@ static int SystemCommand_Grumpy(SystemCommand *command, CommandArgs command_args
         return 0;
     }
     MainWindow::Main->OpenGrumpy(command_args.Parameters[0], GP_DEFAULT_SSL_PORT, command_args.Parameters[1], command_args.Parameters[2], true);
+    return 0;
+}
+
+static int SystemCommand_UnsecureGrumpy(SystemCommand *command, CommandArgs command_args)
+{
+    Q_UNUSED(command);
+    // if there is no parameter we throw some error
+    if (command_args.Parameters.count() < 3)
+    {
+        GRUMPY_ERROR(QObject::tr("This command requires exactly 3 parameters"));
+        return 0;
+    }
+    MainWindow::Main->OpenGrumpy(command_args.Parameters[0], GP_DEFAULT_PORT, command_args.Parameters[1], command_args.Parameters[2], false);
     return 0;
 }
 
@@ -166,6 +181,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("nick", (SC_Callback)SystemCommand_Nick));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.netstat", (SC_Callback)SystemCommand_Netstat));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.next_session_nick", (SC_Callback)SystemCommand_NextSessionNick));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("unsecuregrumpyd", (SC_Callback)SystemCommand_UnsecureGrumpy));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpyd", (SC_Callback)SystemCommand_Grumpy));
     // Welcome user
     this->systemWindow->InsertText(QString("Grumpy irc version " + GCFG->GetVersion()));
@@ -196,6 +212,11 @@ void MainWindow::WriteToSystemWindow(QString text)
     this->systemWindow->InsertText(text);
 }
 
+void MainWindow::WriteToCurrentWindow(QString text)
+{
+    this->scrollbackWindow->GetCurrentScrollback()->InsertText(text);
+}
+
 ScrollbackFrame *MainWindow::GetSystem()
 {
     return this->systemWindow;
@@ -223,11 +244,11 @@ void MainWindow::OpenIRCNetworkLink(QString link)
     MainWindow::Main->OpenServer(libirc::ServerAddress(link));
 }
 
-void MainWindow::OpenServer(libirc::ServerAddress &server)
+void MainWindow::OpenServer(libirc::ServerAddress server)
 {
     if (server.GetNick().isEmpty())
     {
-        QString nick = CONFIG_NICK;
+        QString nick = CONF->GetNick();
         if (GCFG->GetValueAsString("next-session-nick", nick) != nick)
         {
             nick = GCFG->GetValueAsString("next-session-nick");
@@ -249,4 +270,18 @@ void MainWindow::on_actionExit_triggered()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     Exit();
+}
+
+void GrumpyIRC::MainWindow::on_actionConnect_triggered()
+{
+    ConnectWin *wx = new ConnectWin(this);
+    wx->setAttribute(Qt::WA_DeleteOnClose);
+    wx->show();
+}
+
+void GrumpyIRC::MainWindow::on_actionAbout_triggered()
+{
+    AboutWin *wx = new AboutWin(this);
+    wx->setAttribute(Qt::WA_DeleteOnClose);
+    wx->show();
 }

@@ -34,6 +34,18 @@ void DatabaseBin::LoadUsers()
 
 }
 
+QHash<QString, QVariant> DatabaseBin::GetConfiguration(user_id_t user)
+{
+    QHash<QString, QVariant> hash;
+
+    return hash;
+}
+
+void DatabaseBin::SetConfiguration(user_id_t user, QHash<QString, QVariant> data)
+{
+
+}
+
 QString DatabaseBin::getDFPath()
 {
     QString path = Grumpyd::GetDFPath() + "db_bin/";

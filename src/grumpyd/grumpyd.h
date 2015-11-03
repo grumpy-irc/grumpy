@@ -27,6 +27,7 @@ namespace GrumpyIRC
     {
             Q_OBJECT
         public:
+            static Grumpyd *grumpyd;
             static QString GetCFPath();
             static QString GetDFPath();
             static QString GetPathSSLCert();
@@ -35,6 +36,7 @@ namespace GrumpyIRC
 
             Grumpyd();
             ~Grumpyd();
+            DatabaseBackend *GetBackend();
 
         public slots:
             void Main();

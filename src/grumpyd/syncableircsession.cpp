@@ -12,6 +12,7 @@
 
 #include "syncableircsession.h"
 #include "virtualscrollback.h"
+#include "userconfiguration.h"
 #include "user.h"
 #include "session.h"
 #include "../libcore/core.h"
@@ -89,6 +90,11 @@ void SyncableIRCSession::RequestDisconnect(Scrollback *window, QString reason, b
 SyncableIRCSession::~SyncableIRCSession()
 {
 
+}
+
+Configuration *SyncableIRCSession::GetConfiguration()
+{
+    return this->owner->GetConfiguration();
 }
 
 void SyncableIRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
