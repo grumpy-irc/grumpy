@@ -82,6 +82,7 @@ bool TerminalParser::Parse(int argc, char **argv)
             if (item == NULL)
             {
                 std::cerr << "ERROR: unrecognized parameter: " << parameter.toStdString() << std::endl;
+                delete item;
                 return false;
             }
             expected_parameters = item->GetParameters();
@@ -97,6 +98,34 @@ bool TerminalParser::Parse(int argc, char **argv)
         else if (parameter.startsWith("-"))
         {
             // It's a single character(s), let's process them recursively
+            int symbol_px = 0;
+            while (parameter.size() > ++symbol_px)
+            {
+                char sx = parameter[symbol_px].toLatin1();
+                delete item;
+                item = this->GetItem(sx);
+                if (item == NULL)
+                {
+                    std::cerr << "ERROR: unrecognized parameter: -" << sx << std::endl;
+                    delete item;
+                    return false;
+                }
+                expected_parameters = item->GetParameters();
+                if (expected_parameters && symbol_px < parameter.size())
+                {
+                    std::cerr << "ERROR: not enough parameters provided for -" << sx << std::endl;
+                    delete item;
+                    return false;
+                }
+                if (expected_parameters)
+                    continue;
+                // let's process this item
+                if (item->Exec(this, parameter_buffer) == TP_RESULT_SHUT)
+                {
+                    delete item;
+                    return false;
+                }
+            }
         }
     }
     delete item;
@@ -128,6 +157,16 @@ QList<TerminalItem> TerminalParser::GetItems()
     return this->_items;
 }
 
+TerminalItem *TerminalParser::GetItem(char name)
+{
+    foreach(TerminalItem x, this->_items)
+    {
+        if (x.GetShort() == name)
+            return new TerminalItem(x);
+    }
+    return NULL;
+}
+
 TerminalItem::TerminalItem(char symbol, QString String, QString Help, int ParametersRequired, TP_Callback callback)
 {
     this->callb = callback;
@@ -142,18 +181,14 @@ QString TerminalItem::GetHelp()
     return this->_help;
 }
 
-QString TerminalItem::GetShort()
+char TerminalItem::GetShort()
 {
-    if (this->ch != 0)
-        return "-" + QChar(this->ch);
-    return "";
+    return this->ch;
 }
 
 QString TerminalItem::GetLong()
 {
-    if (this->string.isEmpty())
-        return "";
-    return "--" + this->string;
+    return this->string;
 }
 
 int TerminalItem::GetParameters()

@@ -96,6 +96,9 @@ void InputBox::History(bool up)
             return;
         this->ui->textEdit->setText(this->history[++this->historyPosition]);
     }
+    QTextCursor cursor = this->ui->textEdit->textCursor();
+    cursor.setPosition(this->ui->textEdit->toPlainText().size());
+    this->ui->textEdit->setTextCursor(cursor);
 }
 
 void InputBox::insertToHistory()
