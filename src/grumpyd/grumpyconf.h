@@ -40,6 +40,7 @@ namespace GrumpyIRC
             QString GetNick();
             QString GetStorage();
             bool Daemon;
+            bool StorageDummy;
     };
 }
 

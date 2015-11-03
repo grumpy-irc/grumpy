@@ -60,6 +60,16 @@ int daemonize()
     return DAEMONIZE_SUCCESS;
 }
 
+//! This will enable the dummy database if user wants that
+int dummy(GrumpyIRC::TerminalParser *parser, QStringList params)
+{
+    Q_UNUSED(params);
+    Q_UNUSED(parser);
+    CONF->StorageDummy = true;
+
+    return TP_RESULT_OK;
+}
+
 int main(int argc, char *argv[])
 {
     try
@@ -69,6 +79,7 @@ int main(int argc, char *argv[])
         CONF = new GrumpyIRC::GrumpyConf();
         // First of all we need to process the arguments and then do other stuff
         GrumpyIRC::TerminalParser *tp = new GrumpyIRC::TerminalParser();
+        tp->Register(0, "dummy", "Use dummy as a storage backend, useful for debugging.", 0, (GrumpyIRC::TP_Callback)dummy);
         if (!tp->Parse(argc, argv))
         {
             // We processed some argument which requires the application to exit
