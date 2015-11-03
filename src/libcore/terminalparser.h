@@ -16,6 +16,8 @@
 #define TP_RESULT_OK 0
 #define TP_RESULT_SHUT 1
 
+#include "definitions.h"
+
 #include "libcore_global.h"
 #include <QStringList>
 #include <QList>

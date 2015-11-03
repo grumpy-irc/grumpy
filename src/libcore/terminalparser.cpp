@@ -18,7 +18,7 @@ using namespace GrumpyIRC;
 
 static int PrintHelp(TerminalParser *parser, QStringList params)
 {
-    std::cout << QCoreApplication::applicationName().toStdString() << std::endl << std::endl
+    std::cout << QCoreApplication::applicationName().toStdString() << " v. " << GRUMPY_VERSION_STRING << std::endl
               << "Following options can be used:" << std::endl << std::endl;
 
     foreach (TerminalItem i, parser->GetItems())
