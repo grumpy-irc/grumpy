@@ -15,6 +15,8 @@
 
 #include "../libcore/definitions.h"
 
+#include <QHash>
+
 namespace GrumpyIRC
 {
     class DatabaseBackend

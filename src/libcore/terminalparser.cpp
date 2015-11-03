@@ -24,7 +24,7 @@ static int PrintHelp(TerminalParser *parser, QStringList params)
     foreach (TerminalItem i, parser->GetItems())
     {
         QString parameters = i.GetLong();
-        QString parameters_short = i.GetShort();
+        QString parameters_short = QString(QChar(i.GetShort()));
         if (!parameters.isEmpty() && !parameters_short.isEmpty())
             parameters += " | " + parameters_short;
         else
