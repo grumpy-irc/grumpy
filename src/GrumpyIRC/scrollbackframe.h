@@ -15,6 +15,7 @@
 
 #include <QFrame>
 #include <QStandardItemModel>
+#include "../libirc2htmlcode/parser.h"
 #include "../libcore/scrollback.h"
 
 namespace Ui
@@ -42,6 +43,8 @@ namespace GrumpyIRC
             Q_OBJECT
 
         public:
+            static irc2htmlcode::Parser parser;
+
             explicit ScrollbackFrame(ScrollbackFrame *parentWindow = NULL, QWidget *parent = NULL, Scrollback *_scrollback = NULL);
             ~ScrollbackFrame();
             QString GetWindowName() const;

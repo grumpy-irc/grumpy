@@ -41,5 +41,5 @@ ADD_EXECUTABLE(grumpy ${src} ${grumpy_HEADERS_MOC} ${headers} ${grumpy_RESOURCES
 if (QT5_BUILD)
     qt5_use_modules(grumpy Core Multimedia Gui Widgets Xml)
 endif()
-TARGET_LINK_LIBRARIES(grumpy core ${QT_LIBRARIES})
+TARGET_LINK_LIBRARIES(grumpy core irc2htmlcode ${QT_LIBRARIES})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})

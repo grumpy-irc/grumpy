@@ -14,11 +14,31 @@
 #define PARSER_H
 
 #include "libirc2htmlcode_global.h"
+#include "formatteditem.h"
+#include <QHash>
 
-class LIBIRC2HTMLCODESHARED_EXPORT Parser
+namespace irc2htmlcode
 {
-    public:
-        Parser();
-};
+    class LIBIRC2HTMLCODESHARED_EXPORT Parser
+    {
+        public:
+            Parser();
+            ~Parser();
+            FormattedItem Process(QString format, QDateTime time, QString user, QString text);
+            QString UserColor;
+            QString TimeColor;
+            QString TextColor;
+            QString EncodeHtml(QString text);
+
+        private:
+            QString formatTime(QDateTime time);
+            QString formatUser(QString user);
+            QString formatText(QString text);
+            int resolveCacheSize;
+            unsigned long long cacheHits;
+            unsigned long long cacheMiss;
+            QHash<QString, FormattedItem> resolveCache;
+    };
+}
 
 #endif // PARSER_H
