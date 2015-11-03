@@ -18,6 +18,8 @@ using namespace GrumpyIRC;
 
 static int PrintHelp(TerminalParser *parser, QStringList params)
 {
+    Q_UNUSED(params);
+
     std::cout << QCoreApplication::applicationName().toStdString() << " version " << GRUMPY_VERSION_STRING << std::endl << std::endl
               << "Following options can be used:" << std::endl << std::endl;
 
@@ -26,7 +28,7 @@ static int PrintHelp(TerminalParser *parser, QStringList params)
         QString parameters = i.GetLong();
         QString parameters_short;
         if (i.GetShort() != 0)
-            parameters_short = QString(QChar(i.GetShort());
+            parameters_short = QString(QChar(i.GetShort()));
         if (!parameters.isEmpty() && !parameters_short.isEmpty())
             parameters += " | " + parameters_short;
         else if (!parameters_short.isEmpty())
