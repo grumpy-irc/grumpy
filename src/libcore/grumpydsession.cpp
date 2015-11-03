@@ -185,7 +185,7 @@ IRCSession *GrumpydSession::GetSessionFromWindow(Scrollback *scrollback)
 void GrumpydSession::Connect()
 {
     if (this->IsConnected())
-            return;
+        return;
     delete this->socket;
     this->systemWindow->InsertText("Connecting to " + this->hostname);
     if (this->SSL)
