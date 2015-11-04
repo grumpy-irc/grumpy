@@ -29,6 +29,7 @@ Scrollback::Scrollback(ScrollbackType Type, Scrollback *parent)
     ScrollbackList_Mutex.unlock();
     this->session = NULL;
     this->_dead = false;
+    this->_lastItemID = 0;
     this->_network = NULL;
     this->type = Type;
     this->_id = lastID++;
@@ -44,6 +45,7 @@ Scrollback::Scrollback(QHash<QString, QVariant> hash)
     ScrollbackList_Mutex.unlock();
     this->session = NULL;
     this->_dead = false;
+    this->_lastItemID   = 0;
     this->_network = NULL;
     this->_original_id = 0;
     this->_id = 0;
@@ -128,13 +130,24 @@ Scrollback *Scrollback::GetParentScrollback()
     return this->parentSx;
 }
 
-QHash<QString, QVariant> Scrollback::ToHash()
+QHash<QString, QVariant> Scrollback::ToHash(int max)
 {
     QHash<QString, QVariant> hash = this->ToPartialHash();
     QList<QVariant> variant_items_list;
     hash.insert("type", static_cast<int>(this->type));
-    foreach (ScrollbackItem xx, this->_items)
-        variant_items_list.append(QVariant(xx.ToHash()));
+    if (this->_items.count() < max)
+    {
+        foreach (ScrollbackItem xx, this->_items)
+            variant_items_list.append(QVariant(xx.ToHash()));
+    }
+    else
+    {
+        while (max > 0)
+        {
+            ScrollbackItem item = this->_items.at(this->_items.count() - 1 - max--);
+            variant_items_list.append(QVariant(item.ToHash()));
+        }
+    }
     hash.insert("items", QVariant(variant_items_list));
     return hash;
 }
@@ -146,6 +159,7 @@ QHash<QString, QVariant> Scrollback::ToPartialHash()
     SERIALIZE(_original_id);
     SERIALIZE(PropertyBag);
     SERIALIZE(_maxItems);
+    SERIALIZE(_lastItemID);
     SERIALIZE(_target);
     return hash;
 }
@@ -156,6 +170,7 @@ void Scrollback::LoadHash(QHash<QString, QVariant> hash)
     UNSERIALIZE_STRING(_target);
     UNSERIALIZE_BOOL(_dead);
     UNSERIALIZE_ULONGLONG(_maxItems);
+    UNSERIALIZE_ULONGLONG(_lastItemID);
     if (hash.contains("type"))
         this->type = static_cast<ScrollbackType>(hash["type"].toInt());
     UNSERIALIZE_ULONGLONG(_original_id);
@@ -220,6 +235,7 @@ void Scrollback::UserListChange(QString nick, libircclient::User *user, UserList
 
 void Scrollback::InsertText(ScrollbackItem item)
 {
+    item.SetID(this->lastID++);
     this->_items.append(item);
     emit Event_InsertText(item);
 }
@@ -242,22 +258,38 @@ ScrollbackItem::ScrollbackItem(QHash<QString, QVariant> hash)
     this->LoadHash(hash);
 }
 
-ScrollbackItem::ScrollbackItem(QString text)
+ScrollbackItem::ScrollbackItem(QString text, scrollback_id_t id)
 {
     this->_type = ScrollbackItemType_System;
+    this->_id = id;
     this->_text = text;
     this->_datetime = QDateTime::currentDateTime();
 }
 
-ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User *user)
+ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User *user, scrollback_id_t id)
 {
     this->_type = type;
+    this->_id = id;
     this->_text = text;
     this->_datetime = QDateTime::currentDateTime();
     if (user == NULL)
         this->_user = NULL;
     else
         this->_user = libircclient::User(user);
+}
+
+ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User user, scrollback_id_t id)
+{
+    this->_type = type;
+    this->_id = id;
+    this->_text = text;
+    this->_datetime = QDateTime::currentDateTime();
+    this->_user = user;
+}
+
+void ScrollbackItem::SetID(scrollback_id_t id)
+{
+    this->_id = id;
 }
 
 ScrollbackItem::~ScrollbackItem()
@@ -268,6 +300,11 @@ ScrollbackItem::~ScrollbackItem()
 QString ScrollbackItem::GetText() const
 {
     return this->_text;
+}
+
+scrollback_id_t ScrollbackItem::GetID()
+{
+    return this->_id;
 }
 
 ScrollbackItemType ScrollbackItem::GetType() const
@@ -307,6 +344,7 @@ void ScrollbackItem::LoadHash(QHash<QString, QVariant> hash)
     if (hash.contains("_type"))
         this->_type = static_cast<ScrollbackItemType>(hash["_type"].toInt());
     UNSERIALIZE_STRING(_text);
+    UNSERIALIZE_ULONGLONG(_id);
     UNSERIALIZE_DATETIME(_datetime);
 }
 
@@ -314,6 +352,7 @@ QHash<QString, QVariant> ScrollbackItem::ToHash()
 {
     QHash<QString, QVariant> hash;
     SERIALIZE(_text);
+    SERIALIZE(_id);
     hash.insert("_user", QVariant(this->_user.ToHash()));
     SERIALIZE(_datetime);
     hash.insert("_type", QVariant(static_cast<int>(this->_type)));

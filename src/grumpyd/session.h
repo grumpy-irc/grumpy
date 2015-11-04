@@ -52,6 +52,7 @@ namespace GrumpyIRC
             void TransferError(QString source, QString description, int id);
             void PermissionDeny(QString source);
             bool IsRunning;
+            int MaxScrollbackSyncItems;
             State SessionState;
 
         private slots:

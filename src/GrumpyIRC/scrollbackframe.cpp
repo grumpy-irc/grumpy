@@ -32,13 +32,19 @@ irc2htmlcode::Parser ScrollbackFrame::parser;
 
 ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent, Scrollback *_scrollback) : QFrame(parent), ui(new Ui::ScrollbackFrame)
 {
+    this->textEdit = new STextBox(this);
     this->ui->setupUi(this);
     this->inputBox = new InputBox(this);
+    this->ui->splitter->addWidget(this->textEdit);
     this->ui->splitter->addWidget(this->inputBox);
-    this->ui->textEdit->setPalette(Skin::Default->Palette());
+    this->textEdit->setPalette(Skin::Default->Palette());
     this->_parent = parentWindow;
     this->TreeNode = NULL;
+    this->needsRefresh = false;
+    this->isClean = true;
+    this->maxItems = 200;
     this->userFrame = new UserFrame();
+    this->IsVisible = false;
     if (_scrollback == NULL)
         this->scrollback = new Scrollback();
     else
@@ -151,16 +157,20 @@ static QString ItemToString(ScrollbackItem item)
 
 void ScrollbackFrame::_insertText_(ScrollbackItem item)
 {
-    int scroll = 0;
-    if (this->ui->textEdit->verticalScrollBar()->maximum() != this->ui->textEdit->verticalScrollBar()->value())
-        scroll = this->ui->textEdit->verticalScrollBar()->value();
-    this->buffer += ItemToString(item) + "<br>\n";
-    this->ui->textEdit->setHtml(buffer);
-    // Scroll to bottom
-    // We need to do this only if the text was on bottom in past
-    if (!scroll)
-        scroll = this->ui->textEdit->verticalScrollBar()->maximum();
-    this->ui->textEdit->verticalScrollBar()->setValue(scroll);
+    if (!this->IsVisible)
+    {
+        while (this->unwritten.size() > this->maxItems)
+        {
+            this->unwritten.removeAt(0);
+            if (!this->isClean)
+                this->clearItems();
+        }
+        this->unwritten.append(item);
+        this->needsRefresh = true;
+    } else
+    {
+        this->writeText(item);
+    }
 }
 
 void ScrollbackFrame::UserList_Insert(libircclient::User *ux)
@@ -205,6 +215,21 @@ void ScrollbackFrame::OnClosed()
 void ScrollbackFrame::NetworkChanged(libircclient::Network *network)
 {
     this->userFrame->SetNetwork(network);
+}
+
+void ScrollbackFrame::clearItems()
+{
+    this->isClean = true;
+    this->buffer.clear();
+    this->textEdit->Clear();
+}
+
+void ScrollbackFrame::writeText(ScrollbackItem item)
+{
+    QString line = ItemToString(item);
+    this->buffer += line;
+    this->textEdit->AppendHtml(line);
+    this->isClean = false;
 }
 
 void ScrollbackFrame::SetWindowName(QString title)
@@ -299,5 +324,21 @@ void ScrollbackFrame::RequestDisconnect()
 {
     if (this->GetSession())
         this->GetSession()->RequestDisconnect(this->GetScrollback(), CONF->GetQuitMessage(), false);
+}
+
+void ScrollbackFrame::RefreshHtml()
+{
+    this->needsRefresh = false;
+    while (this->unwritten.size())
+    {
+        this->writeText(this->unwritten.at(0));
+        this->unwritten.removeAt(0);
+    }
+}
+
+void ScrollbackFrame::RefreshHtmlIfNeeded()
+{
+    if (this->needsRefresh)
+        this->RefreshHtml();
 }
 
