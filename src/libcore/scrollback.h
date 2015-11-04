@@ -14,6 +14,7 @@
 #define SCROLLBACK_H
 
 #include "libcore_global.h"
+#include "definitions.h"
 #include "../libirc/libircclient/user.h"
 #include <QString>
 #include <QObject>
@@ -58,11 +59,15 @@ namespace GrumpyIRC
     {
         public:
             ScrollbackItem(QHash<QString, QVariant> hash);
-            ScrollbackItem(QString text);
-            ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User *user = NULL);
-            ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User user);
+            ScrollbackItem(QString text, scrollback_id_t id=0);
+            ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User *user = NULL, scrollback_id_t id=0);
+            ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User user, scrollback_id_t id=0);
+            virtual void SetID(scrollback_id_t id);
             virtual ~ScrollbackItem();
             virtual QString GetText() const;
+            //! Items in scrollback are indexed with this so that we can sync only newest items.
+            //! If you need older items, request them from the lowest ID you have.
+            virtual scrollback_id_t GetID();
             virtual ScrollbackItemType GetType() const;
             virtual QDateTime GetTime() const;
             virtual void SetType(ScrollbackItemType type);
@@ -72,6 +77,7 @@ namespace GrumpyIRC
             void LoadHash(QHash<QString, QVariant> hash);
             QHash<QString, QVariant> ToHash();
         private:
+            unsigned long long _id;
             libircclient::User _user;
             QString _text;
             QDateTime _datetime;
@@ -161,6 +167,7 @@ namespace GrumpyIRC
         protected:
             static unsigned long long lastID;
 
+            scrollback_id_t _lastItemID;
             libircclient::Network *_network;
             Scrollback *parentSx;
             bool _dead;
