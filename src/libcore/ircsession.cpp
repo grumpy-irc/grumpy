@@ -168,6 +168,7 @@ void IRCSession::Connect(libircclient::Network *Network)
     this->network = Network;
     connect(this->network, SIGNAL(Event_RawOutgoing(QByteArray)), this, SLOT(OnOutgoingRawMessage(QByteArray)));
     connect(this->network, SIGNAL(Event_ConnectionFailure(QAbstractSocket::SocketError)), this, SLOT(OnConnectionFail(QAbstractSocket::SocketError)));
+    connect(this->network, SIGNAL(Event_MOTD(libircclient::Parser*)), this, SLOT(OnMOTD(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_RawIncoming(QByteArray)), this, SLOT(OnIncomingRawMessage(QByteArray)));
     connect(this->network, SIGNAL(Event_Unknown(libircclient::Parser*)), this, SLOT(OnUnknown(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_SelfJoin(libircclient::Channel*)), this, SLOT(OnIRCSelfJoin(libircclient::Channel*)));
@@ -257,7 +258,7 @@ Scrollback *IRCSession::GetScrollbackForUser(QString user)
     return this->users[user_l];
 }
 
-QHash<QString, QVariant> IRCSession::ToHash()
+QHash<QString, QVariant> IRCSession::ToHash(int max_items)
 {
     QHash<QString, QVariant> hash;
     SERIALIZE(SID);
@@ -265,9 +266,12 @@ QHash<QString, QVariant> IRCSession::ToHash()
         hash.insert("network", QVariant(this->network->ToHash()));
     QHash<QString, QVariant> channels_hash;
     foreach (QString channel, this->channels.keys())
-        channels_hash.insert(channel, QVariant(this->channels[channel]->ToHash()));
+        channels_hash.insert(channel, QVariant(this->channels[channel]->ToHash(max_items)));
+    QHash<QString, QVariant> users_hash;
+    foreach (QString user, this->users.keys())
+        users_hash.insert(user, QVariant(this->users[user]->ToHash(max_items)));
     hash.insert("channels", QVariant(channels_hash));
-    hash.insert("systemWindow", QVariant(this->systemWindow->ToHash()));
+    hash.insert("systemWindow", QVariant(this->systemWindow->ToHash(max_items)));
     return hash;
 }
 
@@ -392,6 +396,11 @@ void IRCSession::OnKICK(libircclient::Parser *px, libircclient::Channel *channel
         return;
     this->channels[l]->UserListChange(px->GetParameters()[1], NULL, UserListChange_Remove);
     this->channels[l]->InsertText(ScrollbackItem("kicked " + px->GetParameters()[1] + " from channel: " + px->GetText(), ScrollbackItemType_Kick, px->GetSourceUserInfo()));
+}
+
+void IRCSession::OnMOTD(libircclient::Parser *px)
+{
+    this->systemWindow->InsertText(ScrollbackItem(px->GetText(),ScrollbackItemType_Notice, libircclient::User("MOTD!@")));
 }
 
 void IRCSession::OnPart(libircclient::Parser *px, libircclient::Channel *channel)

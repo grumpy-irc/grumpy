@@ -60,6 +60,7 @@ Session::Session(qintptr socket_ptr, bool ssl)
     this->IsRunning = true;
     SessionList.append(this);
     sessions_lock->unlock();
+    this->MaxScrollbackSyncItems = 800;
     this->loggedUser = NULL;
     if (ssl)
     {
@@ -173,7 +174,7 @@ void Session::processNetworks()
     QList<QVariant> sessions;
     QList<SyncableIRCSession*> network_info = this->loggedUser->GetSIRCSessions();
     foreach (SyncableIRCSession *session, network_info)
-        sessions.append(QVariant(session->ToHash()));
+        sessions.append(QVariant(session->ToHash(this->MaxScrollbackSyncItems)));
     QHash<QString, QVariant> params;
     params.insert("sessions", sessions);
     this->protocol->SendProtocolCommand(GP_CMD_NETWORK_INFO, params);

@@ -128,13 +128,24 @@ Scrollback *Scrollback::GetParentScrollback()
     return this->parentSx;
 }
 
-QHash<QString, QVariant> Scrollback::ToHash()
+QHash<QString, QVariant> Scrollback::ToHash(int max)
 {
     QHash<QString, QVariant> hash = this->ToPartialHash();
     QList<QVariant> variant_items_list;
     hash.insert("type", static_cast<int>(this->type));
-    foreach (ScrollbackItem xx, this->_items)
-        variant_items_list.append(QVariant(xx.ToHash()));
+    if (this->_items.count() < max)
+    {
+        foreach (ScrollbackItem xx, this->_items)
+            variant_items_list.append(QVariant(xx.ToHash()));
+    }
+    else
+    {
+        while (max > 0)
+        {
+            ScrollbackItem item = this->_items.at(this->_items.count() - 1 - max--);
+            variant_items_list.append(QVariant(item.ToHash()));
+        }
+    }
     hash.insert("items", QVariant(variant_items_list));
     return hash;
 }
@@ -258,6 +269,14 @@ ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclie
         this->_user = NULL;
     else
         this->_user = libircclient::User(user);
+}
+
+ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User user)
+{
+    this->_type = type;
+    this->_text = text;
+    this->_datetime = QDateTime::currentDateTime();
+    this->_user = user;
 }
 
 ScrollbackItem::~ScrollbackItem()

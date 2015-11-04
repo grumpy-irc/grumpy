@@ -15,6 +15,7 @@
 
 #include <QFrame>
 #include <QStandardItemModel>
+#include "stextbox.h"
 #include "../libirc2htmlcode/parser.h"
 #include "../libcore/scrollback.h"
 
@@ -64,8 +65,11 @@ namespace GrumpyIRC
             void UpdateIcon();
             void RequestPart();
             void RequestDisconnect();
+            void RefreshHtml();
+            void RefreshHtmlIfNeeded();
             //void SetParent(ScrollbackFrame* parentWindow);
             bool IsDeletable;
+            bool IsVisible;
             ScrollbackList_Node *TreeNode;
         private slots:
             void _insertText_(ScrollbackItem item);
@@ -77,6 +81,13 @@ namespace GrumpyIRC
             void OnClosed();
             void NetworkChanged(libircclient::Network *network);
         private:
+            void clearItems();
+            void writeText(ScrollbackItem item);
+            bool isClean;
+            int maxItems;
+            QList<ScrollbackItem> unwritten;
+            STextBox *textEdit;
+            bool needsRefresh;
             Scrollback *scrollback;
 			//QStandardItem *treeNode;
             QString buffer;

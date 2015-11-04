@@ -60,6 +60,7 @@ namespace GrumpyIRC
             ScrollbackItem(QHash<QString, QVariant> hash);
             ScrollbackItem(QString text);
             ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User *user = NULL);
+            ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User user);
             virtual ~ScrollbackItem();
             virtual QString GetText() const;
             virtual ScrollbackItemType GetType() const;
@@ -129,7 +130,7 @@ namespace GrumpyIRC
             virtual libircclient::Network *GetNetwork() const;
             virtual void SetDead(bool dead);
             virtual Scrollback *GetParentScrollback();
-            QHash<QString, QVariant> ToHash();
+            QHash<QString, QVariant> ToHash(int max = 200);
             QHash<QString, QVariant> ToPartialHash();
             void LoadHash(QHash<QString, QVariant> hash);
             //! Used to resync most of attributes with target

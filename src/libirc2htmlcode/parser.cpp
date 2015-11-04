@@ -22,6 +22,23 @@ Parser::Parser()
     this->resolveCacheSize = 2000;
     this->cacheHits = 0;
     this->cacheMiss = 0;
+    // We expect a dark background so black and white mixed up
+    this->TextColors.insert(0,    "#000000"); // White
+    this->TextColors.insert(1,    "#FFFFFF"); // Black
+    this->TextColors.insert(2,    "#97ADF7"); // Blue
+    this->TextColors.insert(3,    "#A1F797"); // Green
+    this->TextColors.insert(4,    "#FFC4CE"); // Light red
+    this->TextColors.insert(5,    "#CCB472"); // Brown
+    this->TextColors.insert(6,    "#F03CD5"); // Purple
+    this->TextColors.insert(7,    "#F0B754"); // Orange
+    this->TextColors.insert(8,    "#FCFA6A"); // Yellow
+    this->TextColors.insert(9,    "#C3FAC5"); // Light green
+    this->TextColors.insert(10,   "#C8FAF7"); // Cyan
+    this->TextColors.insert(11,   "#DEFAF8"); // Light cyan
+    this->TextColors.insert(12,   "#D2D3FA"); // Light blue
+    this->TextColors.insert(13,   "#F7C3F1"); // Pink
+    this->TextColors.insert(14,   "#C4C4C4"); // Grey
+    this->TextColors.insert(15,   "#DADADA"); // Light grey
 }
 
 Parser::~Parser()
@@ -70,6 +87,124 @@ QString Parser::EncodeHtml(QString text)
     return text;
 }
 
+static bool isNumber(QChar input)
+{
+    return input.toLatin1() >= '0' && input.toLatin1() <= '9';
+}
+
+QString Parser::replaceSpecials(QString source)
+{
+    char underline = 1;
+    char bold = 2;
+    char italic = 16;
+    char color = 3;
+    int current_pos = 0;
+    bool close_b = false;
+    bool close_i = false;
+    bool close_u = false;
+    bool close_k = false;
+    while (current_pos < source.size())
+    {
+        char current_symbol = source[current_pos].toLatin1();
+        if (current_symbol == bold)
+        {
+            // replace
+            source = source.remove(current_pos, 1);
+            if (close_b)
+                source.insert(current_pos, "</b>");
+            else
+                source.insert(current_pos, "<b>");
+            close_b = !close_b;
+        } else if (current_symbol == underline)
+        {
+            source = source.remove(current_pos, 1);
+            if (close_u)
+                source.insert(current_pos, "</u>");
+            else
+                source.insert(current_pos, "<u>");
+            close_u = !close_u;
+        } else if (current_symbol == color)
+        {
+            // check if next symbol is a color number
+            int color_code = -10;
+            if (source.size() <= current_pos + 1)
+            {
+                // There is nothing else to colorize, if this is closing, we close it, otherwise ignore
+                if (close_k)
+                {
+                    source = source.remove(current_pos, 1);
+                    close_k = !close_k;
+                    source.insert(current_pos, "</font>");
+                }
+            } else if (source.size() > current_pos + 2)
+            {
+                // Check if next 2 are numbers
+                QString color_scode;
+                // How many characters we need to remove from original string,
+                // this varies on size of color code string
+                int replace_len = 1;
+                if (isNumber(source[current_pos + 1]))
+                {
+                    replace_len++;
+                    color_scode += source[current_pos + 1];
+                }
+                if (isNumber(source[current_pos + 2]))
+                {
+                    replace_len++;
+                    color_scode += source[current_pos + 2];
+                }
+                if (!color_scode.isEmpty())
+                {
+                    color_code = color_scode.toInt();
+                    QString color = "";
+                    if (color_code < 0 || color_code > 15)
+                    {
+                        // broken color code
+                        // emit some warning?
+                        color = "green";
+                    } else
+                    {
+                        color = this->TextColors[color_code];
+                    }
+                    source = source.remove(current_pos, replace_len);
+                    QString result_string = "<font color=\"" + color + "\">";
+                    if (close_k)
+                    {
+                        // someone wants to change the color but the previous color was not closed
+                        result_string = "</font>" + result_string;
+                    }
+                    close_k = !close_k;
+                    source.insert(current_pos, result_string);
+                } else if (close_k)
+                {
+                    source = source.remove(current_pos, 1);
+                    close_k = !close_k;
+                    source.insert(current_pos, "</font>");
+                }
+            }
+
+        } else if (current_symbol == italic)
+        {
+            source = source.remove(current_pos, 1);
+            if (close_i)
+                source.insert(current_pos, "</i>");
+            else
+                source.insert(current_pos, "<i>");
+            close_i = !close_i;
+        }
+        current_pos++;
+    }
+    if (close_k)
+        source += "</font>";
+    if (close_b)
+        source += "</b>";
+    if (close_u)
+        source += "</u>";
+    if (close_i)
+        source += "</i>";
+    return source;
+}
+
 QString Parser::formatTime(QDateTime time)
 {
     return "<font color=\"" + this->TimeColor + "\">" + this->EncodeHtml(time.toString()) + "</font>";
@@ -82,5 +217,5 @@ QString Parser::formatUser(QString user)
 
 QString Parser::formatText(QString text)
 {
-    return "<font color=\"" + this->TextColor + "\">" + this->EncodeHtml(text) + "</font>";
+    return "<font color=\"" + this->TextColor + "\">" + this->replaceSpecials(this->EncodeHtml(text)) + "</font>";
 }
