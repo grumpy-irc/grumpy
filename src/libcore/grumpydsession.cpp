@@ -294,6 +294,9 @@ void GrumpydSession::OnIncomingCommand(QString text, QHash<QString, QVariant> pa
     } else if (text == GP_CMD_SCROLLBACK_LOAD_NEW_ITEM)
     {
         this->processNewScrollbackItem(parameters);
+    } else if (text == GP_CMD_USERLIST_SYNC)
+    {
+        this->processULSync(parameters);
     } else if (text == GP_CMD_NETWORK_INFO)
     {
         this->processNetwork(parameters);
@@ -348,6 +351,26 @@ void GrumpydSession::processNetwork(QHash<QString, QVariant> hash)
         this->sessionList.insert(session->GetSystemWindow(), session);
     }
     this->systemWindow->InsertText("Synced networks: " + QString::number(session_list.count()));
+}
+
+void GrumpydSession::processULSync(QHash<QString, QVariant> hash)
+{
+    IRCSession *session = this->GetSession(hash["network_id"].toUInt());
+    if (!session)
+        return;
+    libircclient::Channel *channel = session->GetNetwork()->GetChannel(hash["channel_name"].toString());
+    int mode = hash["operation"].toInt();
+    if (!channel || !mode)
+        return;
+    if (mode == GRUMPY_UL_INSERT)
+    {
+        libircclient::User user(hash["user"].toHash());
+        channel->InsertUser(&user);
+    } else if (mode == GRUMPY_UL_REMOVE)
+    {
+        QString user = hash["target"].toString();
+        channel->RemoveUser(user);
+    }
 }
 
 void GrumpydSession::processNetworkResync(QHash<QString, QVariant> hash)

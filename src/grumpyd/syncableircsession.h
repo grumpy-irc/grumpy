@@ -50,6 +50,8 @@ namespace GrumpyIRC
             void OnInfo(libircclient::Parser *px);
             void OnEndOfNames(libircclient::Parser *px);
         private:
+            void resyncULRemove(libircclient::Channel *channel, QString user);
+            void resyncUL(libircclient::Channel *channel, int mode, libircclient::User *user);
             //! User who owns this session
             User *owner;
     };

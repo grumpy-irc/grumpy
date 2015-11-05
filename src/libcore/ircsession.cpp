@@ -64,9 +64,9 @@ IRCSession::IRCSession(QHash<QString, QVariant> sx, Scrollback *root)
 IRCSession::IRCSession(Scrollback *system, Scrollback *root)
 {
     this->Root = root;
+    this->network = NULL;
     this->systemWindow = system;
     this->systemWindow->SetSession(this);
-    this->network = NULL;
     IRCSession::Sessions_Lock.lock();
     IRCSession::Sessions.append(this);
     this->SID = lastID++;

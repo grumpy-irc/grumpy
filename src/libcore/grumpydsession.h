@@ -26,6 +26,10 @@
 #include <QAbstractSocket>
 #include <QTimer>
 
+#define GRUMPY_UL_INSERT 2
+#define GRUMPY_UL_UPDATE 3
+#define GRUMPY_UL_REMOVE 4
+
 namespace libirc
 {
     class ServerAddress;
@@ -86,6 +90,7 @@ namespace GrumpyIRC
         private:
             void processNewScrollbackItem(QHash<QString, QVariant> hash);
             void processNetwork(QHash<QString, QVariant> hash);
+            void processULSync(QHash<QString, QVariant> hash);
             void processNetworkResync(QHash<QString, QVariant> hash);
             void processChannel(QHash<QString, QVariant> hash);
             void processNick(QHash<QString, QVariant> hash);

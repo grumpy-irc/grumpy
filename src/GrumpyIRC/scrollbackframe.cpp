@@ -139,7 +139,7 @@ static QString ItemToString(ScrollbackItem item)
             break;
         case ScrollbackItemType_Nick:
             format_string.replace("$string", CONF->GetActionFormat());
-            text = "changed nick to ";
+            text = "changed nick to " + item.GetText();
             break;
         case ScrollbackItemType_Notice:
             format_string.replace("$string", CONF->GetNoticeFormat());

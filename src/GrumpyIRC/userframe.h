@@ -48,6 +48,7 @@ namespace GrumpyIRC
             void on_listWidget_customContextMenuRequested(const QPoint &pos);
 
         private:
+            QHash<char, unsigned int> userCounts;
             libircclient::Network *network;
             QHash<QString, libircclient::User> users;
             QHash<QString, QListWidgetItem*> userItem;

@@ -25,6 +25,11 @@ UserFrameItem::UserFrameItem(QString text, libircclient::Network *nt) : QListWid
 
 bool UserFrameItem::operator<(const QListWidgetItem &other) const
 {
+    return this->lowerThan(other);
+}
+
+bool UserFrameItem::lowerThan(const QListWidgetItem &other) const
+{
     QString username1 = this->text();
     QString username2 = other.text();
     // in case that one of the users has channel mode, it's higher

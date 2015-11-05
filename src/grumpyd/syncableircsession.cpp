@@ -16,6 +16,7 @@
 #include "user.h"
 #include "session.h"
 #include "../libcore/core.h"
+#include "../libcore/grumpydsession.h"
 #include "../libcore/eventhandler.h"
 #include "../libirc/libircclient/parser.h"
 #include "../libirc/libirc/serveraddress.h"
@@ -124,7 +125,7 @@ void SyncableIRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
 void SyncableIRCSession::OnIRCJoin(libircclient::Parser *px, libircclient::User *user, libircclient::Channel *channel)
 {
     IRCSession::OnIRCJoin(px, user, channel);
-    this->ResyncChannel(channel);
+    this->resyncUL(channel, GRUMPY_UL_INSERT, user);
 }
 
 void SyncableIRCSession::OnNICK(libircclient::Parser *px, QString old_, QString new_)
@@ -143,18 +144,25 @@ void SyncableIRCSession::OnNICK(libircclient::Parser *px, QString old_, QString 
 void SyncableIRCSession::OnIRCSelfNICK(libircclient::Parser *px, QString previous, QString nick)
 {
     IRCSession::OnIRCSelfNICK(px, previous, nick);
+    //this->resyncUL();
 }
 
 void SyncableIRCSession::OnKICK(libircclient::Parser *px, libircclient::Channel *channel)
 {
     IRCSession::OnKICK(px, channel);
-    this->ResyncChannel(channel);
+    //this->ResyncChannel(channel);
+    if (px->GetParameters().count() < 2)
+        return;
+    this->resyncULRemove(channel, px->GetParameters()[1]);
 }
 
 void SyncableIRCSession::OnPart(libircclient::Parser *px, libircclient::Channel *channel)
 {
     IRCSession::OnPart(px, channel);
-    this->ResyncChannel(channel);
+    //this->ResyncChannel(channel);
+    if (!px->GetSourceUserInfo())
+        return;
+    this->resyncULRemove(channel, px->GetSourceUserInfo()->GetNick());
 }
 
 void SyncableIRCSession::OnSelf_KICK(libircclient::Parser *px, libircclient::Channel *channel)
@@ -166,12 +174,15 @@ void SyncableIRCSession::OnSelf_KICK(libircclient::Parser *px, libircclient::Cha
 void SyncableIRCSession::OnTOPIC(libircclient::Parser *px, libircclient::Channel *channel, QString previous_one)
 {
     IRCSession::OnTOPIC(px, channel, previous_one);
+    //! \todo sync
 }
 
 void SyncableIRCSession::OnQuit(libircclient::Parser *px, libircclient::Channel *channel)
 {
     IRCSession::OnQuit(px, channel);
-    this->ResyncChannel(channel);
+    if (!px->GetSourceUserInfo())
+        return;
+    this->resyncULRemove(channel, px->GetSourceUserInfo()->GetNick());
 }
 
 void SyncableIRCSession::OnSelfPart(libircclient::Parser *px, libircclient::Channel *channel)
@@ -213,4 +224,32 @@ void SyncableIRCSession::OnEndOfNames(libircclient::Parser *px)
     if (!channel)
         return;
     this->ResyncChannel(channel);
+}
+
+void SyncableIRCSession::resyncULRemove(libircclient::Channel *channel, QString user)
+{
+    Session *session = this->owner->GetAnyGPSession();
+    if (!session)
+        return;
+    // Resync the whole network
+    QHash<QString, QVariant> parameters;
+    parameters.insert("network_id", QVariant(this->GetSID()));
+    parameters.insert("channel_name", QVariant(channel->GetName()));
+    parameters.insert("operation", QVariant(GRUMPY_UL_REMOVE));
+    parameters.insert("target", QVariant(user));
+    session->SendToEverySession(GP_CMD_USERLIST_SYNC, parameters);
+}
+
+void SyncableIRCSession::resyncUL(libircclient::Channel *channel, int mode, libircclient::User *user)
+{
+    Session *session = this->owner->GetAnyGPSession();
+    if (!session)
+        return;
+    // Resync the whole network
+    QHash<QString, QVariant> parameters;
+    parameters.insert("network_id", QVariant(this->GetSID()));
+    parameters.insert("channel_name", QVariant(channel->GetName()));
+    parameters.insert("operation", QVariant(mode));
+    parameters.insert("user", QVariant(user->ToHash()));
+    session->SendToEverySession(GP_CMD_USERLIST_SYNC, parameters);
 }

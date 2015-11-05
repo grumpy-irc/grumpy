@@ -61,18 +61,30 @@ void UserFrame::InsertUser(libircclient::User *user)
 {
     if (!this->network)
         return;
+    if (this->userCounts.contains(user->CUMode))
+        this->userCounts[user->CUMode]++;
     QString name = user->GetNick().toLower();
     if (this->users.contains(name))
         this->RemoveUser(name);
     this->users.insert(name, libircclient::User(user));
-    QListWidgetItem *item = new UserFrameItem(user->GetPrefixedNick(), this->network);
+    UserFrameItem *item = new UserFrameItem(user->GetPrefixedNick(), this->network);
     item->setTextColor(getColor(user));
     this->userItem.insert(name, item);
-    this->ui->listWidget->addItem(item);
-    if (this->IsVisible)
+    // insert user in a way it's already sorted, so that we don't need to resort the whole
+    // user list, which is pretty expensive operation
+    int index = -1;
+    int count = this->ui->listWidget->count();
+    while (++index < this->ui->listWidget->count())
+    {
+        if (item->lowerThan(*this->ui->listWidget->item(index)))
+            break;
+    }
+    this->ui->listWidget->insertItem(index, item);
+    /*if (this->IsVisible)
         this->ui->listWidget->sortItems();
     else
         this->NeedsUpdate = true;
+    */
     this->UpdateInfo();
 }
 
@@ -82,6 +94,9 @@ void UserFrame::RemoveUser(QString user)
     user = user.toLower();
     if (!this->users.contains(user))
         return;
+    libircclient::User ux = this->users[user];
+    if (this->userCounts.contains(ux.CUMode))
+        this->userCounts[ux.CUMode]--;
     this->users.remove(user);
     this->ui->listWidget->removeItemWidget(this->userItem[user]);
     delete this->userItem[user];
@@ -95,19 +110,18 @@ void UserFrame::ChangeNick(QString new_nick, QString old_nick)
     if (!this->users.contains(old_nick))
         return;
     libircclient::User user = this->users[old_nick];
-    this->users.remove(old_nick);
+    this->RemoveUser(old_nick);
     user.SetNick(new_nick);
-    QString ln = new_nick.toLower();
-    this->users.insert(ln, user);
-    QListWidgetItem *item = this->userItem[old_nick];
-    this->userItem.insert(ln, item);
-    this->userItem.remove(old_nick);
-    item->setText(new_nick);
+    this->InsertUser(&user);
 }
 
 void UserFrame::SetNetwork(libircclient::Network *Network)
 {
+    if (!Network)
+        return;
     this->network = Network;
+    foreach (char mode, this->network->GetCUModes())
+        this->userCounts.insert(mode, 0);
 }
 
 void UserFrame::UpdateInfo()
@@ -120,7 +134,7 @@ void UserFrame::UpdateInfo()
 
     if (this->NeedsUpdate)
     {
-        this->ui->listWidget->sortItems();
+        //this->ui->listWidget->sortItems();
         this->NeedsUpdate = false;
     }
 
@@ -128,22 +142,16 @@ void UserFrame::UpdateInfo()
     QString overview = QString::number(this->users.count());
     QString extras = " (";
     bool extras_found = false;
-    foreach (char mode, this->network->GetCUModes())
+    foreach (char mode, this->userCounts.keys())
     {
-        int count = 0;
+        int count = this->userCounts[mode];
+        if (!count)
+            continue;
         QString info = QChar(mode) + ": ";
         // now count all users with this mode
-        foreach (libircclient::User user, this->users.values())
-        {
-            if (user.CUMode == mode)
-                count++;
-        }
         info += QString::number(count) + " ";
-        if (count)
-        {
-            extras_found = true;
-            extras += info;
-        }
+        extras_found = true;
+        extras += info;
     }
     if (extras.endsWith(" "))
         extras = extras.mid(0, extras.size() - 1);

@@ -27,6 +27,7 @@ namespace GrumpyIRC
         public:
             UserFrameItem(QString text, libircclient::Network *nt);
             bool operator<(const QListWidgetItem &other) const;
+            bool lowerThan(const QListWidgetItem &other) const;
             libircclient::Network *network;
     };
 }
