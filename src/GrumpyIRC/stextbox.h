@@ -25,7 +25,7 @@ namespace GrumpyIRC
             void AppendHtml(QString html);
             void Clear();
         protected:
-
+            void scrollContentsBy();
     };
 }
 

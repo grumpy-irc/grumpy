@@ -65,8 +65,11 @@ namespace GrumpyIRC
             void UpdateIcon();
             void RequestPart();
             void RequestDisconnect();
+            void RequestMore(int count);
             void RefreshHtml();
             void RefreshHtmlIfNeeded();
+            scrollback_id_t GetItems();
+            int GetSynced();
             //void SetParent(ScrollbackFrame* parentWindow);
             bool IsDeletable;
             bool IsVisible;
@@ -78,6 +81,7 @@ namespace GrumpyIRC
             void UserList_Rename(QString old, libircclient::User *us);
             void OnDead();
             void Refresh();
+            void Menu(QPoint pn);
             void OnClosed();
             void NetworkChanged(libircclient::Network *network);
         private:

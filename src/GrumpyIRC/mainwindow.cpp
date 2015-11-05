@@ -168,9 +168,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->scrollbackWindow = new ScrollbacksManager(this);
     this->userWidget = new UserWidget(this);
     this->setCentralWidget(this->scrollbackWindow);
+    this->statusFrame = new QLabel(this);
     this->addDockWidget(Qt::LeftDockWidgetArea, this->windowList);
     this->addDockWidget(Qt::BottomDockWidgetArea, this->syslogWindow);
     this->addDockWidget(Qt::RightDockWidgetArea, this->userWidget);
+    this->ui->statusBar->addPermanentWidget(this->statusFrame);
     ScrollbacksManager::Global = this->scrollbackWindow;
     this->syslogWindow->hide();
     // Create a system scrollback
@@ -185,6 +187,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpyd", (SC_Callback)SystemCommand_Grumpy));
     // Welcome user
     this->systemWindow->InsertText(QString("Grumpy irc version " + GCFG->GetVersion()));
+    connect(&this->timer, SIGNAL(timeout()), this, SLOT(OnRefresh()));
+    this->timer.start(100);
     // Try to restore geometry
     this->restoreGeometry(GCFG->GetValue("mainwindow_geometry").toByteArray());
     this->restoreState(GCFG->GetValue("mainwindow_state").toByteArray());
@@ -232,6 +236,13 @@ UserWidget *MainWindow::GetUsers()
     return this->userWidget;
 }
 
+void MainWindow::UpdateStatus()
+{
+    int synced = this->GetScrollbackManager()->GetCurrentScrollback()->GetSynced();
+    int total = this->GetScrollbackManager()->GetCurrentScrollback()->GetItems();
+    this->statusFrame->setText("Items (synced/total): " + QString::number(synced) + " / " + QString::number(total));
+}
+
 void MainWindow::OpenGrumpy(QString hostname, int port, QString username, QString password, bool ssl)
 {
     ScrollbackFrame *system = this->GetScrollbackManager()->CreateWindow(hostname, NULL, true);
@@ -262,6 +273,11 @@ void MainWindow::OpenServer(libirc::ServerAddress server)
     IRCSession::Open(system->GetScrollback(), server, network_name);
 }
 
+void MainWindow::OnRefresh()
+{
+    this->UpdateStatus();
+}
+
 void MainWindow::on_actionExit_triggered()
 {
     Exit();
@@ -284,4 +300,9 @@ void GrumpyIRC::MainWindow::on_actionAbout_triggered()
     AboutWin *wx = new AboutWin(this);
     wx->setAttribute(Qt::WA_DeleteOnClose);
     wx->show();
+}
+
+void GrumpyIRC::MainWindow::on_actionLoad_more_items_from_remote_triggered()
+{
+    this->GetScrollbackManager()->GetCurrentScrollback()->RequestMore(100);
 }

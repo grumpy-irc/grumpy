@@ -103,6 +103,16 @@ void Scrollback::SetSession(NetworkSession *Session)
     emit this->Event_SessionModified(Session);
 }
 
+unsigned long long Scrollback::GetLastID()
+{
+    return this->_lastItemID;
+}
+
+int Scrollback::GetSICount()
+{
+    return this->_items.count();
+}
+
 bool Scrollback::IsDead() const
 {
     return this->_dead;
@@ -235,7 +245,7 @@ void Scrollback::UserListChange(QString nick, libircclient::User *user, UserList
 
 void Scrollback::InsertText(ScrollbackItem item)
 {
-    item.SetID(this->lastID++);
+    item.SetID(this->_lastItemID++);
     this->_items.append(item);
     emit Event_InsertText(item);
 }

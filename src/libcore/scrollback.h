@@ -135,6 +135,8 @@ namespace GrumpyIRC
             void SetNetwork(libircclient::Network *Network);
             virtual libircclient::Network *GetNetwork() const;
             virtual void SetDead(bool dead);
+            virtual unsigned long long GetLastID();
+            virtual int GetSICount();
             virtual Scrollback *GetParentScrollback();
             QHash<QString, QVariant> ToHash(int max = 200);
             QHash<QString, QVariant> ToPartialHash();

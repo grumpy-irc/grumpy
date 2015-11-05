@@ -11,6 +11,7 @@
 // Copyright (c) Petr Bena 2015
 
 #include <QScrollBar>
+#include <QMenu>
 #include "../libcore/exception.h"
 #include "../libcore/configuration.h"
 #include "../libcore/ircsession.h"
@@ -42,6 +43,7 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     this->TreeNode = NULL;
     this->needsRefresh = false;
     this->isClean = true;
+    connect(this->textEdit, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(Menu(QPoint)));
     this->maxItems = 200;
     this->userFrame = new UserFrame();
     this->IsVisible = false;
@@ -201,6 +203,32 @@ void ScrollbackFrame::Refresh()
     this->UpdateIcon();
 }
 
+void ScrollbackFrame::Menu(QPoint pn)
+{
+    QPoint globalPos = this->textEdit->viewport()->mapToGlobal(pn);
+    QMenu Menu;
+    // Items
+    QAction *menuCopy = new QAction(QObject::tr("Copy"), &Menu);
+    Menu.addAction(menuCopy);
+    QAction *menuRetrieveTopic = NULL;
+    if (this->IsChannel())
+    {
+        menuRetrieveTopic = new QAction(QObject::tr("Retrieve topic"), &Menu);
+        Menu.addAction(menuRetrieveTopic);
+    }
+
+    QAction* selectedItem = Menu.exec(globalPos);
+    if (!selectedItem)
+        return;
+    if (selectedItem == menuCopy)
+    {
+
+    } else if (selectedItem == menuRetrieveTopic)
+    {
+        //wx->RequestPart();
+    }
+}
+
 void ScrollbackFrame::OnClosed()
 {
     // The wrapped scrollback is being closed we must unregister this frame and delete it,
@@ -326,6 +354,11 @@ void ScrollbackFrame::RequestDisconnect()
         this->GetSession()->RequestDisconnect(this->GetScrollback(), CONF->GetQuitMessage(), false);
 }
 
+void ScrollbackFrame::RequestMore(int count)
+{
+
+}
+
 void ScrollbackFrame::RefreshHtml()
 {
     this->needsRefresh = false;
@@ -340,5 +373,15 @@ void ScrollbackFrame::RefreshHtmlIfNeeded()
 {
     if (this->needsRefresh)
         this->RefreshHtml();
+}
+
+scrollback_id_t ScrollbackFrame::GetItems()
+{
+    return this->scrollback->GetLastID();
+}
+
+int ScrollbackFrame::GetSynced()
+{
+    return this->scrollback->GetSICount();
 }
 

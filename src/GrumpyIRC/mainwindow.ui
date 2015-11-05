@@ -47,8 +47,16 @@
     </property>
     <addaction name="actionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuScrollback">
+    <property name="title">
+     <string>Scrollback</string>
+    </property>
+    <addaction name="actionResync"/>
+    <addaction name="actionLoad_more_items_from_remote"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuFavorites"/>
+   <addaction name="menuScrollback"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -90,6 +98,16 @@
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionResync">
+   <property name="text">
+    <string>Resync</string>
+   </property>
+  </action>
+  <action name="actionLoad_more_items_from_remote">
+   <property name="text">
+    <string>Load more items from remote</string>
    </property>
   </action>
  </widget>

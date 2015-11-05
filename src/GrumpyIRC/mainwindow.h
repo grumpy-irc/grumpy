@@ -13,7 +13,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QLabel>
 #include <QMainWindow>
+#include <QTimer>
 
 namespace Ui
 {
@@ -51,19 +53,22 @@ namespace GrumpyIRC
             ScrollbackFrame *GetSystem();
             ScrollbackFrame *GetCurrentScrollbackFrame();
             UserWidget *GetUsers();
+            void UpdateStatus();
             void OpenGrumpy(QString hostname, int port, QString username, QString password, bool ssl);
             void OpenIRCNetworkLink(QString link);
             void OpenServer(libirc::ServerAddress server);
 
         private slots:
+            void OnRefresh();
             void on_actionExit_triggered();
-
             void on_actionConnect_triggered();
-
             void on_actionAbout_triggered();
+            void on_actionLoad_more_items_from_remote_triggered();
 
         private:
             void closeEvent(QCloseEvent *event);
+            QTimer timer;
+            QLabel *statusFrame;
             ScrollbackFrame *systemWindow;
             ScrollbackList *windowList;
             UserWidget *userWidget;
