@@ -46,7 +46,7 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     connect(this->textEdit, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(Menu(QPoint)));
     this->maxItems = 200;
     this->userFrame = new UserFrame();
-    this->IsVisible = false;
+    this->isVisible = false;
     if (_scrollback == NULL)
         this->scrollback = new Scrollback();
     else
@@ -159,7 +159,7 @@ static QString ItemToString(ScrollbackItem item)
 
 void ScrollbackFrame::_insertText_(ScrollbackItem item)
 {
-    if (!this->IsVisible)
+    if (!this->IsVisible())
     {
         while (this->unwritten.size() > this->maxItems)
         {
@@ -383,5 +383,21 @@ scrollback_id_t ScrollbackFrame::GetItems()
 int ScrollbackFrame::GetSynced()
 {
     return this->scrollback->GetSICount();
+}
+
+bool ScrollbackFrame::IsVisible()
+{
+    return this->isVisible;
+}
+
+void ScrollbackFrame::SetVisible(bool is_visible)
+{
+    if (this->userFrame)
+    {
+        this->userFrame->IsVisible = is_visible;
+        if (is_visible && this->userFrame->NeedsUpdate)
+            this->userFrame->UpdateInfo();
+    }
+    this->isVisible = is_visible;
 }
 

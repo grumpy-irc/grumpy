@@ -22,6 +22,8 @@ UserFrame::UserFrame(QWidget *parent) : QFrame(parent), ui(new Ui::UserFrame)
 {
     this->ui->setupUi(this);
     this->network = NULL;
+    this->IsVisible = false;
+    this->NeedsUpdate = false;
     this->ui->label->setPalette(Skin::Default->Palette());
     this->ui->label->setText("");
     this->ui->listWidget->setPalette(Skin::Default->Palette());
@@ -67,7 +69,10 @@ void UserFrame::InsertUser(libircclient::User *user)
     item->setTextColor(getColor(user));
     this->userItem.insert(name, item);
     this->ui->listWidget->addItem(item);
-    this->ui->listWidget->sortItems();
+    if (this->IsVisible)
+        this->ui->listWidget->sortItems();
+    else
+        this->NeedsUpdate = true;
     this->UpdateInfo();
 }
 
@@ -107,6 +112,18 @@ void UserFrame::SetNetwork(libircclient::Network *Network)
 
 void UserFrame::UpdateInfo()
 {
+    if (!this->IsVisible)
+    {
+        this->NeedsUpdate = true;
+        return;
+    }
+
+    if (this->NeedsUpdate)
+    {
+        this->ui->listWidget->sortItems();
+        this->NeedsUpdate = false;
+    }
+
     // create a overview list
     QString overview = QString::number(this->users.count());
     QString extras = " (";

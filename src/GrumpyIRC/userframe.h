@@ -39,6 +39,8 @@ namespace GrumpyIRC
             void ChangeNick(QString new_nick, QString old_nick);
             void SetNetwork(libircclient::Network *Network);
             void UpdateInfo();
+            bool IsVisible;
+            bool NeedsUpdate;
 
         private slots:
             void on_listWidget_doubleClicked(const QModelIndex &index);

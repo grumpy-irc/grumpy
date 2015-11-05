@@ -72,7 +72,8 @@ namespace GrumpyIRC
             int GetSynced();
             //void SetParent(ScrollbackFrame* parentWindow);
             bool IsDeletable;
-            bool IsVisible;
+            bool IsVisible();
+            void SetVisible(bool is_visible);
             ScrollbackList_Node *TreeNode;
         private slots:
             void _insertText_(ScrollbackItem item);
@@ -87,6 +88,7 @@ namespace GrumpyIRC
         private:
             void clearItems();
             void writeText(ScrollbackItem item);
+            bool isVisible;
             bool isClean;
             int maxItems;
             QList<ScrollbackItem> unwritten;
