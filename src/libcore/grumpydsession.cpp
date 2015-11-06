@@ -123,6 +123,15 @@ void GrumpydSession::RequestRemove(Scrollback *window)
 
 }
 
+QList<QString> GrumpydSession::GetChannels(Scrollback *window)
+{
+    IRCSession *ircs = this->GetSessionFromWindow(window);
+    if (!ircs)
+        throw new NullPointerException("ircs", BOOST_CURRENT_FUNCTION);
+
+    return ircs->GetChannels(window);
+}
+
 void GrumpydSession::RequestDisconnect(Scrollback *window, QString reason, bool auto_delete)
 {
     if (!this->IsConnected())

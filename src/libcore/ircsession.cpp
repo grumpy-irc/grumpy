@@ -210,6 +210,15 @@ SessionType IRCSession::GetType()
     return SessionType_IRC;
 }
 
+QList<QString> IRCSession::GetChannels(Scrollback *window)
+{
+    Q_UNUSED(window);
+    QList<QString> channel_names;
+    foreach (libircclient::Channel *cx, this->network->GetChannels())
+        channel_names.append(cx->GetName());
+    return channel_names;
+}
+
 void IRCSession::SyncWindows(QHash<QString, QVariant> windows, QHash<QString, Scrollback*> *hash)
 {
     // this is most likely a remote IRC session managed by grumpyd because nothing else would

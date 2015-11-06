@@ -70,6 +70,8 @@ namespace GrumpyIRC
             void RefreshHtml();
             void RefreshHtmlIfNeeded();
             scrollback_id_t GetItems();
+            QList<QString> GetUsers();
+            QList<QString> GetChannels();
             int GetSynced();
             //void SetParent(ScrollbackFrame* parentWindow);
             bool IsDeletable;

@@ -69,6 +69,7 @@ namespace GrumpyIRC
             SessionType GetType();
             void SendAction(Scrollback *window, QString text);
             void RequestRemove(Scrollback *window);
+            QList<QString> GetChannels(Scrollback *window);
             void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete);
             void RequestPart(Scrollback *window);
             Scrollback *GetScrollback(unsigned long long original_id);

@@ -38,6 +38,7 @@ namespace GrumpyIRC
             void RemoveUser(QString user);
             void ChangeNick(QString new_nick, QString old_nick);
             void SetNetwork(libircclient::Network *Network);
+            QList<QString> GetUsers();
             void UpdateInfo();
             bool IsVisible;
             bool NeedsUpdate;

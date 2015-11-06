@@ -385,6 +385,18 @@ scrollback_id_t ScrollbackFrame::GetItems()
     return this->scrollback->GetLastID();
 }
 
+QList<QString> ScrollbackFrame::GetUsers()
+{
+    return this->userFrame->GetUsers();
+}
+
+QList<QString> ScrollbackFrame::GetChannels()
+{
+    if (!this->GetSession())
+        return QList<QString>  ();
+    return this->GetSession()->GetChannels(this->GetScrollback());
+}
+
 int ScrollbackFrame::GetSynced()
 {
     return this->scrollback->GetSICount();

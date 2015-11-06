@@ -27,17 +27,7 @@ AutocompletionEngine::~AutocompletionEngine()
 
 }
 
-void AutocompletionEngine::SetUsers(QList<QString> ul)
-{
-    this->users = ul;
-}
-
-void AutocompletionEngine::SetChannels(QList<QString> cl)
-{
-    this->channels = cl;
-}
-
-AutocompletionInformation AutocompletionEngine::Execute(AutocompletionInformation input)
+AutocompletionInformation AutocompletionEngine::Execute(AutocompletionInformation input, QList<QString> users, QList<QString> channels)
 {
     // This is where the isolated word starts
     //   this pos: v
@@ -67,7 +57,7 @@ AutocompletionInformation AutocompletionEngine::Execute(AutocompletionInformatio
     if (!word.isEmpty() && word.startsWith(this->channelPrefix))
     {
         QString unprefixed_cn = word.mid(1);
-        results = this->processList(this->channels, &successful, true, unprefixed_cn, start+1, input.FullText);
+        results = this->processList(channels, &successful, true, unprefixed_cn, start+1, input.FullText);
         if (successful)
             return results;
     }
@@ -78,11 +68,11 @@ AutocompletionInformation AutocompletionEngine::Execute(AutocompletionInformatio
         // if we are on end of the sentence, we want to put colon to nickname, otherwise just complete it
         if (input.Position == input.FullText.size())
         {
-            foreach (QString ux, this->users)
+            foreach (QString ux, users)
                 ulist << ux + ": ";
         } else
         {
-            ulist = this->users;
+            ulist = users;
         }
         results = this->processList(ulist, &successful, true, word, start, input.FullText);
         if (successful)

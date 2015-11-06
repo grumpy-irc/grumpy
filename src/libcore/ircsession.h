@@ -86,6 +86,7 @@ namespace GrumpyIRC
             virtual bool IsConnected() const;
             virtual QList<NetworkSniffer_Item*> GetSniffer();
             SessionType GetType();
+            QList<QString> GetChannels(Scrollback *window);
             QHash<QString, QVariant> ToHash(int max_items = 2000);
             void LoadHash(QHash<QString, QVariant> hash);
             void SendAction(Scrollback *window, QString text);

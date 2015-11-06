@@ -56,7 +56,7 @@ void InputBox::Complete()
     input.Position = this->ui->textEdit->textCursor().position();
     input.FullText = this->ui->textEdit->toPlainText();
 
-    AutocompletionInformation result = AE->Execute(input);
+    AutocompletionInformation result = AE->Execute(input, this->parent->GetUsers(), this->parent->GetChannels());
     if (!result.Success)
         return;
     this->ui->textEdit->setText(result.FullText);

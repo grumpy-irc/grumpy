@@ -124,6 +124,17 @@ void UserFrame::SetNetwork(libircclient::Network *Network)
         this->userCounts.insert(mode, 0);
 }
 
+QList<QString> UserFrame::GetUsers()
+{
+    QList<QString> ul;
+
+    foreach (libircclient::User user, this->users.values())
+        ul.append(user.GetNick());
+
+    return ul;
+
+}
+
 void UserFrame::UpdateInfo()
 {
     if (!this->IsVisible)
