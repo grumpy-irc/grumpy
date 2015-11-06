@@ -210,6 +210,7 @@ void Session::processMessage(QHash<QString, QVariant> parameters)
     // We have the original ID of scrollback so let's find it here
     unsigned int nsid = parameters["network_id"].toUInt();
     unsigned long long sid = parameters["scrollback_id"].toULongLong();
+    bool is_action = parameters["me"].toBool();
     // let's find the network
     SyncableIRCSession* irc = this->loggedUser->GetSIRCSession(nsid);
     if (!irc)
@@ -225,7 +226,10 @@ void Session::processMessage(QHash<QString, QVariant> parameters)
         return;
     }
     QString rx = parameters["text"].toString();
-    irc->SendMessage(scrollback, rx);
+    if (!is_action)
+        irc->SendMessage(scrollback, rx);
+    else
+        irc->SendAction(scrollback, rx);
 }
 
 void Session::processCommand(QHash<QString, QVariant> parameters)
