@@ -36,6 +36,7 @@ namespace GrumpyIRC
             void ProcessInput();
             void Complete();
             void Focus();
+            void InsertEnter();
             void History(bool up = false);
 
         private:

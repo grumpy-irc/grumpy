@@ -30,6 +30,9 @@ namespace GrumpyIRC
             explicit PreferencesWin(QWidget *parent = 0);
             ~PreferencesWin();
 
+        private slots:
+            void on_buttonBox_rejected();
+
         private:
             Ui::PreferencesWin *ui;
     };

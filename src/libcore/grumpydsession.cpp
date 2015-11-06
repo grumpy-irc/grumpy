@@ -74,6 +74,7 @@ void GrumpydSession::SendMessage(Scrollback *window, QString text)
     QHash<QString, QVariant> parameters;
     parameters.insert("network_id", QVariant(ircs->GetSID()));
     parameters.insert("scrollback_id", QVariant(window->GetOriginalID()));
+    parameters.insert("me", QVariant(false));
     parameters.insert("text", QVariant(text));
     this->SendProtocolCommand(GP_CMD_MESSAGE, parameters);
 }
@@ -98,6 +99,19 @@ void GrumpydSession::SendRaw(Scrollback *window, QString raw)
 SessionType GrumpydSession::GetType()
 {
     return SessionType_Grumpyd;
+}
+
+void GrumpydSession::SendAction(Scrollback *window, QString text)
+{
+    IRCSession *ircs = this->GetSessionFromWindow(window);
+    if (!ircs)
+        return;
+    QHash<QString, QVariant> parameters;
+    parameters.insert("network_id", QVariant(ircs->GetSID()));
+    parameters.insert("me", QVariant(true));
+    parameters.insert("scrollback_id", QVariant(window->GetOriginalID()));
+    parameters.insert("text", QVariant(text));
+    this->SendProtocolCommand(GP_CMD_MESSAGE, parameters);
 }
 
 void GrumpydSession::RequestRemove(Scrollback *window)
@@ -355,20 +369,30 @@ void GrumpydSession::processNetwork(QHash<QString, QVariant> hash)
 
 void GrumpydSession::processULSync(QHash<QString, QVariant> hash)
 {
+    QString channel_name = hash["channel_name"].toString();
     IRCSession *session = this->GetSession(hash["network_id"].toUInt());
     if (!session)
         return;
-    libircclient::Channel *channel = session->GetNetwork()->GetChannel(hash["channel_name"].toString());
+    libircclient::Channel *channel = session->GetNetwork()->GetChannel(channel_name);
     int mode = hash["operation"].toInt();
     if (!channel || !mode)
         return;
+    Scrollback *window = session->GetScrollback(channel_name);
+    if (!window)
+    {
+        GRUMPY_DEBUG("Unable to resync user list, window is missing for " + channel_name, 1);
+        return;
+    }
     if (mode == GRUMPY_UL_INSERT)
     {
         libircclient::User user(hash["user"].toHash());
         channel->InsertUser(&user);
+        window->UserListChange(user.GetNick(), &user, UserListChange_Insert);
     } else if (mode == GRUMPY_UL_REMOVE)
     {
         QString user = hash["target"].toString();
+        // Remove the user from window
+        window->UserListChange(user, NULL, UserListChange_Remove);
         channel->RemoveUser(user);
     }
 }

@@ -185,6 +185,7 @@ void IRCSession::Connect(libircclient::Network *Network)
     connect(this->network, SIGNAL(Event_SelfPart(libircclient::Parser*,libircclient::Channel*)), this, SLOT(OnSelfPart(libircclient::Parser*,libircclient::Channel*)));
     connect(this->network, SIGNAL(Event_TOPIC(libircclient::Parser*,libircclient::Channel*,QString)), this, SLOT(OnTOPIC(libircclient::Parser*,libircclient::Channel*,QString)));
     connect(this->network, SIGNAL(Event_TOPICInfo(libircclient::Parser*,libircclient::Channel*)), this, SLOT(OnTopicInfo(libircclient::Parser*,libircclient::Channel*)));
+    connect(this->network, SIGNAL(Event_CTCP(libircclient::Parser*,QString,QString)), this, SLOT(OnCTCP(libircclient::Parser*,QString,QString)));
     this->network->Connect();
 }
 
@@ -297,6 +298,20 @@ void IRCSession::LoadHash(QHash<QString, QVariant> hash)
         this->SyncWindows(hash["channels"].toHash(), &this->channels);
 }
 
+void IRCSession::SendAction(Scrollback *window, QString text)
+{
+    if (!this->IsConnected())
+    {
+        this->GetSystemWindow()->InsertText("Can't send messages to a disconnected network");
+        return;
+    }
+    if (window->GetTarget().isEmpty())
+        throw new GrumpyIRC::Exception("window->GetTarget() contains empty string", BOOST_CURRENT_FUNCTION);
+    this->GetNetwork()->SendAction(text, window->GetTarget());
+    // Write the message to active window
+    window->InsertText(ScrollbackItem(text, ScrollbackItemType_Act, this->GetNetwork()->GetLocalUserInfo()));
+}
+
 void IRCSession::SendRaw(Scrollback *window, QString raw)
 {
     Q_UNUSED(window);
@@ -396,6 +411,17 @@ void IRCSession::OnKICK(libircclient::Parser *px, libircclient::Channel *channel
         return;
     this->channels[l]->UserListChange(px->GetParameters()[1], NULL, UserListChange_Remove);
     this->channels[l]->InsertText(ScrollbackItem("kicked " + px->GetParameters()[1] + " from channel: " + px->GetText(), ScrollbackItemType_Kick, px->GetSourceUserInfo()));
+}
+
+void IRCSession::OnCTCP(libircclient::Parser *px, QString ctcp, QString pars)
+{
+    if (ctcp == "ACTION")
+    {
+        this->processME(px, pars);
+    } else if (ctcp == "VERSION")
+    {
+        //this->GetNetwork()->sen
+    }
 }
 
 void IRCSession::OnMOTD(libircclient::Parser *px)
@@ -514,6 +540,27 @@ void IRCSession::OnNotice(libircclient::Parser *px)
     sx->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Notice, px->GetSourceUserInfo()));
 }
 
+void IRCSession::processME(libircclient::Parser *px, QString message)
+{
+    Scrollback *sx = NULL;
+    // Get the target scrollback
+    QString target = px->GetParameters()[0];
+    // if target is current user we need to find target scrollback based on a user's nick
+    if (target.toLower() == this->network->GetLocalUserInfo()->GetNick().toLower())
+    {
+        sx = this->GetScrollbackForUser(px->GetSourceUserInfo()->GetNick());
+    } else
+    {
+        sx = this->GetScrollbackForChannel(target);
+    }
+    if (sx == NULL)
+    {
+        this->systemWindow->InsertText("No target for " + target + ": " + px->GetRaw());
+        return;
+    }
+    sx->InsertText(ScrollbackItem(message, ScrollbackItemType_Act, px->GetSourceUserInfo()));
+}
+
 Configuration *IRCSession::GetConfiguration()
 {
     return Core::GrumpyCore->GetConfiguration();
@@ -570,11 +617,6 @@ void IRCSession::OnConnectionFail(QAbstractSocket::SocketError er)
 
 void IRCSession::OnMessage(libircclient::Parser *px)
 {
-    if (px->GetParameters().count() < 1)
-    {
-        this->systemWindow->InsertText("Ignoring malformed PRIVMSG: " + px->GetRaw());
-        return;
-    }
     Scrollback *sx = NULL;
     // Get the target scrollback
     QString target = px->GetParameters()[0];

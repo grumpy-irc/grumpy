@@ -60,7 +60,7 @@ Session::Session(qintptr socket_ptr, bool ssl)
     this->IsRunning = true;
     SessionList.append(this);
     sessions_lock->unlock();
-    this->MaxScrollbackSyncItems = 800;
+    this->MaxScrollbackSyncItems = 200;
     this->loggedUser = NULL;
     if (ssl)
     {

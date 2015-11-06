@@ -85,6 +85,7 @@ Grumpyd::Grumpyd()
 
 Grumpyd::~Grumpyd()
 {
+    delete this->listenerSSL;
     delete this->listener;
 }
 
@@ -110,12 +111,24 @@ void Grumpyd::Main()
     this->databaseBackend->LoadRoles();
     this->databaseBackend->LoadUsers();
     GRUMPY_LOG("Starting listeners");
-    this->listener->listen(QHostAddress::Any, GP_DEFAULT_PORT);
-    GRUMPY_LOG("Listener open on port " + QString::number(GP_DEFAULT_PORT));
+    if (!this->listener->listen(QHostAddress::Any, GP_DEFAULT_PORT))
+    {
+        GRUMPY_ERROR("Unable to open port " + GP_DEFAULT_PORT);
+    }
+    else
+    {
+        GRUMPY_LOG("Listener open on port " + QString::number(GP_DEFAULT_PORT));
+    }
     if (SSLIsAvailable())
     {
-        this->listenerSSL->listen(QHostAddress::Any, GP_DEFAULT_SSL_PORT);
-        GRUMPY_LOG("Listener (SSL) open on port " + QString::number(GP_DEFAULT_SSL_PORT));
+        if (!this->listenerSSL->listen(QHostAddress::Any, GP_DEFAULT_SSL_PORT))
+        {
+            GRUMPY_ERROR("Unable to open " + GP_DEFAULT_SSL_PORT);
+        }
+        else
+        {
+            GRUMPY_LOG("Listener (SSL) open on port " + QString::number(GP_DEFAULT_SSL_PORT));
+        }
     }
 }
 

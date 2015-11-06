@@ -10,22 +10,29 @@
 
 // Copyright (c) Petr Bena 2015
 
-#include "preferenceswin.h"
-#include "ui_preferenceswin.h"
+#ifndef SCRIPTWIN_H
+#define SCRIPTWIN_H
 
-using namespace GrumpyIRC;
+#include <QDialog>
 
-PreferencesWin::PreferencesWin(QWidget *parent) : QDialog(parent), ui(new Ui::PreferencesWin)
+namespace Ui
 {
-    this->ui->setupUi(this);
+    class ScriptWin;
 }
 
-PreferencesWin::~PreferencesWin()
+namespace GrumpyIRC
 {
-    delete this->ui;
+    class ScriptWin : public QDialog
+    {
+            Q_OBJECT
+
+        public:
+            explicit ScriptWin(QWidget *parent = 0);
+            ~ScriptWin();
+
+        private:
+            Ui::ScriptWin *ui;
+    };
 }
 
-void GrumpyIRC::PreferencesWin::on_buttonBox_rejected()
-{
-
-}
+#endif // SCRIPTWIN_H

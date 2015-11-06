@@ -57,6 +57,7 @@ namespace GrumpyIRC
             NetworkSession *GetSession();
             Scrollback *GetScrollback();
             UserFrame *GetUserFrame();
+            QString GetTitle();
             void Focus();
             bool IsChannel();
             bool IsNetwork();

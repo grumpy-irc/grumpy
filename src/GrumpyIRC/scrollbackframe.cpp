@@ -290,6 +290,11 @@ UserFrame *ScrollbackFrame::GetUserFrame()
     return this->userFrame;
 }
 
+QString ScrollbackFrame::GetTitle()
+{
+    return this->scrollback->GetTarget();
+}
+
 void ScrollbackFrame::Focus()
 {
     this->inputBox->Focus();

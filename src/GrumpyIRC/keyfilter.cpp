@@ -27,6 +27,8 @@ bool KeyFilter::eventFilter(QObject *obj, QEvent *event)
     if (event->type() == QEvent::KeyPress)
     {
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->modifiers().testFlag(Qt::AltModifier) || keyEvent->modifiers().testFlag(Qt::ShiftModifier))
+            return QObject::eventFilter(obj, event);
         if (keyEvent->key() == Qt::Key_Down)
         {
             this->parentInput->History();

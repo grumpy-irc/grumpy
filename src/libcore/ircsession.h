@@ -88,6 +88,7 @@ namespace GrumpyIRC
             SessionType GetType();
             QHash<QString, QVariant> ToHash(int max_items = 2000);
             void LoadHash(QHash<QString, QVariant> hash);
+            void SendAction(Scrollback *window, QString text);
             void SendRaw(Scrollback *window, QString raw);
             void RequestRemove(Scrollback *window);
             void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete);
@@ -110,6 +111,7 @@ namespace GrumpyIRC
             virtual void OnIRCSelfJoin(libircclient::Channel *channel);
             virtual void OnIRCSelfNICK(libircclient::Parser *px, QString previous, QString nick);
             virtual void OnKICK(libircclient::Parser *px, libircclient::Channel *channel);
+            virtual void OnCTCP(libircclient::Parser *px, QString ctcp, QString pars);
             virtual void OnMOTD(libircclient::Parser *px);
             virtual void OnPart(libircclient::Parser *px, libircclient::Channel *channel);
             virtual void OnSelf_KICK(libircclient::Parser *px, libircclient::Channel *channel);
@@ -122,6 +124,7 @@ namespace GrumpyIRC
         protected:
             static unsigned int lastID;
 
+            virtual void processME(libircclient::Parser *px, QString message);
             //! Returns a configuration of grumpy, this method is overriden by grumpyd so that it returns
             //! the configuration for every user
             virtual Configuration *GetConfiguration();

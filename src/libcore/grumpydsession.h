@@ -67,6 +67,7 @@ namespace GrumpyIRC
             libircclient::Network *GetNetwork();
             void SendRaw(Scrollback *window, QString raw);
             SessionType GetType();
+            void SendAction(Scrollback *window, QString text);
             void RequestRemove(Scrollback *window);
             void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete);
             void RequestPart(Scrollback *window);

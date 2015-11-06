@@ -79,6 +79,11 @@ void InputBox::Focus()
     this->ui->textEdit->setFocus();
 }
 
+void InputBox::InsertEnter()
+{
+    this->ui->textEdit->insertPlainText("\n");
+}
+
 void InputBox::History(bool up)
 {
     if (up)

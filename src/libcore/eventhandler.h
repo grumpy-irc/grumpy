@@ -17,14 +17,14 @@
 #include "../libirc/libircclient/irceventhandler.h"
 
 // Debug
-#define GRUMPY_DEBUG(text, verbosity)    if (GrumpyIRC::Core::GrumpyCore && GrumpyIRC::Core::GrumpyCore->GetCurrentEventHandler()) \
-                                         { GrumpyIRC::Core::GrumpyCore->GetCurrentEventHandler()->OnDebug(text, verbosity); }
+#define GRUMPY_DEBUG(text, verbosity)    { if (GrumpyIRC::Core::GrumpyCore && GrumpyIRC::Core::GrumpyCore->GetCurrentEventHandler()) \
+                                         { GrumpyIRC::Core::GrumpyCore->GetCurrentEventHandler()->OnDebug(text, verbosity); } }
 // Standard log
-#define GRUMPY_LOG(text)                 if (GrumpyIRC::Core::GrumpyCore && GrumpyIRC::Core::GrumpyCore->GetCurrentEventHandler()) \
-                                         { GrumpyIRC::Core::GrumpyCore->GetCurrentEventHandler()->OnSystemLog(text); }
+#define GRUMPY_LOG(text)                 { if (GrumpyIRC::Core::GrumpyCore && GrumpyIRC::Core::GrumpyCore->GetCurrentEventHandler()) \
+                                         { GrumpyIRC::Core::GrumpyCore->GetCurrentEventHandler()->OnSystemLog(text); } }
 // Error message
-#define GRUMPY_ERROR(text)               if (GrumpyIRC::Core::GrumpyCore && GrumpyIRC::Core::GrumpyCore->GetCurrentEventHandler()) \
-                                         { GrumpyIRC::Core::GrumpyCore->GetCurrentEventHandler()->OnError(text); }
+#define GRUMPY_ERROR(text)               { if (GrumpyIRC::Core::GrumpyCore && GrumpyIRC::Core::GrumpyCore->GetCurrentEventHandler()) \
+                                         { GrumpyIRC::Core::GrumpyCore->GetCurrentEventHandler()->OnError(text); } }
 
 namespace GrumpyIRC
 {

@@ -53,6 +53,7 @@ namespace GrumpyIRC
             ScrollbackFrame *GetSystem();
             ScrollbackFrame *GetCurrentScrollbackFrame();
             UserWidget *GetUsers();
+            void SetWN(QString text);
             void UpdateStatus();
             void OpenGrumpy(QString hostname, int port, QString username, QString password, bool ssl);
             void OpenIRCNetworkLink(QString link);

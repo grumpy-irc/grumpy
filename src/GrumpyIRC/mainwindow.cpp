@@ -118,6 +118,26 @@ static int SystemCommand_Grumpy(SystemCommand *command, CommandArgs command_args
     return 0;
 }
 
+static int SystemCommand_Act(SystemCommand *command, CommandArgs command_args)
+{
+    Q_UNUSED(command);
+    if (command_args.Parameters.count() < 1)
+    {
+        GRUMPY_ERROR(QObject::tr("This command requires some text"));
+        return 1;
+    }
+    ScrollbackFrame *scrollback = MainWindow::Main->GetScrollbackManager()->GetCurrentScrollback();
+    if (!scrollback->GetSession() ||
+            !scrollback->GetSession()->IsConnected() ||
+            scrollback->GetScrollback()->GetType() == ScrollbackType_System)
+    {
+        GRUMPY_ERROR(QObject::tr("You can only use this command in channel or user windows of connected networks"));
+        return 2;
+    }
+    scrollback->GetSession()->SendAction(scrollback->GetScrollback(), command_args.ParameterLine);
+    return 0;
+}
+
 static int SystemCommand_UnsecureGrumpy(SystemCommand *command, CommandArgs command_args)
 {
     Q_UNUSED(command);
@@ -181,6 +201,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("quit", (SC_Callback)SystemCommand_Exit));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("server", (SC_Callback)SystemCommand_Server));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("nick", (SC_Callback)SystemCommand_Nick));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("me", (SC_Callback)SystemCommand_Act));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.netstat", (SC_Callback)SystemCommand_Netstat));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.next_session_nick", (SC_Callback)SystemCommand_NextSessionNick));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("unsecuregrumpyd", (SC_Callback)SystemCommand_UnsecureGrumpy));
@@ -234,6 +255,14 @@ ScrollbackFrame *MainWindow::GetCurrentScrollbackFrame()
 UserWidget *MainWindow::GetUsers()
 {
     return this->userWidget;
+}
+
+void MainWindow::SetWN(QString text)
+{
+    if (text.isEmpty())
+        this->setWindowTitle("GrumpyIRC");
+    else
+        this->setWindowTitle("GrumpyIRC - " + text);
 }
 
 void MainWindow::UpdateStatus()
