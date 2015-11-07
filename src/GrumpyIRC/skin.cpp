@@ -11,15 +11,33 @@
 // Copyright (c) Petr Bena 2015
 
 #include "skin.h"
+#include <QFontDatabase>
+#include <QStringList>
 
 using namespace GrumpyIRC;
 
-Skin *Skin::Default = new Skin();
+Skin *Skin::Default = NULL;
+
+Skin *GrumpyIRC::Skin::GetDefault()
+{
+	if (Skin::Default == NULL)
+		Skin::Default = new Skin();
+	return Skin::Default;
+}
 
 Skin::Skin()
 {
     this->BackgroundColor = QColor(0, 0, 0);
     this->TextColor = QColor(255, 255, 255);
+#ifdef GRUMPY_WIN
+    if (QFontDatabase().families().contains("Consolas"))
+        this->TextFont = QFont("Consolas");
+    else
+        this->TextFont = QFont("Courier New");
+#else
+    this->TextFont = QFont("Monospace");
+#endif
+    this->TextFont.setPixelSize(13);
     this->ModeColors.insert('v', QColor(244, 254, 10));
     this->ModeColors.insert('h', QColor(212, 250, 145));
     this->ModeColors.insert('o', QColor(92, 247, 14));

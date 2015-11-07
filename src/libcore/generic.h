@@ -15,6 +15,7 @@
 
 #include <QStringList>
 #include <QString>
+#include <QObject>
 #include "libcore_global.h"
 #include <QList>
 

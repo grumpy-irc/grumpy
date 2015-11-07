@@ -24,9 +24,9 @@ UserFrame::UserFrame(QWidget *parent) : QFrame(parent), ui(new Ui::UserFrame)
     this->network = NULL;
     this->IsVisible = false;
     this->NeedsUpdate = false;
-    this->ui->label->setPalette(Skin::Default->Palette());
+    this->ui->label->setPalette(Skin::GetDefault()->Palette());
     this->ui->label->setText("");
-    this->ui->listWidget->setPalette(Skin::Default->Palette());
+    this->ui->listWidget->setPalette(Skin::GetDefault()->Palette());
 }
 
 UserFrame::~UserFrame()
@@ -51,10 +51,10 @@ void UserFrame::on_listWidget_customContextMenuRequested(const QPoint &pos)
 
 static QColor getColor(libircclient::User *ux)
 {
-    if (ux->CUMode == 0 || !Skin::Default->ModeColors.contains(ux->CUMode))
-        return Skin::Default->TextColor;
+    if (ux->CUMode == 0 || !Skin::GetDefault()->ModeColors.contains(ux->CUMode))
+        return Skin::GetDefault()->TextColor;
     
-    return Skin::Default->ModeColors[ux->CUMode];
+    return Skin::GetDefault()->ModeColors[ux->CUMode];
 }
 
 void UserFrame::InsertUser(libircclient::User *user)

@@ -127,7 +127,7 @@ QList<QString> GrumpydSession::GetChannels(Scrollback *window)
 {
     IRCSession *ircs = this->GetSessionFromWindow(window);
     if (!ircs)
-        throw new NullPointerException("ircs", BOOST_CURRENT_FUNCTION);
+        return QList<QString>();
 
     return ircs->GetChannels(window);
 }

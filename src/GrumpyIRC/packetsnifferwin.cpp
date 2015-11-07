@@ -21,6 +21,8 @@ using namespace GrumpyIRC;
 PacketSnifferWin::PacketSnifferWin(QWidget *parent) : QDialog(parent), ui(new Ui::PacketSnifferWin)
 {
     this->ui->setupUi(this);
+    this->ui->plainTextEdit->clear();
+    this->ui->plainTextEdit->setReadOnly(true);
 }
 
 PacketSnifferWin::~PacketSnifferWin()
@@ -39,5 +41,5 @@ void PacketSnifferWin::Load(IRCSession *session)
             direction =     " > ";
         text += snif->Time.toString() + " " + session->GetNetwork()->GetServerAddress() + direction + snif->Text;
     }
-    this->ui->textEdit->setText(text);
+    this->ui->plainTextEdit->appendPlainText(text);
 }

@@ -38,7 +38,8 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     this->inputBox = new InputBox(this);
     this->ui->splitter->addWidget(this->textEdit);
     this->ui->splitter->addWidget(this->inputBox);
-    this->textEdit->setPalette(Skin::Default->Palette());
+    this->textEdit->setFont(Skin::GetDefault()->TextFont);
+    this->textEdit->setPalette(Skin::GetDefault()->Palette());
     this->_parent = parentWindow;
     this->TreeNode = NULL;
     this->needsRefresh = false;

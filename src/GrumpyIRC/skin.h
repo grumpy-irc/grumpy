@@ -13,7 +13,10 @@
 #ifndef SKIN_H
 #define SKIN_H
 
+#include "../libcore/definitions.h"
+
 #include <QHash>
+#include <QFont>
 #include <QPalette>
 
 namespace GrumpyIRC
@@ -22,9 +25,11 @@ namespace GrumpyIRC
     {
         public:
             static Skin *Default;
+			static Skin *GetDefault();
 
             Skin();
             QPalette Palette();
+            QFont TextFont;
             QColor TextColor;
             QColor BackgroundColor;
             QHash<char, QColor> ModeColors;

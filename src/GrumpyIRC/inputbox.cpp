@@ -27,9 +27,10 @@ AutocompletionEngine *InputBox::AE = NULL;
 InputBox::InputBox(ScrollbackFrame *parent) : QFrame(parent), ui(new Ui::InputBox)
 {
     this->ui->setupUi(this);
-    this->ui->textEdit->setPalette(Skin::Default->Palette());
     this->ui->textEdit->installEventFilter(new KeyFilter(this));
     this->historySize = 800;
+	this->ui->textEdit->setFont(Skin::GetDefault()->TextFont);
+	this->ui->textEdit->setPalette(Skin::GetDefault()->Palette());
     this->historyPosition = 0;
     this->parent = parent;
 }
