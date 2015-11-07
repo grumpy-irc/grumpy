@@ -27,7 +27,7 @@ AutocompletionEngine::~AutocompletionEngine()
 
 }
 
-AutocompletionInformation AutocompletionEngine::Execute(AutocompletionInformation input, QList<QString> users, QList<QString> channels)
+AutocompletionInformation AutocompletionEngine::Execute(AutocompletionInformation input, QList<QString> extra_commands, QList<QString> users, QList<QString> channels)
 {
     // This is where the isolated word starts
     //   this pos: v
@@ -49,6 +49,12 @@ AutocompletionInformation AutocompletionEngine::Execute(AutocompletionInformatio
         QList<QString> commands;
         foreach (QString cm, Core::GrumpyCore->GetCommandProcessor()->GetCommands())
             commands << cm + " ";
+        foreach (QString cm, extra_commands)
+        {
+            QString command = cm + " ";
+            if (!commands.contains(command))
+                commands.append(command);
+        }
         results = this->processList(commands, &successful, true, unprefixed_command, start+1, input.FullText);
         if (successful)
             return results;
@@ -56,8 +62,7 @@ AutocompletionInformation AutocompletionEngine::Execute(AutocompletionInformatio
     // Now let's try channels
     if (!word.isEmpty() && word.startsWith(this->channelPrefix))
     {
-        QString unprefixed_cn = word.mid(1);
-        results = this->processList(channels, &successful, true, unprefixed_cn, start+1, input.FullText);
+        results = this->processList(channels, &successful, true, word, start, input.FullText);
         if (successful)
             return results;
     }
@@ -65,8 +70,18 @@ AutocompletionInformation AutocompletionEngine::Execute(AutocompletionInformatio
     if (!word.isEmpty())
     {
         QList<QString> ulist;
-        // if we are on end of the sentence, we want to put colon to nickname, otherwise just complete it
-        if (input.Position == input.FullText.size())
+        bool is_start = true;
+        int position = input.Position;
+        while (position > 0)
+        {
+            if (input.FullText[position--] == ' ')
+            {
+                is_start = false;
+                break;
+            }
+        }
+        // if we are on start of the sentence, we want to put colon to nickname, otherwise just complete it
+        if (is_start)
         {
             foreach (QString ux, users)
                 ulist << ux + ": ";

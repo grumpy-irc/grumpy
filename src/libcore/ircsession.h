@@ -94,6 +94,7 @@ namespace GrumpyIRC
             void RequestRemove(Scrollback *window);
             void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete);
             void RequestPart(Scrollback *window);
+            libircclient::User *GetSelfNetworkID(Scrollback *window);
             //! Used mostly only for synchronization with grumpyd
             virtual void RegisterChannel(libircclient::Channel *channel, Scrollback *window);
             Scrollback *Root;
@@ -121,7 +122,9 @@ namespace GrumpyIRC
             virtual void OnSelfPart(libircclient::Parser *px, libircclient::Channel *channel);
             virtual void OnTopicInfo(libircclient::Parser *px, libircclient::Channel *channel);
             virtual void OnEndOfNames(libircclient::Parser *px);
+            virtual void OnWHO(libircclient::Parser *px, libircclient::Channel *channel, libircclient::User *user);
             virtual void OnNotice(libircclient::Parser *px);
+            virtual void OnWhoEnd(libircclient::Parser *px);
         protected:
             static unsigned int lastID;
 
@@ -141,6 +144,9 @@ namespace GrumpyIRC
             libircclient::Network *network;
             QHash<QString, Scrollback*> users;
             Scrollback *systemWindow;
+        private:
+            bool isRetrievingWhoInfo(QString channel);
+            QList<QString> retrievingWho;
     };
 }
 

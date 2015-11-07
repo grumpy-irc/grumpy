@@ -18,6 +18,7 @@
 #include "ui_mainwindow.h"
 #include "userwidget.h"
 #include "grumpyconf.h"
+#include "preferenceswin.h"
 #include "scrollbackframe.h"
 #include "../libcore/generic.h"
 #include "syslogwindow.h"
@@ -189,6 +190,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->userWidget = new UserWidget(this);
     this->setCentralWidget(this->scrollbackWindow);
     this->statusFrame = new QLabel(this);
+    this->identFrame = new QLabel(this);
+    this->ui->statusBar->addPermanentWidget(this->identFrame);
     this->addDockWidget(Qt::LeftDockWidgetArea, this->windowList);
     this->addDockWidget(Qt::BottomDockWidgetArea, this->syslogWindow);
     this->addDockWidget(Qt::RightDockWidgetArea, this->userWidget);
@@ -270,6 +273,11 @@ void MainWindow::UpdateStatus()
     int synced = this->GetScrollbackManager()->GetCurrentScrollback()->GetSynced();
     int total = this->GetScrollbackManager()->GetCurrentScrollback()->GetItems();
     this->statusFrame->setText("Items (synced/total): " + QString::number(synced) + " / " + QString::number(total));
+    libircclient::User *self_ident = this->GetCurrentScrollbackFrame()->GetIdentity();
+    if (!self_ident)
+        this->identFrame->setText("");
+    else
+        this->identFrame->setText(self_ident->ToString());
 }
 
 void MainWindow::OpenGrumpy(QString hostname, int port, QString username, QString password, bool ssl)
@@ -334,4 +342,11 @@ void GrumpyIRC::MainWindow::on_actionAbout_triggered()
 void GrumpyIRC::MainWindow::on_actionLoad_more_items_from_remote_triggered()
 {
     this->GetScrollbackManager()->GetCurrentScrollback()->RequestMore(100);
+}
+
+void GrumpyIRC::MainWindow::on_actionPreferences_triggered()
+{
+    PreferencesWin *wx = new PreferencesWin(this);
+    wx->setAttribute(Qt::WA_DeleteOnClose);
+    wx->show();
 }

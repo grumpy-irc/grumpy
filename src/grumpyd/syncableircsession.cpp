@@ -226,6 +226,15 @@ void SyncableIRCSession::OnEndOfNames(libircclient::Parser *px)
     this->ResyncChannel(channel);
 }
 
+void SyncableIRCSession::OnWHO(libircclient::Parser *px, libircclient::Channel *channel, libircclient::User *user)
+{
+    IRCSession::OnWHO(px, channel, user);
+    if (!channel || !user)
+        return;
+
+    this->resyncUL(channel, GRUMPY_UL_UPDATE, user);
+}
+
 void SyncableIRCSession::resyncULRemove(libircclient::Channel *channel, QString user)
 {
     Session *session = this->owner->GetAnyGPSession();

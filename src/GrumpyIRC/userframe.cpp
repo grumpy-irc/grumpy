@@ -49,6 +49,15 @@ void UserFrame::on_listWidget_customContextMenuRequested(const QPoint &pos)
 
 }
 
+QString UserFrame::GenerateTip(libircclient::User *ux)
+{
+    QString text = ux->ToString();
+    if (ux->GetRealname().length())
+        text += "\n" + ux->GetRealname();
+
+    return text;
+}
+
 static QColor getColor(libircclient::User *ux)
 {
     if (ux->CUMode == 0 || !Skin::GetDefault()->ModeColors.contains(ux->CUMode))
@@ -68,13 +77,14 @@ void UserFrame::InsertUser(libircclient::User *user)
         this->RemoveUser(name);
     this->users.insert(name, libircclient::User(user));
     UserFrameItem *item = new UserFrameItem(user->GetPrefixedNick(), this->network);
+    item->setToolTip(this->GenerateTip(user));
     item->setTextColor(getColor(user));
     this->userItem.insert(name, item);
     // insert user in a way it's already sorted, so that we don't need to resort the whole
     // user list, which is pretty expensive operation
     int index = -1;
     int count = this->ui->listWidget->count();
-    while (++index < this->ui->listWidget->count())
+    while (++index < count)
     {
         if (item->lowerThan(*this->ui->listWidget->item(index)))
             break;
@@ -102,6 +112,13 @@ void UserFrame::RemoveUser(QString user)
     delete this->userItem[user];
     this->userItem.remove(user);
     this->UpdateInfo();
+}
+
+void UserFrame::RefreshUser(libircclient::User *user)
+{
+    //! \todo Optimize
+    this->RemoveUser(user->GetNick());
+    this->InsertUser(user);
 }
 
 void UserFrame::ChangeNick(QString new_nick, QString old_nick)

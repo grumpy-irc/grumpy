@@ -36,7 +36,12 @@ namespace GrumpyIRC
             GrumpyConf();
             Configuration *GetConfiguration();
             QString GetQuitMessage();
+            void SetQuitMessage(QString text);
             void SetNick(QString nick);
+            QString GetIdent();
+            void SetIdent(QString ident);
+            QString GetAlterNick();
+            void SetAlterNick(QString text);
             bool WriteNoticesToSystem();
             QString GetNick();
             QString GetLineFormat();

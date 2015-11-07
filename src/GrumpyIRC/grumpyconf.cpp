@@ -36,9 +36,34 @@ QString GrumpyConf::GetQuitMessage()
     return qm;
 }
 
+void GrumpyConf::SetQuitMessage(QString text)
+{
+    GCFG->SetValue("quit_message", QVariant(text));
+}
+
 void GrumpyConf::SetNick(QString nick)
 {
     GCFG->SetValue("nick", QVariant(nick));
+}
+
+QString GrumpyConf::GetIdent()
+{
+    return GCFG->GetValueAsString("ident", "grumpy");
+}
+
+void GrumpyConf::SetIdent(QString ident)
+{
+    GCFG->SetValue("ident", QVariant(ident));
+}
+
+QString GrumpyConf::GetAlterNick()
+{
+    return GCFG->GetValueAsString("alternative_nick");
+}
+
+void GrumpyConf::SetAlterNick(QString text)
+{
+    GCFG->SetValue("alternative_nick", QVariant(text));
 }
 
 bool GrumpyConf::WriteNoticesToSystem()

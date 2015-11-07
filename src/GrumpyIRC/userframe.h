@@ -36,6 +36,7 @@ namespace GrumpyIRC
             ~UserFrame();
             void InsertUser(libircclient::User *user);
             void RemoveUser(QString user);
+            void RefreshUser(libircclient::User *user);
             void ChangeNick(QString new_nick, QString old_nick);
             void SetNetwork(libircclient::Network *Network);
             QList<QString> GetUsers();
@@ -49,6 +50,7 @@ namespace GrumpyIRC
             void on_listWidget_customContextMenuRequested(const QPoint &pos);
 
         private:
+            QString GenerateTip(libircclient::User *ux);
             QHash<char, unsigned int> userCounts;
             libircclient::Network *network;
             QHash<QString, libircclient::User> users;

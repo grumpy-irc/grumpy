@@ -10,6 +10,7 @@
 
 // Copyright (c) Petr Bena 2015
 
+#include "skin.h"
 #include "channelwin.h"
 #include "ui_channelwin.h"
 
@@ -17,10 +18,16 @@ using namespace GrumpyIRC;
 
 ChannelWin::ChannelWin(QWidget *parent) : QDialog(parent), ui(new Ui::ChannelWin)
 {
-    ui->setupUi(this);
+    this->ui->setupUi(this);
+    this->ui->plainTextEdit->setPalette(Skin::GetDefault()->Palette());
 }
 
 ChannelWin::~ChannelWin()
 {
-    delete ui;
+    delete this->ui;
+}
+
+void GrumpyIRC::ChannelWin::on_pushButton_clicked()
+{
+
 }

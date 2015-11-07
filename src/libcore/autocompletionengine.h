@@ -35,7 +35,7 @@ namespace GrumpyIRC
         public:
             AutocompletionEngine();
             virtual ~AutocompletionEngine();
-            virtual AutocompletionInformation Execute(AutocompletionInformation input, QList<QString> users, QList<QString> channels);
+            virtual AutocompletionInformation Execute(AutocompletionInformation input, QList<QString> extra_commands, QList<QString> users, QList<QString> channels);
         protected:
             virtual QString replaceWord(QString source, int start, QString sw, QString target);
             virtual QString getIsolatedWord(AutocompletionInformation input, int *start_pos);

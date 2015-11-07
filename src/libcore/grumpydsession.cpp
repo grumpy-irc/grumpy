@@ -238,6 +238,15 @@ void GrumpydSession::Connect()
     }
 }
 
+libircclient::User *GrumpydSession::GetSelfNetworkID(Scrollback *window)
+{
+    IRCSession *ircs = this->GetSessionFromWindow(window);
+    if (!ircs)
+        return NULL;
+
+    return ircs->GetSelfNetworkID(window);
+}
+
 void GrumpydSession::OnSslHandshakeFailure(QList<QSslError> errors)
 {
     foreach(QSslError x, errors)
@@ -403,6 +412,11 @@ void GrumpydSession::processULSync(QHash<QString, QVariant> hash)
         // Remove the user from window
         window->UserListChange(user, NULL, UserListChange_Remove);
         channel->RemoveUser(user);
+    } else if (mode == GRUMPY_UL_UPDATE)
+    {
+        libircclient::User user(hash["user"].toHash());
+        channel->InsertUser(&user);
+        window->UserListChange(user.GetNick(), &user, UserListChange_Refresh);
     }
 }
 

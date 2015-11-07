@@ -60,6 +60,7 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     connect(this->scrollback, SIGNAL(Event_UserRemoved(QString)), this, SLOT(UserList_Remove(QString)));
     connect(this->scrollback, SIGNAL(Event_InsertText(ScrollbackItem)), this, SLOT(_insertText_(ScrollbackItem)));
     connect(this->scrollback, SIGNAL(Event_Closed()), this, SLOT(OnClosed()));
+    connect(this->scrollback, SIGNAL(Event_UserRefresh(libircclient::User*)), this, SLOT(UserList_Refresh(libircclient::User*)));
 }
 
 ScrollbackFrame::~ScrollbackFrame()
@@ -181,6 +182,11 @@ void ScrollbackFrame::UserList_Insert(libircclient::User *ux)
     this->userFrame->InsertUser(ux);
 }
 
+void ScrollbackFrame::UserList_Refresh(libircclient::User *ux)
+{
+    this->userFrame->RefreshUser(ux);
+}
+
 void ScrollbackFrame::UserList_Remove(QString user)
 {
     this->userFrame->RemoveUser(user);
@@ -264,6 +270,15 @@ void ScrollbackFrame::writeText(ScrollbackItem item)
 void ScrollbackFrame::SetWindowName(QString title)
 {
     this->_name = title;
+}
+
+bool ScrollbackFrame::IsConnectedToIRC()
+{
+    if (!this->GetSession())
+        return false;
+    if (!this->GetSession()->IsConnected())
+        return false;
+    return true;
 }
 
 ScrollbackFrame *ScrollbackFrame::GetParent()
@@ -379,6 +394,15 @@ void ScrollbackFrame::RefreshHtmlIfNeeded()
 {
     if (this->needsRefresh)
         this->RefreshHtml();
+}
+
+libircclient::User *ScrollbackFrame::GetIdentity()
+{
+    if (!this->GetSession())
+        return NULL;
+
+    // Return a self identity information for the current network
+    return this->GetSession()->GetSelfNetworkID(this->GetScrollback());
 }
 
 scrollback_id_t ScrollbackFrame::GetItems()

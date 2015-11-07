@@ -30,6 +30,9 @@ namespace GrumpyIRC
             explicit ChannelWin(QWidget *parent = 0);
             ~ChannelWin();
 
+        private slots:
+            void on_pushButton_clicked();
+
         private:
             Ui::ChannelWin *ui;
     };

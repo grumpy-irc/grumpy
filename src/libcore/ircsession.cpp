@@ -186,6 +186,8 @@ void IRCSession::Connect(libircclient::Network *Network)
     connect(this->network, SIGNAL(Event_TOPIC(libircclient::Parser*,libircclient::Channel*,QString)), this, SLOT(OnTOPIC(libircclient::Parser*,libircclient::Channel*,QString)));
     connect(this->network, SIGNAL(Event_TOPICInfo(libircclient::Parser*,libircclient::Channel*)), this, SLOT(OnTopicInfo(libircclient::Parser*,libircclient::Channel*)));
     connect(this->network, SIGNAL(Event_CTCP(libircclient::Parser*,QString,QString)), this, SLOT(OnCTCP(libircclient::Parser*,QString,QString)));
+    connect(this->network, SIGNAL(Event_EndOfWHO(libircclient::Parser*)), this, SLOT(OnWhoEnd(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_WHO(libircclient::Parser*,libircclient::Channel*,libircclient::User*)), this, SLOT(OnWHO(libircclient::Parser*,libircclient::Channel*,libircclient::User*)));
     this->network->Connect();
 }
 
@@ -251,6 +253,11 @@ void IRCSession::SyncWindows(QHash<QString, QVariant> windows, QHash<QString, Sc
         scrollback->SetSession(window_session);
         hash->insert(name.toLower(), scrollback);
     }
+}
+
+bool IRCSession::isRetrievingWhoInfo(QString channel)
+{
+    return this->retrievingWho.contains(channel.toLower());
 }
 
 Scrollback *IRCSession::GetScrollbackForUser(QString user)
@@ -368,6 +375,15 @@ void IRCSession::RequestPart(Scrollback *window)
     this->GetNetwork()->RequestPart(window->GetTarget());
 }
 
+libircclient::User *IRCSession::GetSelfNetworkID(Scrollback *window)
+{
+    if (!this->network)
+        return NULL;
+
+    // return data from network info
+    return this->network->GetLocalUserInfo();
+}
+
 void IRCSession::RegisterChannel(libircclient::Channel *channel, Scrollback *window)
 {
     this->channels.insert(channel->GetName().toLower(), window);
@@ -398,13 +414,18 @@ void IRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
 {
     if (channel->GetName().isEmpty())
         throw new GrumpyIRC::Exception("Invalid channel name", BOOST_CURRENT_FUNCTION);
-    if (this->channels.contains(channel->GetName().toLower()))
+    QString ln = channel->GetName().toLower();
+    if (this->channels.contains(ln))
         throw new GrumpyIRC::Exception("This window name already exists", BOOST_CURRENT_FUNCTION);
     // we just joined a new channel, let's add a scrollback for it
     Scrollback *window = Core::GrumpyCore->NewScrollback(this->systemWindow, channel->GetName(), ScrollbackType_Channel);
     window->SetSession(this);
     emit this->Event_ScrollbackIsOpen(window);
-    this->channels.insert(channel->GetName().toLower(), window);
+    this->channels.insert(ln, window);
+	// Request some information about users in the channel
+    if (!this->retrievingWho.contains(ln))
+        this->retrievingWho.append(ln);
+	this->GetNetwork()->TransferRaw("WHO " + channel->GetName());
 }
 
 void IRCSession::OnIRCSelfNICK(libircclient::Parser *px, QString previous, QString nick)
@@ -520,6 +541,19 @@ void IRCSession::OnEndOfNames(libircclient::Parser *px)
     }
 }
 
+void IRCSession::OnWHO(libircclient::Parser *px, libircclient::Channel *channel, libircclient::User *user)
+{
+    if (!channel || !user)
+        return;
+    if (!this->retrievingWho.contains(channel->GetName().toLower()))
+        this->systemWindow->InsertText("WHO: " + px->GetParameterLine() + ": " + px->GetText());
+    // The user in respective channel was likely updated by libirc now
+    Scrollback *scrollback = this->GetScrollbackForChannel(channel->GetName());
+    if (!scrollback)
+        return;
+    scrollback->UserListChange(user->GetNick(), user, UserListChange_Refresh);
+}
+
 void IRCSession::OnNotice(libircclient::Parser *px)
 {
     if (px->GetParameters().count() < 1)
@@ -547,6 +581,18 @@ void IRCSession::OnNotice(libircclient::Parser *px)
         return;
     }
     sx->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Notice, px->GetSourceUserInfo()));
+}
+
+void IRCSession::OnWhoEnd(libircclient::Parser *px)
+{
+    if (px->GetParameters().size() <= 1)
+        return;
+    QString name = px->GetParameters()[1].toLower();
+
+    if (this->retrievingWho.contains(name))
+        this->retrievingWho.removeOne(name);
+    else
+        this->systemWindow->InsertText("End of WHO for " + name);
 }
 
 void IRCSession::processME(libircclient::Parser *px, QString message)

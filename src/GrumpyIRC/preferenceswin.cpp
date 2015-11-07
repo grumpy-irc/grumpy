@@ -12,12 +12,16 @@
 
 #include "preferenceswin.h"
 #include "ui_preferenceswin.h"
+#include "grumpyconf.h"
 
 using namespace GrumpyIRC;
 
 PreferencesWin::PreferencesWin(QWidget *parent) : QDialog(parent), ui(new Ui::PreferencesWin)
 {
     this->ui->setupUi(this);
+    this->ui->leIdent->setText(CONF->GetIdent());
+    this->ui->leNick->setText(CONF->GetNick());
+    this->ui->leNickFix->setText(CONF->GetAlterNick());
 }
 
 PreferencesWin::~PreferencesWin()
@@ -27,5 +31,12 @@ PreferencesWin::~PreferencesWin()
 
 void GrumpyIRC::PreferencesWin::on_buttonBox_rejected()
 {
+    this->close();
+}
 
+void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
+{
+    CONF->SetNick(this->ui->leNick->text());
+    CONF->SetIdent(this->ui->leIdent->text());
+    this->close();
 }

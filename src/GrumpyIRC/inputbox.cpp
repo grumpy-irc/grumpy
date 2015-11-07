@@ -54,10 +54,26 @@ void InputBox::Complete()
         return;
 
     AutocompletionInformation input;
+    QList<QString> commands;
+    if (this->parent->IsConnectedToIRC())
+    {
+        // these are typical IRC commands supported by majority of servers
+        commands << "join"
+            << "part"
+            << "kick"
+            << "mode"
+            << "whois"
+            << "whowas"
+            << "who"
+            << "topic"
+            << "knock"
+            << "sajoin"
+            << "samode";
+    }
     input.Position = this->ui->textEdit->textCursor().position();
     input.FullText = this->ui->textEdit->toPlainText();
 
-    AutocompletionInformation result = AE->Execute(input, this->parent->GetUsers(), this->parent->GetChannels());
+    AutocompletionInformation result = AE->Execute(input, commands, this->parent->GetUsers(), this->parent->GetChannels());
     if (!result.Success)
         return;
     this->ui->textEdit->setText(result.FullText);

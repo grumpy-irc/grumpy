@@ -52,6 +52,7 @@ namespace GrumpyIRC
             void InsertText(QString text);
             void InsertText(ScrollbackItem item);
             void SetWindowName(QString title);
+            bool IsConnectedToIRC();
 			ScrollbackFrame *GetParent();
             unsigned long GetID();
             NetworkSession *GetSession();
@@ -69,6 +70,7 @@ namespace GrumpyIRC
             void RequestMore(int count);
             void RefreshHtml();
             void RefreshHtmlIfNeeded();
+            libircclient::User *GetIdentity();
             scrollback_id_t GetItems();
             QList<QString> GetUsers();
             QList<QString> GetChannels();
@@ -81,6 +83,7 @@ namespace GrumpyIRC
         private slots:
             void _insertText_(ScrollbackItem item);
             void UserList_Insert(libircclient::User *ux);
+            void UserList_Refresh(libircclient::User *ux);
             void UserList_Remove(QString user);
             void UserList_Rename(QString old, libircclient::User *us);
             void OnDead();

@@ -76,6 +76,7 @@ namespace GrumpyIRC
             IRCSession *GetSession(unsigned int nsid);
             IRCSession *GetSessionFromWindow(Scrollback *scrollback);
             void Connect();
+            libircclient::User *GetSelfNetworkID(Scrollback *window);
 
         signals:
             void Event_IncomingData(QByteArray data);

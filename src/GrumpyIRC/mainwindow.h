@@ -66,10 +66,13 @@ namespace GrumpyIRC
             void on_actionAbout_triggered();
             void on_actionLoad_more_items_from_remote_triggered();
 
+            void on_actionPreferences_triggered();
+
         private:
             void closeEvent(QCloseEvent *event);
             QTimer timer;
             QLabel *statusFrame;
+            QLabel *identFrame;
             ScrollbackFrame *systemWindow;
             ScrollbackList *windowList;
             UserWidget *userWidget;
