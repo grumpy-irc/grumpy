@@ -13,6 +13,7 @@
 #include <QDateTime>
 #include "../libirc/libircclient/network.h"
 #include "../libcore/ircsession.h"
+#include "skin.h"
 #include "packetsnifferwin.h"
 #include "ui_packetsnifferwin.h"
 
@@ -23,6 +24,8 @@ PacketSnifferWin::PacketSnifferWin(QWidget *parent) : QDialog(parent), ui(new Ui
     this->ui->setupUi(this);
     this->ui->plainTextEdit->clear();
     this->ui->plainTextEdit->setReadOnly(true);
+    this->ui->plainTextEdit->setPalette(Skin::GetDefault()->Palette());
+    this->ui->plainTextEdit->setFont(Skin::GetDefault()->TextFont);
 }
 
 PacketSnifferWin::~PacketSnifferWin()

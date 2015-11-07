@@ -425,6 +425,7 @@ void IRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
 	// Request some information about users in the channel
     if (!this->retrievingWho.contains(ln))
         this->retrievingWho.append(ln);
+    this->GetNetwork()->TransferRaw("MODE " + channel->GetName());
 	this->GetNetwork()->TransferRaw("WHO " + channel->GetName());
 }
 
