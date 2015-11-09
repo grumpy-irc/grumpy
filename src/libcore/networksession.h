@@ -14,11 +14,13 @@
 #define NETWORKSESSION_H
 
 #include <QString>
+#include <QObject>
 
 namespace libircclient
 {
     class User;
     class Network;
+    class Channel;
 }
 
 namespace GrumpyIRC
@@ -31,19 +33,21 @@ namespace GrumpyIRC
 
     class Scrollback;
 
-    class NetworkSession
+    class NetworkSession : public QObject
     {
+            Q_OBJECT
         public:
             NetworkSession();
             virtual ~NetworkSession();
             virtual bool IsConnected() const=0;
-            virtual libircclient::Network *GetNetwork()=0;
+            virtual libircclient::Network *GetNetwork(Scrollback *window = 0)=0;
             virtual void SendAction(Scrollback *window, QString text)=0;
             virtual void SendMessage(Scrollback *window, QString text)=0;
             virtual void SendRaw(Scrollback *window, QString raw)=0;
             virtual QList<QString> GetChannels(Scrollback *window)=0;
             virtual libircclient::User *GetSelfNetworkID(Scrollback *window)=0;
             virtual Scrollback *GetSystemWindow()=0;
+            virtual libircclient::Channel *GetChannel(Scrollback *window)=0;
             virtual void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete) = 0;
             //! Request the selected window to be removed from window tree
             //! the windows are never directly removed because there might be complex structures depending on them
@@ -52,7 +56,8 @@ namespace GrumpyIRC
             virtual void RequestPart(Scrollback *window)=0;
             virtual SessionType GetType()=0;
 
-        //signals:
+        signals:
+            void Event_Deleted();
 
         //public slots:
     };

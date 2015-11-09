@@ -149,8 +149,9 @@ Scrollback *IRCSession::GetScrollbackByOriginal(unsigned long long original_sid)
     return NULL;
 }
 
-libircclient::Network *IRCSession::GetNetwork()
+libircclient::Network *IRCSession::GetNetwork(Scrollback *window)
 {
+    //Q_UNUSED(window);
     return this->network;
 }
 
@@ -191,7 +192,7 @@ void IRCSession::Connect(libircclient::Network *Network)
     connect(this->network, SIGNAL(Event_WHO(libircclient::Parser*,libircclient::Channel*,libircclient::User*)), this, SLOT(OnWHO(libircclient::Parser*,libircclient::Channel*,libircclient::User*)));
     connect(this->network, SIGNAL(Event_TOPICWhoTime(libircclient::Parser*,libircclient::Channel*)), this, SLOT(OnTOPICWhoTime(libircclient::Parser*,libircclient::Channel*)));
     connect(this->network, SIGNAL(Event_ModeInfo(libircclient::Parser*)), this, SLOT(OnMODEInfo(libircclient::Parser*)));
-    connect(this->network, SIGNAL(Event_ModeTime(libircclient::Parser*)), this, SLOT(OnMODETIME(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_CreationTime(libircclient::Parser*)), this, SLOT(OnMODETIME(libircclient::Parser*)));
     this->network->Connect();
 }
 
@@ -353,6 +354,13 @@ void IRCSession::RequestRemove(Scrollback *window)
         return;
     }
     this->rmWindow(window);
+}
+
+libircclient::Channel *IRCSession::GetChannel(Scrollback *window)
+{
+    if (!this->network)
+        return NULL;
+    return this->GetNetwork()->GetChannel(window->GetTarget());
 }
 
 void IRCSession::RequestDisconnect(Scrollback *window, QString reason, bool auto_delete)
@@ -626,7 +634,7 @@ void IRCSession::OnMODETIME(libircclient::Parser *px)
         return;
 
     Scrollback *sc = this->channels[lx[1].toLower()];
-    sc->InsertText("MODE set at " + QDateTime::fromTime_t(lx[2].toUInt()).toString());
+    sc->InsertText("Channel was created at " + QDateTime::fromTime_t(lx[2].toUInt()).toString());
 }
 
 void IRCSession::processME(libircclient::Parser *px, QString message)

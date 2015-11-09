@@ -51,7 +51,7 @@ namespace GrumpyIRC
     class Scrollback;
     class IRCSession;
 
-    class LIBCORESHARED_EXPORT GrumpydSession : public libgp::GP, public NetworkSession
+    class LIBCORESHARED_EXPORT GrumpydSession : public NetworkSession
     {
             Q_OBJECT
         public:
@@ -64,7 +64,7 @@ namespace GrumpyIRC
             virtual void Open(libirc::ServerAddress server);
             bool IsConnected() const;
             void SendMessage(Scrollback *window, QString text);
-            libircclient::Network *GetNetwork();
+            libircclient::Network *GetNetwork(Scrollback *window = NULL);
             void SendRaw(Scrollback *window, QString raw);
             SessionType GetType();
             void SendAction(Scrollback *window, QString text);
@@ -72,22 +72,24 @@ namespace GrumpyIRC
             QList<QString> GetChannels(Scrollback *window);
             void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete);
             void RequestPart(Scrollback *window);
+            libircclient::Channel *GetChannel(Scrollback *window);
             Scrollback *GetScrollback(unsigned long long original_id);
             IRCSession *GetSession(unsigned int nsid);
             IRCSession *GetSessionFromWindow(Scrollback *scrollback);
             void Connect();
             libircclient::User *GetSelfNetworkID(Scrollback *window);
+            unsigned long long GetBytesRcvd();
+            unsigned long long GetBytesSent();
 
         signals:
             void Event_IncomingData(QByteArray data);
+            //void Event_Deleted();
 
         public slots:
-            void OnSslHandshakeFailure(QList<QSslError> errors);
+            void OnSslHandshakeFailure(QList<QSslError> errors, bool *ok);
             void OnDisconnect();
             void OnTimeout();
             void OnConnected();
-
-        protected:
             void OnIncomingCommand(QString text, QHash<QString, QVariant> parameters);
 
         private:
@@ -101,6 +103,7 @@ namespace GrumpyIRC
             void processSResync(QHash<QString, QVariant> parameters);
             void processPSResync(QHash<QString, QVariant> parameters);
             void closeError(QString error);
+            libgp::GP *gp;
             //! Irc sessions associated with their ROOT window so that we can figure out the network just from parent window
             QHash<Scrollback*, IRCSession*> sessionList;
             //! This is a persistent storage which contains all scrollbacks that are meant to belong to this grumpyd

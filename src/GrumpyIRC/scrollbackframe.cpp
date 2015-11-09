@@ -15,10 +15,12 @@
 #include "../libcore/exception.h"
 #include "../libcore/configuration.h"
 #include "../libcore/ircsession.h"
+#include "../libcore/networksession.h"
 #include "../libcore/core.h"
 #include "../libirc/libircclient/user.h"
 #include "corewrapper.h"
 #include "grumpyconf.h"
+#include "channelwin.h"
 #include "scrollbacklist_node.h"
 #include "skin.h"
 #include "scrollbackframe.h"
@@ -218,10 +220,13 @@ void ScrollbackFrame::Menu(QPoint pn)
     QAction *menuCopy = new QAction(QObject::tr("Copy"), &Menu);
     Menu.addAction(menuCopy);
     QAction *menuRetrieveTopic = NULL;
+    QAction *menuChanSet = NULL;
     if (this->IsChannel())
     {
         menuRetrieveTopic = new QAction(QObject::tr("Retrieve topic"), &Menu);
         Menu.addAction(menuRetrieveTopic);
+        menuChanSet = new QAction(QObject::tr("Channel settings"), &Menu);
+        Menu.addAction(menuChanSet);
     }
 
     QAction* selectedItem = Menu.exec(globalPos);
@@ -233,6 +238,19 @@ void ScrollbackFrame::Menu(QPoint pn)
     } else if (selectedItem == menuRetrieveTopic)
     {
         //wx->RequestPart();
+    } else if (selectedItem == menuChanSet)
+    {
+        if (!this->GetScrollback()->GetNetwork())
+            return;
+        libircclient::Network *network = this->GetSession()->GetNetwork(this->scrollback);
+        libircclient::Channel *channel = this->GetSession()->GetChannel(this->scrollback);
+        if (!channel || !network)
+            return;
+        ChannelWin *window = new ChannelWin(this->GetSession(), network, channel, this);
+        window->setAttribute(Qt::WA_DeleteOnClose);
+        // We need to close this window when the session gets deleted otherwise we could access deleted memory
+        connect(this->GetSession(), SIGNAL(Event_Deleted()), window, SLOT(close()));
+        window->show();
     }
 }
 

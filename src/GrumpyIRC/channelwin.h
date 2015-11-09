@@ -20,20 +20,32 @@ namespace Ui
     class ChannelWin;
 }
 
+namespace libircclient
+{
+    class User;
+    class Channel;
+    class Network;
+}
+
 namespace GrumpyIRC
 {
+    class NetworkSession;
+
     class ChannelWin : public QDialog
     {
             Q_OBJECT
 
         public:
-            explicit ChannelWin(QWidget *parent = 0);
+            explicit ChannelWin(NetworkSession *session, libircclient::Network *network, libircclient::Channel *channel, QWidget *parent = 0);
             ~ChannelWin();
 
         private slots:
             void on_pushButton_clicked();
 
         private:
+            NetworkSession *_ns;
+            libircclient::Network *_network;
+            libircclient::Channel *_channel;
             Ui::ChannelWin *ui;
     };
 }

@@ -21,6 +21,6 @@ NetworkSession::NetworkSession()
 
 NetworkSession::~NetworkSession()
 {
-
+    emit this->Event_Deleted();
 }
 

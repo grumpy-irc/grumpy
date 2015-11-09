@@ -29,8 +29,12 @@ QList<GrumpydSession*> GrumpydSession::Sessions;
 
 GrumpydSession::GrumpydSession(Scrollback *System, QString Hostname, QString UserName, QString Pass, int Port, bool ssl)
 {
+    this->gp = new libgp::GP();
     this->systemWindow = System;
     this->hostname = Hostname;
+    connect(this->gp, SIGNAL(Event_Connected()), this, SLOT(OnConnected()));
+    connect(this->gp, SIGNAL(Event_IncomingCommand(QString,QHash<QString,QVariant>)), this, SLOT(OnIncomingCommand(QString,QHash<QString,QVariant>)));
+    connect(this->gp, SIGNAL(Event_SslHandshakeFailure(QList<QSslError>,bool*)), this, SLOT(OnSslHandshakeFailure(QList<QSslError>,bool*)));
     this->systemWindow->SetSession(this);
     this->port = Port;
     this->username = UserName;
@@ -47,6 +51,7 @@ GrumpydSession::~GrumpydSession()
     GrumpydSession::Sessions_Lock.lock();
     GrumpydSession::Sessions.removeAll(this);
     GrumpydSession::Sessions_Lock.unlock();
+    delete this->gp;
 }
 
 Scrollback *GrumpydSession::GetSystemWindow()
@@ -58,12 +63,12 @@ void GrumpydSession::Open(libirc::ServerAddress server)
 {
     QHash<QString, QVariant> parameters;
     parameters.insert("server", QVariant(server.ToHash()));
-    this->SendProtocolCommand(GP_CMD_SERVER, parameters);
+    this->gp->SendProtocolCommand(GP_CMD_SERVER, parameters);
 }
 
 bool GrumpydSession::IsConnected() const
 {
-    return GP::IsConnected();
+    return this->gp->IsConnected();
 }
 
 void GrumpydSession::SendMessage(Scrollback *window, QString text)
@@ -76,12 +81,16 @@ void GrumpydSession::SendMessage(Scrollback *window, QString text)
     parameters.insert("scrollback_id", QVariant(window->GetOriginalID()));
     parameters.insert("me", QVariant(false));
     parameters.insert("text", QVariant(text));
-    this->SendProtocolCommand(GP_CMD_MESSAGE, parameters);
+    this->gp->SendProtocolCommand(GP_CMD_MESSAGE, parameters);
 }
 
-libircclient::Network *GrumpydSession::GetNetwork()
+libircclient::Network *GrumpydSession::GetNetwork(Scrollback *window)
 {
-    return NULL;
+    IRCSession *ircs = this->GetSessionFromWindow(window);
+    if (!ircs)
+        return NULL;
+
+    return ircs->GetNetwork();
 }
 
 void GrumpydSession::SendRaw(Scrollback *window, QString raw)
@@ -93,7 +102,7 @@ void GrumpydSession::SendRaw(Scrollback *window, QString raw)
     QHash<QString, QVariant> parameters;
     parameters.insert("network_id", QVariant(ircs->GetSID()));
     parameters.insert("command", QVariant(raw));
-    this->SendProtocolCommand(GP_CMD_RAW, parameters);
+    this->gp->SendProtocolCommand(GP_CMD_RAW, parameters);
 }
 
 SessionType GrumpydSession::GetType()
@@ -111,7 +120,7 @@ void GrumpydSession::SendAction(Scrollback *window, QString text)
     parameters.insert("me", QVariant(true));
     parameters.insert("scrollback_id", QVariant(window->GetOriginalID()));
     parameters.insert("text", QVariant(text));
-    this->SendProtocolCommand(GP_CMD_MESSAGE, parameters);
+    this->gp->SendProtocolCommand(GP_CMD_MESSAGE, parameters);
 }
 
 void GrumpydSession::RequestRemove(Scrollback *window)
@@ -144,7 +153,7 @@ void GrumpydSession::RequestDisconnect(Scrollback *window, QString reason, bool 
         foreach(Scrollback *sx, this->scrollbackHash.values())
             sx->SetDead(true);
         this->scrollbackHash.clear();
-        this->Disconnect();
+        this->gp->Disconnect();
         if (auto_delete)
             delete this;
     } else
@@ -155,7 +164,7 @@ void GrumpydSession::RequestDisconnect(Scrollback *window, QString reason, bool 
         QHash<QString, QVariant> parameters;
         parameters.insert("network_id", QVariant(ircs->GetSID()));
         parameters.insert("reason", QVariant(reason));
-        this->SendProtocolCommand(GP_CMD_IRC_QUIT, parameters);
+        this->gp->SendProtocolCommand(GP_CMD_IRC_QUIT, parameters);
     }
 }
 
@@ -166,6 +175,15 @@ void GrumpydSession::RequestPart(Scrollback *window)
 
     // Let's just send a part command, no point in having an extra protocol command for this
     this->SendRaw(window, "PART " + window->GetTarget());
+}
+
+libircclient::Channel *GrumpydSession::GetChannel(Scrollback *window)
+{
+    IRCSession *ircs = this->GetSessionFromWindow(window);
+    if (!ircs)
+        return NULL;
+
+    return ircs->GetChannel(window);
 }
 
 Scrollback *GrumpydSession::GetScrollback(unsigned long long original_id)
@@ -209,33 +227,9 @@ void GrumpydSession::Connect()
 {
     if (this->IsConnected())
         return;
-    delete this->socket;
     this->systemWindow->InsertText("Connecting to " + this->hostname);
-    if (this->SSL)
-        this->socket = new QSslSocket();
-    else
-        this->socket = new QTcpSocket();
-    this->ResolveSignals();
-    if (!this->SSL)
-    {
-        connect(this->socket, SIGNAL(connected()), this, SLOT(OnConnected()));
-        this->socket->connectToHost(this->hostname, this->port);
-    }
-    else
-    {
-        // We don't care about self signed certificates
-        connect(((QSslSocket*)this->socket), SIGNAL(encrypted()), this, SLOT(OnConnected()));
-        //QList<QSslError> errors;
-        //errors << QSslError(QSslError::SelfSignedCertificate);
-        //errors << QSslError(QSslError::HostNameMismatch);
-        ((QSslSocket*)this->socket)->ignoreSslErrors();
-        connect(((QSslSocket*)this->socket), SIGNAL(sslErrors(QList<QSslError>)), this, SLOT(OnSslHandshakeFailure(QList<QSslError>)));
-        ((QSslSocket*)this->socket)->connectToHostEncrypted(this->hostname, this->port);
-        if (!((QSslSocket*)this->socket)->waitForEncrypted())
-        {
-            this->closeError("SSL handshake failed: " + this->socket->errorString());
-        }
-    }
+    // Connect grumpy
+    this->gp->Connect(this->hostname, this->port, this->SSL);
 }
 
 libircclient::User *GrumpydSession::GetSelfNetworkID(Scrollback *window)
@@ -247,11 +241,21 @@ libircclient::User *GrumpydSession::GetSelfNetworkID(Scrollback *window)
     return ircs->GetSelfNetworkID(window);
 }
 
-void GrumpydSession::OnSslHandshakeFailure(QList<QSslError> errors)
+unsigned long long GrumpydSession::GetBytesRcvd()
+{
+    return this->gp->GetBytesRcvd();
+}
+
+unsigned long long GrumpydSession::GetBytesSent()
+{
+    return this->gp->GetBytesSent();
+}
+
+void GrumpydSession::OnSslHandshakeFailure(QList<QSslError> errors, bool *ok)
 {
     foreach(QSslError x, errors)
         GRUMPY_ERROR("SSL warning: " + x.errorString());
-    ((QSslSocket*)this->socket)->ignoreSslErrors();
+    *ok = true;
 }
 
 void GrumpydSession::OnDisconnect()
@@ -269,7 +273,7 @@ void GrumpydSession::OnConnected()
     this->systemWindow->InsertText("Connected to remote server, sending HELLO packet");
     QHash<QString, QVariant> parameters;
     parameters.insert("version", QString(GRUMPY_VERSION_STRING));
-    this->SendProtocolCommand(GP_CMD_HELLO, parameters);
+    this->gp->SendProtocolCommand(GP_CMD_HELLO, parameters);
 }
 
 void GrumpydSession::OnIncomingCommand(QString text, QHash<QString, QVariant> parameters)
@@ -297,7 +301,7 @@ void GrumpydSession::OnIncomingCommand(QString text, QHash<QString, QVariant> pa
         QHash<QString, QVariant> params;
         params.insert("password", this->password);
         params.insert("username", this->username);
-        this->SendProtocolCommand(GP_CMD_LOGIN, params);
+        this->gp->SendProtocolCommand(GP_CMD_LOGIN, params);
     } else if (text == GP_CMD_LOGIN_FAIL)
     {
         this->closeError("Invalid username or password provided");
@@ -322,7 +326,7 @@ void GrumpydSession::OnIncomingCommand(QString text, QHash<QString, QVariant> pa
     } else if (text == GP_CMD_LOGIN_OK)
     {
         this->systemWindow->InsertText("Synchronizing networks");
-        this->SendProtocolCommand(GP_CMD_NETWORK_INFO);
+        this->gp->SendProtocolCommand(GP_CMD_NETWORK_INFO);
     } else if (text == GP_CMD_SCROLLBACK_LOAD_NEW_ITEM)
     {
         this->processNewScrollbackItem(parameters);
@@ -342,7 +346,7 @@ void GrumpydSession::OnIncomingCommand(QString text, QHash<QString, QVariant> pa
     {
         QHash<QString, QVariant> params;
         params.insert("source", text);
-        this->SendProtocolCommand(GP_CMD_UNKNOWN, params);
+        this->gp->SendProtocolCommand(GP_CMD_UNKNOWN, params);
         this->systemWindow->InsertText("Unknown command from grumpyd " + text);
     }
 }
@@ -559,7 +563,7 @@ void GrumpydSession::processPSResync(QHash<QString, QVariant> parameters)
 
 void GrumpydSession::closeError(QString error)
 {
-    this->Disconnect();
+    this->gp->Disconnect();
     this->systemWindow->SetDead(true);
     this->systemWindow->InsertText("Connection failure: " + error);
 }

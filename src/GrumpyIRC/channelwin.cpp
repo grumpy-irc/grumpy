@@ -16,9 +16,12 @@
 
 using namespace GrumpyIRC;
 
-ChannelWin::ChannelWin(QWidget *parent) : QDialog(parent), ui(new Ui::ChannelWin)
+ChannelWin::ChannelWin(NetworkSession *session, libircclient::Network *network, libircclient::Channel *channel, QWidget *parent) : QDialog(parent), ui(new Ui::ChannelWin)
 {
     this->ui->setupUi(this);
+    this->_ns = session;
+    this->_network = network;
+    this->_channel = channel;
     this->ui->plainTextEdit->setPalette(Skin::GetDefault()->Palette());
 }
 

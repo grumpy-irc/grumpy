@@ -51,7 +51,7 @@ namespace GrumpyIRC
             QString Text;
     };
 
-    class LIBCORESHARED_EXPORT IRCSession : public QObject, public NetworkSession, public libirc::SerializableItem
+    class LIBCORESHARED_EXPORT IRCSession : public NetworkSession, public libirc::SerializableItem
     {
             Q_OBJECT
             friend class GrumpydSession;
@@ -79,7 +79,7 @@ namespace GrumpyIRC
             virtual Scrollback *GetScrollbackForChannel(QString channel);
             //! Retrieves a scrollback for given user, if it doesn't exist it will be created
             virtual Scrollback *GetScrollbackForUser(QString user);
-            virtual libircclient::Network *GetNetwork();
+            virtual libircclient::Network *GetNetwork(Scrollback *window = 0);
             virtual unsigned int GetSID();
             virtual void Connect(libircclient::Network *Network);
             virtual void SendMessage(Scrollback *window, QString text);
@@ -92,6 +92,7 @@ namespace GrumpyIRC
             void SendAction(Scrollback *window, QString text);
             void SendRaw(Scrollback *window, QString raw);
             void RequestRemove(Scrollback *window);
+            libircclient::Channel *GetChannel(Scrollback *window);
             void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete);
             void RequestPart(Scrollback *window);
             libircclient::User *GetSelfNetworkID(Scrollback *window);
