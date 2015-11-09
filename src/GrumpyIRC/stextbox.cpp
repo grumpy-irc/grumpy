@@ -36,3 +36,19 @@ void STextBox::Clear()
     this->clear();
 }
 
+void STextBox::mousePressEvent(QMouseEvent *e)
+{
+    this->clickedAnchor = (e->button() & Qt::LeftButton) ? anchorAt(e->pos()) : QString();
+    QPlainTextEdit::mousePressEvent(e);
+}
+
+void STextBox::mouseReleaseEvent(QMouseEvent *e)
+{
+    if (e->button() & Qt::LeftButton && !this->clickedAnchor.isEmpty() && anchorAt(e->pos()) == this->clickedAnchor)
+    {
+        emit this->Event_Link(this->clickedAnchor);
+    }
+
+    QPlainTextEdit::mouseReleaseEvent(e);
+}
+

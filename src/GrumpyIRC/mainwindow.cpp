@@ -106,6 +106,19 @@ static int SystemCommand_Netstat(SystemCommand *command, CommandArgs command_arg
     return 0;
 }
 
+static int SystemCommand_RAW(SystemCommand *command, CommandArgs command_args)
+{
+    Q_UNUSED(command);
+    if (command_args.Parameters.count() < 1)
+    {
+        GRUMPY_ERROR(QObject::tr("This command requires some text"));
+        return 1;
+    }
+    ScrollbackFrame *scrollback = MainWindow::Main->GetScrollbackManager()->GetCurrentScrollback();
+    scrollback->GetSession()->SendRaw(scrollback->GetScrollback(), command_args.ParameterLine);
+    return 0;
+}
+
 static int SystemCommand_Grumpy(SystemCommand *command, CommandArgs command_args)
 {
     Q_UNUSED(command);
@@ -209,6 +222,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.next_session_nick", (SC_Callback)SystemCommand_NextSessionNick));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("unsecuregrumpyd", (SC_Callback)SystemCommand_UnsecureGrumpy));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpyd", (SC_Callback)SystemCommand_Grumpy));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("raw", (SC_Callback)SystemCommand_RAW));
     // Welcome user
     this->systemWindow->InsertText(QString("Grumpy irc version " + GCFG->GetVersion()));
     connect(&this->timer, SIGNAL(timeout()), this, SLOT(OnRefresh()));

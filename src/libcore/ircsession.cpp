@@ -14,6 +14,7 @@
 #include "configuration.h"
 #include "ircsession.h"
 #include "eventhandler.h"
+#include "../libirc/libircclient/generic.h"
 #include "../libirc/libircclient/parser.h"
 #include "../libirc/libirc/serveraddress.h"
 #include "../libirc/libircclient/network.h"
@@ -188,6 +189,9 @@ void IRCSession::Connect(libircclient::Network *Network)
     connect(this->network, SIGNAL(Event_CTCP(libircclient::Parser*,QString,QString)), this, SLOT(OnCTCP(libircclient::Parser*,QString,QString)));
     connect(this->network, SIGNAL(Event_EndOfWHO(libircclient::Parser*)), this, SLOT(OnWhoEnd(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_WHO(libircclient::Parser*,libircclient::Channel*,libircclient::User*)), this, SLOT(OnWHO(libircclient::Parser*,libircclient::Channel*,libircclient::User*)));
+    connect(this->network, SIGNAL(Event_TOPICWhoTime(libircclient::Parser*,libircclient::Channel*)), this, SLOT(OnTOPICWhoTime(libircclient::Parser*,libircclient::Channel*)));
+    connect(this->network, SIGNAL(Event_ModeInfo(libircclient::Parser*)), this, SLOT(OnMODEInfo(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_ModeTime(libircclient::Parser*)), this, SLOT(OnMODETIME(libircclient::Parser*)));
     this->network->Connect();
 }
 
@@ -227,7 +231,7 @@ void IRCSession::SyncWindows(QHash<QString, QVariant> windows, QHash<QString, Sc
     // deserialize it, but just to be sure we check once more and grab the pointer to grumpyd
     // in case it really is that
     NetworkSession *window_session = this;
-    if (this->Root && Generic::IsGrumpy(this->Root))
+    if (this->Root && GrumpyIRC::Generic::IsGrumpy(this->Root))
         window_session = this->Root->GetSession();
     foreach (QVariant xx, windows.values())
     {
@@ -357,11 +361,7 @@ void IRCSession::RequestDisconnect(Scrollback *window, QString reason, bool auto
     if (!this->IsConnected())
         return;
     // Disconnect the network
-    foreach (Scrollback *sx, this->users)
-        sx->SetDead(true);
-    foreach (Scrollback *sx, this->channels)
-        sx->SetDead(true);
-    this->systemWindow->SetDead(true);
+    this->SetDead();
     if (this->GetNetwork())
         this->GetNetwork()->Disconnect(reason);
     if (auto_delete)
@@ -492,6 +492,15 @@ void IRCSession::OnTOPIC(libircclient::Parser *px, libircclient::Channel *channe
     sc->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Topic, px->GetSourceUserInfo()));
 }
 
+void IRCSession::OnTOPICWhoTime(libircclient::Parser *px, libircclient::Channel *channel)
+{
+    if (channel->GetTopicUser().isEmpty() || !this->channels.contains(channel->GetName().toLower()))
+        return;
+
+    Scrollback *sc = this->channels[channel->GetName().toLower()];
+    sc->InsertText("Topic set at " + channel->GetTopicTime().toString() + " by " + channel->GetTopicUser());
+}
+
 void IRCSession::OnQuit(libircclient::Parser *px, libircclient::Channel *channel)
 {
     if (!this->channels.contains(channel->GetName().toLower()))
@@ -596,6 +605,30 @@ void IRCSession::OnWhoEnd(libircclient::Parser *px)
         this->systemWindow->InsertText("End of WHO for " + name);
 }
 
+void IRCSession::OnMODEInfo(libircclient::Parser *px)
+{
+    QStringList lx = px->GetParameters();
+    if (lx.size() < 3)
+        return;
+    if (!this->channels.contains(lx[1].toLower()))
+        return;
+
+    Scrollback *sc = this->channels[lx[1].toLower()];
+    sc->InsertText("MODE for " + lx[1] + " is: " + lx[2]);
+}
+
+void IRCSession::OnMODETIME(libircclient::Parser *px)
+{
+    QStringList lx = px->GetParameters();
+    if (lx.size() < 3)
+        return;
+    if (!this->channels.contains(lx[1].toLower()))
+        return;
+
+    Scrollback *sc = this->channels[lx[1].toLower()];
+    sc->InsertText("MODE set at " + QDateTime::fromTime_t(lx[2].toUInt()).toString());
+}
+
 void IRCSession::processME(libircclient::Parser *px, QString message)
 {
     Scrollback *sx = NULL;
@@ -615,6 +648,15 @@ void IRCSession::processME(libircclient::Parser *px, QString message)
         return;
     }
     sx->InsertText(ScrollbackItem(message, ScrollbackItemType_Act, px->GetSourceUserInfo()));
+}
+
+void IRCSession::SetDead()
+{
+    foreach (Scrollback *sx, this->users)
+        sx->SetDead(true);
+    foreach (Scrollback *sx, this->channels)
+        sx->SetDead(true);
+    this->systemWindow->SetDead(true);
 }
 
 Configuration *IRCSession::GetConfiguration()
@@ -647,7 +689,7 @@ void IRCSession::_gs_ResyncNickChange(QString new_, QString old_)
 void IRCSession::rmWindow(Scrollback *window)
 {
     if (!window->IsDead())
-        throw new Exception("You can't delete window which is live", BOOST_CURRENT_FUNCTION);
+        throw new Exception("You can't delete window which is alive", BOOST_CURRENT_FUNCTION);
     QString name = window->GetTarget().toLower();
     if (this->channels.contains(name))
         this->channels.remove(name);
@@ -668,7 +710,8 @@ void IRCSession::OnIncomingRawMessage(QByteArray message)
 
 void IRCSession::OnConnectionFail(QAbstractSocket::SocketError er)
 {
-    this->systemWindow->InsertText("Connection failed");
+    this->systemWindow->InsertText("Connection failed: " + libircclient::Generic::ErrorCode2String(er));
+    this->SetDead();
 }
 
 void IRCSession::OnMessage(libircclient::Parser *px)

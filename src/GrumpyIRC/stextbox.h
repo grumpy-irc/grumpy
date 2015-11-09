@@ -19,13 +19,19 @@ namespace GrumpyIRC
 {
     class STextBox : public QPlainTextEdit
     {
+            Q_OBJECT
         public:
             STextBox(QWidget *parent = NULL);
             ~STextBox();
             void AppendHtml(QString html);
             void Clear();
+        signals:
+            void Event_Link(QString text);
         protected:
             void scrollContentsBy();
+            void mousePressEvent(QMouseEvent *e);
+            void mouseReleaseEvent(QMouseEvent *e);
+            QString clickedAnchor;
     };
 }
 
