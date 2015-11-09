@@ -53,6 +53,9 @@
               <height>80</height>
              </size>
             </property>
+            <property name="readOnly">
+             <bool>false</bool>
+            </property>
            </widget>
           </item>
          </layout>

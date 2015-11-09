@@ -11,17 +11,24 @@
 // Copyright (c) Petr Bena 2015
 
 #include "skin.h"
+#include "../libcore/networksession.h"
+#include "scrollbackframe.h"
+#include "../libirc/libircclient/mode.h"
+#include "../libirc/libircclient/channel.h"
 #include "channelwin.h"
 #include "ui_channelwin.h"
 
 using namespace GrumpyIRC;
 
-ChannelWin::ChannelWin(NetworkSession *session, libircclient::Network *network, libircclient::Channel *channel, QWidget *parent) : QDialog(parent), ui(new Ui::ChannelWin)
+ChannelWin::ChannelWin(NetworkSession *session, libircclient::Network *network, libircclient::Channel *channel, ScrollbackFrame *parent) : QDialog(parent), ui(new Ui::ChannelWin)
 {
     this->ui->setupUi(this);
     this->_ns = session;
+    this->updateTopic = false;
     this->_network = network;
     this->_channel = channel;
+    this->ui->plainTextEdit->setPlainText(channel->GetTopic());
+    this->ui->groupBox->setTitle("Topic set by " + channel->GetTopicUser() + " at " + channel->GetTopicTime().toString());
     this->ui->plainTextEdit->setPalette(Skin::GetDefault()->Palette());
 }
 
@@ -32,5 +39,12 @@ ChannelWin::~ChannelWin()
 
 void GrumpyIRC::ChannelWin::on_pushButton_clicked()
 {
+    if (this->updateTopic)
+        this->_ns->SendRaw(((ScrollbackFrame*)this->parent())->GetScrollback(), "TOPIC " + this->_channel->GetName() + " :" + this->ui->plainTextEdit->toPlainText());
+    this->close();
+}
 
+void GrumpyIRC::ChannelWin::on_plainTextEdit_textChanged()
+{
+    this->updateTopic = true;
 }

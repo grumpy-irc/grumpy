@@ -29,6 +29,7 @@ namespace libircclient
 
 namespace GrumpyIRC
 {
+    class ScrollbackFrame;
     class NetworkSession;
 
     class ChannelWin : public QDialog
@@ -36,13 +37,16 @@ namespace GrumpyIRC
             Q_OBJECT
 
         public:
-            explicit ChannelWin(NetworkSession *session, libircclient::Network *network, libircclient::Channel *channel, QWidget *parent = 0);
+            explicit ChannelWin(NetworkSession *session, libircclient::Network *network, libircclient::Channel *channel, ScrollbackFrame *parent);
             ~ChannelWin();
 
         private slots:
             void on_pushButton_clicked();
 
+            void on_plainTextEdit_textChanged();
+
         private:
+            bool updateTopic;
             NetworkSession *_ns;
             libircclient::Network *_network;
             libircclient::Channel *_channel;
