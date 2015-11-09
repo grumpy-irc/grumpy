@@ -118,6 +118,7 @@ namespace GrumpyIRC
             virtual void OnPart(libircclient::Parser *px, libircclient::Channel *channel);
             virtual void OnSelf_KICK(libircclient::Parser *px, libircclient::Channel *channel);
             virtual void OnTOPIC(libircclient::Parser *px, libircclient::Channel *channel, QString previous_one);
+            virtual void OnTOPICWhoTime(libircclient::Parser *px, libircclient::Channel *channel);
             virtual void OnQuit(libircclient::Parser *px, libircclient::Channel *channel);
             virtual void OnSelfPart(libircclient::Parser *px, libircclient::Channel *channel);
             virtual void OnTopicInfo(libircclient::Parser *px, libircclient::Channel *channel);
@@ -125,6 +126,8 @@ namespace GrumpyIRC
             virtual void OnWHO(libircclient::Parser *px, libircclient::Channel *channel, libircclient::User *user);
             virtual void OnNotice(libircclient::Parser *px);
             virtual void OnWhoEnd(libircclient::Parser *px);
+            virtual void OnMODEInfo(libircclient::Parser *px);
+            virtual void OnMODETIME(libircclient::Parser *px);
         protected:
             static unsigned int lastID;
 

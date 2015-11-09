@@ -188,6 +188,9 @@ void IRCSession::Connect(libircclient::Network *Network)
     connect(this->network, SIGNAL(Event_CTCP(libircclient::Parser*,QString,QString)), this, SLOT(OnCTCP(libircclient::Parser*,QString,QString)));
     connect(this->network, SIGNAL(Event_EndOfWHO(libircclient::Parser*)), this, SLOT(OnWhoEnd(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_WHO(libircclient::Parser*,libircclient::Channel*,libircclient::User*)), this, SLOT(OnWHO(libircclient::Parser*,libircclient::Channel*,libircclient::User*)));
+    connect(this->network, SIGNAL(Event_TOPICWhoTime(libircclient::Parser*,libircclient::Channel*)), this, SLOT(OnTOPICWhoTime(libircclient::Parser*,libircclient::Channel*)));
+    connect(this->network, SIGNAL(Event_ModeInfo(libircclient::Parser*)), this, SLOT(OnMODEInfo(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_ModeTime(libircclient::Parser*)), this, SLOT(OnMODETIME(libircclient::Parser*)));
     this->network->Connect();
 }
 
@@ -492,6 +495,15 @@ void IRCSession::OnTOPIC(libircclient::Parser *px, libircclient::Channel *channe
     sc->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Topic, px->GetSourceUserInfo()));
 }
 
+void IRCSession::OnTOPICWhoTime(libircclient::Parser *px, libircclient::Channel *channel)
+{
+    if (channel->GetTopicUser().isEmpty() || !this->channels.contains(channel->GetName().toLower()))
+        return;
+
+    Scrollback *sc = this->channels[channel->GetName().toLower()];
+    sc->InsertText("Topic set at " + channel->GetTopicTime().toString() + " by " + channel->GetTopicUser());
+}
+
 void IRCSession::OnQuit(libircclient::Parser *px, libircclient::Channel *channel)
 {
     if (!this->channels.contains(channel->GetName().toLower()))
@@ -594,6 +606,30 @@ void IRCSession::OnWhoEnd(libircclient::Parser *px)
         this->retrievingWho.removeOne(name);
     else
         this->systemWindow->InsertText("End of WHO for " + name);
+}
+
+void IRCSession::OnMODEInfo(libircclient::Parser *px)
+{
+    QStringList lx = px->GetParameters();
+    if (lx.size() < 3)
+        return;
+    if (!this->channels.contains(lx[1].toLower()))
+        return;
+
+    Scrollback *sc = this->channels[lx[1].toLower()];
+    sc->InsertText("MODE for " + lx[1] + " is: " + lx[2]);
+}
+
+void IRCSession::OnMODETIME(libircclient::Parser *px)
+{
+    QStringList lx = px->GetParameters();
+    if (lx.size() < 3)
+        return;
+    if (!this->channels.contains(lx[1].toLower()))
+        return;
+
+    Scrollback *sc = this->channels[lx[1].toLower()];
+    sc->InsertText("MODE set at " + QDateTime::fromTime_t(lx[2].toUInt()).toString());
 }
 
 void IRCSession::processME(libircclient::Parser *px, QString message)
