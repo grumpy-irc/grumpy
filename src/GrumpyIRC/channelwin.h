@@ -46,6 +46,7 @@ namespace GrumpyIRC
             void on_plainTextEdit_textChanged();
 
         private:
+            bool ignore;
             bool updateTopic;
             NetworkSession *_ns;
             libircclient::Network *_network;

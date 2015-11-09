@@ -23,11 +23,13 @@ using namespace GrumpyIRC;
 ChannelWin::ChannelWin(NetworkSession *session, libircclient::Network *network, libircclient::Channel *channel, ScrollbackFrame *parent) : QDialog(parent), ui(new Ui::ChannelWin)
 {
     this->ui->setupUi(this);
+    this->ignore = true;
     this->_ns = session;
     this->updateTopic = false;
+    this->ui->plainTextEdit->setPlainText(channel->GetTopic());
     this->_network = network;
     this->_channel = channel;
-    this->ui->plainTextEdit->setPlainText(channel->GetTopic());
+    this->ignore = false;
     this->ui->groupBox->setTitle("Topic set by " + channel->GetTopicUser() + " at " + channel->GetTopicTime().toString());
     this->ui->plainTextEdit->setPalette(Skin::GetDefault()->Palette());
 }
@@ -46,5 +48,7 @@ void GrumpyIRC::ChannelWin::on_pushButton_clicked()
 
 void GrumpyIRC::ChannelWin::on_plainTextEdit_textChanged()
 {
+    if (this->ignore)
+        return;
     this->updateTopic = true;
 }
