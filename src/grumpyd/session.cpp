@@ -77,7 +77,7 @@ Session::Session(qintptr socket_ptr, bool ssl)
     }
     this->protocol = new libgp::GP(socket);
     this->SessionState = State_Login;
-    connect(this->protocol, SIGNAL(Event_IncomingCommand(QString,QHash<QString,QVariant>)), this, SLOT(OnCommand(QString,QHash<QString,QVariant>)));
+    connect(this->protocol, SIGNAL(Event_IncomingCommand(gp_command_t,QHash<QString,QVariant>)), this, SLOT(OnCommand(gp_command_t,QHash<QString,QVariant>)));
     connect(this->protocol, SIGNAL(Event_Disconnected()), this, SLOT(OnDisconnected()));
     this->protocol->ResolveSignals();
     GRUMPY_LOG("New session (" + QString::number(this->SID) + ") from " + this->peer);

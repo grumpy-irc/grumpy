@@ -33,7 +33,7 @@ GrumpydSession::GrumpydSession(Scrollback *System, QString Hostname, QString Use
     this->systemWindow = System;
     this->hostname = Hostname;
     connect(this->gp, SIGNAL(Event_Connected()), this, SLOT(OnConnected()));
-    connect(this->gp, SIGNAL(Event_IncomingCommand(QString,QHash<QString,QVariant>)), this, SLOT(OnIncomingCommand(QString,QHash<QString,QVariant>)));
+    connect(this->gp, SIGNAL(Event_IncomingCommand(gp_command_t,QHash<QString,QVariant>)), this, SLOT(OnIncomingCommand(gp_command_t,QHash<QString,QVariant>)));
     connect(this->gp, SIGNAL(Event_SslHandshakeFailure(QList<QSslError>,bool*)), this, SLOT(OnSslHandshakeFailure(QList<QSslError>,bool*)));
     this->systemWindow->SetSession(this);
     this->port = Port;
