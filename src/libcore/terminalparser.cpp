@@ -142,6 +142,11 @@ bool TerminalParser::Parse(int argc, char **argv)
         }
     }
     delete item;
+    if (expected_parameters)
+    {
+        std::cerr << "ERROR: missing parameter" << std::endl;
+        return false;
+    }
     return true;
 }
 

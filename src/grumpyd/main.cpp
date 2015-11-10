@@ -72,6 +72,16 @@ int dummy(GrumpyIRC::TerminalParser *parser, QStringList params)
     return TP_RESULT_OK;
 }
 
+int config(GrumpyIRC::TerminalParser *parser, QStringList params)
+{
+    Q_UNUSED(parser);
+    if (params.isEmpty())
+        GRUMPY_ERROR("Invalid file");
+
+    CONF->GetConfiguration()->SetAlternativeConfigFile(params[0]);
+    CONF->GetConfiguration()->Load();
+}
+
 int pid(GrumpyIRC::TerminalParser *parser, QStringList params)
 {
     (void)parser;
@@ -91,6 +101,7 @@ int main(int argc, char *argv[])
         // First of all we need to process the arguments and then do other stuff
         GrumpyIRC::TerminalParser *tp = new GrumpyIRC::TerminalParser();
         tp->Register('x', "pid", "Write process ID to a file", 1, (GrumpyIRC::TP_Callback)pid);
+        tp->Register('k', "config", "Specify a path to configuration file", 1, (GrumpyIRC::TP_Callback)config);
         tp->Register(0, "dummy", "Use dummy as a storage backend, useful for debugging.", 0, (GrumpyIRC::TP_Callback)dummy);
         if (!tp->Parse(argc, argv))
         {

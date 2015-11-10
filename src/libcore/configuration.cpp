@@ -41,6 +41,11 @@ QVariant Configuration::GetValue(QString key)
     return this->Options[key];
 }
 
+void Configuration::SetAlternativeConfigFile(QString file)
+{
+    this->configuration_path = file;
+}
+
 bool Configuration::GetValueAsBool(QString key, bool none)
 {
     if (!this->Options.contains(key))
@@ -80,7 +85,11 @@ void Configuration::SetValue(QString key, QVariant value)
 void Configuration::Load()
 {
     QSettings::setDefaultFormat(QSettings::IniFormat);
-    QSettings settings(CONFIGURATION_FILE, QSettings::IniFormat);
+    QSettings settings;
+    if (this->configuration_path.isEmpty())
+        settings = QSettings(CONFIGURATION_FILE, QSettings::IniFormat);
+    else
+        settings = QSettings(this->configuration_path, QSettings::IniFormat);
     foreach (QString key, settings.allKeys())
         this->SetValue(key, settings.value(key));
     qDebug() << (QString("Configuration path: ") + settings.fileName());
@@ -88,7 +97,11 @@ void Configuration::Load()
 
 void Configuration::Save()
 {
-    QSettings settings(CONFIGURATION_FILE, QSettings::IniFormat);
+    QSettings settings;
+    if (this->configuration_path.isEmpty())
+        settings = QSettings(CONFIGURATION_FILE, QSettings::IniFormat);
+    else
+        settings = QSettings(this->configuration_path, QSettings::IniFormat);
     foreach (QString key, this->Options.keys())
         settings.setValue(key, this->Options[key]);
     settings.sync();

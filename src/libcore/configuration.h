@@ -30,6 +30,7 @@ namespace GrumpyIRC
             Configuration();
             virtual ~Configuration();
             virtual QVariant GetValue(QString key);
+            virtual void SetAlternativeConfigFile(QString file);
             virtual bool GetValueAsBool(QString key, bool none = false);
             virtual QString GetValueAsString(QString key, QString default_value = "");
             virtual void RemoveValue(QString key);
@@ -42,6 +43,7 @@ namespace GrumpyIRC
 			unsigned int Verbosity;
 
         protected:
+            QString configuration_path;
             QHash<QString, QVariant> Options;
     };
 
