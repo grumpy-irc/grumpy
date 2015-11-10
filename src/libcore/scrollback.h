@@ -77,7 +77,7 @@ namespace GrumpyIRC
             void LoadHash(QHash<QString, QVariant> hash);
             QHash<QString, QVariant> ToHash();
         private:
-            unsigned long long _id;
+            scrollback_id_t _id;
             libircclient::User _user;
             QString _text;
             QDateTime _datetime;
@@ -113,13 +113,13 @@ namespace GrumpyIRC
             Scrollback(QHash<QString, QVariant> hash);
             virtual ~Scrollback();
             virtual void Close();
-            virtual unsigned long long GetMaxItemsSize();
+            virtual scrollback_id_t GetMaxItemsSize();
             //! Unique ID of this scrollback for this grumpy, this is newer synced over network
-            unsigned long long GetID();
+            scrollback_id_t GetID();
             //! Original ID of this scrollback as it was on grumpy instance which created it
             //! synced ower network
-            unsigned long long GetOriginalID();
-            void SetMaxItemsSize(unsigned long long size);
+            scrollback_id_t GetOriginalID();
+            void SetMaxItemsSize(scrollback_id_t size);
             virtual void InsertText(QString text, ScrollbackItemType type = ScrollbackItemType_System);
             virtual void InsertText(ScrollbackItem item);
             virtual void SetTarget(QString target);
@@ -135,9 +135,12 @@ namespace GrumpyIRC
             void SetNetwork(libircclient::Network *Network);
             virtual libircclient::Network *GetNetwork() const;
             virtual void SetDead(bool dead);
-            virtual unsigned long long GetLastID();
+            virtual scrollback_id_t GetLastID();
             virtual int GetSICount();
             virtual Scrollback *GetParentScrollback();
+            virtual void PrependItems(QList<ScrollbackItem> list);
+            ScrollbackItem FetchItem(scrollback_id_t id);
+            QList<QVariant> FetchBacklog(scrollback_id_t from, unsigned int size);
             QHash<QString, QVariant> ToHash(int max = 200);
             QHash<QString, QVariant> ToPartialHash();
             void LoadHash(QHash<QString, QVariant> hash);
@@ -167,7 +170,7 @@ namespace GrumpyIRC
             void Event_UserRefresh(libircclient::User *user);
 
         protected:
-            static unsigned long long lastID;
+            static scrollback_id_t lastID;
 
             scrollback_id_t _lastItemID;
             libircclient::Network *_network;
@@ -177,9 +180,9 @@ namespace GrumpyIRC
             NetworkSession *session;
             ScrollbackType type;
             QList<ScrollbackItem> _items;
-            unsigned long long _id;
-            unsigned long long _original_id;
-            unsigned long long _maxItems;
+            scrollback_id_t _id;
+            scrollback_id_t _original_id;
+            scrollback_id_t _maxItems;
     };
 }
 

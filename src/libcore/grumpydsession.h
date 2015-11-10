@@ -73,7 +73,8 @@ namespace GrumpyIRC
             void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete);
             void RequestPart(Scrollback *window);
             libircclient::Channel *GetChannel(Scrollback *window);
-            Scrollback *GetScrollback(unsigned long long original_id);
+            Scrollback *GetScrollback(scrollback_id_t original_id);
+            void RequestBL(Scrollback *window, scrollback_id_t from, unsigned int size);
             IRCSession *GetSession(unsigned int nsid);
             IRCSession *GetSessionFromWindow(Scrollback *scrollback);
             void Connect();
@@ -90,7 +91,7 @@ namespace GrumpyIRC
             void OnDisconnect();
             void OnTimeout();
             void OnConnected();
-            void OnIncomingCommand(QString text, QHash<QString, QVariant> parameters);
+            void OnIncomingCommand(gp_command_t text, QHash<QString, QVariant> parameters);
 
         private:
             void processNewScrollbackItem(QHash<QString, QVariant> hash);
@@ -99,6 +100,7 @@ namespace GrumpyIRC
             void processNetworkResync(QHash<QString, QVariant> hash);
             void processChannel(QHash<QString, QVariant> hash);
             void processNick(QHash<QString, QVariant> hash);
+            void processRequest(QHash<QString, QVariant> hash);
             void processChannelResync(QHash<QString, QVariant> hash);
             void processSResync(QHash<QString, QVariant> parameters);
             void processPSResync(QHash<QString, QVariant> parameters);
@@ -108,7 +110,7 @@ namespace GrumpyIRC
             QHash<Scrollback*, IRCSession*> sessionList;
             //! This is a persistent storage which contains all scrollbacks that are meant to belong to this grumpyd
             //! it's used to fasten up the resolution of scrollbacks by the original id
-            QHash<unsigned long long, Scrollback*> scrollbackHash;
+            QHash<scrollback_id_t, Scrollback*> scrollbackHash;
             Scrollback *systemWindow;
             bool SSL;
             QString hostname;

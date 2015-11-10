@@ -186,7 +186,7 @@ libircclient::Channel *GrumpydSession::GetChannel(Scrollback *window)
     return ircs->GetChannel(window);
 }
 
-Scrollback *GrumpydSession::GetScrollback(unsigned long long original_id)
+Scrollback *GrumpydSession::GetScrollback(scrollback_id_t original_id)
 {
     if (this->scrollbackHash.contains(original_id))
         return this->scrollbackHash[original_id];
@@ -200,6 +200,15 @@ Scrollback *GrumpydSession::GetScrollback(unsigned long long original_id)
         }
     }
     return NULL;
+}
+
+void GrumpydSession::RequestBL(Scrollback *window, scrollback_id_t from, unsigned int size)
+{
+    QHash<QString, QVariant> parameters;
+    parameters.insert("from", QVariant(from));
+    parameters.insert("scrollback_id", QVariant(window->GetOriginalID()));
+    parameters.insert("request_size", QVariant(size));
+    this->gp->SendProtocolCommand(GP_CMD_REQUEST_ITEMS, parameters);
 }
 
 IRCSession *GrumpydSession::GetSession(unsigned int nsid)
@@ -276,7 +285,7 @@ void GrumpydSession::OnConnected()
     this->gp->SendProtocolCommand(GP_CMD_HELLO, parameters);
 }
 
-void GrumpydSession::OnIncomingCommand(QString text, QHash<QString, QVariant> parameters)
+void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVariant> parameters)
 {
     if (text == GP_CMD_UNKNOWN)
     {
@@ -336,6 +345,9 @@ void GrumpydSession::OnIncomingCommand(QString text, QHash<QString, QVariant> pa
     } else if (text == GP_CMD_NETWORK_INFO)
     {
         this->processNetwork(parameters);
+    } else if (text == GP_CMD_REQUEST_ITEMS)
+    {
+        this->processRequest(parameters);
     } else if (text == GP_CMD_PERMDENY)
     {
         QString source = "unknown request";
@@ -363,7 +375,7 @@ void GrumpydSession::processNewScrollbackItem(QHash<QString, QVariant> hash)
         GRUMPY_DEBUG("Missing scrollback id for item", 2);
         return;
     }
-    unsigned long long id = hash["scrollback"].toULongLong();
+    scrollback_id_t id = hash["scrollback"].toUInt();
     Scrollback *window = this->GetScrollback(id);
     if (!window)
     {
@@ -446,7 +458,7 @@ void GrumpydSession::processChannel(QHash<QString, QVariant> hash)
     if (!session)
         return;
     libircclient::Channel channel(hash["channel"].toHash());
-    Scrollback *window = this->GetScrollback(hash["scrollback_id"].toULongLong());
+    Scrollback *window = this->GetScrollback(hash["scrollback_id"].toUInt());
     if (!window)
         return;
     session->RegisterChannel(&channel, window);
@@ -466,6 +478,19 @@ void GrumpydSession::processNick(QHash<QString, QVariant> hash)
         session->GetNetwork()->SetNick(new_);
     }
     session->_gs_ResyncNickChange(new_, old_);
+}
+
+void GrumpydSession::processRequest(QHash<QString, QVariant> hash)
+{
+    Scrollback *scrollback = this->GetScrollback(hash["scrollback_id"].toUInt());
+    if (!scrollback)
+        return;
+
+    QList<QVariant> lx = hash["data"].toList();
+    QList<ScrollbackItem> data;
+    foreach (QVariant item, lx)
+        data.append(ScrollbackItem(item.toHash()));
+    scrollback->PrependItems(data);
 }
 
 void GrumpydSession::processChannelResync(QHash<QString, QVariant> hash)
@@ -516,10 +541,10 @@ void GrumpydSession::processSResync(QHash<QString, QVariant> parameters)
 {
     // Let's register this scrollback to this session
     Scrollback *root = this->systemWindow;
-    unsigned long long parent = this->systemWindow->GetID();
+    scrollback_id_t parent = this->systemWindow->GetID();
     if (parameters.contains("parent_sid"))
     {
-        parent = parameters["parent_sid"].toULongLong();
+        parent = parameters["parent_sid"].toUInt();
         root = this->GetScrollback(parent);
         if (!root)
             root = this->systemWindow;

@@ -11,18 +11,19 @@
 // Copyright (c) Petr Bena 2015
 
 #include <QCoreApplication>
+#include <QFile>
+#include <QProcess>
 //#include <iostream>
 #include "corewrapper.h"
 #include "scrollbackfactory.h"
-#include "../libcore/exception.h"
 #include "grumpyconf.h"
 #include "grumpyd.h"
 #include "../libcore/configuration.h"
-#include "../libcore/definitions.h"
 #include "../libcore/core.h"
-#include "../libcore/terminalparser.h"
+#include "../libcore/definitions.h"
 #include "../libcore/eventhandler.h"
 #include "../libcore/exception.h"
+#include "../libcore/terminalparser.h"
 #include "../libcore/generic.h"
 #include <errno.h>
 
@@ -35,6 +36,7 @@
 #define DAEMONIZE_FAILED  2
 #define EDAEMONIZEFAILED    -1
 #define EUNHANDLEDEXCEPTION -2
+#define EPIDMKER            -3
 
 int daemonize()
 {
@@ -70,6 +72,15 @@ int dummy(GrumpyIRC::TerminalParser *parser, QStringList params)
     return TP_RESULT_OK;
 }
 
+int pid(GrumpyIRC::TerminalParser *parser, QStringList params)
+{
+    (void)parser;
+    if (params.isEmpty())
+        GRUMPY_ERROR("Invalid pid file");
+    CONF->PID = params[0];
+    return TP_RESULT_OK;
+}
+
 int main(int argc, char *argv[])
 {
     try
@@ -79,6 +90,7 @@ int main(int argc, char *argv[])
         CONF = new GrumpyIRC::GrumpyConf();
         // First of all we need to process the arguments and then do other stuff
         GrumpyIRC::TerminalParser *tp = new GrumpyIRC::TerminalParser();
+        tp->Register('x', "pid", "Write process ID to a file", 1, (GrumpyIRC::TP_Callback)pid);
         tp->Register(0, "dummy", "Use dummy as a storage backend, useful for debugging.", 0, (GrumpyIRC::TP_Callback)dummy);
         if (!tp->Parse(argc, argv))
         {
@@ -94,6 +106,18 @@ int main(int argc, char *argv[])
             return EDAEMONIZEFAILED;
         if (dr == DAEMONIZE_FORKED)
             return 0;
+
+        // Write pid
+        if (!CONF->PID.isEmpty())
+        {
+            QFile pf(CONF->PID);
+            if (!pf.open(QIODevice::WriteOnly))
+            {
+                GRUMPY_ERROR("Unable to write to pid file: " + CONF->PID);
+                return EPIDMKER;
+            }
+            pf.write(QString::number(QCoreApplication::applicationPid()).toLatin1());
+        }
 
         GrumpyIRC::CoreWrapper::GrumpyCore = new GrumpyIRC::Core();
         // Install our own scrollback factory that creates scrollbacks which are automagically network synced

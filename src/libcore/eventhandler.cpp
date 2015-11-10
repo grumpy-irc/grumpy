@@ -23,7 +23,7 @@ GrumpyIRC::EventHandler::~EventHandler()
 
 }
 
-void GrumpyIRC::EventHandler::OnMessage(unsigned long long ScrollbackID)
+void GrumpyIRC::EventHandler::OnMessage(scrollback_id_t ScrollbackID)
 {
     //qDebug() << "Message: " +
 }

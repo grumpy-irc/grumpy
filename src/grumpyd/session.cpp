@@ -17,6 +17,7 @@
 #include "../libirc/libircclient/network.h"
 #include "../libcore/core.h"
 #include "../libcore/eventhandler.h"
+#include "grumpyconf.h"
 #include "corewrapper.h"
 #include "grumpyd.h"
 #include "user.h"
@@ -131,7 +132,7 @@ bool Session::IsAuthorized(QString permission)
     return this->loggedUser->IsAuthorized(permission);
 }
 
-void Session::SendToEverySession(QString command, QHash<QString, QVariant> parameters)
+void Session::SendToEverySession(gp_command_t command, QHash<QString, QVariant> parameters)
 {
     if (!this->loggedUser)
         return;
@@ -140,7 +141,21 @@ void Session::SendToEverySession(QString command, QHash<QString, QVariant> param
         xx->protocol->SendProtocolCommand(command, parameters);
 }
 
-void Session::TransferError(QString source, QString description, int id)
+Scrollback *Session::GetScrollback(scrollback_id_t scrollback_id)
+{
+    Scrollback *result = NULL;
+    if (!this->loggedUser)
+        return NULL;
+    foreach (SyncableIRCSession *session, this->loggedUser->GetSIRCSessions())
+    {
+        result = session->GetScrollback(scrollback_id);
+        if (result)
+            return result;
+    }
+    return NULL;
+}
+
+void Session::TransferError(gp_command_t source, QString description, int id)
 {
     QHash<QString, QVariant> params;
     params.insert("id", QVariant(id));
@@ -149,7 +164,7 @@ void Session::TransferError(QString source, QString description, int id)
     this->protocol->SendProtocolCommand(GP_CMD_ERROR, params);
 }
 
-void Session::PermissionDeny(QString source)
+void Session::PermissionDeny(gp_command_t source)
 {
     QHash<QString, QVariant> params;
     params.insert("source", QVariant(source));
@@ -209,7 +224,7 @@ void Session::processMessage(QHash<QString, QVariant> parameters)
 
     // We have the original ID of scrollback so let's find it here
     unsigned int nsid = parameters["network_id"].toUInt();
-    unsigned long long sid = parameters["scrollback_id"].toULongLong();
+    scrollback_id_t sid = parameters["scrollback_id"].toUInt();
     bool is_action = parameters["me"].toBool();
     // let's find the network
     SyncableIRCSession* irc = this->loggedUser->GetSIRCSession(nsid);
@@ -274,9 +289,8 @@ void Session::processNew(QHash<QString, QVariant> info)
     this->SendToEverySession(GP_CMD_NETWORK_INFO, parameters);
 }
 
-void Session::OnCommand(QString text, QHash<QString, QVariant> parameters)
+void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
 {
-    text = text.toUpper();
     if (text == GP_CMD_HELLO)
     {
         if (parameters.contains("version"))
@@ -310,6 +324,9 @@ void Session::OnCommand(QString text, QHash<QString, QVariant> parameters)
     } else if (text == GP_CMD_SERVER)
     {
         this->processNew(parameters);
+    } else if (text == GP_CMD_REQUEST_ITEMS)
+    {
+        this->processRequest(parameters);
     } else
     {
         // We received some unknown packet, send it back to client so that it at least knows we don't support this
@@ -350,4 +367,37 @@ void Session::processLogin(QHash<QString, QVariant> parameters)
     }
 }
 
+void Session::processRequest(QHash<QString, QVariant> parameters)
+{
+    if (!this->IsAuthorized(PRIVILEGE_USE_IRC))
+    {
+        this->PermissionDeny(GP_CMD_REQUEST_ITEMS);
+        return;
+    }
 
+    scrollback_id_t from = parameters["from"].toUInt();
+    unsigned int size = parameters["request_size"].toUInt();
+    if (size > CONF->GetMaxLoadSize())
+        size = CONF->GetMaxLoadSize();
+    scrollback_id_t sx = parameters["scrollback_id"].toUInt();
+    Scrollback *scrollback = this->GetScrollback(sx);
+    if (!scrollback)
+    {
+        GRUMPY_ERROR("Unable to find scrollback i " + QString::number(sx) + " for user " + this->loggedUser->GetName());
+        this->TransferError(GP_CMD_REQUEST_ITEMS, "dScrollback not found", GP_ESCROLLBACKNOTFOUND);
+        return;
+    }
+    QVariant list;
+    try
+    {
+        list = QVariant(scrollback->FetchBacklog(from, size));
+    } catch (GrumpyIRC::Exception *ex)
+    {
+        this->TransferError(GP_CMD_REQUEST_ITEMS, "Exception: " + ex->GetMessage(), GP_ERROR);
+        delete ex;
+    }
+    QHash<QString, QVariant> response;
+    response.insert("data", list);
+    response.insert("scrollback_id", QVariant(sx));
+    this->protocol->SendProtocolCommand(GP_CMD_REQUEST_ITEMS, response);
+}

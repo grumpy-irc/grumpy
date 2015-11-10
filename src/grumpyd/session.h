@@ -25,6 +25,7 @@
 
 namespace GrumpyIRC
 {
+    class Scrollback;
     class User;
 
     class Session : public QThread
@@ -48,16 +49,17 @@ namespace GrumpyIRC
             unsigned long GetSID();
             bool IsAuthorized(QString permission);
             //! Transfer data to every session this user has, so that every session connected as this user receives it
-            void SendToEverySession(QString command, QHash<QString, QVariant> parameters);
-            void TransferError(QString source, QString description, int id);
-            void PermissionDeny(QString source);
+            void SendToEverySession(gp_command_t command, QHash<QString, QVariant> parameters);
+            Scrollback *GetScrollback(scrollback_id_t scrollback_id);
+            void TransferError(gp_command_t source, QString description, int id);
+            void PermissionDeny(gp_command_t source);
             bool IsRunning;
             int MaxScrollbackSyncItems;
             State SessionState;
 
         private slots:
             void OnDisconnected();
-            void OnCommand(QString text, QHash<QString, QVariant> parameters);
+            void OnCommand(gp_command_t text, QHash<QString, QVariant> parameters);
 
         signals:
             void OnError(int error, QString text);
@@ -70,6 +72,7 @@ namespace GrumpyIRC
             void processLogin(QHash<QString, QVariant> parameters);
             void processNetworks();
             void processIrcQuit(QHash<QString, QVariant> parameters);
+            void processRequest(QHash<QString, QVariant> parameters);
             void processMessage(QHash<QString, QVariant> parameters);
             void processCommand(QHash<QString, QVariant> parameters);
             //! Called when user wants to connect to new IRC server

@@ -21,7 +21,7 @@ namespace GrumpyIRC
 	{
 		public:
 			GrumpyEventHandler();
-			void OnMessage(unsigned long long ScrollbackID);
+            void OnMessage(scrollback_id_t ScrollbackID);
 			void OnDebug(QString text, unsigned int verbosity = 1);
 			void OnError(QString text);
 			void OnSystemLog(QString text);

@@ -67,7 +67,7 @@ namespace GrumpyIRC
             void UpdateIcon();
             void RequestPart();
             void RequestDisconnect();
-            void RequestMore(int count);
+            void RequestMore(unsigned int count);
             void RefreshHtml();
             void RefreshHtmlIfNeeded();
             libircclient::User *GetIdentity();

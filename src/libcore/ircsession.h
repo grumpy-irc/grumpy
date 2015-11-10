@@ -13,6 +13,9 @@
 #ifndef IRCSESSION_H
 #define IRCSESSION_H
 
+#include "definitions.h"
+
+
 #include <QMutex>
 #include <QObject>
 #include <QDateTime>
@@ -73,8 +76,8 @@ namespace GrumpyIRC
             //! Return a first scrollback that matches the name, keep in mind that scrollbacks may have same name, for unique
             //! instance use SID of the give scrollback
             virtual Scrollback *GetScrollback(QString name);
-            virtual Scrollback *GetScrollback(unsigned long long sid);
-            virtual Scrollback *GetScrollbackByOriginal(unsigned long long original_sid);
+            virtual Scrollback *GetScrollback(scrollback_id_t sid);
+            virtual Scrollback *GetScrollbackByOriginal(scrollback_id_t original_sid);
             //! Get a scrollback for given channel, if it doesn't exist it returns NULL
             virtual Scrollback *GetScrollbackForChannel(QString channel);
             //! Retrieves a scrollback for given user, if it doesn't exist it will be created

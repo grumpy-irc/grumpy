@@ -13,6 +13,9 @@
 #ifndef LIBEVENTHANDLER_H
 #define LIBEVENTHANDLER_H
 
+#include "definitions.h"
+
+
 #include "libcore_global.h"
 #include "../libirc/libircclient/irceventhandler.h"
 
@@ -33,7 +36,7 @@ namespace GrumpyIRC
         public:
             EventHandler();
             virtual ~EventHandler();
-            virtual void OnMessage(unsigned long long ScrollbackID);
+            virtual void OnMessage(scrollback_id_t ScrollbackID);
             virtual void OnDebug(QString text, unsigned int verbosity = 1);
             virtual void OnError(QString text);
             virtual void OnSystemLog(QString text);

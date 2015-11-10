@@ -42,6 +42,11 @@ void GrumpyConf::SetNick(QString nick)
     GCFG->SetValue("nick", QVariant(nick));
 }
 
+unsigned int GrumpyConf::GetMaxLoadSize()
+{
+    return 800;
+}
+
 QString GrumpyConf::GetNick()
 {
     return GCFG->GetValueAsString("nick", "GrumpyUser");

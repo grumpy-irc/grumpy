@@ -109,7 +109,7 @@ Scrollback *IRCSession::GetScrollback(QString name)
     return NULL;
 }
 
-Scrollback *IRCSession::GetScrollback(unsigned long long sid)
+Scrollback *IRCSession::GetScrollback(scrollback_id_t sid)
 {
     if (this->systemWindow->GetID() == sid)
         return this->systemWindow;
@@ -129,7 +129,7 @@ Scrollback *IRCSession::GetScrollback(unsigned long long sid)
     return NULL;
 }
 
-Scrollback *IRCSession::GetScrollbackByOriginal(unsigned long long original_sid)
+Scrollback *IRCSession::GetScrollbackByOriginal(scrollback_id_t original_sid)
 {
     if (this->systemWindow->GetOriginalID() == original_sid)
         return this->systemWindow;

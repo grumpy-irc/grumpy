@@ -18,7 +18,7 @@ using namespace GrumpyIRC;
 
 QList<Scrollback*> Scrollback::ScrollbackList;
 QMutex Scrollback::ScrollbackList_Mutex;
-unsigned long long Scrollback::lastID = 1;
+scrollback_id_t Scrollback::lastID = 1;
 
 Scrollback::Scrollback(ScrollbackType Type, Scrollback *parent)
 {
@@ -59,12 +59,12 @@ Scrollback::~Scrollback()
     ScrollbackList_Mutex.unlock();
 }
 
-unsigned long long Scrollback::GetMaxItemsSize()
+scrollback_id_t Scrollback::GetMaxItemsSize()
 {
     return this->_maxItems;
 }
 
-unsigned long long Scrollback::GetID()
+scrollback_id_t Scrollback::GetID()
 {
     return this->_id;
 }
@@ -75,7 +75,7 @@ void Scrollback::Close()
     delete this;
 }
 
-unsigned long long Scrollback::GetOriginalID()
+scrollback_id_t Scrollback::GetOriginalID()
 {
     return this->_original_id;
 }
@@ -85,7 +85,7 @@ ScrollbackType Scrollback::GetType() const
     return this->type;
 }
 
-void Scrollback::SetMaxItemsSize(unsigned long long size)
+void Scrollback::SetMaxItemsSize(scrollback_id_t size)
 {
     this->_maxItems = size;
 }
@@ -103,7 +103,7 @@ void Scrollback::SetSession(NetworkSession *Session)
     emit this->Event_SessionModified(Session);
 }
 
-unsigned long long Scrollback::GetLastID()
+scrollback_id_t Scrollback::GetLastID()
 {
     return this->_lastItemID;
 }
@@ -138,6 +138,70 @@ void Scrollback::SetDead(bool dead)
 Scrollback *Scrollback::GetParentScrollback()
 {
     return this->parentSx;
+}
+
+void Scrollback::PrependItems(QList<ScrollbackItem> list)
+{
+    while (list.count() > 0)
+    {
+        this->_items.insert(0, list.last());
+        list.removeLast();
+    }
+    emit this->Event_Reload();
+}
+
+ScrollbackItem Scrollback::FetchItem(scrollback_id_t id)
+{
+    foreach (ScrollbackItem item, this->_items)
+    {
+        if (item.GetID() == id)
+            return item;
+    }
+
+    throw new GrumpyIRC::Exception("No such item: " + QString::number(id), BOOST_CURRENT_FUNCTION);
+}
+
+QList<QVariant> Scrollback::FetchBacklog(scrollback_id_t from, unsigned int size)
+{
+    QList<QVariant> result;
+
+    if (from > this->_lastItemID)
+        return result;
+
+    if (size > from)
+    {
+        size = from;
+    }
+
+    scrollback_id_t current_item_id = from;
+    int current_item_index = 0;
+    // we need to find a index of current item
+    while (current_item_index < this->_items.size())
+    {
+        if (this->_items[current_item_index].GetID() == current_item_id)
+            break;
+    }
+    if (current_item_index >= this->_items.size())
+    {
+        // we didn't find this item in current list
+        return result;
+    }
+    while (size--)
+    {
+        if (current_item_index < 0)
+            break;
+        if (this->_items[current_item_index].GetID() == current_item_id)
+        {
+            result.insert(0, QVariant(this->_items[current_item_index].ToHash()));
+        } else
+        {
+            // inconsistency, do something
+            result.insert(0, this->FetchItem(current_item_id).ToHash());
+        }
+        current_item_id--;
+    }
+
+    return result;
 }
 
 QHash<QString, QVariant> Scrollback::ToHash(int max)
@@ -179,11 +243,11 @@ void Scrollback::LoadHash(QHash<QString, QVariant> hash)
     UNSERIALIZE_HASH(PropertyBag);
     UNSERIALIZE_STRING(_target);
     UNSERIALIZE_BOOL(_dead);
-    UNSERIALIZE_ULONGLONG(_maxItems);
-    UNSERIALIZE_ULONGLONG(_lastItemID);
+    UNSERIALIZE_UINT(_maxItems);
+    UNSERIALIZE_UINT(_lastItemID);
     if (hash.contains("type"))
         this->type = static_cast<ScrollbackType>(hash["type"].toInt());
-    UNSERIALIZE_ULONGLONG(_original_id);
+    UNSERIALIZE_UINT(_original_id);
     if (hash.contains("items"))
     {
         QList<QVariant> items_l;
@@ -354,7 +418,7 @@ void ScrollbackItem::LoadHash(QHash<QString, QVariant> hash)
     if (hash.contains("_type"))
         this->_type = static_cast<ScrollbackItemType>(hash["_type"].toInt());
     UNSERIALIZE_STRING(_text);
-    UNSERIALIZE_ULONGLONG(_id);
+    UNSERIALIZE_UINT(_id);
     UNSERIALIZE_DATETIME(_datetime);
 }
 

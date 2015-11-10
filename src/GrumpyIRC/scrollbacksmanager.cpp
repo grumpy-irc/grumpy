@@ -53,7 +53,7 @@ ScrollbackFrame *ScrollbacksManager::CreateWindow(QString name, ScrollbackFrame 
     return window;
 }
 
-ScrollbackFrame *ScrollbacksManager::GetWindowFromID(unsigned long long id)
+ScrollbackFrame *ScrollbacksManager::GetWindowFromID(scrollback_id_t id)
 {
     foreach (ScrollbackFrame *sb, this->Scrollbacks)
     {
@@ -92,7 +92,7 @@ void ScrollbacksManager::DestroyWindow(ScrollbackFrame *window)
     delete window;
 }
 
-void ScrollbacksManager::SwitchWindow(unsigned long long id)
+void ScrollbacksManager::SwitchWindow(scrollback_id_t id)
 {
     ScrollbackFrame *scrollback = this->GetWindowFromID(id);
     if (scrollback)

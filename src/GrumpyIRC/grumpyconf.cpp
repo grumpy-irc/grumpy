@@ -10,9 +10,9 @@
 
 // Copyright (c) Petr Bena 2015
 
+#include "corewrapper.h"
 #include "grumpyconf.h"
 #include "../libcore/configuration.h"
-#include "corewrapper.h"
 #include "../libcore/core.h"
 
 using namespace GrumpyIRC;

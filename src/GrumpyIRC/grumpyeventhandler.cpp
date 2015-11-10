@@ -25,7 +25,7 @@ GrumpyEventHandler::GrumpyEventHandler()
 
 }
 
-void GrumpyEventHandler::OnMessage(unsigned long long ScrollbackID)
+void GrumpyEventHandler::OnMessage(scrollback_id_t ScrollbackID)
 {
 
 }

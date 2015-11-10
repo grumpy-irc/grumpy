@@ -14,6 +14,7 @@
 #include <QMenu>
 #include "../libcore/exception.h"
 #include "../libcore/configuration.h"
+#include "../libcore/generic.h"
 #include "../libcore/ircsession.h"
 #include "../libcore/networksession.h"
 #include "../libcore/core.h"
@@ -393,8 +394,11 @@ void ScrollbackFrame::RequestDisconnect()
         this->GetSession()->RequestDisconnect(this->GetScrollback(), CONF->GetQuitMessage(), false);
 }
 
-void ScrollbackFrame::RequestMore(int count)
+void ScrollbackFrame::RequestMore(unsigned int count)
 {
+    if (!Generic::IsGrumpy(this->GetScrollback()))
+        return;
+    GrumpydSession *grumpy = (GrumpydSession*)this->GetSession();
 
 }
 

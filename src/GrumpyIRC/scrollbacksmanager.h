@@ -13,6 +13,7 @@
 #ifndef SCROLLBACKSMANAGER_H
 #define SCROLLBACKSMANAGER_H
 
+#include "../libcore/definitions.h"
 #include <QFrame>
 #include <QList>
 
@@ -44,10 +45,10 @@ namespace GrumpyIRC
              * \return
              */
             ScrollbackFrame *CreateWindow(QString name, ScrollbackFrame *parent = NULL, bool focus = false, bool is_deletable = true, Scrollback *scrollback = NULL);
-            ScrollbackFrame *GetWindowFromID(unsigned long long id);
+            ScrollbackFrame *GetWindowFromID(scrollback_id_t id);
             ScrollbackFrame *GetWindowFromScrollback(Scrollback *scrollback);
             void DestroyWindow(ScrollbackFrame *window);
-            void SwitchWindow(unsigned long long id);
+            void SwitchWindow(scrollback_id_t id);
             void SwitchWindow(ScrollbackFrame *window);
             ScrollbackFrame *GetCurrentScrollback() const;
 
