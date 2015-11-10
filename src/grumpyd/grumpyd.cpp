@@ -113,7 +113,7 @@ void Grumpyd::Main()
     GRUMPY_LOG("Starting listeners");
     if (!this->listener->listen(QHostAddress::Any, GP_DEFAULT_PORT))
     {
-        GRUMPY_ERROR("Unable to open port " + GP_DEFAULT_PORT);
+        GRUMPY_ERROR("Unable to open listener on port " + QString::number(GP_DEFAULT_PORT));
     }
     else
     {
@@ -123,7 +123,7 @@ void Grumpyd::Main()
     {
         if (!this->listenerSSL->listen(QHostAddress::Any, GP_DEFAULT_SSL_PORT))
         {
-            GRUMPY_ERROR("Unable to open " + GP_DEFAULT_SSL_PORT);
+            GRUMPY_ERROR("Unable to open listener (SSL) on port " + QString::number(GP_DEFAULT_SSL_PORT));
         }
         else
         {

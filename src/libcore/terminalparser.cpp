@@ -35,6 +35,13 @@ static int PrintHelp(TerminalParser *parser, QStringList params)
             parameters += " | " + parameters_short;
         else if (!parameters_short.isEmpty())
             parameters += parameters_short;
+        if (i.GetParameters() > 0)
+        {
+            if (i.GetParameters() == 1)
+                parameters += " <required parameter>";
+            else
+                parameters += " <" + QString::number(i.GetParameters()) + " required parameters>";
+        }
         std::cout << "  " << parameters.toStdString() << ": " << i.GetHelp().toStdString() << std::endl;
     }
 

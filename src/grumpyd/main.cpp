@@ -124,6 +124,7 @@ int main(int argc, char *argv[])
         GrumpyIRC::CoreWrapper::GrumpyCore->InstallFactory(new GrumpyIRC::ScrollbackFactory());
         GrumpyIRC::CoreWrapper::GrumpyCore->InitCfg();
         // Save the configuration immediately so that we have the configuration file
+        CONF->SetStorage(CONF->GetStorage());
         GrumpyIRC::CoreWrapper::GrumpyCore->GetConfiguration()->Save();
         GRUMPY_LOG("Grumpyd starting...");
         GrumpyIRC::Grumpyd *daemon = new GrumpyIRC::Grumpyd();

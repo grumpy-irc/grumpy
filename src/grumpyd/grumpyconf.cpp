@@ -59,6 +59,11 @@ QString GrumpyConf::GetStorage()
     return GCFG->GetValueAsString("storage", "DatabaseBin");
 }
 
+void GrumpyConf::SetStorage(QString name)
+{
+    GCFG->SetValue("storage", QVariant(name));
+}
+
 
 
 
