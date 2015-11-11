@@ -196,6 +196,7 @@ static int SystemCommand_Server(SystemCommand *command, CommandArgs command_args
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     Main = this;
+    this->isFork = false;
     this->ui->setupUi(this);
     this->syslogWindow = new SyslogWindow(this);
     this->windowList = new ScrollbackList(this);
@@ -224,6 +225,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpyd", (SC_Callback)SystemCommand_Grumpy));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("raw", (SC_Callback)SystemCommand_RAW));
     // Welcome user
+    this->ui->actionOpen_window->setVisible(false);
     this->systemWindow->InsertText(QString("Grumpy irc version " + GCFG->GetVersion()));
     connect(&this->timer, SIGNAL(timeout()), this, SLOT(OnRefresh()));
     this->timer.start(100);
@@ -231,6 +233,38 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->restoreGeometry(GCFG->GetValue("mainwindow_geometry").toByteArray());
     this->restoreState(GCFG->GetValue("mainwindow_state").toByteArray());
     this->userWidget->hide();
+}
+
+MainWindow::MainWindow(bool fork, MainWindow *parent)
+{
+    Q_UNUSED(fork);
+    this->ui = new Ui::MainWindow();
+    this->isFork = true;
+    /*this->userWidget = new UserWidget(this);
+    this->setCentralWidget(this->scrollbackWindow);
+    this->statusFrame = new QLabel(this);
+    this->identFrame = new QLabel(this);
+    this->ui->statusBar->addPermanentWidget(this->identFrame);
+    this->addDockWidget(Qt::LeftDockWidgetArea, this->windowList);
+    this->addDockWidget(Qt::BottomDockWidgetArea, this->syslogWindow);
+    this->addDockWidget(Qt::RightDockWidgetArea, this->userWidget);
+    this->ui->statusBar->addPermanentWidget(this->statusFrame);
+    ScrollbacksManager::Global = this->scrollbackWindow;
+    */
+    this->ui->setupUi(this);
+    this->syslogWindow = parent->syslogWindow;
+    this->windowList = parent->windowList;
+    this->scrollbackWindow = parent->scrollbackWindow;
+    this->syslogWindow->hide();
+    // Create a system scrollback
+    this->systemWindow = parent->systemWindow;
+    connect(&this->timer, SIGNAL(timeout()), this, SLOT(OnRefresh()));
+    this->timer.start(100);
+    if (!parent->userWidget->isVisible())
+        this->userWidget->hide();
+    // Try to restore geometry
+    this->restoreGeometry(GCFG->GetValue("mainwindow_geometry").toByteArray());
+    this->restoreState(GCFG->GetValue("mainwindow_state").toByteArray());
 }
 
 MainWindow::~MainWindow()
@@ -272,6 +306,13 @@ ScrollbackFrame *MainWindow::GetCurrentScrollbackFrame()
 UserWidget *MainWindow::GetUsers()
 {
     return this->userWidget;
+}
+
+void MainWindow::Fork()
+{
+    MainWindow *window = new MainWindow(true, this);
+    window->setAttribute(Qt::WA_DeleteOnClose);
+    window->show();
 }
 
 void MainWindow::SetWN(QString text)
@@ -366,4 +407,9 @@ void GrumpyIRC::MainWindow::on_actionPreferences_triggered()
     PreferencesWin *wx = new PreferencesWin(this);
     wx->setAttribute(Qt::WA_DeleteOnClose);
     wx->show();
+}
+
+void GrumpyIRC::MainWindow::on_actionOpen_window_triggered()
+{
+    this->Fork();
 }

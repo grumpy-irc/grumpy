@@ -44,6 +44,7 @@ namespace GrumpyIRC
             static MainWindow *Main;
 
             explicit MainWindow(QWidget *parent = 0);
+            MainWindow(bool fork, MainWindow *parent);
             ~MainWindow();
             ScrollbacksManager *GetScrollbackManager();
             //! Return a pointer to widget that contains list of all windows
@@ -53,6 +54,7 @@ namespace GrumpyIRC
             ScrollbackFrame *GetSystem();
             ScrollbackFrame *GetCurrentScrollbackFrame();
             UserWidget *GetUsers();
+            void Fork();
             void SetWN(QString text);
             void UpdateStatus();
             void OpenGrumpy(QString hostname, int port, QString username, QString password, bool ssl);
@@ -65,11 +67,12 @@ namespace GrumpyIRC
             void on_actionConnect_triggered();
             void on_actionAbout_triggered();
             void on_actionLoad_more_items_from_remote_triggered();
-
             void on_actionPreferences_triggered();
+            void on_actionOpen_window_triggered();
 
         private:
             void closeEvent(QCloseEvent *event);
+            bool isFork;
             QTimer timer;
             QLabel *statusFrame;
             QLabel *identFrame;

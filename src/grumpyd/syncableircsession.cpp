@@ -77,6 +77,20 @@ void SyncableIRCSession::ResyncChannel(libircclient::Channel *channel)
     session->SendToEverySession(GP_CMD_CHANNEL_RESYNC, hash);
 }
 
+void SyncableIRCSession::Resync(QHash<QString, QVariant> network)
+{
+    Session *session = this->owner->GetAnyGPSession();
+    if (!session)
+        return;
+
+
+    QHash<QString, QVariant> hash;
+    hash.insert("network_id", QVariant(this->GetSID()));
+    hash.insert("partial", QVariant(true));
+    hash.insert("network", QVariant(network));
+    session->SendToEverySession(GP_CMD_NETWORK_RESYNC, hash);
+}
+
 void SyncableIRCSession::RequestDisconnect(Scrollback *window, QString reason, bool auto_delete)
 {
     IRCSession::RequestDisconnect(window, reason, auto_delete);
@@ -144,7 +158,10 @@ void SyncableIRCSession::OnNICK(libircclient::Parser *px, QString old_, QString 
 void SyncableIRCSession::OnIRCSelfNICK(libircclient::Parser *px, QString previous, QString nick)
 {
     IRCSession::OnIRCSelfNICK(px, previous, nick);
-    //this->resyncUL();
+
+    QHash<QString, QVariant> hash;
+    hash.insert("localUser", QVariant(this->GetNetwork()->GetLocalUserInfo()->ToHash()));
+    this->Resync(hash);
 }
 
 void SyncableIRCSession::OnKICK(libircclient::Parser *px, libircclient::Channel *channel)
@@ -233,6 +250,15 @@ void SyncableIRCSession::OnWHO(libircclient::Parser *px, libircclient::Channel *
         return;
 
     this->resyncUL(channel, GRUMPY_UL_UPDATE, user);
+}
+
+void SyncableIRCSession::OnMODE(libircclient::Parser *px)
+{
+    IRCSession::OnMODE(px);
+
+    QHash<QString, QVariant> hash;
+    hash.insert("localUserMode", QVariant(this->GetNetwork()->GetLocalUserMode().ToHash()));
+    this->Resync(hash);
 }
 
 void SyncableIRCSession::resyncULRemove(libircclient::Channel *channel, QString user)

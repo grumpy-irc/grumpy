@@ -447,9 +447,21 @@ void GrumpydSession::processULSync(QHash<QString, QVariant> hash)
 
 void GrumpydSession::processNetworkResync(QHash<QString, QVariant> hash)
 {
+    if (!hash.contains("network_id") || !hash.contains("network"))
+        return;
     IRCSession *session = this->GetSession(hash["network_id"].toUInt());
     if (!session)
         return;
+
+    bool is_partial = hash.contains("partial") && hash["partial"].toBool();
+
+    if (is_partial)
+    {
+        // This is just a partial update of existing network
+        session->GetNetwork()->LoadHash(hash["network"].toHash());
+        return;
+    }
+
     libircclient::Network resynced_network(hash["network"].toHash());
     libircclient::Network *nt = session->GetNetwork();
     nt->SetCUModes(resynced_network.GetCUModes());

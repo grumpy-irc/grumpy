@@ -45,6 +45,7 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionOpen_window"/>
     <addaction name="actionConnect"/>
     <addaction name="actionPreferences"/>
     <addaction name="separator"/>
@@ -122,6 +123,14 @@
   <action name="actionLoad_more_items_from_remote">
    <property name="text">
     <string>Load more items from remote</string>
+   </property>
+  </action>
+  <action name="actionOpen_window">
+   <property name="text">
+    <string>Open new grumpy window</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+N</string>
    </property>
   </action>
  </widget>
