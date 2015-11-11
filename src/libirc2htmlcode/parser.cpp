@@ -46,7 +46,7 @@ Parser::~Parser()
 
 }
 
-FormattedItem Parser::Process(QString format, QDateTime time, QString user, QString text)
+FormattedItem Parser::Process(QString format, QDateTime time, QString user, QString text, QString override_default_text_color)
 {
     /*if (this->resolveCache.contains(input))
     {
@@ -54,6 +54,9 @@ FormattedItem Parser::Process(QString format, QDateTime time, QString user, QStr
         return this->resolveCache[input];
     }
     this->cacheMiss++;*/
+    QString text_color = this->TextColor;
+    if (!override_default_text_color.isEmpty())
+        text_color = override_default_text_color;
     FormattedItem item;
     item.time = time;
     item.text = text;
@@ -62,7 +65,7 @@ FormattedItem Parser::Process(QString format, QDateTime time, QString user, QStr
     item.source = this->EncodeHtml(format);
     item.source.replace("$time", this->formatTime(time));
     item.source.replace("$nick", this->formatUser(user));
-    item.source.replace("$string", this->formatText(text));
+    item.source.replace("$string", this->formatText(text, text_color));
 
     //item.source = input;
     /*
@@ -215,7 +218,7 @@ QString Parser::formatUser(QString user)
     return "<font color=\"" + this->UserColor + "\">" + this->EncodeHtml(user) + "</font>";
 }
 
-QString Parser::formatText(QString text)
+QString Parser::formatText(QString text, QString color)
 {
-    return "<font color=\"" + this->TextColor + "\">" + this->replaceSpecials(this->EncodeHtml(text)) + "</font>";
+    return "<font color=\"" + color + "\">" + this->replaceSpecials(this->EncodeHtml(text)) + "</font>";
 }

@@ -101,6 +101,7 @@ namespace GrumpyIRC
             libircclient::User *GetSelfNetworkID(Scrollback *window);
             //! Used mostly only for synchronization with grumpyd
             virtual void RegisterChannel(libircclient::Channel *channel, Scrollback *window);
+            QString GetLocalUserModeAsString(Scrollback *window);
             Scrollback *Root;
         signals:
             //! Emited when a new window for this session is open, needed by grumpyd for network sync
@@ -132,6 +133,7 @@ namespace GrumpyIRC
             virtual void OnWhoEnd(libircclient::Parser *px);
             virtual void OnMODEInfo(libircclient::Parser *px);
             virtual void OnMODETIME(libircclient::Parser *px);
+            virtual void OnMODE(libircclient::Parser *px);
         protected:
             static unsigned int lastID;
 

@@ -158,7 +158,10 @@ static QString ItemToString(ScrollbackItem item)
             break;
     }
     //format_string.replace("$string", result);
-    irc2htmlcode::FormattedItem results = ScrollbackFrame::parser.Process(format_string, item.GetTime(), user, text);
+    QColor color = Skin::GetDefault()->TextColor;
+    if (item.GetType() == ScrollbackItemType_System)
+        color = Skin::GetDefault()->SystemColor;
+    irc2htmlcode::FormattedItem results = ScrollbackFrame::parser.Process(format_string, item.GetTime(), user, text, color.name());
     return results.source;
 }
 
@@ -442,6 +445,15 @@ QList<QString> ScrollbackFrame::GetChannels()
     if (!this->GetSession())
         return QList<QString>  ();
     return this->GetSession()->GetChannels(this->GetScrollback());
+}
+
+QString ScrollbackFrame::GetLocalUserMode()
+{
+    if (!this->GetSession())
+        return "";
+
+    // Return a self identity information for the current network
+    return this->GetSession()->GetLocalUserModeAsString(this->GetScrollback());
 }
 
 int ScrollbackFrame::GetSynced()

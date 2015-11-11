@@ -35,7 +35,8 @@ SOURCES += main.cpp\
     packetsnifferwin.cpp \
     stextbox.cpp \
     channelwin.cpp \
-    scriptwin.cpp
+    scriptwin.cpp \
+    highlighter.cpp
 
 HEADERS  += mainwindow.h \
     scrollbackframe.h \
@@ -59,7 +60,8 @@ HEADERS  += mainwindow.h \
     packetsnifferwin.h \
     stextbox.h \
     channelwin.h \
-    scriptwin.h
+    scriptwin.h \
+    highlighter.h
 
 FORMS    += mainwindow.ui \
     scrollbackframe.ui \

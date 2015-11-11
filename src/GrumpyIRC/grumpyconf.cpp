@@ -96,3 +96,8 @@ QString GrumpyConf::GetActionFormat()
     return GCFG->GetValueAsString("action_format", "* $nick $string");
 }
 
+bool GrumpyConf::FirstRun()
+{
+    return GCFG->GetValueAsBool("first_run", true);
+}
+

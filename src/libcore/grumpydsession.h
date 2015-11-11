@@ -76,6 +76,7 @@ namespace GrumpyIRC
             Scrollback *GetScrollback(scrollback_id_t original_id);
             void RequestBL(Scrollback *window, scrollback_id_t from, unsigned int size);
             IRCSession *GetSession(unsigned int nsid);
+            QString GetLocalUserModeAsString(Scrollback *window);
             IRCSession *GetSessionFromWindow(Scrollback *scrollback);
             void Connect();
             libircclient::User *GetSelfNetworkID(Scrollback *window);

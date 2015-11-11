@@ -85,26 +85,28 @@ void Configuration::SetValue(QString key, QVariant value)
 void Configuration::Load()
 {
     QSettings::setDefaultFormat(QSettings::IniFormat);
-    QSettings settings;
+    QSettings *settings;
     if (this->configuration_path.isEmpty())
-        settings = QSettings(CONFIGURATION_FILE, QSettings::IniFormat);
+        settings = new QSettings(CONFIGURATION_FILE, QSettings::IniFormat);
     else
-        settings = QSettings(this->configuration_path, QSettings::IniFormat);
-    foreach (QString key, settings.allKeys())
-        this->SetValue(key, settings.value(key));
-    qDebug() << (QString("Configuration path: ") + settings.fileName());
+        settings = new QSettings(this->configuration_path, QSettings::IniFormat);
+    foreach (QString key, settings->allKeys())
+        this->SetValue(key, settings->value(key));
+    qDebug() << (QString("Configuration path: ") + settings->fileName());
+    delete settings;
 }
 
 void Configuration::Save()
 {
-    QSettings settings;
+    QSettings *settings;
     if (this->configuration_path.isEmpty())
-        settings = QSettings(CONFIGURATION_FILE, QSettings::IniFormat);
+        settings = new QSettings(CONFIGURATION_FILE, QSettings::IniFormat);
     else
-        settings = QSettings(this->configuration_path, QSettings::IniFormat);
+        settings = new QSettings(this->configuration_path, QSettings::IniFormat);
     foreach (QString key, this->Options.keys())
-        settings.setValue(key, this->Options[key]);
-    settings.sync();
+        settings->setValue(key, this->Options[key]);
+    settings->sync();
+    delete settings;
 }
 
 

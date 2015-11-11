@@ -193,6 +193,7 @@ void IRCSession::Connect(libircclient::Network *Network)
     connect(this->network, SIGNAL(Event_TOPICWhoTime(libircclient::Parser*,libircclient::Channel*)), this, SLOT(OnTOPICWhoTime(libircclient::Parser*,libircclient::Channel*)));
     connect(this->network, SIGNAL(Event_ModeInfo(libircclient::Parser*)), this, SLOT(OnMODEInfo(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_CreationTime(libircclient::Parser*)), this, SLOT(OnMODETIME(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_Mode(libircclient::Parser*)), this, SLOT(OnMODE(libircclient::Parser*)));
     this->network->Connect();
 }
 
@@ -397,6 +398,12 @@ void IRCSession::RegisterChannel(libircclient::Channel *channel, Scrollback *win
     this->channels.insert(channel->GetName().toLower(), window);
     if (!this->GetNetwork()->GetChannel(channel->GetName()))
         this->GetNetwork()->_st_InsertChannel(channel);
+}
+
+QString IRCSession::GetLocalUserModeAsString(Scrollback *window)
+{
+    Q_UNUSED(window);
+    return this->GetNetwork()->GetLocalUserMode().ToString();
 }
 
 void IRCSession::OnOutgoingRawMessage(QByteArray message)
@@ -635,6 +642,14 @@ void IRCSession::OnMODETIME(libircclient::Parser *px)
 
     Scrollback *sc = this->channels[lx[1].toLower()];
     sc->InsertText("Channel was created at " + QDateTime::fromTime_t(lx[2].toUInt()).toString());
+}
+
+void IRCSession::OnMODE(libircclient::Parser *px)
+{
+    if (!px->GetSourceUserInfo())
+        return;
+    if (px->GetParameters()[0] == this->GetNetwork()->GetNick())
+        this->systemWindow->InsertText(ScrollbackItem(px->GetSourceInfo() + " set your mode " + px->GetText()));
 }
 
 void IRCSession::processME(libircclient::Parser *px, QString message)

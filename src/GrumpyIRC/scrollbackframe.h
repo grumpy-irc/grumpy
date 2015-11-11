@@ -74,6 +74,7 @@ namespace GrumpyIRC
             scrollback_id_t GetItems();
             QList<QString> GetUsers();
             QList<QString> GetChannels();
+            QString GetLocalUserMode();
             int GetSynced();
             //void SetParent(ScrollbackFrame* parentWindow);
             bool IsDeletable;

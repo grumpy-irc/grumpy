@@ -221,6 +221,15 @@ IRCSession *GrumpydSession::GetSession(unsigned int nsid)
     return NULL;
 }
 
+QString GrumpydSession::GetLocalUserModeAsString(Scrollback *window)
+{
+    IRCSession *ircs = this->GetSessionFromWindow(window);
+    if (!ircs)
+        return "";
+
+    return ircs->GetLocalUserModeAsString(window);
+}
+
 IRCSession *GrumpydSession::GetSessionFromWindow(Scrollback *scrollback)
 {
     if (this->sessionList.contains(scrollback))
@@ -475,7 +484,7 @@ void GrumpydSession::processNick(QHash<QString, QVariant> hash)
     if (session->GetNetwork()->GetNick().toLower() == old_.toLower())
     {
         // yup, it's our so we need to update it
-        session->GetNetwork()->SetNick(new_);
+        session->GetNetwork()->_st_SetNick(new_);
     }
     session->_gs_ResyncNickChange(new_, old_);
 }

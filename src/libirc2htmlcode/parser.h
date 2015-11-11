@@ -24,18 +24,18 @@ namespace irc2htmlcode
         public:
             Parser();
             virtual ~Parser();
-            virtual FormattedItem Process(QString format, QDateTime time, QString user, QString text);
+            virtual FormattedItem Process(QString format, QDateTime time, QString user, QString text, QString override_default_text_color = "");
+            QString EncodeHtml(QString text);
             QString UserColor;
             QString TimeColor;
             QString TextColor;
             QHash<unsigned int, QString> TextColors;
-            QString EncodeHtml(QString text);
 
         private:
             QString replaceSpecials(QString source);
             QString formatTime(QDateTime time);
             QString formatUser(QString user);
-            QString formatText(QString text);
+            QString formatText(QString text, QString color);
             int resolveCacheSize;
             unsigned long long cacheHits;
             unsigned long long cacheMiss;

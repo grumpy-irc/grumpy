@@ -21,6 +21,7 @@
 #include "grumpyeventhandler.h"
 #include "../libcore/autocompletionengine.h"
 #include "../libcore/core.h"
+#include "highlighter.h"
 #include "inputbox.h"
 #include "widgetfactory.h"
 #include <QApplication>
@@ -52,6 +53,7 @@ int main(int argc, char *argv[])
     CoreWrapper::GrumpyCore->InitCfg();
     CoreWrapper::GrumpyCore->SetSystemEventHandler(new GrumpyEventHandler());
     CoreWrapper::GrumpyCore->InstallFactory(new WidgetFactory());
+    Highlighter::Init();
     InputBox::AE = new AutocompletionEngine();
     MainWindow w;
     w.show();

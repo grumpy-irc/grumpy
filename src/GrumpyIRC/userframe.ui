@@ -38,7 +38,7 @@
    <item>
     <widget class="QListWidget" name="listWidget">
      <property name="selectionMode">
-      <enum>QAbstractItemView::MultiSelection</enum>
+      <enum>QAbstractItemView::ExtendedSelection</enum>
      </property>
     </widget>
    </item>

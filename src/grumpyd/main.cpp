@@ -80,6 +80,8 @@ int config(GrumpyIRC::TerminalParser *parser, QStringList params)
 
     CONF->GetConfiguration()->SetAlternativeConfigFile(params[0]);
     CONF->GetConfiguration()->Load();
+
+    return TP_RESULT_OK;
 }
 
 int pid(GrumpyIRC::TerminalParser *parser, QStringList params)

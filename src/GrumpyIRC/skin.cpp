@@ -28,6 +28,8 @@ Skin *GrumpyIRC::Skin::GetDefault()
 Skin::Skin()
 {
     this->BackgroundColor = QColor(0, 0, 0);
+    this->HighligtedColor = QColor(250, 184, 30);
+    this->SystemColor = QColor(71, 245, 92);
     this->TextColor = QColor(255, 255, 255);
 #ifdef GRUMPY_WIN
     if (QFontDatabase().families().contains("Consolas"))

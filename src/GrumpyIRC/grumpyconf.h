@@ -48,6 +48,7 @@ namespace GrumpyIRC
             QString GetNoticeFormat();
             QString GetMessageFormat();
             QString GetActionFormat();
+            bool FirstRun();
     };
 }
 

@@ -288,10 +288,13 @@ void MainWindow::UpdateStatus()
     int total = this->GetScrollbackManager()->GetCurrentScrollback()->GetItems();
     this->statusFrame->setText("Items (synced/total): " + QString::number(synced) + " / " + QString::number(total));
     libircclient::User *self_ident = this->GetCurrentScrollbackFrame()->GetIdentity();
+    QString mode = this->GetCurrentScrollbackFrame()->GetLocalUserMode();
+    if (!mode.isEmpty())
+        mode = "(" + mode + ")";
     if (!self_ident)
         this->identFrame->setText("");
     else
-        this->identFrame->setText(self_ident->ToString());
+        this->identFrame->setText(self_ident->ToString() + " " + mode);
 }
 
 void MainWindow::OpenGrumpy(QString hostname, int port, QString username, QString password, bool ssl)

@@ -46,6 +46,7 @@ namespace GrumpyIRC
             virtual void SendRaw(Scrollback *window, QString raw)=0;
             virtual QList<QString> GetChannels(Scrollback *window)=0;
             virtual libircclient::User *GetSelfNetworkID(Scrollback *window)=0;
+            virtual QString GetLocalUserModeAsString(Scrollback *window)=0;
             virtual Scrollback *GetSystemWindow()=0;
             virtual libircclient::Channel *GetChannel(Scrollback *window)=0;
             virtual void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete) = 0;

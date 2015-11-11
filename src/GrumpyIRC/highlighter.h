@@ -10,32 +10,32 @@
 
 // Copyright (c) Petr Bena 2015
 
-#ifndef SKIN_H
-#define SKIN_H
+#ifndef HIGHLIGHTER_H
+#define HIGHLIGHTER_H
 
 #include "../libcore/definitions.h"
-
-#include <QHash>
-#include <QFont>
-#include <QPalette>
+#include <QRegExp>
+#include <QList>
 
 namespace GrumpyIRC
 {
-    class Skin
+    class ScrollbackItem;
+
+    class Highlighter
     {
         public:
-            static Skin *Default;
-			static Skin *GetDefault();
-
-            Skin();
-            QPalette Palette();
-            QFont TextFont;
-            QColor TextColor;
-            QColor HighligtedColor;
-            QColor SystemColor;
-            QColor BackgroundColor;
-            QHash<char, QColor> ModeColors;
+            static void Init();
+            static QList<Highlighter*> Highlighter_Data;
+            static bool IsMatch(ScrollbackItem *text);
+            Highlighter(QString text);
+            ~Highlighter();
+            bool IsMatching(ScrollbackItem *text);
+            bool CaseSensitive;
+            bool IsRegex;
+        private:
+            QString definition;
+            QRegExp regex;
     };
 }
 
-#endif // SKIN_H
+#endif // HIGHLIGHTER_H
