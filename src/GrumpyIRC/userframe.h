@@ -28,11 +28,13 @@ namespace Ui
 
 namespace GrumpyIRC
 {
+    class ScrollbackFrame;
+
     class UserFrame : public QFrame
     {
             Q_OBJECT
         public:
-            explicit UserFrame(QWidget *parent = 0);
+            explicit UserFrame(ScrollbackFrame *parent);
             ~UserFrame();
             void InsertUser(libircclient::User *user);
             void RemoveUser(QString user);
@@ -40,6 +42,7 @@ namespace GrumpyIRC
             void ChangeNick(QString new_nick, QString old_nick);
             void SetNetwork(libircclient::Network *Network);
             QList<QString> GetUsers();
+            void ChangeMode(QString mode);
             void UpdateInfo();
             bool IsVisible;
             bool NeedsUpdate;
@@ -52,6 +55,7 @@ namespace GrumpyIRC
         private:
             QString GenerateTip(libircclient::User *ux);
             QHash<char, unsigned int> userCounts;
+            ScrollbackFrame *parentFrame;
             libircclient::Network *network;
             QHash<QString, libircclient::User> users;
             QHash<QString, QListWidgetItem*> userItem;

@@ -14,6 +14,7 @@
 #include "corewrapper.h"
 #include "mainwindow.h"
 #include "connectwin.h"
+#include "favoriteswin.h"
 #include "scrollbacklist.h"
 #include "ui_mainwindow.h"
 #include "userwidget.h"
@@ -412,4 +413,11 @@ void GrumpyIRC::MainWindow::on_actionPreferences_triggered()
 void GrumpyIRC::MainWindow::on_actionOpen_window_triggered()
 {
     this->Fork();
+}
+
+void GrumpyIRC::MainWindow::on_actionFavorites_triggered()
+{
+    FavoritesWin *favorites = new FavoritesWin(this);
+    favorites->setAttribute(Qt::WA_DeleteOnClose);
+    favorites->show();
 }

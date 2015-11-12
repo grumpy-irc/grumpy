@@ -36,7 +36,8 @@ SOURCES += main.cpp\
     stextbox.cpp \
     channelwin.cpp \
     scriptwin.cpp \
-    highlighter.cpp
+    highlighter.cpp \
+    favoriteswin.cpp
 
 HEADERS  += mainwindow.h \
     scrollbackframe.h \
@@ -61,7 +62,8 @@ HEADERS  += mainwindow.h \
     stextbox.h \
     channelwin.h \
     scriptwin.h \
-    highlighter.h
+    highlighter.h \
+    favoriteswin.h
 
 FORMS    += mainwindow.ui \
     scrollbackframe.ui \
@@ -76,7 +78,8 @@ FORMS    += mainwindow.ui \
     aboutwin.ui \
     packetsnifferwin.ui \
     channelwin.ui \
-    scriptwin.ui
+    scriptwin.ui \
+    favoriteswin.ui
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../libirc/libirc/build-libirc-Desktop_Qt_5_4_2_MinGW_32bit-Debug/release/ -llibirc
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../libirc/libirc/build-libirc-Desktop_Qt_5_4_2_MinGW_32bit-Debug/debug/ -llibirc

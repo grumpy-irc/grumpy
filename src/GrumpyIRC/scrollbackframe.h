@@ -72,6 +72,7 @@ namespace GrumpyIRC
             void RequestMore(unsigned int count);
             void RefreshHtml();
             void RefreshHtmlIfNeeded();
+            void TransferRaw(QString data);
             libircclient::User *GetIdentity();
             scrollback_id_t GetItems();
             QList<QString> GetUsers();

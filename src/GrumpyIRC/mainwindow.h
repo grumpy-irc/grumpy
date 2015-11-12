@@ -70,6 +70,8 @@ namespace GrumpyIRC
             void on_actionPreferences_triggered();
             void on_actionOpen_window_triggered();
 
+            void on_actionFavorites_triggered();
+
         private:
             void closeEvent(QCloseEvent *event);
             bool isFork;

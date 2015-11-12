@@ -11,16 +11,21 @@
 // Copyright (c) Petr Bena 2015
 
 #include "../libirc/libircclient/network.h"
+#include "scrollbackframe.h"
+#include "../libcore/exception.h"
 #include "userframe.h"
 #include "userframeitem.h"
 #include "ui_userframe.h"
+#include <QListWidgetItem>
+#include <QMenu>
 #include "skin.h"
 
 using namespace GrumpyIRC;
 
-UserFrame::UserFrame(QWidget *parent) : QFrame(parent), ui(new Ui::UserFrame)
+UserFrame::UserFrame(ScrollbackFrame *parent) : QFrame(parent), ui(new Ui::UserFrame)
 {
     this->ui->setupUi(this);
+    this->parentFrame = parent;
     this->network = NULL;
     this->IsVisible = false;
     this->NeedsUpdate = false;
@@ -46,7 +51,63 @@ void UserFrame::on_listWidget_clicked(const QModelIndex &index)
 
 void UserFrame::on_listWidget_customContextMenuRequested(const QPoint &pos)
 {
+    // We have some window selected so let's display a menu
+    QPoint globalPos = this->ui->listWidget->viewport()->mapToGlobal(pos);
+    QMenu Menu;
+    // Items
+    QMenu *menuModes = new QMenu("Mode", &Menu);
 
+    QAction *modeQ = new QAction("+q", &Menu);
+    QAction *modeA = new QAction("+a", &Menu);
+    QAction *modeO = new QAction("+o", &Menu);
+    QAction *modeH = new QAction("+h", &Menu);
+    QAction *modeV = new QAction("+v", &Menu);
+
+    QAction *modeq = new QAction("-q", &Menu);
+    QAction *modea = new QAction("-a", &Menu);
+    QAction *modeo = new QAction("-o", &Menu);
+    QAction *modeh = new QAction("-h", &Menu);
+    QAction *modev = new QAction("-v", &Menu);
+
+    menuModes->addAction(modeQ);
+    menuModes->addAction(modeA);
+    menuModes->addAction(modeO);
+    menuModes->addAction(modeH);
+    menuModes->addAction(modeV);
+    menuModes->addSeparator();
+    menuModes->addAction(modeq);
+    menuModes->addAction(modea);
+    menuModes->addAction(modeo);
+    menuModes->addAction(modeh);
+    menuModes->addAction(modev);
+
+    Menu.addMenu(menuModes);
+
+    Menu.addSeparator();
+
+    QAction* selectedItem = Menu.exec(globalPos);
+    if (!selectedItem)
+        return;
+    if (selectedItem == modeo)
+        this->ChangeMode("-o");
+    else if (selectedItem == modeq)
+        this->ChangeMode("-q");
+    else if (selectedItem == modeh)
+        this->ChangeMode("-h");
+    else if (selectedItem == modev)
+        this->ChangeMode("-v");
+    else if (selectedItem == modea)
+        this->ChangeMode("-a");
+    else if (selectedItem == modeQ)
+        this->ChangeMode("+q");
+    else if (selectedItem == modeA)
+        this->ChangeMode("+a");
+    else if (selectedItem == modeO)
+        this->ChangeMode("+o");
+    else if (selectedItem == modeH)
+        this->ChangeMode("+h");
+    else if (selectedItem == modeV)
+        this->ChangeMode("+v");
 }
 
 QString UserFrame::GenerateTip(libircclient::User *ux)
@@ -150,6 +211,29 @@ QList<QString> UserFrame::GetUsers()
 
     return ul;
 
+}
+
+void UserFrame::ChangeMode(QString mode)
+{
+    if (!this->network)
+        return;
+    QString channel_name = this->parentFrame->GetScrollback()->GetTarget();
+    // Check all users who were selected
+    foreach (QListWidgetItem* item,  this->ui->listWidget->selectedItems())
+    {
+        QString nick = item->text().toLower();
+        if (nick.isEmpty())
+            throw new GrumpyIRC::Exception("Empty nick!?", BOOST_CURRENT_FUNCTION);
+        // strip the prefix
+        char prefix = nick[0].toLatin1();
+        if (this->network->GetChannelUserPrefixes().contains(prefix))
+            nick = nick.mid(1);
+        if (!this->users.contains(nick))
+            throw new GrumpyIRC::Exception("Missing user", BOOST_CURRENT_FUNCTION);
+
+        libircclient::User user = this->users[nick];
+        this->parentFrame->TransferRaw("MODE " + channel_name + " " + mode + " " + user.GetNick());
+    }
 }
 
 void UserFrame::UpdateInfo()

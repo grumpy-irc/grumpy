@@ -89,12 +89,24 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     // Items
     QAction *menuClose = new QAction(QObject::tr("Close"), &Menu);
     Menu.addAction(menuClose);
+    QAction *menuInsrFavorites = NULL;
+    QAction *menuAuto = NULL;
     QAction *menuPart = NULL;
     QAction *menuDisconnect = NULL;
     QAction *menuSniffer = NULL;
 
     if (!wx->IsDeletable || !wx->IsDead())
         menuClose->setEnabled(false);
+
+    if (wx->IsNetwork())
+    {
+        menuInsrFavorites = new QAction("Insert to favorite networks", &Menu);
+        Menu.addAction(menuInsrFavorites);
+        menuAuto = new QAction("Automatically connect", &Menu);
+        menuAuto->setCheckable(true);
+        menuAuto->setChecked(false);
+        Menu.addAction(menuAuto);
+    }
 
     if (wx->IsChannel())
     {

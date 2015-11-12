@@ -49,7 +49,7 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     this->isClean = true;
     connect(this->textEdit, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(Menu(QPoint)));
     this->maxItems = 200;
-    this->userFrame = new UserFrame();
+    this->userFrame = new UserFrame(this);
     this->isVisible = false;
     if (_scrollback == NULL)
         this->scrollback = new Scrollback();
@@ -447,6 +447,15 @@ void ScrollbackFrame::RefreshHtmlIfNeeded()
 {
     if (this->needsRefresh)
         this->RefreshHtml();
+}
+
+void ScrollbackFrame::TransferRaw(QString data)
+{
+    if (!this->GetSession())
+        return;
+
+    // Delegate the raw command
+    this->GetSession()->SendRaw(this->GetScrollback(), data);
 }
 
 libircclient::User *ScrollbackFrame::GetIdentity()
