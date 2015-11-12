@@ -59,12 +59,14 @@ namespace GrumpyIRC
             Scrollback *GetScrollback();
             UserFrame *GetUserFrame();
             QString GetTitle();
+            void UpdateColor();
             void Focus();
             bool IsChannel();
             bool IsNetwork();
             bool IsDead();
             void RequestClose();
             void UpdateIcon();
+            void EnableState(bool enable);
             void RequestPart();
             void RequestDisconnect();
             void RequestMore(unsigned int count);
@@ -85,6 +87,7 @@ namespace GrumpyIRC
             void _insertText_(ScrollbackItem item);
             void UserList_Insert(libircclient::User *ux);
             void UserList_Refresh(libircclient::User *ux);
+            void OnState();
             void UserList_Remove(QString user);
             void UserList_Rename(QString old, libircclient::User *us);
             void OnDead();

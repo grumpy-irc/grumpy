@@ -11,6 +11,7 @@
 // Copyright (c) Petr Bena 2015
 
 #include "scrollbacklist_node.h"
+#include "skin.h"
 #include "../libcore/scrollback.h"
 #include "scrollbackframe.h"
 
@@ -19,12 +20,26 @@ using namespace GrumpyIRC;
 ScrollbackList_Node::ScrollbackList_Node(ScrollbackFrame *sb) : QStandardItem(sb->GetWindowName())
 {
     this->scrollback = sb;
+    this->RebuildCache();
+    this->UpdateColor();
     this->UpdateIcon();
 }
 
 ScrollbackFrame *ScrollbackList_Node::GetScrollback()
 {
     return this->scrollback;
+}
+
+void ScrollbackList_Node::RebuildCache()
+{
+    this->unreadBrush = this->foreground();
+    this->standardBrush = this->foreground();
+    this->highlighterBrush = this->foreground();
+    this->systemBrush = this->foreground();
+    this->unreadBrush.setColor(Skin::GetDefault()->Unread);
+    this->standardBrush.setColor(Skin::GetDefault()->TextColor);
+    this->highlighterBrush.setColor(Skin::GetDefault()->HighligtedColor);
+    this->systemBrush.setColor(Skin::GetDefault()->SystemColor);
 }
 
 void ScrollbackList_Node::UpdateIcon()
@@ -62,5 +77,24 @@ void ScrollbackList_Node::UpdateIcon()
                 this->setIcon(QIcon(":/icons/img/at-s.png"));
                 break;
         }
+    }
+}
+
+void ScrollbackList_Node::UpdateColor()
+{
+    switch (this->scrollback->GetScrollback()->GetState())
+    {
+        case ScrollbackState_UnreadMessages:
+            this->setForeground(this->unreadBrush);
+            break;
+        case ScrollbackState_UnreadNotice:
+            this->setForeground(this->highlighterBrush);
+            break;
+        case ScrollbackState_UnreadSystem:
+            this->setForeground(this->systemBrush);
+            break;
+        case ScrollbackState_Normal:
+            this->setForeground(this->standardBrush);
+            break;
     }
 }

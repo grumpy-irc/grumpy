@@ -32,7 +32,9 @@ namespace GrumpyIRC
             QFont TextFont;
             QColor TextColor;
             QColor HighligtedColor;
+            QColor SystemInfo;
             QColor SystemColor;
+            QColor Unread;
             QColor BackgroundColor;
             QHash<char, QColor> ModeColors;
     };

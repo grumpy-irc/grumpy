@@ -40,6 +40,8 @@ Skin::Skin()
     this->TextFont = QFont("Monospace");
 #endif
     this->TextFont.setPixelSize(13);
+    this->SystemInfo = QColor(240, 250, 102);
+    this->Unread = QColor(240, 250, 102);
     this->ModeColors.insert('v', QColor(244, 254, 10));
     this->ModeColors.insert('h', QColor(212, 250, 145));
     this->ModeColors.insert('o', QColor(92, 247, 14));

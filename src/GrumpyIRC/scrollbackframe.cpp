@@ -64,11 +64,12 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     connect(this->scrollback, SIGNAL(Event_InsertText(ScrollbackItem)), this, SLOT(_insertText_(ScrollbackItem)));
     connect(this->scrollback, SIGNAL(Event_Closed()), this, SLOT(OnClosed()));
     connect(this->scrollback, SIGNAL(Event_UserRefresh(libircclient::User*)), this, SLOT(UserList_Refresh(libircclient::User*)));
+    connect(this->scrollback, SIGNAL(Event_StateModified()), this, SLOT(OnState()));
 }
 
 ScrollbackFrame::~ScrollbackFrame()
 {
-    //delete this->scrollback;
+    delete this->scrollback;
     delete this->userFrame;
     //! \todo Handle deletion of TreeNode from list of scbs
     //delete this->TreeNode;
@@ -111,6 +112,7 @@ static QString ItemToString(ScrollbackItem item)
     QString format_string = CONF->GetLineFormat();
     QString text = item.GetText();
     QString user = item.GetUser().GetNick();
+    bool system = false;
     //format_string.replace("$time", item.GetTime().toString());
     //QString result;
     switch (item.GetType())
@@ -120,12 +122,14 @@ static QString ItemToString(ScrollbackItem item)
             format_string.replace("$string", CONF->GetActionFormat());
             break;
         case ScrollbackItemType_Join:
+            system = true;
             format_string.replace("$string", CONF->GetActionFormat());
             user = item.GetUser().ToString();
             text = "joined channel";
             //result = FormatAction(item.GetUser(), "joined channel", true);
             break;
         case ScrollbackItemType_Part:
+            system = true;
             format_string.replace("$string", CONF->GetActionFormat());
             user = item.GetUser().ToString();
             if (item.GetText().isEmpty())
@@ -134,15 +138,18 @@ static QString ItemToString(ScrollbackItem item)
                 text = "left channel (" + item.GetText() + ")";
             break;
         case ScrollbackItemType_Quit:
+            system = true;
             format_string.replace("$string", CONF->GetActionFormat());
             user = item.GetUser().ToString();
             text = "quit (" + item.GetText() + ")";
             break;
         case ScrollbackItemType_Kick:
+            system = true;
             format_string.replace("$string", CONF->GetActionFormat());
 
             break;
         case ScrollbackItemType_Nick:
+            system = true;
             format_string.replace("$string", CONF->GetActionFormat());
             text = "changed nick to " + item.GetText();
             break;
@@ -161,6 +168,8 @@ static QString ItemToString(ScrollbackItem item)
     QColor color = Skin::GetDefault()->TextColor;
     if (item.GetType() == ScrollbackItemType_System)
         color = Skin::GetDefault()->SystemColor;
+    else if (system)
+        color = Skin::GetDefault()->SystemInfo;
     irc2htmlcode::FormattedItem results = ScrollbackFrame::parser.Process(format_string, item.GetTime(), user, text, color.name());
     return results.source;
 }
@@ -193,6 +202,11 @@ void ScrollbackFrame::UserList_Refresh(libircclient::User *ux)
     this->userFrame->RefreshUser(ux);
 }
 
+void ScrollbackFrame::OnState()
+{
+    this->UpdateColor();
+}
+
 void ScrollbackFrame::UserList_Remove(QString user)
 {
     this->userFrame->RemoveUser(user);
@@ -214,6 +228,7 @@ void ScrollbackFrame::Refresh()
     foreach (ScrollbackItem item, this->scrollback->GetItems())
         this->_insertText_(item);
     this->UpdateIcon();
+    this->UpdateColor();
 }
 
 void ScrollbackFrame::Menu(QPoint pn)
@@ -333,6 +348,12 @@ QString ScrollbackFrame::GetTitle()
     return this->scrollback->GetTarget();
 }
 
+void ScrollbackFrame::UpdateColor()
+{
+    if (this->TreeNode)
+        this->TreeNode->UpdateColor();
+}
+
 void ScrollbackFrame::Focus()
 {
     this->inputBox->Focus();
@@ -383,6 +404,13 @@ void ScrollbackFrame::UpdateIcon()
 {
     if (this->TreeNode)
         this->TreeNode->UpdateIcon();
+}
+
+void ScrollbackFrame::EnableState(bool enable)
+{
+    this->scrollback->IgnoreState = !enable;
+    if (!enable)
+        this->scrollback->SetState(ScrollbackState_Normal);
 }
 
 void ScrollbackFrame::RequestPart()

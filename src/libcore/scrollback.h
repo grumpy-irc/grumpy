@@ -52,6 +52,14 @@ namespace GrumpyIRC
         ScrollbackItemType_Topic
     };
 
+    enum ScrollbackState
+    {
+        ScrollbackState_Normal,
+        ScrollbackState_UnreadMessages,
+        ScrollbackState_UnreadSystem,
+        ScrollbackState_UnreadNotice
+    };
+
     /*!
      * \brief The ScrollbackItem class is a one item in scrollback buffer
      */
@@ -146,6 +154,10 @@ namespace GrumpyIRC
             void LoadHash(QHash<QString, QVariant> hash);
             //! Used to resync most of attributes with target
             void Resync(Scrollback *target);
+            void SetState(ScrollbackState state);
+            ScrollbackState GetState();
+            //! You can set this to true in order to suppress state updates
+            bool IgnoreState;
             QHash<QString, QVariant> PropertyBag;
 
         signals:
@@ -162,6 +174,7 @@ namespace GrumpyIRC
             void Event_UserAltered(QString original_name, libircclient::User *user);
             void Event_ChangedDeadStatus();
             void Event_SessionModified(NetworkSession *Session);
+            void Event_StateModified();
             void Event_Reload();
             void Event_UserRemoved(QString name);
             void Event_Resync();
@@ -173,6 +186,7 @@ namespace GrumpyIRC
             static scrollback_id_t lastID;
 
             scrollback_id_t _lastItemID;
+            ScrollbackState scrollbackState;
             libircclient::Network *_network;
             Scrollback *parentSx;
             bool _dead;

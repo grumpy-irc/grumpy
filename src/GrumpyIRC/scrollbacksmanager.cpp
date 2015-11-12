@@ -107,6 +107,7 @@ void ScrollbacksManager::SwitchWindow(ScrollbackFrame *window)
     if (this->currentWidget != NULL)
     {
         this->currentWidget->SetVisible(false);
+        this->currentWidget->EnableState(true);
         QLayoutItem *container = this->ui->verticalLayout_2->itemAt(0);
         this->ui->verticalLayout_2->removeItem(this->ui->verticalLayout_2->itemAt(0));
         this->ui->verticalLayout_2->removeWidget(this->currentWidget);
@@ -135,6 +136,7 @@ void ScrollbacksManager::SwitchWindow(ScrollbackFrame *window)
     this->currentWidget->Focus();
 
     // Redraw the buffer contents if needed
+    window->EnableState(false);
     window->SetVisible(true);
     window->RefreshHtmlIfNeeded();
 }

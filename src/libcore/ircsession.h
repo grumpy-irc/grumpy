@@ -124,6 +124,7 @@ namespace GrumpyIRC
             virtual void OnSelf_KICK(libircclient::Parser *px, libircclient::Channel *channel);
             virtual void OnTOPIC(libircclient::Parser *px, libircclient::Channel *channel, QString previous_one);
             virtual void OnTOPICWhoTime(libircclient::Parser *px, libircclient::Channel *channel);
+            virtual void OnNickConflict(libircclient::Parser *px);
             virtual void OnQuit(libircclient::Parser *px, libircclient::Channel *channel);
             virtual void OnSelfPart(libircclient::Parser *px, libircclient::Channel *channel);
             virtual void OnTopicInfo(libircclient::Parser *px, libircclient::Channel *channel);

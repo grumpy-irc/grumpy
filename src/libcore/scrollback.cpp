@@ -29,6 +29,7 @@ Scrollback::Scrollback(ScrollbackType Type, Scrollback *parent)
     ScrollbackList_Mutex.unlock();
     this->session = NULL;
     this->_dead = false;
+    this->IgnoreState = false;
     this->_lastItemID = 0;
     this->_network = NULL;
     this->type = Type;
@@ -40,6 +41,7 @@ Scrollback::Scrollback(QHash<QString, QVariant> hash)
 {
     this->_maxItems = 0;
     this->parentSx = NULL;
+    this->IgnoreState = false;
     ScrollbackList_Mutex.lock();
     ScrollbackList.append(this);
     ScrollbackList_Mutex.unlock();
@@ -233,6 +235,7 @@ QHash<QString, QVariant> Scrollback::ToPartialHash()
     SERIALIZE(_original_id);
     SERIALIZE(PropertyBag);
     SERIALIZE(_maxItems);
+    hash.insert("scrollbackState", static_cast<int>(this->scrollbackState));
     SERIALIZE(_lastItemID);
     SERIALIZE(_target);
     return hash;
@@ -247,6 +250,8 @@ void Scrollback::LoadHash(QHash<QString, QVariant> hash)
     UNSERIALIZE_UINT(_lastItemID);
     if (hash.contains("type"))
         this->type = static_cast<ScrollbackType>(hash["type"].toInt());
+    if (hash.contains("scrollbackState"))
+        this->scrollbackState = static_cast<ScrollbackState>(hash["scrollbackState"].toInt());
     UNSERIALIZE_UINT(_original_id);
     if (hash.contains("items"))
     {
@@ -271,6 +276,17 @@ void Scrollback::Resync(Scrollback *target)
             this->PropertyBag[key] = target->PropertyBag[key];
     }
     emit this->Event_Resync();
+}
+
+void Scrollback::SetState(ScrollbackState state)
+{
+    this->scrollbackState = state;
+    emit this->Event_StateModified();
+}
+
+ScrollbackState Scrollback::GetState()
+{
+    return this->scrollbackState;
 }
 
 void Scrollback::SetTarget(QString target)
@@ -311,6 +327,25 @@ void Scrollback::InsertText(ScrollbackItem item)
 {
     item.SetID(this->_lastItemID++);
     this->_items.append(item);
+    if (!this->IgnoreState)
+    {
+        switch (item.GetType())
+        {
+            case ScrollbackItemType_Act:
+            case ScrollbackItemType_Notice:
+            case ScrollbackItemType_Message:
+                this->SetState(ScrollbackState_UnreadMessages);
+                break;
+            case ScrollbackItemType_Kick:
+            case ScrollbackItemType_Nick:
+            case ScrollbackItemType_Part:
+            case ScrollbackItemType_Quit:
+            case ScrollbackItemType_System:
+            case ScrollbackItemType_Topic:
+                this->SetState(ScrollbackState_UnreadSystem);
+                break;
+        }
+    }
     emit Event_InsertText(item);
 }
 

@@ -194,6 +194,8 @@ void IRCSession::Connect(libircclient::Network *Network)
     connect(this->network, SIGNAL(Event_ModeInfo(libircclient::Parser*)), this, SLOT(OnMODEInfo(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_CreationTime(libircclient::Parser*)), this, SLOT(OnMODETIME(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_Mode(libircclient::Parser*)), this, SLOT(OnMODE(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_NickCollision(libircclient::Parser*)), this, SLOT(OnNickConflict(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_Welcome(libircclient::Parser*)), this, SLOT(OnUnknown(libircclient::Parser*)));
     this->network->Connect();
 }
 
@@ -514,6 +516,13 @@ void IRCSession::OnTOPICWhoTime(libircclient::Parser *px, libircclient::Channel 
 
     Scrollback *sc = this->channels[channel->GetName().toLower()];
     sc->InsertText("Topic set at " + channel->GetTopicTime().toString() + " by " + channel->GetTopicUser());
+}
+
+void IRCSession::OnNickConflict(libircclient::Parser *px)
+{
+    if (px->GetParameters().size() < 2)
+        return;
+    this->systemWindow->InsertText("Nick already in use: " + px->GetParameters()[1]);
 }
 
 void IRCSession::OnQuit(libircclient::Parser *px, libircclient::Channel *channel)

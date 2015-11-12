@@ -14,6 +14,7 @@
 #define SCROLLBACKLIST_NODE_H
 
 #include <QStandardItemModel>
+#include <QBrush>
 #include <QIcon>
 
 namespace GrumpyIRC
@@ -24,9 +25,15 @@ namespace GrumpyIRC
 		public:
 			ScrollbackList_Node(ScrollbackFrame *sb);
 			ScrollbackFrame *GetScrollback();
+            void RebuildCache();
             void UpdateIcon();
+            void UpdateColor();
 
 		private:
+            QBrush standardBrush;
+            QBrush highlighterBrush;
+            QBrush unreadBrush;
+            QBrush systemBrush;
 			ScrollbackFrame *scrollback;
 
 	};
