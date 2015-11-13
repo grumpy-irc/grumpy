@@ -32,8 +32,9 @@ namespace GrumpyIRC
 
         private slots:
             void on_pushButton_clicked();
-
             void on_comboBox_currentIndexChanged(int index);
+
+            void on_checkBox_toggled(bool checked);
 
         private:
             Ui::ConnectWin *ui;

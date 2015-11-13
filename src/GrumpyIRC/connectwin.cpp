@@ -63,8 +63,12 @@ void GrumpyIRC::ConnectWin::on_comboBox_currentIndexChanged(int index)
         // Don't change the text if user inserted their own port
         switch (this->ui->lineEdit->text().toInt())
         {
+            case IRC_STANDARD_PORT:
+            case IRC_STANDARD_PORT_SSL:
             case GP_DEFAULT_PORT:
             case GP_DEFAULT_SSL_PORT:
+                break;
+            default:
                 return;
         }
     }
@@ -81,4 +85,10 @@ void GrumpyIRC::ConnectWin::on_comboBox_currentIndexChanged(int index)
         else
             this->ui->lineEdit->setText(QString::number(GP_DEFAULT_PORT));
     }
+}
+
+void GrumpyIRC::ConnectWin::on_checkBox_toggled(bool checked)
+{
+    (void)(checked);
+    this->on_comboBox_currentIndexChanged(this->ui->comboBox->currentIndex());
 }
