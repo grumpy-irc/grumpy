@@ -30,6 +30,9 @@ namespace GrumpyIRC
             explicit FavoritesWin(QWidget *parent = 0);
             ~FavoritesWin();
 
+        private slots:
+            void on_tableWidget_customContextMenuRequested(const QPoint &pos);
+
         private:
             Ui::FavoritesWin *ui;
     };

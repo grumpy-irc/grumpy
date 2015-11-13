@@ -26,3 +26,8 @@ FavoritesWin::~FavoritesWin()
 {
     delete this->ui;
 }
+
+void GrumpyIRC::FavoritesWin::on_tableWidget_customContextMenuRequested(const QPoint &pos)
+{
+
+}

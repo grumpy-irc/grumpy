@@ -519,7 +519,7 @@ void GrumpydSession::processChannelResync(QHash<QString, QVariant> hash)
     IRCSession *session = this->GetSession(hash["network_id"].toUInt());
     if (!session)
         return;
-    libircclient::Channel *channel = session->GetNetwork()->GetChannel(resynced_channel.GetName());
+    libircclient::Channel *channel = session->GetNetwork()->GetChannel(hash["channel_name"].toString());
     if (hash.contains("partial") && hash["partial"].toBool())
     {
         if (channel)
