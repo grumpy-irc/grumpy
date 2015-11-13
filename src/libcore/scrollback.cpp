@@ -95,7 +95,7 @@ void Scrollback::SetMaxItemsSize(scrollback_id_t size)
 void Scrollback::SetSession(NetworkSession *Session)
 {
     if (this->session)
-        throw new GrumpyIRC::Exception("This scrollback already has an IrcSession", BOOST_CURRENT_FUNCTION);
+        throw new GrumpyIRC::Exception("This scrollback already has NetworkSession", BOOST_CURRENT_FUNCTION);
 
     if (Session->GetType() == SessionType_IRC)
         this->SetNetwork(Session->GetNetwork());
@@ -280,6 +280,11 @@ void Scrollback::Resync(Scrollback *target)
 
 void Scrollback::SetState(ScrollbackState state)
 {
+	int current_state = static_cast<int>(this->scrollbackState);
+	int modified_state = static_cast<int>(state);
+	if (current_state >= modified_state)
+		return;
+
     this->scrollbackState = state;
     emit this->Event_StateModified();
 }

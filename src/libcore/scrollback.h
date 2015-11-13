@@ -55,10 +55,10 @@ namespace GrumpyIRC
 
     enum ScrollbackState
     {
-        ScrollbackState_Normal,
-        ScrollbackState_UnreadMessages,
-        ScrollbackState_UnreadSystem,
-        ScrollbackState_UnreadNotice
+        ScrollbackState_Normal = 1,
+		ScrollbackState_UnreadSystem = 2,
+        ScrollbackState_UnreadMessages = 3,
+        ScrollbackState_UnreadNotice = 4
     };
 
     /*!
