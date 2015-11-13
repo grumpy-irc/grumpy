@@ -77,6 +77,29 @@ void SyncableIRCSession::ResyncChannel(libircclient::Channel *channel)
     session->SendToEverySession(GP_CMD_CHANNEL_RESYNC, hash);
 }
 
+void SyncableIRCSession::ResyncChannel(libircclient::Channel *channel, QHash<QString, QVariant> hash)
+{
+    if (!channel)
+        throw new NullPointerException("channel", BOOST_CURRENT_FUNCTION);
+    if (!this->owner)
+        throw new NullPointerException("this->owner", BOOST_CURRENT_FUNCTION);
+
+    Session *session = this->owner->GetAnyGPSession();
+    if (!session)
+    {
+        // there is nobody we would need to sync this information with
+        // so we can safely ignore the request to sync
+        // this information is provided through other channels
+        return;
+    }
+    QHash<QString, QVariant> hash;
+    hash.insert("network_id", QVariant(this->GetSID()));
+    hash.insert("partial", QVariant(true));
+    hash.insert("channel_name", QVariant(channel->GetName()));
+    hash.insert("channel", QVariant(hash));
+    session->SendToEverySession(GP_CMD_CHANNEL_RESYNC, hash);
+}
+
 void SyncableIRCSession::Resync(QHash<QString, QVariant> network)
 {
     Session *session = this->owner->GetAnyGPSession();
@@ -243,6 +266,15 @@ void SyncableIRCSession::OnEndOfNames(libircclient::Parser *px)
     this->ResyncChannel(channel);
 }
 
+void SyncableIRCSession::OnUMODE(libircclient::Parser *px, libircclient::Channel *channel, libircclient::User *user)
+{
+    IRCSession::OnUMODE(px, channel, user);
+    if (!channel || !user)
+        return;
+
+    this->resyncUL(channel, GRUMPY_UL_UPDATE, user);
+}
+
 void SyncableIRCSession::OnWHO(libircclient::Parser *px, libircclient::Channel *channel, libircclient::User *user)
 {
     IRCSession::OnWHO(px, channel, user);
@@ -259,6 +291,18 @@ void SyncableIRCSession::OnMODE(libircclient::Parser *px)
     QHash<QString, QVariant> hash;
     hash.insert("localUserMode", QVariant(this->GetNetwork()->GetLocalUserMode().ToHash()));
     this->Resync(hash);
+}
+
+void SyncableIRCSession::OnChannelMODE(libircclient::Parser *px, libircclient::Channel *channel)
+{
+    IRCSession::OnChannelMODE(px, channel);
+
+    if (!channel)
+        return;
+
+    QHash<QString, QVariant> cx;
+    cx.insert("_localMode", channel->GetMode().ToHash());
+    this->ResyncChannel(channel, cx);
 }
 
 void SyncableIRCSession::resyncULRemove(libircclient::Channel *channel, QString user)

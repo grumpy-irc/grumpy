@@ -519,8 +519,16 @@ void GrumpydSession::processChannelResync(QHash<QString, QVariant> hash)
     IRCSession *session = this->GetSession(hash["network_id"].toUInt());
     if (!session)
         return;
-    libircclient::Channel resynced_channel(hash["channel"].toHash());
     libircclient::Channel *channel = session->GetNetwork()->GetChannel(resynced_channel.GetName());
+    if (hash.contains("partial") && hash["partial"].toBool())
+    {
+        if (channel)
+            channel->LoadHash(hash["channel"].toHash());
+
+        // That's all :)
+        return;
+    }
+    libircclient::Channel resynced_channel(hash["channel"].toHash());
     // Find a scrollback that is associated to this channel if there is some
     Scrollback *window = session->GetScrollback(resynced_channel.GetName());
     if (!channel)

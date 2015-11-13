@@ -30,6 +30,7 @@ namespace GrumpyIRC
             SyncableIRCSession(Scrollback *system, User *user, Scrollback *root = NULL);
             void Connect(libircclient::Network *Network);
             void ResyncChannel(libircclient::Channel* channel);
+            void ResyncChannel(libircclient::Channel *channel, QHash<QString, QVariant> hash);
             void Resync(QHash<QString, QVariant> network);
             void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete);
             ~SyncableIRCSession();
@@ -50,8 +51,10 @@ namespace GrumpyIRC
             void OnTopicInfo(libircclient::Parser *px, libircclient::Channel *channel);
             void OnInfo(libircclient::Parser *px);
             void OnEndOfNames(libircclient::Parser *px);
+            void OnUMODE(libircclient::Parser *px, libircclient::Channel *channel, libircclient::User *user);
             void OnWHO(libircclient::Parser *px, libircclient::Channel *channel, libircclient::User *user);
             void OnMODE(libircclient::Parser *px);
+            void OnChannelMODE(libircclient::Parser *px, libircclient::Channel *channel);
         private:
             void resyncULRemove(libircclient::Channel *channel, QString user);
             void resyncUL(libircclient::Channel *channel, int mode, libircclient::User *user);
