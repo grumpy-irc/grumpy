@@ -13,11 +13,13 @@
 // This file must be included first because it defines GRUMPY_WIN
 #include "../libcore/definitions.h"
 
+#include <iostream>
 #ifdef GRUMPY_WIN
     #include <windows.h>
 #endif
 #include "mainwindow.h"
 #include "corewrapper.h"
+#include "../libcore/exception.h"
 #include "grumpyeventhandler.h"
 #include "../libcore/autocompletionengine.h"
 #include "../libcore/core.h"
@@ -33,35 +35,49 @@ using namespace GrumpyIRC;
 // this function hides the console once the grumpy is started up and main window is loaded
 
 // it doesn't do anything if grumpy is compiled in debug mode, because we want to see it all time in that case :)
-void HideConsole()
+void HideConsole(int hide)
 {
 #ifndef _DEBUG
     HWND Stealth;
     AllocConsole();
     Stealth = FindWindowA("ConsoleWindowClass", NULL);
-    ShowWindow(Stealth, 0);
+    ShowWindow(Stealth, hide);
 #endif
 }
 #endif
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    int ReturnCode = 0;
+    try
+    {
+        QApplication a(argc, argv);
 
-    // Initialize core first
-    CoreWrapper::GrumpyCore = new Core();
-    CoreWrapper::GrumpyCore->InitCfg();
-    CoreWrapper::GrumpyCore->SetSystemEventHandler(new GrumpyEventHandler());
-    CoreWrapper::GrumpyCore->InstallFactory(new WidgetFactory());
-    Highlighter::Init();
-    InputBox::AE = new AutocompletionEngine();
-    MainWindow w;
-    w.show();
+        // Initialize core first
+        CoreWrapper::GrumpyCore = new Core();
+        CoreWrapper::GrumpyCore->InitCfg();
+        CoreWrapper::GrumpyCore->SetSystemEventHandler(new GrumpyEventHandler());
+        CoreWrapper::GrumpyCore->InstallFactory(new WidgetFactory());
+        Highlighter::Init();
+        InputBox::AE = new AutocompletionEngine();
+        MainWindow w;
+        w.show();
+    #ifdef GRUMPY_WIN
+        HideConsole(0);
+    #endif
+        ReturnCode = a.exec();
+        delete CoreWrapper::GrumpyCore;
+        return ReturnCode;
+    } catch (GrumpyIRC::Exception *ex)
+    {
+        std::cerr << "Unhandled exception: " << ex->GetMessage().toStdString() << std::endl;
+        std::cerr << "Source: " << ex->GetSource().toStdString() << std::endl;
+        delete ex;
 #ifdef GRUMPY_WIN
-    HideConsole();
+        HideConsole(1);
+        std::cerr << "Press any key to exit grumpy" << std::endl;
+        std::cin.get();
 #endif
-
-    int ReturnCode = a.exec();
-    delete CoreWrapper::GrumpyCore;
+    }
     return ReturnCode;
 }

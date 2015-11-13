@@ -32,6 +32,10 @@
     #define __FILE__ "{unknown}"
 #endif
 
+#ifdef GetMessage
+    #undef GetMessage
+#endif
+
 #define HUGGLE_FILE_LINE QString("@") + QString(__FILE__) + QString(":") + QString::number(__LINE__)
 
 #ifndef BOOST_CURRENT_FUNCTION
@@ -63,6 +67,7 @@ namespace GrumpyIRC
             virtual ~Exception() {}
             virtual int ErrorCode() { return errc; }
             virtual QString GetMessage();
+            virtual QString GetSource();
         private:
             int errc;
             QString source;

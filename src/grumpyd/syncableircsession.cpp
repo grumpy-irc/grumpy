@@ -77,7 +77,7 @@ void SyncableIRCSession::ResyncChannel(libircclient::Channel *channel)
     session->SendToEverySession(GP_CMD_CHANNEL_RESYNC, hash);
 }
 
-void SyncableIRCSession::ResyncChannel(libircclient::Channel *channel, QHash<QString, QVariant> hash)
+void SyncableIRCSession::ResyncChannel(libircclient::Channel *channel, QHash<QString, QVariant> cx)
 {
     if (!channel)
         throw new NullPointerException("channel", BOOST_CURRENT_FUNCTION);
@@ -96,7 +96,7 @@ void SyncableIRCSession::ResyncChannel(libircclient::Channel *channel, QHash<QSt
     hash.insert("network_id", QVariant(this->GetSID()));
     hash.insert("partial", QVariant(true));
     hash.insert("channel_name", QVariant(channel->GetName()));
-    hash.insert("channel", QVariant(hash));
+    hash.insert("channel", QVariant(cx));
     session->SendToEverySession(GP_CMD_CHANNEL_RESYNC, hash);
 }
 

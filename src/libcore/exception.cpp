@@ -14,7 +14,8 @@
 
 GrumpyIRC::Exception::Exception()
 {
-
+    this->message = "??";
+    this->source = "(not provided)";
 }
 
 GrumpyIRC::Exception::Exception(QString Message, QString function_id)
@@ -23,9 +24,13 @@ GrumpyIRC::Exception::Exception(QString Message, QString function_id)
     this->source = function_id;
 }
 
+QString GrumpyIRC::Exception::GetSource()
+{
+    return this->source;
+}
+
 QString GrumpyIRC::Exception::GetMessage()
 {
-    this->source = "(not provided)";
     return this->message;
 }
 
