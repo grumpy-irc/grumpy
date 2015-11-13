@@ -93,6 +93,7 @@ namespace GrumpyIRC
             void UserList_Remove(QString user);
             void UserList_Rename(QString old, libircclient::User *us);
             void OnDead();
+            void OnLink(QString url);
             void Refresh();
             void Menu(QPoint pn);
             void OnClosed();

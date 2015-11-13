@@ -24,6 +24,7 @@ namespace GrumpyIRC
             STextBox(QWidget *parent = NULL);
             ~STextBox();
             void AppendHtml(QString html);
+            void SetStyleSheet(QString css);
             void Clear();
         signals:
             void Event_Link(QString text);

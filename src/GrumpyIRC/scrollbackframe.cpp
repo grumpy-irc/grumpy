@@ -65,6 +65,8 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     connect(this->scrollback, SIGNAL(Event_Closed()), this, SLOT(OnClosed()));
     connect(this->scrollback, SIGNAL(Event_UserRefresh(libircclient::User*)), this, SLOT(UserList_Refresh(libircclient::User*)));
     connect(this->scrollback, SIGNAL(Event_StateModified()), this, SLOT(OnState()));
+    connect(this->textEdit, SIGNAL(Event_Link(QString)), this, SLOT(OnLink(QString)));
+    this->textEdit->SetStyleSheet(ScrollbackFrame::parser.GetStyle());
 }
 
 ScrollbackFrame::~ScrollbackFrame()
@@ -225,6 +227,17 @@ void ScrollbackFrame::UserList_Rename(QString old, libircclient::User *us)
 void ScrollbackFrame::OnDead()
 {
     this->UpdateIcon();
+}
+
+void ScrollbackFrame::OnLink(QString url)
+{
+    if (!url.contains("://"))
+            return;
+    QString scheme = url.mid(0, url.indexOf("://"));
+    if (scheme == "irc_join")
+    {
+        this->TransferRaw("JOIN " + url.mid(url.indexOf("://") + 3));
+    }
 }
 
 void ScrollbackFrame::Refresh()

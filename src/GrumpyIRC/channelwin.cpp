@@ -29,6 +29,7 @@ ChannelWin::ChannelWin(NetworkSession *session, libircclient::Network *network, 
     this->ui->plainTextEdit->setPlainText(channel->GetTopic());
     this->_network = network;
     this->_channel = channel;
+    this->setWindowTitle(channel->GetName());
     this->ignore = false;
     this->ui->groupBox->setTitle("Topic set by " + channel->GetTopicUser() + " at " + channel->GetTopicTime().toString());
     this->ui->plainTextEdit->setPalette(Skin::GetDefault()->Palette());

@@ -68,7 +68,7 @@ namespace GrumpyIRC
             virtual int ErrorCode() { return errc; }
             virtual QString GetMessage();
             virtual QString GetSource();
-        private:
+        protected:
             int errc;
             QString source;
             QString message;

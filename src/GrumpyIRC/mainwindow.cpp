@@ -57,6 +57,13 @@ static int SystemCommand_Exit(SystemCommand *command, CommandArgs args)
     return 0;
 }
 
+static int SystemCommand_echo(SystemCommand *command, CommandArgs args)
+{
+    Q_UNUSED(command);
+    MainWindow::Main->GetCurrentScrollbackFrame()->InsertText(args.ParameterLine);
+    return 0;
+}
+
 static int SystemCommand_NextSessionNick(SystemCommand *command, CommandArgs args)
 {
     Q_UNUSED(command);
@@ -225,6 +232,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("unsecuregrumpyd", (SC_Callback)SystemCommand_UnsecureGrumpy));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpyd", (SC_Callback)SystemCommand_Grumpy));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("raw", (SC_Callback)SystemCommand_RAW));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("echo", (SC_Callback)SystemCommand_echo));
     // Welcome user
     this->ui->actionOpen_window->setVisible(false);
     this->systemWindow->InsertText(QString("Grumpy irc version " + GCFG->GetVersion()));

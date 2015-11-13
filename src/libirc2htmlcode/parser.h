@@ -26,12 +26,22 @@ namespace irc2htmlcode
             virtual ~Parser();
             virtual FormattedItem Process(QString format, QDateTime time, QString user, QString text, QString override_default_text_color = "");
             QString EncodeHtml(QString text);
+            QString GetStyle();
+            char ChannelSymbol;
+            QString LinkColor;
             QString UserColor;
             QString TimeColor;
             QString TextColor;
+            QList<QString> Protocols;
+            QList<char> LinkSeparators;
+            QList<char> SeparatorsPriv;
+            QList<char> Separators;
             QHash<unsigned int, QString> TextColors;
 
         private:
+            QString linkUrl(QString source, QString protocol);
+            QString linkUrls(QString source);
+            QString linkChannels(QString source);
             QString replaceSpecials(QString source);
             QString formatTime(QDateTime time);
             QString formatUser(QString user);

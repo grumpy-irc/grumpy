@@ -31,6 +31,11 @@ void STextBox::AppendHtml(QString html)
     this->appendHtml(html);
 }
 
+void STextBox::SetStyleSheet(QString css)
+{
+    this->setStyleSheet(css);
+}
+
 void STextBox::Clear()
 {
     this->clear();

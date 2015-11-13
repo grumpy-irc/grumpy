@@ -19,9 +19,15 @@ Parser::Parser()
     this->TextColor = "#FFFFFF";
     this->TimeColor = "#DCFCAC";
     this->UserColor = "#B4D6FA";
+    this->ChannelSymbol = '#';
     this->resolveCacheSize = 2000;
     this->cacheHits = 0;
+    this->LinkColor = "#94D7F2";
     this->cacheMiss = 0;
+    this->Protocols << "http" << "https" << "ftp" << "irc" << "ircs";
+    this->LinkSeparators << ' ';
+    this->Separators << ' ' << '.' << ',' << ':' << ';' << '!' << '(' << ')';
+    this->SeparatorsPriv << ' ' << '(';
     // We expect a dark background so black and white mixed up
     this->TextColors.insert(0,    "#000000"); // White
     this->TextColors.insert(1,    "#FFFFFF"); // Black
@@ -88,6 +94,87 @@ QString Parser::EncodeHtml(QString text)
     text.replace(">", "&gt;");
 
     return text;
+}
+
+QString Parser::GetStyle()
+{
+    return "a {\n"\
+           "    color: " + this->LinkColor + ";\n"\
+                                             "}";
+}
+
+QString Parser::linkUrl(QString source, QString protocol)
+{
+    int position = 0;
+    protocol = protocol + "://";
+    while (position < source.size() && source.mid(position).contains(protocol))
+    {
+        position = source.indexOf(protocol, position);
+        // find the end of link
+        int end = position;
+        while (++end < source.size())
+        {
+            if (this->LinkSeparators.contains(source[end].toLatin1()))
+                break;
+        }
+        QString lx = source.mid(position, end - position);
+        QString linked_lx = "<a style=\"color:" + this->LinkColor + ";\" href=\"" + lx + "\">" + lx + "</a>";
+        source.remove(position, lx.size());
+        source.insert(position, linked_lx);
+        position += linked_lx.size();
+    }
+    return source;
+}
+
+QString Parser::linkUrls(QString source)
+{
+    foreach (QString protocol, this->Protocols)
+        source = this->linkUrl(source, protocol);
+    return source;
+}
+
+QString Parser::linkChannels(QString source)
+{
+    int current_pos = 0;
+    int word_start = 0;
+    while (current_pos < source.size())
+    {
+        char current = source[current_pos].toLatin1();
+        if (current == ChannelSymbol)
+        {
+            // This is likely a channel, but only if the preceeding symbol was a separator OR this is a first symbol
+            if (current_pos != 0)
+            {
+                char previous_char = source[current_pos - 1].toLatin1();
+                if (!this->SeparatorsPriv.contains(previous_char))
+                {
+                    current_pos++;
+                    continue;
+                }
+            }
+            int channel_end = current_pos;
+            while (++channel_end < source.size())
+            {
+                if (this->Separators.contains(source[channel_end].toLatin1()))
+                {
+                    break;
+                }
+            }
+            QString channel_name = source.mid(word_start, channel_end - word_start);
+            QString channel_link = "<a style=\"color:" + this->LinkColor + ";\" href=\"irc_join://" + channel_name + "\">" + channel_name + "</a>";
+            // Now we need to cut the original channel from source
+            source.remove(word_start, channel_end - word_start);
+            source.insert(word_start, channel_link);
+            current_pos = word_start + channel_link.size();
+            continue;
+        } else if (this->Separators.contains(current))
+        {
+            word_start = current_pos+1;
+        }
+        current_pos++;
+    }
+
+    return source;
 }
 
 static bool isNumber(QChar input)
@@ -220,5 +307,5 @@ QString Parser::formatUser(QString user)
 
 QString Parser::formatText(QString text, QString color)
 {
-    return "<font color=\"" + color + "\">" + this->replaceSpecials(this->EncodeHtml(text)) + "</font>";
+    return "<font color=\"" + color + "\">" + this->replaceSpecials(this->linkChannels(this->linkUrls(this->EncodeHtml(text)))) + "</font>";
 }
