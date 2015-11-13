@@ -148,6 +148,11 @@ static QString ItemToString(ScrollbackItem item)
             format_string.replace("$string", CONF->GetActionFormat());
 
             break;
+        case ScrollbackItemType_Mode:
+            system = true;
+            format_string.replace("$string", CONF->GetActionFormat());
+            text = "set mode " + item.GetText();
+            break;
         case ScrollbackItemType_Nick:
             system = true;
             format_string.replace("$string", CONF->GetActionFormat());
@@ -417,6 +422,11 @@ void ScrollbackFrame::RequestPart()
 {
     if (this->GetSession() && this->IsChannel())
         this->GetSession()->RequestPart(this->GetScrollback());
+}
+
+void ScrollbackFrame::ToggleSecure()
+{
+    this->inputBox->Secure();
 }
 
 void ScrollbackFrame::RequestDisconnect()

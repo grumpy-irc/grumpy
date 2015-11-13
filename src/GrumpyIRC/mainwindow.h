@@ -69,8 +69,8 @@ namespace GrumpyIRC
             void on_actionLoad_more_items_from_remote_triggered();
             void on_actionPreferences_triggered();
             void on_actionOpen_window_triggered();
-
             void on_actionFavorites_triggered();
+            void on_actionToggle_secret_triggered();
 
         private:
             void closeEvent(QCloseEvent *event);

@@ -421,3 +421,8 @@ void GrumpyIRC::MainWindow::on_actionFavorites_triggered()
     favorites->setAttribute(Qt::WA_DeleteOnClose);
     favorites->show();
 }
+
+void GrumpyIRC::MainWindow::on_actionToggle_secret_triggered()
+{
+    this->GetCurrentScrollbackFrame()->ToggleSecure();
+}

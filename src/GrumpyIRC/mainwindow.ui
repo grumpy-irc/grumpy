@@ -65,6 +65,7 @@
     </property>
     <addaction name="actionResync"/>
     <addaction name="actionLoad_more_items_from_remote"/>
+    <addaction name="actionToggle_secret"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuScrollback"/>
@@ -132,6 +133,14 @@
   <action name="actionFavorites">
    <property name="text">
     <string>Favorites</string>
+   </property>
+  </action>
+  <action name="actionToggle_secret">
+   <property name="text">
+    <string>Secured input</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+S</string>
    </property>
   </action>
  </widget>

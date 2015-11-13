@@ -34,13 +34,18 @@ namespace GrumpyIRC
             explicit InputBox(ScrollbackFrame *parent = 0);
             ~InputBox();
             void ProcessInput();
+            void Secure();
             void Complete();
             void Focus();
             void InsertEnter();
             void History(bool up = false);
 
+        private slots:
+            void on_lineEdit_returnPressed();
+
         private:
             void insertToHistory();
+            bool isPassword;
             int historyPosition;
             unsigned int historySize;
             QStringList history;

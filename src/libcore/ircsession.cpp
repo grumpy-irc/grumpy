@@ -151,7 +151,7 @@ Scrollback *IRCSession::GetScrollbackByOriginal(scrollback_id_t original_sid)
 
 libircclient::Network *IRCSession::GetNetwork(Scrollback *window)
 {
-    //Q_UNUSED(window);
+    Q_UNUSED(window);
     return this->network;
 }
 
@@ -196,6 +196,8 @@ void IRCSession::Connect(libircclient::Network *Network)
     connect(this->network, SIGNAL(Event_Mode(libircclient::Parser*)), this, SLOT(OnMODE(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_NickCollision(libircclient::Parser*)), this, SLOT(OnNickConflict(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_Welcome(libircclient::Parser*)), this, SLOT(OnUnknown(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_ChannelModeChanged(libircclient::Parser*, libircclient::Channel*)), this, SLOT(OnChannelMODE(libircclient::Parser*,libircclient::Channel*)));
+    connect(this->network, SIGNAL(Event_ChannelUserModeChanged(libircclient::Parser*, libircclient::Channel*, libircclient::User*)), this, SLOT(OnUMODE(libircclient::Parser*,libircclient::Channel*,libircclient::User*)));
     this->network->Connect();
 }
 
@@ -659,6 +661,40 @@ void IRCSession::OnMODE(libircclient::Parser *px)
         return;
     if (px->GetParameters()[0] == this->GetNetwork()->GetNick())
         this->systemWindow->InsertText(ScrollbackItem(px->GetSourceInfo() + " set your mode " + px->GetText()));
+}
+
+void IRCSession::OnChannelMODE(libircclient::Parser *px, libircclient::Channel *channel)
+{
+    Scrollback *sx = this->GetScrollback(channel->GetName());
+    if (!sx)
+        return;
+
+    if (!px->GetSourceUserInfo())
+        return;
+
+    // Get the mode string
+    QStringList mode = px->GetParameters();
+    if (mode.isEmpty())
+        return;
+    mode.removeFirst();
+    QString mode_string;
+    foreach (QString mp, mode)
+        mode_string += mp + " ";
+    mode_string = mode_string.trimmed();
+
+    sx->InsertText(ScrollbackItem(mode_string, ScrollbackItemType_Mode, px->GetSourceUserInfo()));
+}
+
+void IRCSession::OnUMODE(libircclient::Parser *px, libircclient::Channel *channel, libircclient::User *user)
+{
+    Q_UNUSED(px);
+    if (!channel || !user)
+        return;
+    // The user in respective channel was likely updated by libirc now
+    Scrollback *scrollback = this->GetScrollbackForChannel(channel->GetName());
+    if (!scrollback)
+        return;
+    scrollback->UserListChange(user->GetNick(), user, UserListChange_Refresh);
 }
 
 void IRCSession::processME(libircclient::Parser *px, QString message)

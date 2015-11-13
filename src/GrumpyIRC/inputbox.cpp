@@ -27,11 +27,14 @@ AutocompletionEngine *InputBox::AE = NULL;
 InputBox::InputBox(ScrollbackFrame *parent) : QFrame(parent), ui(new Ui::InputBox)
 {
     this->ui->setupUi(this);
+    this->ui->lineEdit->setVisible(false);
     this->ui->textEdit->installEventFilter(new KeyFilter(this));
     this->historySize = 800;
 	this->ui->textEdit->setFont(Skin::GetDefault()->TextFont);
 	this->ui->textEdit->setPalette(Skin::GetDefault()->Palette());
+    this->ui->lineEdit->setPalette(Skin::GetDefault()->Palette());
     this->historyPosition = 0;
+    this->isPassword = false;
     this->parent = parent;
 }
 
@@ -48,8 +51,31 @@ void InputBox::ProcessInput()
     this->ui->textEdit->setText("");
 }
 
+void InputBox::Secure()
+{
+    this->isPassword = !this->isPassword;
+    this->ui->lineEdit->setVisible(this->isPassword);
+    this->ui->textEdit->setVisible(!this->isPassword);
+    if (this->isPassword)
+    {
+        // Copy the text from textEdit to lineEdit
+        this->ui->lineEdit->setText(this->ui->textEdit->toPlainText());
+        this->ui->lineEdit->setCursorPosition(this->ui->textEdit->textCursor().position());
+        this->ui->lineEdit->setFocus();
+        this->ui->textEdit->setText("");
+    } else
+    {
+        this->ui->textEdit->setFocus();
+        this->ui->lineEdit->setText("");
+        this->ui->textEdit->setText("");
+    }
+}
+
 void InputBox::Complete()
 {
+    if (this->isPassword)
+        return;
+
     if (!InputBox::AE)
         return;
 
@@ -103,6 +129,9 @@ void InputBox::InsertEnter()
 
 void InputBox::History(bool up)
 {
+    if (this->isPassword)
+        return;
+
     if (up)
     {
         if (this->historyPosition <= 0)
@@ -135,4 +164,10 @@ void InputBox::insertToHistory()
         }
         this->history.append(line);
     }
+}
+
+void GrumpyIRC::InputBox::on_lineEdit_returnPressed()
+{
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->ProcessText(this->ui->lineEdit->text(), this->parent->GetScrollback());
+    this->ui->lineEdit->setText("");
 }

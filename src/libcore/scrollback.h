@@ -39,17 +39,18 @@ namespace GrumpyIRC
 
     enum ScrollbackItemType
     {
-        ScrollbackItemType_Unknown,
-        ScrollbackItemType_Message,
-        ScrollbackItemType_Join,
-        ScrollbackItemType_Part,
-        ScrollbackItemType_Kick,
-        ScrollbackItemType_Nick,
-        ScrollbackItemType_Quit,
-        ScrollbackItemType_Notice,
-        ScrollbackItemType_Act,
-        ScrollbackItemType_System,
-        ScrollbackItemType_Topic
+        ScrollbackItemType_Unknown = 0,
+        ScrollbackItemType_Message = 1,
+        ScrollbackItemType_Join = 2,
+        ScrollbackItemType_Part = 3,
+        ScrollbackItemType_Kick = 4,
+        ScrollbackItemType_Nick = 5,
+        ScrollbackItemType_Mode = 6,
+        ScrollbackItemType_Quit = 7,
+        ScrollbackItemType_Notice = 8,
+        ScrollbackItemType_Act = 9,
+        ScrollbackItemType_System = 10,
+        ScrollbackItemType_Topic = 11
     };
 
     enum ScrollbackState

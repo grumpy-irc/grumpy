@@ -135,6 +135,8 @@ namespace GrumpyIRC
             virtual void OnMODEInfo(libircclient::Parser *px);
             virtual void OnMODETIME(libircclient::Parser *px);
             virtual void OnMODE(libircclient::Parser *px);
+            virtual void OnChannelMODE(libircclient::Parser *px, libircclient::Channel *channel);
+            virtual void OnUMODE(libircclient::Parser *px, libircclient::Channel *channel, libircclient::User *user);
         protected:
             static unsigned int lastID;
 
