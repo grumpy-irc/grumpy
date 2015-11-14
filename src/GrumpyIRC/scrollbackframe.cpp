@@ -428,7 +428,7 @@ void ScrollbackFrame::EnableState(bool enable)
 {
     this->scrollback->IgnoreState = !enable;
     if (!enable)
-        this->scrollback->SetState(ScrollbackState_Normal);
+        this->scrollback->SetState(ScrollbackState_Normal, true);
 }
 
 void ScrollbackFrame::RequestPart()

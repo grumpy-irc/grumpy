@@ -278,12 +278,15 @@ void Scrollback::Resync(Scrollback *target)
     emit this->Event_Resync();
 }
 
-void Scrollback::SetState(ScrollbackState state)
+void Scrollback::SetState(ScrollbackState state, bool enforce)
 {
-	int current_state = static_cast<int>(this->scrollbackState);
-	int modified_state = static_cast<int>(state);
-	if (current_state >= modified_state)
-		return;
+    if (!enforce)
+    {
+        int current_state = static_cast<int>(this->scrollbackState);
+        int modified_state = static_cast<int>(state);
+        if (current_state >= modified_state)
+            return;
+    }
 
     this->scrollbackState = state;
     emit this->Event_StateModified();

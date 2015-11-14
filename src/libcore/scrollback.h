@@ -155,7 +155,7 @@ namespace GrumpyIRC
             void LoadHash(QHash<QString, QVariant> hash);
             //! Used to resync most of attributes with target
             void Resync(Scrollback *target);
-            void SetState(ScrollbackState state);
+            void SetState(ScrollbackState state, bool enforced = false);
             ScrollbackState GetState();
             //! You can set this to true in order to suppress state updates
             bool IgnoreState;
