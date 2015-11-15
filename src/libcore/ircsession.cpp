@@ -778,7 +778,7 @@ void IRCSession::OnIncomingRawMessage(QByteArray message)
 
 void IRCSession::OnConnectionFail(QAbstractSocket::SocketError er)
 {
-    this->systemWindow->InsertText("Connection failed: " + libircclient::Generic::ErrorCode2String(er));
+    this->systemWindow->InsertText("Connection failed: " + libircclient::Generic::ErrorCode2String(er), ScrollbackItemType_SystemError);
     this->SetDead();
 }
 

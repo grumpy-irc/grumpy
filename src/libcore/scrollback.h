@@ -50,7 +50,9 @@ namespace GrumpyIRC
         ScrollbackItemType_Notice = 8,
         ScrollbackItemType_Act = 9,
         ScrollbackItemType_System = 10,
-        ScrollbackItemType_Topic = 11
+        ScrollbackItemType_Topic = 11,
+        ScrollbackItemType_SystemWarning = 12,
+        ScrollbackItemType_SystemError = 13
     };
 
     enum ScrollbackState

@@ -83,9 +83,13 @@ QString ScrollbackFrame::GetWindowName() const
     return this->_name;
 }
 
-void ScrollbackFrame::InsertText(QString text)
+void ScrollbackFrame::InsertText(QString text, ScrollbackItemType item)
 {
-    this->scrollback->InsertText(text);
+    if (!this->scrollback)
+        throw new NullPointerException("this->scrollback", BOOST_CURRENT_FUNCTION);
+
+    // Write
+    this->scrollback->InsertText(text, item);
 }
 
 void ScrollbackFrame::InsertText(ScrollbackItem item)
@@ -115,6 +119,7 @@ static QString ItemToString(ScrollbackItem item)
     QString text = item.GetText();
     QString user = item.GetUser().GetNick();
     bool system = false;
+    QColor color = Skin::GetDefault()->TextColor;
     //format_string.replace("$time", item.GetTime().toString());
     //QString result;
     switch (item.GetType())
@@ -170,9 +175,14 @@ static QString ItemToString(ScrollbackItem item)
         case ScrollbackItemType_Unknown:
             //result = item.GetText();
             break;
+        case ScrollbackItemType_SystemError:
+            color = Skin::GetDefault()->Error;
+            break;
+        case ScrollbackItemType_SystemWarning:
+            color = Skin::GetDefault()->Warning;
+            break;
     }
     //format_string.replace("$string", result);
-    QColor color = Skin::GetDefault()->TextColor;
     if (item.GetType() == ScrollbackItemType_System)
         color = Skin::GetDefault()->SystemColor;
     else if (system)
@@ -426,6 +436,10 @@ void ScrollbackFrame::UpdateIcon()
 
 void ScrollbackFrame::EnableState(bool enable)
 {
+    if (!this->scrollback)
+        return;
+
+    // Update the state
     this->scrollback->IgnoreState = !enable;
     if (!enable)
         this->scrollback->SetState(ScrollbackState_Normal, true);

@@ -74,6 +74,7 @@ namespace GrumpyIRC
             void RequestPart(Scrollback *window);
             libircclient::Channel *GetChannel(Scrollback *window);
             Scrollback *GetScrollback(scrollback_id_t original_id);
+            void SendProtocolCommand(unsigned int command, QHash<QString, QVariant> parameters);
             void RequestBL(Scrollback *window, scrollback_id_t from, unsigned int size);
             IRCSession *GetSession(unsigned int nsid);
             QString GetLocalUserModeAsString(Scrollback *window);

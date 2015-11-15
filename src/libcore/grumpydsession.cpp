@@ -202,6 +202,16 @@ Scrollback *GrumpydSession::GetScrollback(scrollback_id_t original_id)
     return NULL;
 }
 
+void GrumpydSession::SendProtocolCommand(unsigned int command, QHash<QString, QVariant> parameters)
+{
+    if (!this->gp)
+    {
+        throw new NullPointerException("gp", BOOST_CURRENT_FUNCTION);
+    }
+
+    this->gp->SendProtocolCommand(command, parameters);
+}
+
 void GrumpydSession::RequestBL(Scrollback *window, scrollback_id_t from, unsigned int size)
 {
     QHash<QString, QVariant> parameters;
@@ -299,7 +309,7 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVarian
     if (text == GP_CMD_UNKNOWN)
     {
         if (parameters.contains("unrecognized"))
-            this->systemWindow->InsertText(QString("Grumpyd didn't recognize this command: ") + parameters["unrecognized"].toString());
+            this->systemWindow->InsertText(QString("Grumpyd didn't recognize this command: ") + parameters["unrecognized"].toString(), ScrollbackItemType_SystemError);
     } else if (text == GP_CMD_HELLO)
     {
         if (!parameters.contains("version"))
@@ -362,13 +372,13 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVarian
         QString source = "unknown request";
         if (parameters.contains("source"))
             source = parameters["source"].toString();
-        this->systemWindow->InsertText("Permission denied: " + source);
+        this->systemWindow->InsertText("Permission denied: " + source, ScrollbackItemType_SystemError);
     } else
     {
         QHash<QString, QVariant> params;
         params.insert("source", text);
         this->gp->SendProtocolCommand(GP_CMD_UNKNOWN, params);
-        this->systemWindow->InsertText("Unknown command from grumpyd " + text);
+        this->systemWindow->InsertText("Unknown command from grumpyd " + text, ScrollbackItemType_SystemError);
     }
 }
 
@@ -388,7 +398,7 @@ void GrumpydSession::processNewScrollbackItem(QHash<QString, QVariant> hash)
     Scrollback *window = this->GetScrollback(id);
     if (!window)
     {
-        this->systemWindow->InsertText("Received scrollback item for scrollback which couldn't be found, name: " + hash["scrollback_name"].toString());
+        this->systemWindow->InsertText("Received scrollback item for scrollback which couldn't be found, name: " + hash["scrollback_name"].toString(), ScrollbackItemType_SystemWarning);
         return;
     }
     window->InsertText(ScrollbackItem(hash["item"].toHash()));
@@ -608,7 +618,7 @@ void GrumpydSession::processPSResync(QHash<QString, QVariant> parameters)
     Scrollback *origin = this->GetScrollback(scrollback.GetOriginalID());
     if (!origin)
     {
-        this->systemWindow->InsertText("RESYNC ERROR: Failed to resync scrollback with id " + QString::number(scrollback.GetOriginalID()));
+        this->systemWindow->InsertText("RESYNC ERROR: Failed to resync scrollback with id " + QString::number(scrollback.GetOriginalID()), ScrollbackItemType_SystemError);
         return;
     }
     // let's resync most of the stuff
@@ -619,6 +629,6 @@ void GrumpydSession::closeError(QString error)
 {
     this->gp->Disconnect();
     this->systemWindow->SetDead(true);
-    this->systemWindow->InsertText("Connection failure: " + error);
+    this->systemWindow->InsertText("Connection failure: " + error, ScrollbackItemType_SystemError);
 }
 

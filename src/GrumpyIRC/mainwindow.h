@@ -13,6 +13,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "../libcore/scrollback.h"
 #include <QLabel>
 #include <QMainWindow>
 #include <QTimer>
@@ -50,7 +51,7 @@ namespace GrumpyIRC
             //! Return a pointer to widget that contains list of all windows
             ScrollbackList *GetScrollbackList();
             void WriteToSystemWindow(QString text);
-            void WriteToCurrentWindow(QString text);
+            void WriteToCurrentWindow(QString text, ScrollbackItemType item = ScrollbackItemType_System);
             ScrollbackFrame *GetSystem();
             ScrollbackFrame *GetCurrentScrollbackFrame();
             UserWidget *GetUsers();

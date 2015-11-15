@@ -51,7 +51,7 @@ void GrumpyEventHandler::OnError(QString text)
         return;
 
     // Write error to system window
-    MainWindow::Main->WriteToCurrentWindow(QObject::tr("ERROR") + ": " + text);
+    MainWindow::Main->WriteToCurrentWindow(QObject::tr("ERROR") + ": " + text, ScrollbackItemType_SystemError);
 }
 
 void GrumpyEventHandler::OnSystemLog(QString text)

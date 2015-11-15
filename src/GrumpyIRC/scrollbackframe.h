@@ -49,7 +49,7 @@ namespace GrumpyIRC
             explicit ScrollbackFrame(ScrollbackFrame *parentWindow = NULL, QWidget *parent = NULL, Scrollback *_scrollback = NULL);
             ~ScrollbackFrame();
             QString GetWindowName() const;
-            void InsertText(QString text);
+            void InsertText(QString text, ScrollbackItemType item = ScrollbackItemType_System);
             void InsertText(ScrollbackItem item);
             void SetWindowName(QString title);
             bool IsConnectedToIRC();

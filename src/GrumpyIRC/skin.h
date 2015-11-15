@@ -33,6 +33,8 @@ namespace GrumpyIRC
             QColor TextColor;
             QColor HighligtedColor;
             QColor SystemInfo;
+            QColor Error;
+            QColor Warning;
             QColor SystemColor;
             QColor Unread;
             QColor BackgroundColor;

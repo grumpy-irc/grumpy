@@ -110,7 +110,7 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
     }
     else
     {
-        window->InsertText("You can't send messages to this window");
+        window->InsertText("You can't send messages to this window", ScrollbackItemType_SystemWarning);
     }
     return 0;
 }
