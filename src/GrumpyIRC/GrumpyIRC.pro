@@ -38,7 +38,8 @@ SOURCES += main.cpp\
     scriptwin.cpp \
     highlighter.cpp \
     favoriteswin.cpp \
-    grumpydcfwin.cpp
+    grumpydcfwin.cpp \
+    linkhandler.cpp
 
 HEADERS  += mainwindow.h \
     scrollbackframe.h \
@@ -65,7 +66,8 @@ HEADERS  += mainwindow.h \
     scriptwin.h \
     highlighter.h \
     favoriteswin.h \
-    grumpydcfwin.h
+    grumpydcfwin.h \
+    linkhandler.h
 
 FORMS    += mainwindow.ui \
     scrollbackframe.ui \

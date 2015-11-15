@@ -18,6 +18,7 @@
 #include "scrollbacklist.h"
 #include "ui_mainwindow.h"
 #include "userwidget.h"
+#include "linkhandler.h"
 #include "grumpyconf.h"
 #include "preferenceswin.h"
 #include "scrollbackframe.h"
@@ -237,6 +238,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->ui->actionOpen_window->setVisible(false);
     this->systemWindow->InsertText(QString("Grumpy irc version " + GCFG->GetVersion()));
     connect(&this->timer, SIGNAL(timeout()), this, SLOT(OnRefresh()));
+    this->handler = new LinkHandler();
     this->timer.start(100);
     // Try to restore geometry
     this->restoreGeometry(GCFG->GetValue("mainwindow_geometry").toByteArray());
@@ -280,6 +282,7 @@ MainWindow::~MainWindow()
 {
     ScrollbacksManager::Global = NULL;
     delete this->ui;
+    delete this->handler;
 }
 
 ScrollbacksManager *MainWindow::GetScrollbackManager()
@@ -351,6 +354,11 @@ void MainWindow::UpdateStatus()
         this->identFrame->setText("");
     else
         this->identFrame->setText(self_ident->ToString() + " " + mode);
+}
+
+void MainWindow::OpenUrl(QString url)
+{
+    this->handler->OpenLink(url);
 }
 
 void MainWindow::OpenGrumpy(QString hostname, int port, QString username, QString password, bool ssl)

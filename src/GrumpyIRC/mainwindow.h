@@ -33,6 +33,7 @@ namespace GrumpyIRC
     class InputBox;
     class ScrollbackFrame;
     class UserWidget;
+    class LinkHandler;
     class ScrollbackList;
     class ScrollbacksManager;
     class Skin;
@@ -58,6 +59,7 @@ namespace GrumpyIRC
             void Fork();
             void SetWN(QString text);
             void UpdateStatus();
+            void OpenUrl(QString url);
             void OpenGrumpy(QString hostname, int port, QString username, QString password, bool ssl);
             void OpenIRCNetworkLink(QString link);
             void OpenServer(libirc::ServerAddress server);
@@ -80,6 +82,7 @@ namespace GrumpyIRC
             QLabel *statusFrame;
             QLabel *identFrame;
             ScrollbackFrame *systemWindow;
+            LinkHandler *handler;
             ScrollbackList *windowList;
             UserWidget *userWidget;
             SyslogWindow *syslogWindow;

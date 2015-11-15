@@ -12,6 +12,7 @@
 
 #include <QScrollBar>
 #include <QMenu>
+#include "mainwindow.h"
 #include "../libcore/exception.h"
 #include "../libcore/configuration.h"
 #include "../libcore/generic.h"
@@ -247,6 +248,9 @@ void ScrollbackFrame::OnLink(QString url)
     if (scheme == "irc_join")
     {
         this->TransferRaw("JOIN " + url.mid(url.indexOf("://") + 3));
+    } else if (scheme == "https" || scheme == "http")
+    {
+        MainWindow::Main->OpenUrl(url);
     }
 }
 
