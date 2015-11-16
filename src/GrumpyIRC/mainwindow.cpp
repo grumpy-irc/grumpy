@@ -65,6 +65,19 @@ static int SystemCommand_echo(SystemCommand *command, CommandArgs args)
     return 0;
 }
 
+static int SystemCommand_Notice(SystemCommand *command, CommandArgs args)
+{
+    Q_UNUSED(command);
+    if (command_args.Parameters.count() < 1)
+    {
+        GRUMPY_ERROR(QObject::tr("This command requires some text"));
+        return 1;
+    }
+    ScrollbackFrame *scrollback = MainWindow::Main->GetScrollbackManager()->GetCurrentScrollback();
+    scrollback->GetSession()->SendNotice(scrollback->GetScrollback(), args.ParameterLine);
+    return 0;
+}
+
 static int SystemCommand_NextSessionNick(SystemCommand *command, CommandArgs args)
 {
     Q_UNUSED(command);
@@ -228,6 +241,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("server", (SC_Callback)SystemCommand_Server));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("nick", (SC_Callback)SystemCommand_Nick));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("me", (SC_Callback)SystemCommand_Act));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("notice", (SC_Callback)SystemCommand_Notice));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.netstat", (SC_Callback)SystemCommand_Netstat));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.next_session_nick", (SC_Callback)SystemCommand_NextSessionNick));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("unsecuregrumpyd", (SC_Callback)SystemCommand_UnsecureGrumpy));

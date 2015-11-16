@@ -23,7 +23,7 @@ PreferencesWin::PreferencesWin(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
     this->ui->leNick->setText(CONF->GetNick());
     this->ui->leNickFix->setText(CONF->GetAlterNick());
     this->ui->lineEdit->setText(CONF->GetQuitMessage());
-    //this->ui->lineEdit_2->setText(CONF->get);
+    this->ui->lineEdit_2->setText(CONF->GetName());
 }
 
 PreferencesWin::~PreferencesWin()
@@ -38,8 +38,10 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_rejected()
 
 void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
 {
+    CONF->SetAlterNick(this->ui->leNickFix->text());
     CONF->SetNick(this->ui->leNick->text());
     CONF->SetIdent(this->ui->leIdent->text());
-    CONF->SetAlterNick(this->ui->leNickFix->text());
+    CONF->SetQuitMessage(this->ui->lineEdit->text());
+    CONF->SetName(this->ui->lineEdit_2->text());
     this->close();
 }

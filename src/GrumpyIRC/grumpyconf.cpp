@@ -71,6 +71,16 @@ bool GrumpyConf::WriteNoticesToSystem()
     return GCFG->GetValueAsBool("write_notices_to_system", true);
 }
 
+void GrumpyConf::SetName(QString text)
+{
+    GCFG->SetValue("name", text);
+}
+
+QString GrumpyConf::GetName()
+{
+    return GCFG->GetValueAsString("name", "Grumpy IRC");
+}
+
 QString GrumpyConf::GetNick()
 {
     return GCFG->GetValueAsString("nick", "GrumpyUser");

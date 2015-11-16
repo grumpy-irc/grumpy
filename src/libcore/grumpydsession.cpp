@@ -202,6 +202,20 @@ Scrollback *GrumpydSession::GetScrollback(scrollback_id_t original_id)
     return NULL;
 }
 
+void GrumpydSession::SendNotice(Scrollback *window, QString text)
+{
+    IRCSession *ircs = this->GetSessionFromWindow(window);
+    if (!ircs)
+        return;
+    QHash<QString, QVariant> parameters;
+    parameters.insert("network_id", QVariant(ircs->GetSID()));
+    parameters.insert("scrollback_id", QVariant(window->GetOriginalID()));
+    parameters.insert("is_notice", QVariant(false));
+    parameters.insert("me", QVariant(false));
+    parameters.insert("text", QVariant(text));
+    this->gp->SendProtocolCommand(GP_CMD_MESSAGE, parameters);
+}
+
 void GrumpydSession::SendProtocolCommand(unsigned int command, QHash<QString, QVariant> parameters)
 {
     if (!this->gp)

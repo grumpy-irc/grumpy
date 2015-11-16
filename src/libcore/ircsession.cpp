@@ -209,6 +209,20 @@ bool IRCSession::IsConnected() const
     return false;
 }
 
+void IRCSession::SendNotice(Scrollback *window, QString text)
+{
+    if (!this->IsConnected())
+    {
+        this->GetSystemWindow()->InsertText("Can't send notices to a disconnected network");
+        return;
+    }
+    if (window->GetTarget().isEmpty())
+        throw new GrumpyIRC::Exception("window->GetTarget() contains empty string", BOOST_CURRENT_FUNCTION);
+    this->GetNetwork()->SendNotice(text, window->GetTarget());
+    // Write the message to active window
+    window->InsertText(ScrollbackItem(text, ScrollbackItemType_Notice, this->GetNetwork()->GetLocalUserInfo()));
+}
+
 Scrollback *IRCSession::GetScrollbackForChannel(QString channel)
 {
     if (!this->channels.contains(channel.toLower()))

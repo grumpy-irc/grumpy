@@ -16,6 +16,12 @@
 
 using namespace GrumpyIRC;
 
+LinkHandler_Priv::LinkHandler_Priv()
+{
+    this->IsRunning = true;
+    this->IsOffline = false;
+}
+
 void LinkHandler::OpenLink(QString url)
 {
     // Queue for open
@@ -32,23 +38,33 @@ LinkHandler::LinkHandler()
 
 LinkHandler::~LinkHandler()
 {
-    this->thread.exit();
+    this->thread.IsRunning = false;
+    while (!this->thread.IsOffline)
+        LinkHandler_Priv::pub_sleep(10);
+}
+
+void LinkHandler_Priv::pub_sleep(unsigned int time)
+{
+    QThread::msleep(time);
 }
 
 void LinkHandler_Priv::run()
 {
-    while (this->isRunning())
+    while (this->IsRunning)
     {
         if (this->links.count())
         {
+            QString url;
             this->mutex.lock();
             if (this->links.count())
             {
-                QDesktopServices::openUrl(QUrl(this->links.first()));
+                url = this->links.first();
                 this->links.removeAt(0);
             }
             this->mutex.unlock();
+            QDesktopServices::openUrl(QUrl(url));
         }
         this->usleep(200000);
     }
+    this->IsOffline = true;
 }

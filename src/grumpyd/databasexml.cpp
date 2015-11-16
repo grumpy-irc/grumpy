@@ -29,7 +29,6 @@ void DatabaseXML::LoadRoles()
 void DatabaseXML::LoadUsers()
 {
     User::UserInfo.clear();
-
 }
 
 QHash<QString, QVariant> DatabaseXML::GetConfiguration(user_id_t user)

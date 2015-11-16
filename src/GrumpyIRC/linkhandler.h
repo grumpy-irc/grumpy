@@ -23,7 +23,11 @@ namespace GrumpyIRC
     class LinkHandler_Priv : public QThread
     {
         public:
+            LinkHandler_Priv();
             void run();
+            static void pub_sleep(unsigned int time);
+            bool IsRunning;
+            bool IsOffline;
             QMutex mutex;
             QList<QString> links;
     };
