@@ -407,6 +407,13 @@ bool ScrollbackFrame::IsNetwork()
     return true;
 }
 
+bool ScrollbackFrame::IsGrumpy()
+{
+    if (!this->scrollback)
+        return false;
+    return Generic::IsGrumpy(this->scrollback);
+}
+
 bool ScrollbackFrame::IsDead()
 {
     return this->scrollback->IsDead();

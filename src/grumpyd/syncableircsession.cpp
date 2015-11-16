@@ -16,14 +16,14 @@
 #include "user.h"
 #include "session.h"
 #include "../libcore/core.h"
-#include "../libcore/grumpydsession.h"
 #include "../libcore/eventhandler.h"
+#include "../libcore/exception.h"
+#include "../libcore/grumpydsession.h"
 #include "../libirc/libircclient/parser.h"
 #include "../libirc/libirc/serveraddress.h"
 #include "../libirc/libircclient/network.h"
 #include "../libirc/libircclient/user.h"
 #include "../libirc/libircclient/channel.h"
-#include "../libcore/exception.h"
 
 using namespace GrumpyIRC;
 
@@ -214,7 +214,14 @@ void SyncableIRCSession::OnSelf_KICK(libircclient::Parser *px, libircclient::Cha
 void SyncableIRCSession::OnTOPIC(libircclient::Parser *px, libircclient::Channel *channel, QString previous_one)
 {
     IRCSession::OnTOPIC(px, channel, previous_one);
-    //! \todo sync
+
+    if (!channel)
+        return;
+
+    QHash<QString, QVariant> cx;
+    cx.insert("_topicTime", QVariant(channel->GetTopicTime()));
+    cx.insert("_topic", QVariant(channel->GetTopic()));
+    this->ResyncChannel(channel, cx);
 }
 
 void SyncableIRCSession::OnQuit(libircclient::Parser *px, libircclient::Channel *channel)
@@ -242,7 +249,14 @@ void SyncableIRCSession::OnSelfPart(libircclient::Parser *px, libircclient::Chan
 void SyncableIRCSession::OnTopicInfo(libircclient::Parser *px, libircclient::Channel *channel)
 {
     IRCSession::OnTopicInfo(px, channel);
-    //! \todo we need to update the topic on clients as well
+
+    if (!channel)
+        return;
+
+    QHash<QString, QVariant> cx;
+    cx.insert("_topicTime", QVariant(channel->GetTopicTime()));
+    cx.insert("_topic", QVariant(channel->GetTopic()));
+    this->ResyncChannel(channel, cx);
 }
 
 void SyncableIRCSession::OnInfo(libircclient::Parser *px)

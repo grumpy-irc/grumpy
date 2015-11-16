@@ -53,6 +53,11 @@ namespace GrumpyIRC
             void InsertText(ScrollbackItem item);
             void SetWindowName(QString title);
             bool IsConnectedToIRC();
+            bool IsChannel();
+            bool IsNetwork();
+            bool IsGrumpy();
+            bool IsVisible();
+            bool IsDead();
 			ScrollbackFrame *GetParent();
             unsigned long GetID();
             NetworkSession *GetSession();
@@ -61,9 +66,6 @@ namespace GrumpyIRC
             QString GetTitle();
             void UpdateColor();
             void Focus();
-            bool IsChannel();
-            bool IsNetwork();
-            bool IsDead();
             void RequestClose();
             void UpdateIcon();
             void EnableState(bool enable);
@@ -82,7 +84,6 @@ namespace GrumpyIRC
             int GetSynced();
             //void SetParent(ScrollbackFrame* parentWindow);
             bool IsDeletable;
-            bool IsVisible();
             void SetVisible(bool is_visible);
             ScrollbackList_Node *TreeNode;
         private slots:

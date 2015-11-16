@@ -18,6 +18,7 @@
 #include "../libcore/networksession.h"
 #include "../libcore/ircsession.h"
 #include "packetsnifferwin.h"
+#include "grumpydcfwin.h"
 #include "skin.h"
 #include "ui_scrollbacklist.h"
 #include "../libcore/generic.h"
@@ -91,6 +92,7 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     Menu.addAction(menuClose);
     QAction *menuInsrFavorites = NULL;
     QAction *menuAuto = NULL;
+    QAction *menuSettings = NULL;
     QAction *menuPart = NULL;
     QAction *menuDisconnect = NULL;
     QAction *menuSniffer = NULL;
@@ -106,6 +108,12 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
         menuAuto->setCheckable(true);
         menuAuto->setChecked(false);
         Menu.addAction(menuAuto);
+    }
+
+    if (wx->IsGrumpy())
+    {
+        menuSettings = new QAction("Settings", &Menu);
+        Menu.addAction(menuSettings);
     }
 
     if (wx->IsChannel())
@@ -133,6 +141,12 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     } else if (selectedItem == menuPart)
     {
         wx->RequestPart();
+    } else if (selectedItem == menuSettings)
+    {
+        GrumpydCfWin *window = new GrumpydCfWin();
+        window->setAttribute(Qt::WA_DeleteOnClose);
+        window->GrumpySession = (GrumpydSession*)wx->GetSession();
+        window->show();
     } else if (selectedItem == menuDisconnect)
     {
         wx->RequestDisconnect();

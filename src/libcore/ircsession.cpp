@@ -468,10 +468,22 @@ void IRCSession::OnCTCP(libircclient::Parser *px, QString ctcp, QString pars)
     if (ctcp == "ACTION")
     {
         this->processME(px, pars);
+        return;
     } else if (ctcp == "VERSION")
     {
-        //this->GetNetwork()->sen
+        if (!px->GetSourceUserInfo())
+            return;
+        this->GetNetwork()->SendNotice("VERSION Grumpy IRC client " + QString(GRUMPY_VERSION_STRING) + " http://github.com/grumpy-irc", px->GetSourceUserInfo()->GetNick());
+    } else if (ctcp == "TIME")
+    {
+        if (!px->GetSourceUserInfo())
+            return;
+        this->GetNetwork()->SendNotice("TIME " + QDateTime::currentDateTime().toString(), px->GetSourceUserInfo()->GetNick());
     }
+    if (pars.isEmpty())
+        this->systemWindow->InsertText("Incoming CTCP from " + px->GetSourceInfo() + ": " + ctcp);
+    else
+        this->systemWindow->InsertText("Incoming CTCP from " + px->GetSourceInfo() + ": " + ctcp + " " + pars);
 }
 
 void IRCSession::OnMOTD(libircclient::Parser *px)
