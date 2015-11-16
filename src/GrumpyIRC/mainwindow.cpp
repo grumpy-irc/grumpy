@@ -68,7 +68,7 @@ static int SystemCommand_echo(SystemCommand *command, CommandArgs args)
 static int SystemCommand_Notice(SystemCommand *command, CommandArgs args)
 {
     Q_UNUSED(command);
-    if (command_args.Parameters.count() < 1)
+    if (args.Parameters.count() < 1)
     {
         GRUMPY_ERROR(QObject::tr("This command requires some text"));
         return 1;
