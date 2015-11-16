@@ -32,6 +32,7 @@ namespace GrumpyIRC
     {
         public:
             LinkHandler();
+            ~LinkHandler();
             void OpenLink(QString url);
 
         private:

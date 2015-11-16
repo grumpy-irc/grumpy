@@ -62,6 +62,15 @@ int daemonize()
     return DAEMONIZE_SUCCESS;
 }
 
+int service(GrumpyIRC::TerminalParser *parser, QStringList params)
+{
+    Q_UNUSED(parser);
+    Q_UNUSED(params);
+    CONF->Daemon = true;
+
+    return TP_RESULT_OK;
+}
+
 //! This will enable the dummy database if user wants that
 int dummy(GrumpyIRC::TerminalParser *parser, QStringList params)
 {
@@ -103,6 +112,7 @@ int main(int argc, char *argv[])
         // First of all we need to process the arguments and then do other stuff
         GrumpyIRC::TerminalParser *tp = new GrumpyIRC::TerminalParser();
         tp->Register('x', "pid", "Write process ID to a file", 1, (GrumpyIRC::TP_Callback)pid);
+        tp->Register('d', "daemonize", "Will start grumpyd as system service", 0, (GrumpyIRC::TP_Callback)service);
         tp->Register('k', "config", "Specify a path to configuration file", 1, (GrumpyIRC::TP_Callback)config);
         tp->Register(0, "dummy", "Use dummy as a storage backend, useful for debugging.", 0, (GrumpyIRC::TP_Callback)dummy);
         if (!tp->Parse(argc, argv))

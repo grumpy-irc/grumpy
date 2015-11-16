@@ -30,6 +30,11 @@ LinkHandler::LinkHandler()
     this->thread.start();
 }
 
+LinkHandler::~LinkHandler()
+{
+    this->thread.exit();
+}
+
 void LinkHandler_Priv::run()
 {
     while (this->isRunning())

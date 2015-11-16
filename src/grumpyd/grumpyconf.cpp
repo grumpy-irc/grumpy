@@ -22,7 +22,7 @@ GrumpyConf *GrumpyConf::Conf = NULL;
 GrumpyConf::GrumpyConf()
 {
     this->StorageDummy = false;
-    this->Daemon = true;
+    this->Daemon = false;
 }
 
 Configuration *GrumpyConf::GetConfiguration()
