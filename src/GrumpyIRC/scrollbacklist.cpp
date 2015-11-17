@@ -143,6 +143,8 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
         wx->RequestPart();
     } else if (selectedItem == menuSettings)
     {
+        if (wx->IsDead())
+            return;
         GrumpydCfWin *window = new GrumpydCfWin();
         window->setAttribute(Qt::WA_DeleteOnClose);
         window->GrumpySession = (GrumpydSession*)wx->GetSession();
