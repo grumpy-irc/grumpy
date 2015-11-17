@@ -36,7 +36,7 @@ namespace GrumpyIRC
 
             Grumpyd();
             ~Grumpyd();
-            DatabaseBackend *GetBackend();
+            static DatabaseBackend *GetBackend();
 
         public slots:
             void Main();

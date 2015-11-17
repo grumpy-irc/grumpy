@@ -133,6 +133,7 @@ namespace GrumpyIRC
             void SetMaxItemsSize(scrollback_id_t size);
             virtual void InsertText(QString text, ScrollbackItemType type = ScrollbackItemType_System);
             virtual void InsertText(ScrollbackItem item);
+            ScrollbackItem GetFirst();
             virtual void SetTarget(QString target);
             virtual QString GetTarget() const;
             //! If this scrollback is associated to some session this function returns the pointer to it, in case it's not NULL is returned

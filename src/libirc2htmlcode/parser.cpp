@@ -263,7 +263,7 @@ QString Parser::replaceSpecials(QString source)
                         // someone wants to change the color but the previous color was not closed
                         result_string = "</font>" + result_string;
                     }
-                    close_k = !close_k;
+                    close_k = true;
                     source.insert(current_pos, result_string);
                 } else if (close_k)
                 {

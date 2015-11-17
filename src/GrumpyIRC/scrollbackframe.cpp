@@ -17,6 +17,7 @@
 #include "../libcore/configuration.h"
 #include "../libcore/generic.h"
 #include "../libcore/ircsession.h"
+#include "../libcore/grumpydsession.h"
 #include "../libcore/networksession.h"
 #include "../libcore/core.h"
 #include "../libirc/libircclient/user.h"
@@ -256,6 +257,7 @@ void ScrollbackFrame::OnLink(QString url)
 
 void ScrollbackFrame::Refresh()
 {
+    this->textEdit->Clear();
     this->buffer.clear();
     foreach (ScrollbackItem item, this->scrollback->GetItems())
         this->_insertText_(item);
@@ -478,7 +480,10 @@ void ScrollbackFrame::RequestMore(unsigned int count)
     if (!Generic::IsGrumpy(this->GetScrollback()))
         return;
     GrumpydSession *grumpy = (GrumpydSession*)this->GetSession();
-
+    ScrollbackItem first_item = this->GetScrollback()->GetFirst();
+    if (first_item.GetID() == 0)
+        return;
+    grumpy->RequestBL(this->GetScrollback(), first_item.GetID(), 200);
 }
 
 void ScrollbackFrame::RefreshHtml()

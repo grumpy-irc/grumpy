@@ -89,7 +89,7 @@ bool User::IsAuthorized(QString perm)
     return this->role->IsAuthorized(perm);
 }
 
-QList<Session*> User::GetGPSessions()
+QList<Session*> User::GetGPSessions() const
 {
     return this->sessions_gp;
 }
@@ -102,6 +102,11 @@ QList<SyncableIRCSession *> User::GetSIRCSessions()
 UserConf *User::GetConfiguration()
 {
     return this->conf;
+}
+
+Role *User::GetRole()
+{
+    return this->role;
 }
 
 user_id_t User::GetID()
@@ -127,5 +132,10 @@ Session *User::GetAnyGPSession()
 
     // Return first session
     return this->sessions_gp.at(0);
+}
+
+QString User::GetPassword() const
+{
+    return this->password;
 }
 

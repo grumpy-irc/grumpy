@@ -45,11 +45,13 @@ namespace GrumpyIRC
             void RemoveSession(Session *sx);
             SyncableIRCSession *ConnectToIRCServer(libirc::ServerAddress info);
             bool IsAuthorized(QString perm);
-            QList<Session*> GetGPSessions();
+            QList<Session*> GetGPSessions() const;
             Session *GetAnyGPSession();
+            QString GetPassword() const;
             SyncableIRCSession *GetSIRCSession(unsigned int sid);
             QList<SyncableIRCSession*> GetSIRCSessions();
             UserConf *GetConfiguration();
+            Role *GetRole();
             user_id_t GetID();
             void SetRole(Role *rx);
             QString DefaultNick;

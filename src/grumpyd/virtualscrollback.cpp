@@ -13,6 +13,7 @@
 #include "../libcore/exception.h"
 #include "../libcore/ircsession.h"
 #include "../libcore/networksession.h"
+#include "../libcore/grumpydsession.h"
 #include "virtualscrollback.h"
 #include "user.h"
 #include "session.h"

@@ -16,7 +16,9 @@
 #include "../libirc/libirc/serveraddress.h"
 #include "../libirc/libircclient/network.h"
 #include "../libcore/core.h"
+#include "../libcore/grumpydsession.h"
 #include "../libcore/eventhandler.h"
+#include "databasebackend.h"
 #include "grumpyconf.h"
 #include "corewrapper.h"
 #include "grumpyd.h"
@@ -302,7 +304,9 @@ void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
         // can respond to it
         QHash<QString, QVariant> params;
         params.insert("version", QVariant(QString("Grumpyd ") + GRUMPY_VERSION_STRING));
-        params.insert("authentication_required", QVariant(true));
+        if (CONF->Init)
+            params.insert("initial_setup", true);
+        params.insert("authentication_required", QVariant(!CONF->Init));
         this->protocol->SendProtocolCommand(GP_CMD_HELLO, params);
     } else if (text == GP_CMD_UNKNOWN)
     {
@@ -330,6 +334,9 @@ void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
     } else if (text == GP_CMD_REQUEST_ITEMS)
     {
         this->processRequest(parameters);
+    } else if (text == GP_CMD_INIT)
+    {
+        this->processSetup(parameters);
     } else
     {
         // We received some unknown packet, send it back to client so that it at least knows we don't support this
@@ -403,4 +410,32 @@ void Session::processRequest(QHash<QString, QVariant> parameters)
     response.insert("data", list);
     response.insert("scrollback_id", QVariant(sx));
     this->protocol->SendProtocolCommand(GP_CMD_REQUEST_ITEMS, response);
+}
+
+void Session::processSetup(QHash<QString, QVariant> parameters)
+{
+    if (!CONF->Init)
+    {
+        this->PermissionDeny(GP_CMD_INIT);
+        return;
+    }
+
+    if (!parameters.contains("username") || !parameters.contains("password"))
+    {
+        this->TransferError(GP_CMD_INIT, "Missing user", 0);
+        return;
+    }
+
+    // Register a new user account
+    User *user = new User(parameters["username"].toString(), parameters["password"].toString(), 0);
+    if (!Role::Roles.contains("root"))
+        throw new Exception("Built-in root not found", BOOST_CURRENT_FUNCTION);
+    user->SetRole(Role::Roles["root"]);
+    User::UserInfo.append(user);
+    Grumpyd::GetBackend()->StoreUser(user);
+    CONF->Init = false;
+
+    QHash<QString, QVariant> result;
+    result.insert("done", QVariant(true));
+    this->protocol->SendProtocolCommand(GP_CMD_INIT, result);
 }

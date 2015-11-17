@@ -5,6 +5,8 @@ TARGET = grumpyd
 CONFIG += console
 CONFIG -= app_bundle
 
+DEFINES += GRUMPYD_SQLITE
+
 TEMPLATE = app
 
 SOURCES += main.cpp \
@@ -23,7 +25,8 @@ SOURCES += main.cpp \
     databasebin.cpp \
     grumpyconf.cpp \
     databasedummy.cpp \
-    userconfiguration.cpp
+    userconfiguration.cpp \
+    databaselite.cpp
 
 HEADERS += \
     corewrapper.h \
@@ -41,5 +44,12 @@ HEADERS += \
     databasebin.h \
     grumpyconf.h \
     databasedummy.h \
-    userconfiguration.h
+    userconfiguration.h \
+    databaselite.h
+
+RESOURCES += \
+    resources.qrc
+
+DISTFILES += \
+    install.sql
 

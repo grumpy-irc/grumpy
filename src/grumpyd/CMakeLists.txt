@@ -31,10 +31,15 @@ if (NOT QT5_BUILD)
   INCLUDE(${QT_USE_FILE})
 endif()
 
+if (SQLITE)
+  set(src ${src} "../sqlite/sqlite3.c")
+  ADD_DEFINITIONS(-DGRUMPYD_SQLITE)
+endif()
+
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 ADD_DEFINITIONS( -DQT_USE_QSTRINGBUILDER )
 
-ADD_EXECUTABLE(grumpyd ${src} ${grumpyd_HEADERS_MOC} ${headers} ${grumpyd_FORMS_HEADERS})
+ADD_EXECUTABLE(grumpyd ${src} ${grumpyd_HEADERS_MOC} ${grumpyd_RESOURCES_RCC} ${headers} ${grumpyd_FORMS_HEADERS})
 if (QT5_BUILD)
     qt5_use_modules(grumpyd Core)
 endif()

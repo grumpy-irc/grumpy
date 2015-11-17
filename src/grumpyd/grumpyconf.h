@@ -42,6 +42,7 @@ namespace GrumpyIRC
             unsigned int GetMaxLoadSize();
             QString GetNick();
 
+            bool Init;
             QString PID;
             bool Daemon;
             bool StorageDummy;

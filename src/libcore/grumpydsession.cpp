@@ -334,12 +334,22 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVarian
             return;
         }
         bool authentication_required = parameters["authentication_required"].toBool();
+        bool initial_setup = parameters.contains("initial_setup") && parameters["initial_setup"].toBool();
         if (authentication_required && this->username.isEmpty())
         {
             this->closeError("Remote require authentication, but you didn't provide any credentials needed to login");
             return;
         }
         this->systemWindow->InsertText("Received HELLO from remote system, version of server is: " + parameters["version"].toString());
+        if (initial_setup)
+        {
+            this->systemWindow->InsertText("Remote server requires an initial setup, registering current user and setting up");
+            QHash<QString, QVariant> init;
+            init.insert("username", this->username);
+            init.insert("password", this->password);
+            this->SendProtocolCommand(GP_CMD_INIT, init);
+            return;
+        }
         QHash<QString, QVariant> params;
         params.insert("password", this->password);
         params.insert("username", this->username);
@@ -375,6 +385,12 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVarian
     } else if (text == GP_CMD_USERLIST_SYNC)
     {
         this->processULSync(parameters);
+    } else if (text == GP_CMD_INIT)
+    {
+        QHash<QString, QVariant> params;
+        params.insert("password", this->password);
+        params.insert("username", this->username);
+        this->gp->SendProtocolCommand(GP_CMD_LOGIN, params);
     } else if (text == GP_CMD_NETWORK_INFO)
     {
         this->processNetwork(parameters);

@@ -17,6 +17,7 @@
 #include "grumpyconf.h"
 #include "databasebin.h"
 #include "databasedummy.h"
+#include "databaselite.h"
 #include "databasexml.h"
 #include "sleeper.h"
 #include "listener.h"
@@ -91,7 +92,7 @@ Grumpyd::~Grumpyd()
 
 DatabaseBackend *Grumpyd::GetBackend()
 {
-    return this->databaseBackend;
+    return grumpyd->databaseBackend;
 }
 
 static DatabaseBackend *InstantiateStorage(QString type)
@@ -100,6 +101,8 @@ static DatabaseBackend *InstantiateStorage(QString type)
         return new DatabaseDummy();
     else if (type == "DatabaseXML")
         return new DatabaseXML();
+    else if (type == "DatabaseLite")
+        return new DatabaseLite();
     else
         return new DatabaseBin();
 }

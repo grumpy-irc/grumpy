@@ -22,6 +22,7 @@ GrumpyConf *GrumpyConf::Conf = NULL;
 GrumpyConf::GrumpyConf()
 {
     this->StorageDummy = false;
+    this->Init = false;
     this->Daemon = false;
 }
 
@@ -56,7 +57,7 @@ QString GrumpyConf::GetStorage()
 {
     if (this->StorageDummy)
         return "DatabaseDummy";
-    return GCFG->GetValueAsString("storage", "DatabaseBin");
+    return GCFG->GetValueAsString("storage", "DatabaseLite");
 }
 
 void GrumpyConf::SetStorage(QString name)

@@ -24,4 +24,19 @@ DatabaseBackend::~DatabaseBackend()
 
 }
 
+void DatabaseBackend::StoreUser(User *item)
+{
+
+}
+
+void DatabaseBackend::UpdateUser(User *user)
+{
+
+}
+
+void DatabaseBackend::UpdateRoles()
+{
+
+}
+
 

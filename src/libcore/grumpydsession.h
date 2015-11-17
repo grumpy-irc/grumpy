@@ -30,6 +30,37 @@
 #define GRUMPY_UL_UPDATE 3
 #define GRUMPY_UL_REMOVE 4
 
+#define GP_CMD_HELLO                        1 //"HELLO"
+#define GP_CMD_SERVER                       2 //"SERVER"
+#define GP_CMD_NETWORK_INFO                 3 //"NETWORK_INFO"
+//! When nickname was changed this requires update of network structure
+#define GP_CMD_NICK                         4 //"NICK"
+#define GP_CMD_LOGIN                        5 //"LOGIN"
+#define GP_CMD_LOGIN_OK                     6 //"LOGIN_OK"
+#define GP_CMD_LOGIN_FAIL                   7 //"LOGIN_FAIL"
+#define GP_CMD_RAW                          8 //"RAW"
+#define GP_CMD_PERMDENY                     9 //"PERMDENY"
+#define GP_CMD_UNKNOWN                     10 //"UNKNOWN"
+#define GP_CMD_MESSAGE                     11 //"MESSAGE"
+#define GP_CMD_ERROR                       12 //"ERROR"
+#define GP_CMD_IRC_QUIT                    13 //"IRC_QUIT"
+//! This command is delivered when a new channel is joined by user
+#define GP_CMD_CHANNEL_JOIN                14 //"CHANNEL_JOIN"
+#define GP_CMD_CHANNEL_RESYNC              15 //"CHANNEL_RESYNC"
+//! On resync of a whole network, this only involves internal network parameters
+//! not channel lists and other lists of structures that have pointers
+#define GP_CMD_NETWORK_RESYNC              16 //"NETWORK_RESYNC"
+#define GP_CMD_SCROLLBACK_RESYNC           17 //"SCROLLBACK_RESYNC"
+//! Used to save traffic on events where we need to resync some of the scrollback attributes but not buffer contents
+//! only resync some of the scrollback items
+#define GP_CMD_SCROLLBACK_PARTIAL_RESYNC   18 //"SCROLLBACK_PARTIAL_RESYNC"
+#define GP_CMD_SCROLLBACK_LOAD_NEW_ITEM    19 //"SCROLLBACK_LOAD_NEW_ITEM"
+#define GP_CMD_OPTIONS                     20 //"OPTIONS"
+#define GP_CMD_USERLIST_SYNC               21 //"USERLIST_SYNC"
+#define GP_CMD_REQUEST_ITEMS               22 //"REQUEST_ITEMS"
+#define GP_CMD_REGISTER                    23
+#define GP_CMD_INIT                        24
+
 namespace libirc
 {
     class ServerAddress;

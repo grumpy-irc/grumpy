@@ -177,11 +177,12 @@ QList<QVariant> Scrollback::FetchBacklog(scrollback_id_t from, unsigned int size
 
     scrollback_id_t current_item_id = from;
     int current_item_index = 0;
-    // we need to find a index of current item
+    // we need to find an index of current item, that is the one with id "from"
     while (current_item_index < this->_items.size())
     {
         if (this->_items[current_item_index].GetID() == current_item_id)
             break;
+        current_item_index++;
     }
     if (current_item_index >= this->_items.size())
     {
@@ -305,6 +306,15 @@ void Scrollback::SetTarget(QString target)
 NetworkSession *Scrollback::GetSession()
 {
     return this->session;
+}
+
+ScrollbackItem Scrollback::GetFirst()
+{
+    // We need to return something here even if there are no items we just return an empty item
+    if (!this->_items.count())
+        return ScrollbackItem("");
+
+    return this->_items.first();
 }
 
 QList<ScrollbackItem> Scrollback::GetItems()

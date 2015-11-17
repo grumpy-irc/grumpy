@@ -19,6 +19,7 @@
 
 namespace GrumpyIRC
 {
+    class User;
     class DatabaseBackend
     {
         public:
@@ -26,6 +27,9 @@ namespace GrumpyIRC
             virtual ~DatabaseBackend();
             virtual void LoadRoles()=0;
             virtual void LoadUsers()=0;
+            virtual void StoreUser(User *item);
+            virtual void UpdateUser(User *user);
+            virtual void UpdateRoles();
             virtual QHash<QString, QVariant> GetConfiguration(user_id_t user)=0;
             virtual void SetConfiguration(user_id_t user, QHash<QString, QVariant> data)=0;
     };
