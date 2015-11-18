@@ -116,6 +116,7 @@ namespace GrumpyIRC
             QTimer scroller;
             bool isClean;
             int maxItems;
+            int currentScrollbar;
             QList<ScrollbackItem> unwritten;
             libircclient::Network *precachedNetwork;
             STextBox *textEdit;

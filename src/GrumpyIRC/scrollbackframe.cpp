@@ -74,8 +74,9 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     connect(this->scrollback, SIGNAL(Event_StateModified()), this, SLOT(OnState()));
     connect(this->textEdit, SIGNAL(Event_Link(QString)), this, SLOT(OnLink(QString)));
     this->textEdit->SetStyleSheet(ScrollbackFrame::parser.GetStyle());
+    this->currentScrollbar = 0;
     connect(&this->scroller, SIGNAL(timeout()), this, SLOT(OnScroll()));
-    this->scroller.start(200);
+    //this->scroller.start(200);
 }
 
 ScrollbackFrame::~ScrollbackFrame()
@@ -280,7 +281,7 @@ void ScrollbackFrame::OnScroll()
         return;
     if (this->textEdit->verticalScrollBar()->value() == 0)
     {
-        this->RequestMore(100);
+        this->RequestMore(200);
         // sleep for some longer time
         this->scroller.setInterval(GRUMPY_SCROLLER_TIME_WAIT * 10);
     }
@@ -294,6 +295,8 @@ void ScrollbackFrame::Refresh()
         this->_insertText_(item);
     this->UpdateIcon();
     this->UpdateColor();
+    //if (this->currentScrollbar <= this->textEdit->verticalScrollBar()->maximum())
+    //    this->textEdit->verticalScrollBar()->setValue(this->currentScrollbar);
 }
 
 void ScrollbackFrame::Menu(QPoint pn)
@@ -521,6 +524,7 @@ void ScrollbackFrame::RequestMore(unsigned int count)
     if (first_item.GetID() == 0)
         return;
     grumpy->RequestBL(this->GetScrollback(), first_item.GetID(), 200);
+    this->currentScrollbar = this->textEdit->verticalScrollBar()->value();
 }
 
 void ScrollbackFrame::RefreshHtml()
