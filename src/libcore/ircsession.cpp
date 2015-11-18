@@ -220,7 +220,7 @@ void IRCSession::SendNotice(Scrollback *window, QString text)
         throw new GrumpyIRC::Exception("window->GetTarget() contains empty string", BOOST_CURRENT_FUNCTION);
     this->GetNetwork()->SendNotice(text, window->GetTarget());
     // Write the message to active window
-    window->InsertText(ScrollbackItem(text, ScrollbackItemType_Notice, this->GetNetwork()->GetLocalUserInfo()));
+    window->InsertText(ScrollbackItem(text, ScrollbackItemType_Notice, this->GetNetwork()->GetLocalUserInfo(), 0, true));
 }
 
 Scrollback *IRCSession::GetScrollbackForChannel(QString channel)
@@ -440,7 +440,7 @@ void IRCSession::SendMessage(Scrollback *window, QString text)
         throw new GrumpyIRC::Exception("window->GetTarget() contains empty string", BOOST_CURRENT_FUNCTION);
     this->GetNetwork()->SendMessage(text, window->GetTarget());
     // Write the message to active window
-    window->InsertText(ScrollbackItem(text, ScrollbackItemType_Message, this->GetNetwork()->GetLocalUserInfo()));
+    window->InsertText(ScrollbackItem(text, ScrollbackItemType_Message, this->GetNetwork()->GetLocalUserInfo(), 0, true));
 }
 
 void IRCSession::OnIRCSelfJoin(libircclient::Channel *channel)

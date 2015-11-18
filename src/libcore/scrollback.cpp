@@ -382,18 +382,20 @@ void Scrollback::InsertText(QString text, ScrollbackItemType type)
 ScrollbackItem::ScrollbackItem(QHash<QString, QVariant> hash)
 {
     this->_type = ScrollbackItemType_System;
+    this->_self = false;
     this->LoadHash(hash);
 }
 
-ScrollbackItem::ScrollbackItem(QString text, scrollback_id_t id)
+ScrollbackItem::ScrollbackItem(QString text, scrollback_id_t id, bool self)
 {
     this->_type = ScrollbackItemType_System;
     this->_id = id;
+    this->_self = self;
     this->_text = text;
     this->_datetime = QDateTime::currentDateTime();
 }
 
-ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User *user, scrollback_id_t id)
+ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User *user, scrollback_id_t id, bool self)
 {
     this->_type = type;
     this->_id = id;
@@ -405,7 +407,7 @@ ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclie
         this->_user = libircclient::User(user);
 }
 
-ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User user, scrollback_id_t id)
+ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User user, scrollback_id_t id, bool self)
 {
     this->_type = type;
     this->_id = id;
@@ -459,6 +461,11 @@ void ScrollbackItem::SetUser(libircclient::User *user)
     this->_user = libircclient::User(user);
 }
 
+bool ScrollbackItem::IsSelf() const
+{
+    return this->_self;
+}
+
 libircclient::User ScrollbackItem::GetUser() const
 {
     return this->_user;
@@ -472,6 +479,7 @@ void ScrollbackItem::LoadHash(QHash<QString, QVariant> hash)
         this->_type = static_cast<ScrollbackItemType>(hash["_type"].toInt());
     UNSERIALIZE_STRING(_text);
     UNSERIALIZE_UINT(_id);
+    UNSERIALIZE_BOOL(_self);
     UNSERIALIZE_DATETIME(_datetime);
 }
 
@@ -481,6 +489,7 @@ QHash<QString, QVariant> ScrollbackItem::ToHash()
     SERIALIZE(_text);
     SERIALIZE(_id);
     hash.insert("_user", QVariant(this->_user.ToHash()));
+    SERIALIZE(_self);
     SERIALIZE(_datetime);
     hash.insert("_type", QVariant(static_cast<int>(this->_type)));
     return hash;

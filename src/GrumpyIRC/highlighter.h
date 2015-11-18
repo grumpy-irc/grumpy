@@ -17,6 +17,12 @@
 #include <QRegExp>
 #include <QList>
 
+namespace libircclient
+{
+    class User;
+    class Network;
+}
+
 namespace GrumpyIRC
 {
     class ScrollbackItem;
@@ -25,12 +31,15 @@ namespace GrumpyIRC
     {
         public:
             static void Init();
+            static bool IsMatch(ScrollbackItem *text, libircclient::Network *network);
             static QList<Highlighter*> Highlighter_Data;
-            static bool IsMatch(ScrollbackItem *text);
+
             Highlighter(QString text);
             ~Highlighter();
-            bool IsMatching(ScrollbackItem *text);
+            bool IsMatching(ScrollbackItem *text, libircclient::Network *network);
             bool CaseSensitive;
+            bool Messages;
+            bool MatchingSelf;
             bool IsRegex;
         private:
             QString definition;

@@ -10,31 +10,30 @@
 
 // Copyright (c) Petr Bena 2015
 
-#ifndef STEXTBOX_H
-#define STEXTBOX_H
+#ifndef INITIALIZEWIN_H
+#define INITIALIZEWIN_H
 
-#include <QPlainTextEdit>
+#include <QDialog>
+
+namespace Ui
+{
+    class InitializeWin;
+}
 
 namespace GrumpyIRC
 {
-    class STextBox : public QPlainTextEdit
+    class InitializeWin : public QDialog
     {
             Q_OBJECT
+
         public:
-            STextBox(QWidget *parent = NULL);
-            ~STextBox();
-            void AppendHtml(QString html);
-            void SetStyleSheet(QString css);
-            void Clear();
-        signals:
-            void Event_Link(QString text);
-        protected:
-            void dropEvent(QDropEvent *e);
-            void scrollContentsBy();
-            void mousePressEvent(QMouseEvent *e);
-            void mouseReleaseEvent(QMouseEvent *e);
-            QString clickedAnchor;
+            explicit InitializeWin(QWidget *parent = 0);
+            ~InitializeWin();
+            void Process();
+
+        private:
+            Ui::InitializeWin *ui;
     };
 }
 
-#endif // STEXTBOX_H
+#endif // INITIALIZEWIN_H

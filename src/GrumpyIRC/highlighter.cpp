@@ -10,6 +10,8 @@
 
 // Copyright (c) Petr Bena 2015
 
+#include "../libcore/scrollback.h"
+#include "../libirc/libircclient/network.h"
 #include "highlighter.h"
 #include "grumpyconf.h"
 
@@ -24,11 +26,11 @@ void Highlighter::Init()
     new Highlighter("$nick");
 }
 
-bool Highlighter::IsMatch(ScrollbackItem *text)
+bool Highlighter::IsMatch(ScrollbackItem *text, libircclient::Network *network)
 {
     foreach (Highlighter *hx, Highlighter_Data)
     {
-        if (hx->IsMatching(text))
+        if (hx->IsMatching(text, network))
             return true;
     }
     return false;
@@ -39,6 +41,8 @@ Highlighter::Highlighter(QString text)
     this->CaseSensitive = false;
     this->IsRegex = false;
     this->definition = text;
+    this->Messages = true;
+    this->MatchingSelf = false;
     Highlighter_Data.append(this);
 }
 
@@ -47,8 +51,30 @@ Highlighter::~Highlighter()
     Highlighter_Data.removeOne(this);
 }
 
-bool Highlighter::IsMatching(ScrollbackItem *text)
+bool Highlighter::IsMatching(ScrollbackItem *text, libircclient::Network *network)
 {
+    if (text->IsSelf() && !this->MatchingSelf)
+        return false;
+
+    if (this->Messages && !(text->GetType() == ScrollbackItemType_Notice || text->GetType() == ScrollbackItemType_Message))
+        return false;
+
+    if (!this->IsRegex)
+    {
+        QString string = this->definition;
+        if (network)
+            string.replace("$nick", network->GetNick());
+        if (!this->CaseSensitive)
+        {
+            string = string.toLower();
+            if (text->GetText().toLower().contains(string))
+                return true;
+        } else
+        {
+            if (text->GetText().contains(string))
+                return true;
+        }
+    }
 
     return false;
 }

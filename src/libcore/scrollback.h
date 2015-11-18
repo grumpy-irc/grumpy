@@ -70,9 +70,9 @@ namespace GrumpyIRC
     {
         public:
             ScrollbackItem(QHash<QString, QVariant> hash);
-            ScrollbackItem(QString text, scrollback_id_t id=0);
-            ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User *user = NULL, scrollback_id_t id=0);
-            ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User user, scrollback_id_t id=0);
+            ScrollbackItem(QString text, scrollback_id_t id=0, bool self = false);
+            ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User *user = NULL, scrollback_id_t id=0, bool self = false);
+            ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User user, scrollback_id_t id=0, bool self = false);
             virtual void SetID(scrollback_id_t id);
             virtual ~ScrollbackItem();
             virtual QString GetText() const;
@@ -84,6 +84,7 @@ namespace GrumpyIRC
             virtual void SetType(ScrollbackItemType type);
             virtual void SetText(QString text);
             virtual void SetUser(libircclient::User *user);
+            virtual bool IsSelf() const;
             virtual libircclient::User GetUser() const;
             void LoadHash(QHash<QString, QVariant> hash);
             QHash<QString, QVariant> ToHash();
@@ -91,6 +92,7 @@ namespace GrumpyIRC
             scrollback_id_t _id;
             libircclient::User _user;
             QString _text;
+            bool _self;
             QDateTime _datetime;
             ScrollbackItemType _type;
     };

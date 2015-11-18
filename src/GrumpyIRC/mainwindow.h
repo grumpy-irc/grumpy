@@ -15,6 +15,7 @@
 
 #include "../libcore/scrollback.h"
 #include <QLabel>
+#include <QSystemTrayIcon>
 #include <QMainWindow>
 #include <QTimer>
 
@@ -59,6 +60,7 @@ namespace GrumpyIRC
             void Fork();
             void SetWN(QString text);
             void UpdateStatus();
+            void Notify(QString heading, QString text);
             void OpenUrl(QString url);
             void OpenGrumpy(QString hostname, int port, QString username, QString password, bool ssl);
             void OpenIRCNetworkLink(QString link);
@@ -77,6 +79,7 @@ namespace GrumpyIRC
 
         private:
             void closeEvent(QCloseEvent *event);
+            QSystemTrayIcon tray;
             bool isFork;
             QTimer timer;
             QLabel *statusFrame;

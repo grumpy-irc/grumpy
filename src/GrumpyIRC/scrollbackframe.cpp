@@ -23,7 +23,10 @@
 #include "../libirc/libircclient/user.h"
 #include "corewrapper.h"
 #include "grumpyconf.h"
+#include <QClipboard>
 #include "channelwin.h"
+#include "highlighter.h"
+#include "hooks.h"
 #include "scrollbacklist_node.h"
 #include "skin.h"
 #include "scrollbackframe.h"
@@ -52,6 +55,8 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     connect(this->textEdit, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(Menu(QPoint)));
     this->maxItems = 200;
     this->userFrame = new UserFrame(this);
+    this->Highlighting = true;
+    this->precachedNetwork = NULL;
     this->isVisible = false;
     if (_scrollback == NULL)
         this->scrollback = new Scrollback();
@@ -69,6 +74,8 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     connect(this->scrollback, SIGNAL(Event_StateModified()), this, SLOT(OnState()));
     connect(this->textEdit, SIGNAL(Event_Link(QString)), this, SLOT(OnLink(QString)));
     this->textEdit->SetStyleSheet(ScrollbackFrame::parser.GetStyle());
+    connect(&this->scroller, SIGNAL(timeout()), this, SLOT(OnScroll()));
+    this->scroller.start(200);
 }
 
 ScrollbackFrame::~ScrollbackFrame()
@@ -113,7 +120,7 @@ static QString FormatAction(libircclient::User user, QString action, bool full_u
     return result;
 }
 
-static QString ItemToString(ScrollbackItem item)
+static QString ItemToString(ScrollbackItem item, bool highlighted)
 {
     // Render the text according to our formatting
     //! \todo This needs to be precached otherwise we need to build this string every fucking time
@@ -185,7 +192,9 @@ static QString ItemToString(ScrollbackItem item)
             break;
     }
     //format_string.replace("$string", result);
-    if (item.GetType() == ScrollbackItemType_System)
+    if (highlighted)
+        color = Skin::GetDefault()->HighligtedColor;
+    else if (item.GetType() == ScrollbackItemType_System)
         color = Skin::GetDefault()->SystemColor;
     else if (system)
         color = Skin::GetDefault()->SystemInfo;
@@ -195,6 +204,12 @@ static QString ItemToString(ScrollbackItem item)
 
 void ScrollbackFrame::_insertText_(ScrollbackItem item)
 {
+    int highlighted = GRUMPY_H_NOT;
+    if (Highlighter::IsMatch(&item, this->GetNetwork()))
+    {
+        Hooks::OnScrollbackItemHighlight(this, &item);
+        highlighted = GRUMPY_H_YES;
+    }
     if (!this->IsVisible())
     {
         while (this->unwritten.size() > this->maxItems)
@@ -207,7 +222,7 @@ void ScrollbackFrame::_insertText_(ScrollbackItem item)
         this->needsRefresh = true;
     } else
     {
-        this->writeText(item);
+        this->writeText(item, highlighted);
     }
 }
 
@@ -255,6 +270,22 @@ void ScrollbackFrame::OnLink(QString url)
     }
 }
 
+void ScrollbackFrame::OnScroll()
+{
+    if (this->scroller.interval() != GRUMPY_SCROLLER_TIME_WAIT)
+        this->scroller.setInterval(GRUMPY_SCROLLER_TIME_WAIT);
+    if (!this->IsVisible())
+        return;
+    if ((scrollback_id_t)this->GetSynced() == this->GetItems())
+        return;
+    if (this->textEdit->verticalScrollBar()->value() == 0)
+    {
+        this->RequestMore(100);
+        // sleep for some longer time
+        this->scroller.setInterval(GRUMPY_SCROLLER_TIME_WAIT * 10);
+    }
+}
+
 void ScrollbackFrame::Refresh()
 {
     this->textEdit->Clear();
@@ -287,7 +318,7 @@ void ScrollbackFrame::Menu(QPoint pn)
         return;
     if (selectedItem == menuCopy)
     {
-
+        this->textEdit->copy();
     } else if (selectedItem == menuRetrieveTopic)
     {
         //wx->RequestPart();
@@ -321,6 +352,7 @@ void ScrollbackFrame::OnClosed()
 void ScrollbackFrame::NetworkChanged(libircclient::Network *network)
 {
     this->userFrame->SetNetwork(network);
+    this->precachedNetwork = network;
 }
 
 void ScrollbackFrame::clearItems()
@@ -330,9 +362,14 @@ void ScrollbackFrame::clearItems()
     this->textEdit->Clear();
 }
 
-void ScrollbackFrame::writeText(ScrollbackItem item)
+void ScrollbackFrame::writeText(ScrollbackItem item, int highlighted)
 {
-    QString line = ItemToString(item);
+    bool is_hg = false;
+    if (!highlighted)
+        is_hg = Highlighter::IsMatch(&item, this->GetNetwork());
+    else if (highlighted == GRUMPY_H_YES)
+        is_hg = true;
+    QString line = ItemToString(item, is_hg);
     this->buffer += line;
     this->textEdit->AppendHtml(line);
     this->isClean = false;
@@ -500,6 +537,17 @@ void ScrollbackFrame::RefreshHtmlIfNeeded()
 {
     if (this->needsRefresh)
         this->RefreshHtml();
+}
+
+libircclient::Network *ScrollbackFrame::GetNetwork()
+{
+    if (this->precachedNetwork)
+        return this->precachedNetwork;
+
+    if (this->GetSession())
+        this->precachedNetwork = this->GetSession()->GetNetwork(this->GetScrollback());
+
+    return this->precachedNetwork;
 }
 
 void ScrollbackFrame::TransferRaw(QString data)

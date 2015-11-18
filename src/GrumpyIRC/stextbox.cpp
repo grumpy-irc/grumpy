@@ -41,6 +41,11 @@ void STextBox::Clear()
     this->clear();
 }
 
+void STextBox::dropEvent(QDropEvent *e)
+{
+    // do nothing!
+}
+
 void STextBox::mousePressEvent(QMouseEvent *e)
 {
     this->clickedAnchor = (e->button() & Qt::LeftButton) ? anchorAt(e->pos()) : QString();

@@ -23,6 +23,7 @@
 #include "databaselite.h"
 #include <string>
 #include <QFile>
+#include <QStringList>
 
 using namespace GrumpyIRC;
 

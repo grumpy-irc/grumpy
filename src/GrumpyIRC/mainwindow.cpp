@@ -234,6 +234,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->ui->statusBar->addPermanentWidget(this->statusFrame);
     ScrollbacksManager::Global = this->scrollbackWindow;
     this->syslogWindow->hide();
+    this->tray.setIcon(this->windowIcon());
+    this->tray.show();
+    this->tray.setToolTip("Grumpy IRC");
     // Create a system scrollback
     this->systemWindow = this->scrollbackWindow->CreateWindow("System Window", NULL, true, false);
     // Register built-in commands
@@ -333,6 +336,11 @@ ScrollbackFrame *MainWindow::GetSystem()
 ScrollbackFrame *MainWindow::GetCurrentScrollbackFrame()
 {
     return this->GetScrollbackManager()->GetCurrentScrollback();
+}
+
+void MainWindow::Notify(QString heading, QString text)
+{
+    this->tray.showMessage(heading, text);
 }
 
 UserWidget *MainWindow::GetUsers()

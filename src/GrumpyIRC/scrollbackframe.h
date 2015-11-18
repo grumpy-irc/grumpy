@@ -15,9 +15,16 @@
 
 #include <QFrame>
 #include <QStandardItemModel>
+#include <QTimer>
 #include "stextbox.h"
 #include "../libirc2htmlcode/parser.h"
 #include "../libcore/scrollback.h"
+
+#define GRUMPY_H_UNKNOWN 0
+#define GRUMPY_H_YES     1
+#define GRUMPY_H_NOT     2
+
+#define GRUMPY_SCROLLER_TIME_WAIT 200
 
 namespace Ui
 {
@@ -75,6 +82,7 @@ namespace GrumpyIRC
             void RequestMore(unsigned int count);
             void RefreshHtml();
             void RefreshHtmlIfNeeded();
+            libircclient::Network *GetNetwork();
             void TransferRaw(QString data);
             libircclient::User *GetIdentity();
             scrollback_id_t GetItems();
@@ -84,6 +92,7 @@ namespace GrumpyIRC
             int GetSynced();
             //void SetParent(ScrollbackFrame* parentWindow);
             bool IsDeletable;
+            bool Highlighting;
             void SetVisible(bool is_visible);
             ScrollbackList_Node *TreeNode;
         private slots:
@@ -95,17 +104,20 @@ namespace GrumpyIRC
             void UserList_Rename(QString old, libircclient::User *us);
             void OnDead();
             void OnLink(QString url);
+            void OnScroll();
             void Refresh();
             void Menu(QPoint pn);
             void OnClosed();
             void NetworkChanged(libircclient::Network *network);
         private:
             void clearItems();
-            void writeText(ScrollbackItem item);
+            void writeText(ScrollbackItem item, int highlighted = 0);
             bool isVisible;
+            QTimer scroller;
             bool isClean;
             int maxItems;
             QList<ScrollbackItem> unwritten;
+            libircclient::Network *precachedNetwork;
             STextBox *textEdit;
             bool needsRefresh;
             Scrollback *scrollback;
