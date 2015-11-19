@@ -55,6 +55,13 @@ void UserFrame::on_listWidget_customContextMenuRequested(const QPoint &pos)
     QPoint globalPos = this->ui->listWidget->viewport()->mapToGlobal(pos);
     QMenu Menu;
     // Items
+    QAction *menuQuery = new QAction("PM", &Menu);
+    Menu.addAction(menuQuery);
+    QAction *menuWhois = new QAction("Whois", &Menu);
+    Menu.addAction(menuWhois);
+
+    Menu.addSeparator();
+
     QMenu *menuModes = new QMenu("Mode", &Menu);
 
     QAction *modeQ = new QAction("+q", &Menu);
@@ -85,6 +92,9 @@ void UserFrame::on_listWidget_customContextMenuRequested(const QPoint &pos)
 
     Menu.addSeparator();
 
+    QAction *menuBan = new QAction(QObject::tr("Ban"), &Menu);
+    Menu.addAction(menuBan);
+
     QAction* selectedItem = Menu.exec(globalPos);
     if (!selectedItem)
         return;
@@ -108,6 +118,8 @@ void UserFrame::on_listWidget_customContextMenuRequested(const QPoint &pos)
         this->ChangeMode("+h");
     else if (selectedItem == modeV)
         this->ChangeMode("+v");
+    else if (selectedItem == menuWhois)
+        this->Whois();
 }
 
 QString UserFrame::GenerateTip(libircclient::User *ux)
@@ -127,7 +139,7 @@ static QColor getColor(libircclient::User *ux)
     return Skin::GetDefault()->ModeColors[ux->CUMode];
 }
 
-void UserFrame::InsertUser(libircclient::User *user)
+void UserFrame::InsertUser(libircclient::User *user, bool bulk)
 {
     if (!this->network)
         return;
@@ -143,20 +155,27 @@ void UserFrame::InsertUser(libircclient::User *user)
     this->userItem.insert(name, item);
     // insert user in a way it's already sorted, so that we don't need to resort the whole
     // user list, which is pretty expensive operation
-    int index = -1;
-    int count = this->ui->listWidget->count();
-    while (++index < count)
+    if (!bulk)
     {
-        if (item->lowerThan(*this->ui->listWidget->item(index)))
-            break;
+        int index = -1;
+        int count = this->ui->listWidget->count();
+        while (++index < count)
+        {
+            if (item->lowerThan(*this->ui->listWidget->item(index)))
+                break;
+        }
+        this->ui->listWidget->insertItem(index, item);
     }
-    this->ui->listWidget->insertItem(index, item);
-    /*if (this->IsVisible)
-        this->ui->listWidget->sortItems();
     else
-        this->NeedsUpdate = true;
-    */
-    this->UpdateInfo();
+    {
+        // will be sorted later
+        this->ui->listWidget->addItem(item);
+    }
+
+    if (!bulk)
+    {
+        this->UpdateInfo();
+    }
 }
 
 void UserFrame::RemoveUser(QString user)
@@ -179,7 +198,12 @@ void UserFrame::RefreshUser(libircclient::User *user)
 {
     //! \todo Optimize
     this->RemoveUser(user->GetNick());
-    this->InsertUser(user);
+    this->InsertUser(user, false);
+}
+
+void UserFrame::Sort()
+{
+    this->ui->listWidget->sortItems();
 }
 
 void UserFrame::ChangeNick(QString new_nick, QString old_nick)
@@ -190,7 +214,7 @@ void UserFrame::ChangeNick(QString new_nick, QString old_nick)
     libircclient::User user = this->users[old_nick];
     this->RemoveUser(old_nick);
     user.SetNick(new_nick);
-    this->InsertUser(&user);
+    this->InsertUser(&user, false);
 }
 
 void UserFrame::SetNetwork(libircclient::Network *Network)
@@ -200,6 +224,30 @@ void UserFrame::SetNetwork(libircclient::Network *Network)
     this->network = Network;
     foreach (char mode, this->network->GetCUModes())
         this->userCounts.insert(mode, 0);
+}
+
+QList<libircclient::User> UserFrame::SelectedUsers()
+{
+    QList<libircclient::User> ul;
+    if (!this->network)
+        return ul;
+    QString channel_name = this->parentFrame->GetScrollback()->GetTarget();
+    // Check all users who were selected
+    foreach(QListWidgetItem* item, this->ui->listWidget->selectedItems())
+    {
+        QString nick = item->text().toLower();
+        if (nick.isEmpty())
+            throw new GrumpyIRC::Exception("Empty nick!?", BOOST_CURRENT_FUNCTION);
+        // strip the prefix
+        char prefix = nick[0].toLatin1();
+        if (this->network->GetChannelUserPrefixes().contains(prefix))
+            nick = nick.mid(1);
+        if (!this->users.contains(nick))
+            throw new GrumpyIRC::Exception("Missing user", BOOST_CURRENT_FUNCTION);
+
+        ul.append(this->users[nick]);
+    }
+    return ul;
 }
 
 QList<QString> UserFrame::GetUsers()
@@ -215,25 +263,18 @@ QList<QString> UserFrame::GetUsers()
 
 void UserFrame::ChangeMode(QString mode)
 {
-    if (!this->network)
-        return;
     QString channel_name = this->parentFrame->GetScrollback()->GetTarget();
-    // Check all users who were selected
-    foreach (QListWidgetItem* item,  this->ui->listWidget->selectedItems())
-    {
-        QString nick = item->text().toLower();
-        if (nick.isEmpty())
-            throw new GrumpyIRC::Exception("Empty nick!?", BOOST_CURRENT_FUNCTION);
-        // strip the prefix
-        char prefix = nick[0].toLatin1();
-        if (this->network->GetChannelUserPrefixes().contains(prefix))
-            nick = nick.mid(1);
-        if (!this->users.contains(nick))
-            throw new GrumpyIRC::Exception("Missing user", BOOST_CURRENT_FUNCTION);
 
-        libircclient::User user = this->users[nick];
-        this->parentFrame->TransferRaw("MODE " + channel_name + " " + mode + " " + user.GetNick());
-    }
+    // Change the mode for every user
+    // that is selected
+    foreach (libircclient::User u, this->SelectedUsers())
+        this->parentFrame->TransferRaw("MODE " + channel_name + " " + mode + " " + u.GetNick());
+}
+
+void UserFrame::Whois()
+{
+    foreach(libircclient::User u, this->SelectedUsers())
+        this->parentFrame->TransferRaw("WHOIS " + u.GetNick());
 }
 
 void UserFrame::UpdateInfo()

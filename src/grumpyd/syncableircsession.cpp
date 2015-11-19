@@ -142,6 +142,13 @@ void SyncableIRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
     {
         // Propagate this new window to every connected user
         VirtualScrollback *sx = (VirtualScrollback*)this->channels[channel->GetName().toLower()];
+        if (sx->PropertyBag.contains("initialized"))
+        {
+            // We joined a channel that already had a scrollback window that we already created in other clients, so let's just resync
+            sx->PartialSync();
+            return;
+        }
+        sx->PropertyBag.insert("initialized", QVariant(true));
         sx->SetOwner(this->owner);
         sx->Sync();
         // Now sync the channel with all connected users, we need to do this after we sync the window so that client can assign the window pointer to chan

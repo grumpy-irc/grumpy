@@ -142,7 +142,7 @@ namespace GrumpyIRC
             virtual NetworkSession *GetSession();
             virtual QList<ScrollbackItem> GetItems();
             //! Called by IRC session or any other object if there is any change to user list associated to this scrollback
-            virtual void UserListChange(QString nick, libircclient::User *user, UserListChangeType change_type);
+            virtual void UserListChange(QString nick, libircclient::User *user, UserListChangeType change_type, bool bulk = false);
             virtual ScrollbackType GetType() const;
             virtual void SetSession(NetworkSession *Session);
             virtual bool IsDead() const;
@@ -152,6 +152,7 @@ namespace GrumpyIRC
             virtual scrollback_id_t GetLastID();
             virtual int GetSICount();
             virtual Scrollback *GetParentScrollback();
+            virtual void FinishBulk();
             virtual void PrependItems(QList<ScrollbackItem> list);
             ScrollbackItem FetchItem(scrollback_id_t id);
             QList<QVariant> FetchBacklog(scrollback_id_t from, unsigned int size);
@@ -176,13 +177,14 @@ namespace GrumpyIRC
             //!
             //! this event is called when a network is associated with the scrollback so that wrappers can update
             void Event_NetworkModified(libircclient::Network *network);
-            void Event_UserInserted(libircclient::User *user);
+            void Event_UserInserted(libircclient::User *user, bool bulk);
             void Event_UserAltered(QString original_name, libircclient::User *user);
             void Event_ChangedDeadStatus();
             void Event_SessionModified(NetworkSession *Session);
             void Event_StateModified();
+            void Event_UserListBulkDone();
             void Event_Reload();
-            void Event_UserRemoved(QString name);
+            void Event_UserRemoved(QString name, bool bulk);
             void Event_Resync();
             //! Called when some meta-information for user is changed, such as away status
             //! so that it can be updated in associated widgets

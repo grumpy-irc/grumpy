@@ -229,6 +229,11 @@ QHash<QString, QVariant> Scrollback::ToHash(int max)
     return hash;
 }
 
+void Scrollback::FinishBulk()
+{
+    emit this->Event_UserListBulkDone();
+}
+
 QHash<QString, QVariant> Scrollback::ToPartialHash()
 {
     QHash<QString, QVariant> hash;
@@ -322,7 +327,7 @@ QList<ScrollbackItem> Scrollback::GetItems()
     return this->_items;
 }
 
-void Scrollback::UserListChange(QString nick, libircclient::User *user, UserListChangeType change_type)
+void Scrollback::UserListChange(QString nick, libircclient::User *user, UserListChangeType change_type, bool bulk)
 {
     switch (change_type)
     {
@@ -333,10 +338,10 @@ void Scrollback::UserListChange(QString nick, libircclient::User *user, UserList
             emit this->Event_UserRefresh(user);
             break;
         case UserListChange_Insert:
-            emit this->Event_UserInserted(user);
+            emit this->Event_UserInserted(user, bulk);
             break;
         case UserListChange_Remove:
-            emit this->Event_UserRemoved(nick);
+            emit this->Event_UserRemoved(nick, bulk);
             break;
     }
 }

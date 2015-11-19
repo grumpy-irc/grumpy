@@ -281,8 +281,9 @@ void IRCSession::SyncWindows(QHash<QString, QVariant> windows, QHash<QString, Sc
             if (channel)
             {
                 foreach (libircclient::User *user, channel->GetUsers())
-                    scrollback->UserListChange(user->GetNick(), user, UserListChange_Insert);
+                    scrollback->UserListChange(user->GetNick(), user, UserListChange_Insert, true);
             }
+            scrollback->FinishBulk();
         }
         scrollback->SetSession(window_session);
         hash->insert(name.toLower(), scrollback);

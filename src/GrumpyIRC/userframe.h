@@ -36,12 +36,15 @@ namespace GrumpyIRC
         public:
             explicit UserFrame(ScrollbackFrame *parent);
             ~UserFrame();
-            void InsertUser(libircclient::User *user);
+            void InsertUser(libircclient::User *user, bool bulk);
             void RemoveUser(QString user);
             void RefreshUser(libircclient::User *user);
             void ChangeNick(QString new_nick, QString old_nick);
             void SetNetwork(libircclient::Network *Network);
+            QList<libircclient::User> SelectedUsers();
+            void Sort();
             QList<QString> GetUsers();
+            void Whois();
             void ChangeMode(QString mode);
             void UpdateInfo();
             bool IsVisible;

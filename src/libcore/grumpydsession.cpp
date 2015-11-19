@@ -638,8 +638,9 @@ void GrumpydSession::processChannelResync(QHash<QString, QVariant> hash)
         foreach (libircclient::User *user, channel->GetUsers())
         {
             if (window)
-                window->UserListChange(user->GetNick(), user, UserListChange_Insert);
+                window->UserListChange(user->GetNick(), user, UserListChange_Insert, true);
         }
+        window->FinishBulk();
         return;
     }
 
@@ -647,7 +648,7 @@ void GrumpydSession::processChannelResync(QHash<QString, QVariant> hash)
     {
         // Remove all users from the window's internal user list
         foreach (libircclient::User *user, channel->GetUsers())
-            window->UserListChange(user->GetNick(), user, UserListChange_Remove);
+            window->UserListChange(user->GetNick(), user, UserListChange_Remove, true);
     } else
     {
         GRUMPY_ERROR("request to resync an existing channel for which there is no window: " + channel->GetName());
@@ -661,8 +662,9 @@ void GrumpydSession::processChannelResync(QHash<QString, QVariant> hash)
         // of this function and so will all its subclasses
         channel->InsertUser(new libircclient::User(user));
         if (window)
-            window->UserListChange(user->GetNick(), user, UserListChange_Insert);
+            window->UserListChange(user->GetNick(), user, UserListChange_Insert, true);
     }
+    window->FinishBulk();
 }
 
 void GrumpydSession::processSResync(QHash<QString, QVariant> parameters)

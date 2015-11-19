@@ -99,11 +99,12 @@ namespace GrumpyIRC
             ScrollbackList_Node *TreeNode;
         private slots:
             void _insertText_(ScrollbackItem item);
-            void UserList_Insert(libircclient::User *ux);
+            void UserList_Insert(libircclient::User *ux, bool bulk);
             void UserList_Refresh(libircclient::User *ux);
             void OnState();
-            void UserList_Remove(QString user);
+            void UserList_Remove(QString user, bool bulk);
             void UserList_Rename(QString old, libircclient::User *us);
+            void OnFinishSortBulk();
             void OnDead();
             void OnLink(QString url);
             void OnScroll();

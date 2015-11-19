@@ -64,12 +64,13 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
         this->scrollback = _scrollback;
     connect(this->scrollback, SIGNAL(Event_NetworkModified(libircclient::Network*)), this, SLOT(NetworkChanged(libircclient::Network*)));
     connect(this->scrollback, SIGNAL(Event_ChangedDeadStatus()), this, SLOT(OnDead()));
-    connect(this->scrollback, SIGNAL(Event_UserInserted(libircclient::User*)), this, SLOT(UserList_Insert(libircclient::User*)));
+    connect(this->scrollback, SIGNAL(Event_UserInserted(libircclient::User*, bool)), this, SLOT(UserList_Insert(libircclient::User*, bool)));
     connect(this->scrollback, SIGNAL(Event_Reload()), this, SLOT(Refresh()));
     connect(this->scrollback, SIGNAL(Event_UserAltered(QString,libircclient::User*)), this, SLOT(UserList_Rename(QString,libircclient::User*)));
-    connect(this->scrollback, SIGNAL(Event_UserRemoved(QString)), this, SLOT(UserList_Remove(QString)));
+    connect(this->scrollback, SIGNAL(Event_UserRemoved(QString, bool)), this, SLOT(UserList_Remove(QString, bool)));
     connect(this->scrollback, SIGNAL(Event_InsertText(ScrollbackItem)), this, SLOT(_insertText_(ScrollbackItem)));
     connect(this->scrollback, SIGNAL(Event_Closed()), this, SLOT(OnClosed()));
+    connect(this->scrollback, SIGNAL(Event_UserListBulkDone()), this, SLOT(OnFinishSortBulk()));
     connect(this->scrollback, SIGNAL(Event_UserRefresh(libircclient::User*)), this, SLOT(UserList_Refresh(libircclient::User*)));
     connect(this->scrollback, SIGNAL(Event_StateModified()), this, SLOT(OnState()));
     connect(this->textEdit, SIGNAL(Event_Link(QString)), this, SLOT(OnLink(QString)));
@@ -230,9 +231,9 @@ void ScrollbackFrame::_insertText_(ScrollbackItem item)
     }
 }
 
-void ScrollbackFrame::UserList_Insert(libircclient::User *ux)
+void ScrollbackFrame::UserList_Insert(libircclient::User *ux, bool bulk)
 {
-    this->userFrame->InsertUser(ux);
+    this->userFrame->InsertUser(ux, bulk);
 }
 
 void ScrollbackFrame::UserList_Refresh(libircclient::User *ux)
@@ -245,7 +246,7 @@ void ScrollbackFrame::OnState()
     this->UpdateColor();
 }
 
-void ScrollbackFrame::UserList_Remove(QString user)
+void ScrollbackFrame::UserList_Remove(QString user, bool bulk)
 {
     this->userFrame->RemoveUser(user);
 }
@@ -258,6 +259,11 @@ void ScrollbackFrame::UserList_Rename(QString old, libircclient::User *us)
 void ScrollbackFrame::OnDead()
 {
     this->UpdateIcon();
+}
+
+void ScrollbackFrame::OnFinishSortBulk()
+{
+    this->userFrame->Sort();
 }
 
 void ScrollbackFrame::OnLink(QString url)
