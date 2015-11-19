@@ -10,6 +10,8 @@
 
 // Copyright (c) Petr Bena 2015
 
+/*
+
 #include "databasexml.h"
 #include "security.h"
 #include "user.h"
@@ -42,4 +44,6 @@ void DatabaseXML::SetConfiguration(user_id_t user, QHash<QString, QVariant> data
 {
 
 }
+
+*/
 

@@ -66,12 +66,15 @@ namespace GrumpyIRC
             void StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem *item);
             void StoreUser(User *item);
             void UpdateUser(User *user);
+            void ClearScrollback(User *owner, Scrollback *sx);
+            void RemoveScrollback(User *owner, Scrollback *sx);
             QString GetPath();
             bool Evaluate(int data);
             qint64 LastRow();
             bool ExecuteNonQuery(QString sql);
             SqlResult *ExecuteQuery(QString sql);
             SqlResult *ExecuteQuery_Bind(QString sql, QString parameter);
+            SqlResult *ExecuteQuery_Bind(QString sql, QList<QVariant> parameters);
             SqlResult *ExecuteQuery_Bind(QString sql, QStringList parameters);
             int GetLastUserID();
             QString LastStatement;

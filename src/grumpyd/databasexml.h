@@ -13,6 +13,8 @@
 #ifndef DATABASEXML_H
 #define DATABASEXML_H
 
+/*
+
 #include <QtXml>
 #include "databasebackend.h"
 
@@ -29,5 +31,7 @@ namespace GrumpyIRC
             void SetConfiguration(user_id_t user, QHash<QString, QVariant> data);
     };
 }
+
+*/
 
 #endif // DATABASEXML_H

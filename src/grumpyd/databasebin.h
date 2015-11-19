@@ -15,7 +15,7 @@
 
 #include "databasebackend.h"
 #include <QString>
-
+/*
 namespace GrumpyIRC
 {
     class DatabaseBin : public DatabaseBackend
@@ -34,5 +34,6 @@ namespace GrumpyIRC
             QString getDFPath();
     };
 }
+*/
 
 #endif // DATABASEBIN_H

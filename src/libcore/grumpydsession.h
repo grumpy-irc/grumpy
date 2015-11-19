@@ -30,6 +30,13 @@
 #define GRUMPY_UL_UPDATE 3
 #define GRUMPY_UL_REMOVE 4
 
+#define GP_EALREADYLOGGEDIN      -1
+#define GP_EINVALIDLOGINPARAMS   -2
+#define GP_ENOSERVER             -3
+#define GP_ENETWORKNOTFOUND      -4
+#define GP_ESCROLLBACKNOTFOUND   -5
+#define GP_ESSLHANDSHAKEFAILED   -20
+
 #define GP_CMD_HELLO                        1 //"HELLO"
 #define GP_CMD_SERVER                       2 //"SERVER"
 #define GP_CMD_NETWORK_INFO                 3 //"NETWORK_INFO"
@@ -61,6 +68,7 @@
 #define GP_CMD_REGISTER                    23
 #define GP_CMD_INIT                        24
 #define GP_CMD_RECONNECT                   25
+#define GP_CMD_REMOVE                      26
 
 namespace libirc
 {
@@ -92,27 +100,27 @@ namespace GrumpyIRC
 
             GrumpydSession(Scrollback *System, QString Hostname, QString UserName, QString Pass, int Port = GP_DEFAULT_PORT, bool ssl = false);
             virtual ~GrumpydSession();
+            libircclient::Channel *GetChannel(Scrollback *window);
+            Scrollback *GetScrollback(scrollback_id_t original_id);
+            IRCSession *GetSessionFromWindow(Scrollback *scrollback);
             Scrollback *GetSystemWindow();
+            QList<QString> GetChannels(Scrollback *window);
+            SessionType GetType();
+            libircclient::Network *GetNetwork(Scrollback *window = NULL);
             virtual void Open(libirc::ServerAddress server);
             bool IsConnected() const;
             void SendMessage(Scrollback *window, QString text);
-            libircclient::Network *GetNetwork(Scrollback *window = NULL);
             void SendRaw(Scrollback *window, QString raw);
-            SessionType GetType();
             void SendAction(Scrollback *window, QString text);
-            void RequestRemove(Scrollback *window);
-            QList<QString> GetChannels(Scrollback *window);
-            void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete);
-            void RequestPart(Scrollback *window);
-            libircclient::Channel *GetChannel(Scrollback *window);
-            Scrollback *GetScrollback(scrollback_id_t original_id);
             void SendNotice(Scrollback *window, QString text);
             void SendProtocolCommand(unsigned int command, QHash<QString, QVariant> parameters);
-            void RequestBL(Scrollback *window, scrollback_id_t from, unsigned int size);
             IRCSession *GetSession(unsigned int nsid);
             QString GetLocalUserModeAsString(Scrollback *window);
+            void RequestRemove(Scrollback *window);
+            void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete);
+            void RequestPart(Scrollback *window);
+            void RequestBL(Scrollback *window, scrollback_id_t from, unsigned int size);
             void RequestReconnect(Scrollback *window);
-            IRCSession *GetSessionFromWindow(Scrollback *scrollback);
             void Connect();
             libircclient::User *GetSelfNetworkID(Scrollback *window);
             unsigned long long GetCompressedBytesRcvd();
@@ -142,7 +150,10 @@ namespace GrumpyIRC
             void processChannelResync(QHash<QString, QVariant> hash);
             void processSResync(QHash<QString, QVariant> parameters);
             void processPSResync(QHash<QString, QVariant> parameters);
+            void freememory();
             void closeError(QString error);
+            QDateTime syncInit;
+            bool syncing;
             libgp::GP *gp;
             //! Irc sessions associated with their ROOT window so that we can figure out the network just from parent window
             QHash<Scrollback*, IRCSession*> sessionList;

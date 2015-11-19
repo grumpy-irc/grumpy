@@ -14,6 +14,8 @@
 #include "../libcore/ircsession.h"
 #include "../libcore/networksession.h"
 #include "../libcore/grumpydsession.h"
+#include "databasebackend.h"
+#include "grumpyd.h"
 #include "virtualscrollback.h"
 #include "user.h"
 #include "session.h"
@@ -78,10 +80,45 @@ void VirtualScrollback::SetOwner(User *user, bool restored)
 
 void VirtualScrollback::InsertText(ScrollbackItem item)
 {
-    Scrollback::InsertText(item);
+    //Scrollback::InsertText(item);
+
+    //////////////////////////////////////////////////////////////////
+    // Override of original function
+    //
+    // We need to do this nasty thing so that we get the item ID which
+    // can't normally be retrieved because we are passing the copy of
+    // item instead of pointer
+    //
+    //! \todo Fix this crap
+    //////////////////////////////////////////////////////////////////
+    item.SetID(this->_lastItemID++);
+    this->_items.append(item);
+    if (!this->IgnoreState)
+    {
+        switch (item.GetType())
+        {
+            case ScrollbackItemType_Act:
+            case ScrollbackItemType_Notice:
+            case ScrollbackItemType_Message:
+                this->SetState(ScrollbackState_UnreadMessages);
+                break;
+            case ScrollbackItemType_Kick:
+            case ScrollbackItemType_Nick:
+            case ScrollbackItemType_Part:
+            case ScrollbackItemType_Quit:
+            case ScrollbackItemType_System:
+            case ScrollbackItemType_Topic:
+                this->SetState(ScrollbackState_UnreadSystem);
+                break;
+        }
+    }
+    emit Event_InsertText(item);
+    //////////////////////////////////////////////////////////////////
+
     // let's check if this window belongs to a user which has clients
     if (!this->owner)
         throw new Exception("VirtualScrollback NULL owner", BOOST_CURRENT_FUNCTION);
+    Grumpyd::GetBackend()->StoreItem(this->owner, this, &item);
     Session * xx = this->owner->GetAnyGPSession();
     if (!xx)
         return;

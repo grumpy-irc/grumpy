@@ -155,6 +155,16 @@ libircclient::Network *IRCSession::GetNetwork(Scrollback *window)
     return this->network;
 }
 
+QList<Scrollback *> IRCSession::GetScrollbacks()
+{
+    QList<Scrollback*> sx;
+    // Fetch all windows we manage
+    sx.append(this->users.values());
+    sx.append(this->systemWindow);
+    sx.append(this->channels.values());
+    return sx;
+}
+
 unsigned int IRCSession::GetSID()
 {
     return this->SID;

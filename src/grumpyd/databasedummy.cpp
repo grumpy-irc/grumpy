@@ -46,3 +46,13 @@ void DatabaseDummy::SetConfiguration(user_id_t user, QHash<QString, QVariant> da
 
 }
 
+void DatabaseDummy::RemoveScrollback(User *owner, Scrollback *sx)
+{
+
+}
+
+void DatabaseDummy::StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem *item)
+{
+
+}
+

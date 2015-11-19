@@ -12,13 +12,13 @@
 
 #include <QFile>
 #include <QSslSocket>
+#include <QDir>
+#include <QCoreApplication>
 #include "grumpyd.h"
 #include "corewrapper.h"
 #include "grumpyconf.h"
-#include "databasebin.h"
 #include "databasedummy.h"
 #include "databaselite.h"
-#include "databasexml.h"
 #include "sleeper.h"
 #include "listener.h"
 #include "../libcore/core.h"
@@ -99,12 +99,10 @@ static DatabaseBackend *InstantiateStorage(QString type)
 {
     if (type == "DatabaseDummy")
         return new DatabaseDummy();
-    else if (type == "DatabaseXML")
-        return new DatabaseXML();
     else if (type == "DatabaseLite")
         return new DatabaseLite();
     else
-        return new DatabaseBin();
+        throw new Exception("Unknown database: " + type, BOOST_CURRENT_FUNCTION);
 }
 
 void Grumpyd::Main()

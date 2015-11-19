@@ -33,6 +33,7 @@ CREATE TABLE scrollbacks
     "user_id" INTEGER NOT NULL,
     "parent_id" INTEGER,
     "target" TEXT NOT NULL,
+    "last_item" INTEGER NOT NULL,
     "type" INTEGER NOT NULL,
     "virtual_state" INTEGER NOT NULL
 );
@@ -55,6 +56,7 @@ CREATE TABLE networks
 CREATE TABLE scrollback_items
 (
     "id" INTEGER PRIMARY KEY NOT NULL,
+    "item_id" INTEGER NOT NULL,
     "user_id" INTEGER NOT NULL,
     "scrollback_id" INTEGER NOT NULL,
     "date" NUMERIC NOT NULL,

@@ -10,6 +10,7 @@
 
 // Copyright (c) Petr Bena 2015
 
+/*
 #include <QFile>
 #include <QDir>
 #include "../libcore/exception.h"
@@ -54,3 +55,4 @@ QString DatabaseBin::getDFPath()
     return path;
 }
 
+*/

@@ -215,6 +215,7 @@ void Session::processIrcQuit(QHash<QString, QVariant> parameters)
         return;
     }
     irc->RequestDisconnect(NULL, parameters["reason"].toString(), false);
+    this->SendToEverySession(GP_CMD_IRC_QUIT, parameters);
 }
 
 void Session::processMessage(QHash<QString, QVariant> parameters)
@@ -335,6 +336,9 @@ void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
     } else if (text == GP_CMD_REQUEST_ITEMS)
     {
         this->processRequest(parameters);
+    } else if (text == GP_CMD_REMOVE)
+    {
+        this->processRemove(parameters);
     } else if (text == GP_CMD_INIT)
     {
         this->processSetup(parameters);
@@ -439,4 +443,30 @@ void Session::processSetup(QHash<QString, QVariant> parameters)
     QHash<QString, QVariant> result;
     result.insert("done", QVariant(true));
     this->protocol->SendProtocolCommand(GP_CMD_INIT, result);
+}
+
+void Session::processRemove(QHash<QString, QVariant> parameters)
+{
+    if (!this->IsAuthorized(PRIVILEGE_USE_IRC))
+    {
+        this->PermissionDeny(GP_CMD_REMOVE);
+        return;
+    }
+
+    SyncableIRCSession* irc = this->loggedUser->GetSIRCSession(parameters["network_id"].toUInt());
+    if (!irc)
+    {
+        this->TransferError(GP_CMD_REMOVE, "Network not found :(", GP_ENETWORKNOTFOUND);
+        return;
+    }
+
+    // We need to figure out which window it is, if it's even here
+    Scrollback *scrollback = this->GetScrollback(parameters["scrollback_id"].toUInt());
+    if (!scrollback)
+    {
+        this->TransferError(GP_CMD_REMOVE, "Scrollback not found: " + QString::number(parameters["scrollback_id"].toUInt()), GP_ESCROLLBACKNOTFOUND);
+        return;
+    }
+
+
 }

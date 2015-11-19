@@ -83,6 +83,7 @@ namespace GrumpyIRC
             //! Retrieves a scrollback for given user, if it doesn't exist it will be created
             virtual Scrollback *GetScrollbackForUser(QString user);
             virtual libircclient::Network *GetNetwork(Scrollback *window = 0);
+            virtual QList<Scrollback*> GetScrollbacks();
             virtual unsigned int GetSID();
             virtual void Connect(libircclient::Network *Network);
             void SendMessage(Scrollback *window, QString text);

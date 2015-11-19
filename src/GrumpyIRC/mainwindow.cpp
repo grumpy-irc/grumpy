@@ -132,8 +132,8 @@ static int SystemCommand_Netstat(SystemCommand *command, CommandArgs command_arg
     sx->InsertText("Compressed bytes sent: " + QString::number(cs));
     if (cs > 0 && cr > 0)
     {
-        double ratio_rcvd = (((double)ur - (double)cr) / (double)cr) * 100;
-        double ratio_sent = (((double)us - (double)cs) / (double)cs) * 100;
+        double ratio_rcvd = (((double)cr - (double)ur) / (double)ur) * -100;
+        double ratio_sent = (((double)cs - (double)us) / (double)us) * -100;
         sx->InsertText("Compression ratio for rcvd: " + QString::number(ratio_rcvd));
         sx->InsertText("Compression ratio for sent: " + QString::number(ratio_sent));
     }
@@ -177,9 +177,7 @@ static int SystemCommand_Act(SystemCommand *command, CommandArgs command_args)
         return 1;
     }
     ScrollbackFrame *scrollback = MainWindow::Main->GetScrollbackManager()->GetCurrentScrollback();
-    if (!scrollback->GetSession() ||
-            !scrollback->GetSession()->IsConnected() ||
-            scrollback->GetScrollback()->GetType() == ScrollbackType_System)
+    if (!scrollback->GetSession() || !scrollback->GetSession()->IsConnected() || scrollback->GetScrollback()->GetType() == ScrollbackType_System)
     {
         GRUMPY_ERROR(QObject::tr("You can only use this command in channel or user windows of connected networks"));
         return 2;

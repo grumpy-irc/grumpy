@@ -38,7 +38,9 @@ GrumpydSession::GrumpydSession(Scrollback *System, QString Hostname, QString Use
     this->systemWindow->SetSession(this);
     this->gp->SetCompression(6);
     this->port = Port;
+    this->syncInit = QDateTime::currentDateTime();
     this->username = UserName;
+    this->syncing = false;
     this->password = Pass;
     this->SSL = ssl;
     GrumpydSession::Sessions_Lock.lock();
@@ -129,8 +131,16 @@ void GrumpydSession::RequestRemove(Scrollback *window)
     if (!window->IsDead())
         return;
 
-    // This is fairly complex, we can't remove window here and keep it in grumpyd, so we need to remotely request its removal
+    if (window == this->systemWindow)
+    {
+        // very funny. yep
+        return;
+    }
 
+    // This is fairly complex, we can't remove window here and keep it in grumpyd, so we need to remotely request its removal
+    QHash<QString, QVariant> parameters;
+    parameters.insert("scrollback_id", QVariant(window->GetOriginalID()));
+    this->SendProtocolCommand(GP_CMD_REMOVE, parameters);
 }
 
 QList<QString> GrumpydSession::GetChannels(Scrollback *window)
@@ -151,8 +161,11 @@ void GrumpydSession::RequestDisconnect(Scrollback *window, QString reason, bool 
         // User wants to disconnect whole grumpyd session
         this->systemWindow->SetDead(true);
         // flag every scrollback as dead
-        foreach(Scrollback *sx, this->scrollbackHash.values())
-            sx->SetDead(true);
+        foreach (IRCSession *session, this->sessionList.values())
+        {
+            foreach (Scrollback *window, session->GetScrollbacks())
+                window->SetDead(true);
+        }
         this->scrollbackHash.clear();
         this->gp->Disconnect();
         if (auto_delete)
@@ -330,12 +343,12 @@ void GrumpydSession::OnSslHandshakeFailure(QList<QSslError> errors, bool *ok)
 
 void GrumpydSession::OnDisconnect()
 {
-
+    this->closeError("Remote host closed the connection for unknown reasons");
 }
 
 void GrumpydSession::OnTimeout()
 {
-
+    this->closeError("Timed out");
 }
 
 void GrumpydSession::OnConnected()
@@ -405,8 +418,10 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVarian
         this->processChannel(parameters);
     } else if (text == GP_CMD_LOGIN_OK)
     {
+        this->syncing = true;
         this->systemWindow->InsertText("Synchronizing networks");
         this->gp->SendProtocolCommand(GP_CMD_NETWORK_INFO);
+        this->syncInit = QDateTime::currentDateTime();
     } else if (text == GP_CMD_SCROLLBACK_LOAD_NEW_ITEM)
     {
         this->processNewScrollbackItem(parameters);
@@ -425,6 +440,15 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVarian
     } else if (text == GP_CMD_REQUEST_ITEMS)
     {
         this->processRequest(parameters);
+    } else if (text == GP_CMD_IRC_QUIT)
+    {
+        IRCSession *session = this->GetSession(parameters["network_id"].toUInt());
+        if (!session)
+            return;
+
+        // Let's flag everything disconnected
+        foreach (Scrollback *sb, session->GetScrollbacks())
+            sb->SetDead(true);
     } else if (text == GP_CMD_PERMDENY)
     {
         QString source = "unknown request";
@@ -475,7 +499,14 @@ void GrumpydSession::processNetwork(QHash<QString, QVariant> hash)
         session->GetSystemWindow()->SetSession(this);
         this->sessionList.insert(session->GetSystemWindow(), session);
     }
-    this->systemWindow->InsertText("Synced networks: " + QString::number(session_list.count()));
+    if (this->syncing)
+    {
+        this->systemWindow->InsertText("Networks were synced, " + QString::number(session_list.count()) +
+                                       " networks synced in " +
+                                       QString::number(this->syncInit.secsTo(QDateTime::currentDateTime())) +
+                                       " seconds.");
+        this->syncing = false;
+    }
 }
 
 void GrumpydSession::processULSync(QHash<QString, QVariant> hash)
@@ -681,6 +712,11 @@ void GrumpydSession::processPSResync(QHash<QString, QVariant> parameters)
     }
     // let's resync most of the stuff
     origin->Resync(&scrollback);
+}
+
+void GrumpydSession::freememory()
+{
+
 }
 
 void GrumpydSession::closeError(QString error)
