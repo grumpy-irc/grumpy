@@ -94,6 +94,8 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     QAction *menuAuto = NULL;
     QAction *menuSettings = NULL;
     QAction *menuPart = NULL;
+    QAction *menuJoin = NULL;
+    QAction *menuReconnect = NULL;
     QAction *menuDisconnect = NULL;
     QAction *menuSniffer = NULL;
 
@@ -118,6 +120,12 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
 
     if (wx->IsChannel())
     {
+        Menu.addSeparator();
+        if (wx->IsDead())
+        {
+            menuJoin = new QAction(QObject::tr("Join"), &Menu);
+            Menu.addAction(menuJoin);
+        }
         menuPart = new QAction(QObject::tr("Part"), &Menu);
         // Check if we can part the chan
         if (wx->IsDead())
@@ -126,8 +134,15 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     }
     if (wx->IsNetwork())
     {
+        Menu.addSeparator();
+        if (wx->IsDead())
+        {
+            menuReconnect = new QAction(QObject::tr("Reconnect"), &Menu);
+            Menu.addAction(menuReconnect);
+        }
         menuDisconnect = new QAction(QObject::tr("Disconnect"), &Menu);
         Menu.addAction(menuDisconnect);
+        menuDisconnect->setEnabled(!wx->IsDead());
         menuSniffer = new QAction(QObject::tr("Network sniffer"), &Menu);
         Menu.addAction(menuSniffer);
     }
@@ -155,6 +170,12 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     } else if (selectedItem == menuSniffer)
     {
         this->sniffer(wx);
+    } else if (selectedItem == menuJoin)
+    {
+        wx->RequestJoin();
+    } else if (selectedItem == menuReconnect)
+    {
+        wx->Reconnect();
     }
 }
 

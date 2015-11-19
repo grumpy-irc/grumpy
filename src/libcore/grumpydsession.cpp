@@ -254,6 +254,23 @@ QString GrumpydSession::GetLocalUserModeAsString(Scrollback *window)
     return ircs->GetLocalUserModeAsString(window);
 }
 
+void GrumpydSession::RequestReconnect(Scrollback *window)
+{
+    if (window == this->systemWindow)
+    {
+        // Reconnect grumpyd
+
+        return;
+    }
+
+    IRCSession *ircs = this->GetSessionFromWindow(window);
+    if (!ircs)
+        return;
+    QHash<QString, QVariant> hash;
+    hash.insert("network_id", QVariant(ircs->GetSID()));
+    this->SendProtocolCommand(GP_CMD_RECONNECT, hash);
+}
+
 IRCSession *GrumpydSession::GetSessionFromWindow(Scrollback *scrollback)
 {
     if (this->sessionList.contains(scrollback))

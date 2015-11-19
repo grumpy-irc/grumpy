@@ -60,6 +60,7 @@
 #define GP_CMD_REQUEST_ITEMS               22 //"REQUEST_ITEMS"
 #define GP_CMD_REGISTER                    23
 #define GP_CMD_INIT                        24
+#define GP_CMD_RECONNECT                   25
 
 namespace libirc
 {
@@ -110,6 +111,7 @@ namespace GrumpyIRC
             void RequestBL(Scrollback *window, scrollback_id_t from, unsigned int size);
             IRCSession *GetSession(unsigned int nsid);
             QString GetLocalUserModeAsString(Scrollback *window);
+            void RequestReconnect(Scrollback *window);
             IRCSession *GetSessionFromWindow(Scrollback *scrollback);
             void Connect();
             libircclient::User *GetSelfNetworkID(Scrollback *window);

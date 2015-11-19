@@ -78,6 +78,8 @@ namespace GrumpyIRC
             void EnableState(bool enable);
             void RequestPart();
             void ToggleSecure();
+            void RequestJoin();
+            void Reconnect();
             void RequestDisconnect();
             void RequestMore(unsigned int count);
             void RefreshHtml();

@@ -130,8 +130,6 @@ static QString ItemToString(ScrollbackItem item, bool highlighted)
     QString user = item.GetUser().GetNick();
     bool system = false;
     QColor color = Skin::GetDefault()->TextColor;
-    //format_string.replace("$time", item.GetTime().toString());
-    //QString result;
     switch (item.GetType())
     {
         case ScrollbackItemType_Act:
@@ -507,6 +505,18 @@ void ScrollbackFrame::RequestPart()
 void ScrollbackFrame::ToggleSecure()
 {
     this->inputBox->Secure();
+}
+
+void ScrollbackFrame::RequestJoin()
+{
+    if (this->GetSession() && this->IsChannel())
+        this->GetSession()->SendRaw(this->GetScrollback(), "JOIN " + this->GetScrollback()->GetTarget());
+}
+
+void ScrollbackFrame::Reconnect()
+{
+    if (this->GetSession())
+        this->GetSession()->RequestReconnect(this->GetScrollback());
 }
 
 void ScrollbackFrame::RequestDisconnect()

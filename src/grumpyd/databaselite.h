@@ -17,6 +17,8 @@
 
 #ifdef GRUMPYD_SQLITE
 
+#include <QMutex>
+
 struct sqlite3;
 
 namespace GrumpyIRC
@@ -60,6 +62,8 @@ namespace GrumpyIRC
             void LoadUsers();
             QHash<QString, QVariant> GetConfiguration(user_id_t user);
             void SetConfiguration(user_id_t user, QHash<QString, QVariant> data);
+            void StoreScrollback(User *owner, Scrollback *sx);
+            void StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem *item);
             void StoreUser(User *item);
             void UpdateUser(User *user);
             QString GetPath();
@@ -73,6 +77,7 @@ namespace GrumpyIRC
             QString LastStatement;
             QString LastError;
         private:
+            QMutex master_lock;
             int last_user_id;
             sqlite3 *database;
             QString datafile;

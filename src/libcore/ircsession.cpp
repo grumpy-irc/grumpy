@@ -375,6 +375,19 @@ void IRCSession::RequestRemove(Scrollback *window)
     this->rmWindow(window);
 }
 
+void IRCSession::RequestReconnect(Scrollback *window)
+{
+    Q_UNUSED(window);
+    if (this->IsConnected())
+        return;
+
+    if (!this->network)
+        throw new Exception("You can't use this reconnect method for a network that never was connected", BOOST_CURRENT_FUNCTION);
+
+    this->systemWindow->SetDead(false);
+    this->network->Reconnect();
+}
+
 libircclient::Channel *IRCSession::GetChannel(Scrollback *window)
 {
     if (!this->network)
@@ -448,13 +461,20 @@ void IRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
     if (channel->GetName().isEmpty())
         throw new GrumpyIRC::Exception("Invalid channel name", BOOST_CURRENT_FUNCTION);
     QString ln = channel->GetName().toLower();
+    // Find a scrollback for this channel somewhere ;)
+    Scrollback *window;
     if (this->channels.contains(ln))
-        throw new GrumpyIRC::Exception("This window name already exists", BOOST_CURRENT_FUNCTION);
-    // we just joined a new channel, let's add a scrollback for it
-    Scrollback *window = Core::GrumpyCore->NewScrollback(this->systemWindow, channel->GetName(), ScrollbackType_Channel);
-    window->SetSession(this);
-    emit this->Event_ScrollbackIsOpen(window);
-    this->channels.insert(ln, window);
+    {
+        window = this->channels[ln];
+        window->SetDead(false);
+    }
+    else
+    {
+        window = Core::GrumpyCore->NewScrollback(this->systemWindow, channel->GetName(), ScrollbackType_Channel);
+        emit this->Event_ScrollbackIsOpen(window);
+        this->channels.insert(ln, window);
+        window->SetSession(this);
+    }
 	// Request some information about users in the channel
     if (!this->retrievingWho.contains(ln))
         this->retrievingWho.append(ln);

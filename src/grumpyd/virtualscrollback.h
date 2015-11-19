@@ -33,7 +33,7 @@ namespace GrumpyIRC
             User *GetOwner() const;
             void Sync();
             void PartialSync();
-            void SetOwner(User *user);
+            void SetOwner(User *user, bool restored = false);
             void InsertText(ScrollbackItem item);
 
         private:

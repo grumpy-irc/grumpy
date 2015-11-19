@@ -70,9 +70,10 @@ void VirtualScrollback::PartialSync()
     session->SendToEverySession(GP_CMD_SCROLLBACK_PARTIAL_RESYNC, parameters);
 }
 
-void VirtualScrollback::SetOwner(User *user)
+void VirtualScrollback::SetOwner(User *user, bool restored)
 {
     this->owner = user;
+    this->owner->RegisterScrollback(this, restored);
 }
 
 void VirtualScrollback::InsertText(ScrollbackItem item)

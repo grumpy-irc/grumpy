@@ -13,6 +13,8 @@
 #include "corewrapper.h"
 #include "user.h"
 #include "security.h"
+#include "databasebackend.h"
+#include "grumpyd.h"
 #include "userconfiguration.h"
 #include "../libcore/scrollback.h"
 #include "../libcore/core.h"
@@ -72,6 +74,15 @@ void User::RemoveSession(Session *sx)
 void User::SetRole(Role *rx)
 {
     this->role = rx;
+}
+
+void User::RegisterScrollback(Scrollback *scrollback, bool skip)
+{
+    // We call this same function when recovering the user from db
+    // in that case we must not store it as it's already in there
+    if (!skip)
+        Grumpyd::GetBackend()->StoreScrollback(this, scrollback);
+    this->scrollbacks.append(scrollback);
 }
 
 SyncableIRCSession *User::ConnectToIRCServer(libirc::ServerAddress info)

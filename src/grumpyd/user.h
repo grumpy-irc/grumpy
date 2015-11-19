@@ -21,6 +21,7 @@
 
 namespace GrumpyIRC
 {
+    class Scrollback;
     class Session;
     class UserConf;
     class Role;
@@ -54,9 +55,11 @@ namespace GrumpyIRC
             Role *GetRole();
             user_id_t GetID();
             void SetRole(Role *rx);
+            void RegisterScrollback(Scrollback *scrollback, bool skip = false);
             QString DefaultNick;
 
         private:
+            QList<Scrollback*> scrollbacks;
             user_id_t id;
             Role *role;
             UserConf *conf;

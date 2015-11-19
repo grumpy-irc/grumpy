@@ -96,6 +96,7 @@ namespace GrumpyIRC
             void SendAction(Scrollback *window, QString text);
             void SendRaw(Scrollback *window, QString raw);
             void RequestRemove(Scrollback *window);
+            void RequestReconnect(Scrollback *window);
             libircclient::Channel *GetChannel(Scrollback *window);
             void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete);
             void RequestPart(Scrollback *window);

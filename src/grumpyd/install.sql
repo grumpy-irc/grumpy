@@ -29,10 +29,28 @@ CREATE INDEX idx_privilege_name ON privileges(name);
 CREATE TABLE scrollbacks
 (
     "id" INTEGER PRIMARY KEY NOT NULL,
-    "user_id" INTEGER
+    "original_id" INTEGER NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "parent_id" INTEGER,
+    "target" TEXT NOT NULL,
+    "type" INTEGER NOT NULL,
+    "virtual_state" INTEGER NOT NULL
 );
 
 CREATE INDEX idx_scrollback_user_id ON scrollbacks(user_id);
+
+CREATE TABLE networks
+(
+    "id" INTEGER PRIMARY KEY NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "hostname" TEXT,
+    "port" INTEGER NOT NULL,
+    "ssl" INTEGER NOT NULL,
+    "nick" TEXT NOT NULL,
+    "ident" TEXT NOT NULL,
+    "system_id" INTEGER NOT NULL,
+    "password" TEXT
+);
 
 CREATE TABLE scrollback_items
 (

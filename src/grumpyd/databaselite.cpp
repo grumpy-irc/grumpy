@@ -163,6 +163,23 @@ void DatabaseLite::SetConfiguration(user_id_t user, QHash<QString, QVariant> dat
 
 }
 
+void DatabaseLite::StoreScrollback(User *owner, Scrollback *sx)
+{
+    QString sql = "INSERT INTO scrollbacks (original_id, user_id, target, type, virtual_state) VALUES (?,?,?,?,?);";
+    SqlResult *result;
+    QStringList params;
+    params << QString::number(sx->GetOriginalID())
+           << QString::number(owner->GetID())
+           << sx->GetTarget()
+           << QString::number(static_cast<int>(sx->GetType()))
+           << QString::number(static_cast<int>(sx->GetState()));
+    result = this->ExecuteQuery_Bind(sql, params);
+    if (result->InError)
+        throw new Exception("Unable to insert scrollback to db: " + this->LastError, BOOST_CURRENT_FUNCTION);
+
+    delete result;
+}
+
 void DatabaseLite::StoreUser(User *item)
 {
     QStringList Parameters;
@@ -220,13 +237,37 @@ bool DatabaseLite::ExecuteNonQuery(QString sql)
 {
     char *error;
     this->LastStatement = sql;
+    this->master_lock.lock();
     int x = sqlite3_exec(this->database, sql.toUtf8().constData(), NULL, NULL, &error);
+    this->master_lock.unlock();
     if (!this->Evaluate(x))
     {
         this->LastError = QString(error);
         return false;
     }
     return true;
+}
+
+void DatabaseLite::StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem *item)
+{
+    SqlResult *result;
+    QStringList info;
+
+    info << QString::number(owner->GetID())
+         << QString::number(scrollback->GetOriginalID())
+         << QString::number(item->GetTime().toMSecsSinceEpoch())
+         << QString::number(static_cast<int>(item->GetType()))
+         << item->GetUser().GetNick()
+         << item->GetUser().GetIdent()
+         << item->GetUser().GetHost()
+         << item->GetText();
+
+    QString sql = "INSERT INTO scrollback_items (user_id, scrollback_id, date, type, nick, ident, host, text) VALUES (?,?,?,?,?,?,?,?);";
+    result = this->ExecuteQuery_Bind(sql, info);
+    if (result->InError)
+        throw new Exception("Unable to insert data to db: " + this->LastError, BOOST_CURRENT_FUNCTION);
+
+    delete result;
 }
 
 SqlResult *DatabaseLite::ExecuteQuery(QString sql)
@@ -247,6 +288,7 @@ SqlResult *DatabaseLite::ExecuteQuery_Bind(QString sql, QStringList parameters)
     sqlite3_stmt *statement;
     int current_parameter = 1;
     this->LastStatement = sql;
+    this->master_lock.lock();
     int x = sqlite3_prepare_v2(this->database, sql.toUtf8().constData(), sql.length() + 1, &statement, NULL);
     if (!this->Evaluate(x))
         goto on_error;
@@ -277,6 +319,7 @@ SqlResult *DatabaseLite::ExecuteQuery_Bind(QString sql, QStringList parameters)
                     row.append(QVariant(StringFromUnsignedChar(sqlite3_column_text(statement, value))));
                     break;
                 default:
+                    this->master_lock.unlock();
                     throw new Exception("Unknown data type: " + QString::number(t), BOOST_CURRENT_FUNCTION);
             }
             value++;
@@ -290,12 +333,14 @@ SqlResult *DatabaseLite::ExecuteQuery_Bind(QString sql, QStringList parameters)
         goto on_error;
 
     sqlite3_finalize(statement);
+    this->master_lock.unlock();
     return result;
 
 on_error:
     sqlite3_finalize(statement);
     this->LastError = QString(sqlite3_errmsg(this->database));
     result->InError = true;
+    this->master_lock.unlock();
     return result;
 }
 
