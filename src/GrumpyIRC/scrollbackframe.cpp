@@ -189,6 +189,11 @@ static QString ItemToString(ScrollbackItem item, bool highlighted)
         case ScrollbackItemType_SystemWarning:
             color = Skin::GetDefault()->Warning;
             break;
+        case ScrollbackItemType_Topic:
+            system = true;
+            format_string.replace("$string", CONF->GetActionFormat());
+            text = "changed topic to: " + item.GetText();
+            break;
     }
     //format_string.replace("$string", result);
     if (highlighted)

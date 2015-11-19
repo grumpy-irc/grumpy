@@ -123,8 +123,22 @@ static int SystemCommand_Netstat(SystemCommand *command, CommandArgs command_arg
     if (!sx->GetSession() || !Generic::IsGrumpy(sx))
         return 2;
     GrumpydSession *session = (GrumpydSession*)sx->GetSession();
-    sx->InsertText("Bytes rcvd:" + QString::number(session->GetBytesRcvd()));
-    sx->InsertText("Bytes sent:" + QString::number(session->GetBytesSent()));
+    unsigned long long cr, cs, ur, us;
+    cr = session->GetCompressedBytesRcvd();
+    cs = session->GetCompressedBytesSent();
+    ur = session->GetBytesRcvd();
+    us = session->GetBytesSent();
+    sx->InsertText("Compressed bytes rcvd: " + QString::number(cr));
+    sx->InsertText("Compressed bytes sent: " + QString::number(cs));
+    if (cs > 0 && cr > 0)
+    {
+        double ratio_rcvd = (((double)ur - (double)cr) / (double)cr) * 100;
+        double ratio_sent = (((double)us - (double)cs) / (double)cs) * 100;
+        sx->InsertText("Compression ratio for rcvd: " + QString::number(ratio_rcvd));
+        sx->InsertText("Compression ratio for sent: " + QString::number(ratio_sent));
+    }
+    sx->InsertText("Bytes rcvd:" + QString::number(ur));
+    sx->InsertText("Bytes sent:" + QString::number(us));
     return 0;
 }
 

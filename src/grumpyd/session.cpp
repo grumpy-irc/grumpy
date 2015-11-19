@@ -78,6 +78,7 @@ Session::Session(qintptr socket_ptr, bool ssl)
         }
     }
     this->protocol = new libgp::GP(socket);
+    this->protocol->SetCompression(6);
     this->SessionState = State_Login;
     connect(this->protocol, SIGNAL(Event_IncomingCommand(gp_command_t,QHash<QString,QVariant>)), this, SLOT(OnCommand(gp_command_t,QHash<QString,QVariant>)));
     connect(this->protocol, SIGNAL(Event_Disconnected()), this, SLOT(OnDisconnected()));

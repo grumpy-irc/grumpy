@@ -36,6 +36,7 @@ GrumpydSession::GrumpydSession(Scrollback *System, QString Hostname, QString Use
     connect(this->gp, SIGNAL(Event_IncomingCommand(gp_command_t,QHash<QString,QVariant>)), this, SLOT(OnIncomingCommand(gp_command_t,QHash<QString,QVariant>)));
     connect(this->gp, SIGNAL(Event_SslHandshakeFailure(QList<QSslError>,bool*)), this, SLOT(OnSslHandshakeFailure(QList<QSslError>,bool*)));
     this->systemWindow->SetSession(this);
+    this->gp->SetCompression(6);
     this->port = Port;
     this->username = UserName;
     this->password = Pass;
@@ -298,6 +299,16 @@ libircclient::User *GrumpydSession::GetSelfNetworkID(Scrollback *window)
         return NULL;
 
     return ircs->GetSelfNetworkID(window);
+}
+
+unsigned long long GrumpydSession::GetCompressedBytesRcvd()
+{
+    return this->gp->GetCompBytesRcvd();
+}
+
+unsigned long long GrumpydSession::GetCompressedBytesSent()
+{
+    return this->gp->GetCompBytesSent();
 }
 
 unsigned long long GrumpydSession::GetBytesRcvd()

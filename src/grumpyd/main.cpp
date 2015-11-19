@@ -106,6 +106,7 @@ int main(int argc, char *argv[])
 {
     try
     {
+        QCoreApplication a(argc, argv);
         QCoreApplication::setApplicationName("grumpyd");
         // This is just a wrapper around libcore configuration system so that we can easily access some global config options
         CONF = new GrumpyIRC::GrumpyConf();
@@ -152,7 +153,6 @@ int main(int argc, char *argv[])
         GRUMPY_LOG("Grumpyd starting...");
         GrumpyIRC::Grumpyd *daemon = new GrumpyIRC::Grumpyd();
         QTimer::singleShot(0, daemon, SLOT(Main()));
-        QCoreApplication a(argc, argv);
         return a.exec();
     } catch (GrumpyIRC::Exception *exception)
     {

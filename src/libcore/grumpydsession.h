@@ -115,6 +115,8 @@ namespace GrumpyIRC
             IRCSession *GetSessionFromWindow(Scrollback *scrollback);
             void Connect();
             libircclient::User *GetSelfNetworkID(Scrollback *window);
+            unsigned long long GetCompressedBytesRcvd();
+            unsigned long long GetCompressedBytesSent();
             unsigned long long GetBytesRcvd();
             unsigned long long GetBytesSent();
 
