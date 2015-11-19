@@ -24,6 +24,7 @@
 #endif
 #define CONF GrumpyIRC::GrumpyConf::Conf
 
+#include "../libcore/definitions.h"
 #include <QVariant>
 
 namespace GrumpyIRC
