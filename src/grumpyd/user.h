@@ -21,6 +21,7 @@
 
 namespace GrumpyIRC
 {
+    class VirtualScrollback;
     class Scrollback;
     class Session;
     class UserConf;
@@ -38,6 +39,7 @@ namespace GrumpyIRC
              * \return
              */
             static User *Login(QString user, QString pw);
+            static User *GetUser(user_id_t uid);
 
             User(QString Name, QString Password, user_id_t User_ID);
             ~User();
@@ -45,21 +47,24 @@ namespace GrumpyIRC
             QString GetName() const;
             void RemoveSession(Session *sx);
             SyncableIRCSession *ConnectToIRCServer(libirc::ServerAddress info);
+            void RegisterSession(SyncableIRCSession *session);
             bool IsAuthorized(QString perm);
             QList<Session*> GetGPSessions() const;
             Session *GetAnyGPSession();
+            QList<VirtualScrollback*> GetScrollbacks();
             QString GetPassword() const;
+            VirtualScrollback *GetScrollback(scrollback_id_t id);
             SyncableIRCSession *GetSIRCSession(unsigned int sid);
             QList<SyncableIRCSession*> GetSIRCSessions();
             UserConf *GetConfiguration();
             Role *GetRole();
             user_id_t GetID();
             void SetRole(Role *rx);
-            void RegisterScrollback(Scrollback *scrollback, bool skip = false);
+            void RegisterScrollback(VirtualScrollback *scrollback, bool skip = false);
             QString DefaultNick;
 
         private:
-            QList<Scrollback*> scrollbacks;
+            QHash<scrollback_id_t, VirtualScrollback*> scrollbacks;
             user_id_t id;
             Role *role;
             UserConf *conf;

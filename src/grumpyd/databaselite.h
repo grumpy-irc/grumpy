@@ -60,15 +60,24 @@ namespace GrumpyIRC
             ~DatabaseLite();
             void LoadRoles();
             void LoadUsers();
+            void LoadSessions();
+            void LoadWindows();
+            void LoadText();
             QHash<QString, QVariant> GetConfiguration(user_id_t user);
             void SetConfiguration(user_id_t user, QHash<QString, QVariant> data);
             void StoreScrollback(User *owner, Scrollback *sx);
             void StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem *item);
+            void StoreNetwork(IRCSession *session);
             void StoreUser(User *item);
             void UpdateUser(User *user);
             void ClearScrollback(User *owner, Scrollback *sx);
+            void ClearScrollback(unsigned int id, unsigned int user_id);
+            void RemoveScrollback(unsigned int id);
+            void UpdateNetwork(IRCSession *session);
             void RemoveScrollback(User *owner, Scrollback *sx);
+            void UpdateRoles();
             QString GetPath();
+
             bool Evaluate(int data);
             qint64 LastRow();
             bool ExecuteNonQuery(QString sql);

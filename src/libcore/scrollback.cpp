@@ -82,6 +82,11 @@ scrollback_id_t Scrollback::GetOriginalID()
     return this->_original_id;
 }
 
+void Scrollback::SetOriginalID(scrollback_id_t sid)
+{
+    this->_original_id = sid;
+}
+
 ScrollbackType Scrollback::GetType() const
 {
     return this->type;

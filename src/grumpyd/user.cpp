@@ -16,7 +16,7 @@
 #include "databasebackend.h"
 #include "grumpyd.h"
 #include "userconfiguration.h"
-#include "../libcore/scrollback.h"
+#include "virtualscrollback.h"
 #include "../libcore/core.h"
 #include "syncableircsession.h"
 
@@ -36,6 +36,17 @@ User *User::Login(QString user, QString pw)
             else
                 return ux;
         }
+    }
+
+    return NULL;
+}
+
+User *User::GetUser(user_id_t uid)
+{
+    foreach (User *user, UserInfo)
+    {
+        if (user->GetID() == uid)
+            return user;
     }
 
     return NULL;
@@ -76,13 +87,15 @@ void User::SetRole(Role *rx)
     this->role = rx;
 }
 
-void User::RegisterScrollback(Scrollback *scrollback, bool skip)
+void User::RegisterScrollback(VirtualScrollback *scrollback, bool skip)
 {
     // We call this same function when recovering the user from db
     // in that case we must not store it as it's already in there
     if (!skip)
-        Grumpyd::GetBackend()->StoreScrollback(this, scrollback);
-    this->scrollbacks.append(scrollback);
+        Grumpyd::GetBackend()->StoreScrollback(this, (Scrollback*)scrollback);
+    if (this->scrollbacks.contains(scrollback->GetOriginalID()))
+        throw new Exception("This scrollback is already registered for user", BOOST_CURRENT_FUNCTION);
+    this->scrollbacks.insert(scrollback->GetOriginalID(), scrollback);
 }
 
 SyncableIRCSession *User::ConnectToIRCServer(libirc::ServerAddress info)
@@ -91,6 +104,11 @@ SyncableIRCSession *User::ConnectToIRCServer(libirc::ServerAddress info)
     SyncableIRCSession *session = SyncableIRCSession::Open(system_window, info, this);
     this->sessions.append(session);
     return session;
+}
+
+void User::RegisterSession(SyncableIRCSession *session)
+{
+    this->sessions.append(session);
 }
 
 bool User::IsAuthorized(QString perm)
@@ -145,8 +163,22 @@ Session *User::GetAnyGPSession()
     return this->sessions_gp.at(0);
 }
 
+QList<VirtualScrollback *> User::GetScrollbacks()
+{
+    return this->scrollbacks.values();
+}
+
 QString User::GetPassword() const
 {
     return this->password;
+}
+
+VirtualScrollback *User::GetScrollback(scrollback_id_t id)
+{
+    if (this->scrollbacks.contains(id))
+        return this->scrollbacks[id];
+
+    // There is no such a scrollback with this id
+    return NULL;
 }
 

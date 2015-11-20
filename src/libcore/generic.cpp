@@ -13,6 +13,7 @@
 #ifdef QT_GUI_LIB
 #include <QMessageBox>
 #endif
+#include <QDataStream>
 #include "generic.h"
 #include "networksession.h"
 #include "scrollback.h"
@@ -82,4 +83,20 @@ int Generic::MessageBox(QString title, QString message, GrumpyIRC::Generic::Mess
     // print to cout
 #endif
     return 0;
+}
+
+QByteArray Generic::VariantToByteArray(QVariant data)
+{
+    QByteArray result;
+    QDataStream stream(&result, QIODevice::ReadWrite);
+    stream << data;
+    return result;
+}
+
+QVariant Generic::VariantFromByteArray(QByteArray data)
+{
+    QDataStream stream(&data, QIODevice::ReadWrite);
+    QVariant result;
+    stream >> result;
+    return result;
 }

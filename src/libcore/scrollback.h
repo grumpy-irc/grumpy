@@ -132,6 +132,7 @@ namespace GrumpyIRC
             //! Original ID of this scrollback as it was on grumpy instance which created it
             //! synced ower network
             scrollback_id_t GetOriginalID();
+            virtual void SetOriginalID(scrollback_id_t sid);
             void SetMaxItemsSize(scrollback_id_t size);
             virtual void InsertText(QString text, ScrollbackItemType type = ScrollbackItemType_System);
             virtual void InsertText(ScrollbackItem item);

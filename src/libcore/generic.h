@@ -42,6 +42,8 @@ namespace GrumpyIRC
         LIBCORESHARED_EXPORT QStringList Trim(QStringList list);
         LIBCORESHARED_EXPORT bool IsGrumpy(Scrollback *window);
         LIBCORESHARED_EXPORT int MessageBox(QString title, QString message, MessageBox_Type type, QObject *parent = 0);
+        LIBCORESHARED_EXPORT QByteArray VariantToByteArray(QVariant data);
+        LIBCORESHARED_EXPORT QVariant VariantFromByteArray(QByteArray data);
     }
 }
 

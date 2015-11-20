@@ -22,6 +22,7 @@ namespace GrumpyIRC
     class User;
     class Scrollback;
     class Session;
+    class IRCSession;
     class ScrollbackItem;
 
     class DatabaseBackend
@@ -31,12 +32,17 @@ namespace GrumpyIRC
             virtual ~DatabaseBackend();
             virtual void LoadRoles()=0;
             virtual void LoadUsers()=0;
-            virtual void StoreUser(User *item);
-            virtual void UpdateUser(User *user);
+            virtual void LoadSessions()=0;
+            virtual void LoadWindows()=0;
+            virtual void LoadText()=0;
+            virtual void StoreUser(User *item)=0;
+            virtual void StoreNetwork(IRCSession *session)=0;
+            virtual void UpdateUser(User *user)=0;
             virtual void RemoveScrollback(User *owner, Scrollback *sx)=0;
-            virtual void StoreScrollback(User *owner, Scrollback *sx) {}
+            virtual void StoreScrollback(User *owner, Scrollback *sx)=0;
+            virtual void UpdateNetwork(IRCSession *session)=0;
             virtual void StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem *item)=0;
-            virtual void UpdateRoles();
+            virtual void UpdateRoles()=0;
             virtual QHash<QString, QVariant> GetConfiguration(user_id_t user)=0;
             virtual void SetConfiguration(user_id_t user, QHash<QString, QVariant> data)=0;
     };

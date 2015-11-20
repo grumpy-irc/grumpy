@@ -23,6 +23,7 @@ GrumpyConf::GrumpyConf()
 {
     this->StorageDummy = false;
     this->Init = false;
+    this->AutoFix = false;
     this->Daemon = false;
 }
 
@@ -51,6 +52,11 @@ unsigned int GrumpyConf::GetMaxLoadSize()
 QString GrumpyConf::GetNick()
 {
     return GCFG->GetValueAsString("nick", "GrumpyUser");
+}
+
+unsigned int GrumpyConf::GetMaxScrollbackSize()
+{
+    return GCFG->GetValueAsUInt("max_scrollback_size", 8000);
 }
 
 QString GrumpyConf::GetStorage()

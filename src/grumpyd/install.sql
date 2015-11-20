@@ -31,7 +31,7 @@ CREATE TABLE scrollbacks
     "id" INTEGER PRIMARY KEY NOT NULL,
     "original_id" INTEGER NOT NULL,
     "user_id" INTEGER NOT NULL,
-    "parent_id" INTEGER,
+    "parent" INTEGER,
     "target" TEXT NOT NULL,
     "last_item" INTEGER NOT NULL,
     "type" INTEGER NOT NULL,
@@ -43,14 +43,20 @@ CREATE INDEX idx_scrollback_user_id ON scrollbacks(user_id);
 CREATE TABLE networks
 (
     "id" INTEGER PRIMARY KEY NOT NULL,
+    "network_id" INTEGER NOT NULL,
     "user_id" INTEGER NOT NULL,
+    "name" TEXT,
     "hostname" TEXT,
     "port" INTEGER NOT NULL,
     "ssl" INTEGER NOT NULL,
     "nick" TEXT NOT NULL,
     "ident" TEXT NOT NULL,
     "system_id" INTEGER NOT NULL,
-    "password" TEXT
+    "password" TEXT,
+    "scrollback_list" TEXT,
+    "autoreconnect" INT NOT NULL,
+    "autoidentify" INT NOT NULL,
+    "autorejoin" INT NOT NULL
 );
 
 CREATE TABLE scrollback_items
@@ -64,9 +70,12 @@ CREATE TABLE scrollback_items
     "nick" TEXT,
     "ident" TEXT,
     "host" TEXT,
-    "text" TEXT
+    "text" TEXT,
+    "self" NUMERIC
 );
 
+CREATE INDEX idx_scrollback_item_scrollback_id ON scrollback_items(scrollback_id);
+CREATE INDEX idx_scrollback_item_single_id ON scrollback_items(item_id);
 CREATE INDEX idx_scrollback_item_user ON scrollback_items(user_id);
 
 CREATE TABLE settings

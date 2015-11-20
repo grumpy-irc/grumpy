@@ -42,8 +42,10 @@ namespace GrumpyIRC
             void SetNick(QString nick);
             unsigned int GetMaxLoadSize();
             QString GetNick();
+            unsigned int GetMaxScrollbackSize();
 
             bool Init;
+            bool AutoFix;
             QString PID;
             bool Daemon;
             bool StorageDummy;

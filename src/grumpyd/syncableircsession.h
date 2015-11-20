@@ -28,12 +28,21 @@ namespace GrumpyIRC
 
             SyncableIRCSession(QHash<QString, QVariant> sx, User *user, Scrollback *root = NULL);
             SyncableIRCSession(Scrollback *system, User *user, Scrollback *root = NULL);
+            SyncableIRCSession(unsigned int id, Scrollback *system, User *user, QList<Scrollback*> sl);
+            ~SyncableIRCSession();
             void Connect(libircclient::Network *Network);
             void ResyncChannel(libircclient::Channel* channel);
+            User *GetOwner() const;
             void ResyncChannel(libircclient::Channel *channel, QHash<QString, QVariant> cx);
             void Resync(QHash<QString, QVariant> network);
             void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete);
-            ~SyncableIRCSession();
+            void RegisterScrollback(Scrollback *window);
+            void SetHostname(QString text);
+            void SetName(QString text);
+            void SetNick(QString text);
+            void SetIdent(QString text);
+            void SetSSL(bool is_ssl);
+            void SetPort(unsigned int port);
         protected:
             Configuration *GetConfiguration();
         //signals:

@@ -22,6 +22,11 @@
 
 using namespace GrumpyIRC;
 
+void VirtualScrollback::SetLastID(scrollback_id_t id)
+{
+    lastID = id;
+}
+
 VirtualScrollback::VirtualScrollback(ScrollbackType Type, Scrollback *parent) : Scrollback(Type, parent)
 {
     this->owner = NULL;
@@ -49,7 +54,7 @@ void VirtualScrollback::Sync()
     QHash<QString, QVariant> parameters;
     parameters.insert("name", this->GetTarget());
     if (this->parentSx)
-        parameters.insert("parent_sid", QVariant(this->parentSx->GetID()));
+        parameters.insert("parent_sid", QVariant(this->parentSx->GetOriginalID()));
     if (this->GetSession() && this->GetSession()->GetType() == SessionType_IRC)
         parameters.insert("network_id", QVariant(((IRCSession*)this->GetSession())->GetSID()));
     parameters.insert("scrollback", QVariant(this->ToHash()));
@@ -72,10 +77,20 @@ void VirtualScrollback::PartialSync()
     session->SendToEverySession(GP_CMD_SCROLLBACK_PARTIAL_RESYNC, parameters);
 }
 
+void VirtualScrollback::SetLastItemID(scrollback_id_t id)
+{
+    this->_lastItemID = id;
+}
+
 void VirtualScrollback::SetOwner(User *user, bool restored)
 {
     this->owner = user;
     this->owner->RegisterScrollback(this, restored);
+}
+
+void VirtualScrollback::ImportText(ScrollbackItem item)
+{
+    this->_items.append(item);
 }
 
 void VirtualScrollback::InsertText(ScrollbackItem item)
@@ -104,11 +119,17 @@ void VirtualScrollback::InsertText(ScrollbackItem item)
                 break;
             case ScrollbackItemType_Kick:
             case ScrollbackItemType_Nick:
+            case ScrollbackItemType_Join:
             case ScrollbackItemType_Part:
             case ScrollbackItemType_Quit:
+            case ScrollbackItemType_SystemWarning:
+            case ScrollbackItemType_SystemError:
+            case ScrollbackItemType_Mode:
             case ScrollbackItemType_System:
             case ScrollbackItemType_Topic:
                 this->SetState(ScrollbackState_UnreadSystem);
+                break;
+            case ScrollbackItemType_Unknown:
                 break;
         }
     }
@@ -124,7 +145,7 @@ void VirtualScrollback::InsertText(ScrollbackItem item)
         return;
     // Deliver information about this message to everyone
     QHash<QString, QVariant> parameters;
-    parameters.insert("scrollback", QVariant(this->GetID()));
+    parameters.insert("scrollback", QVariant(this->GetOriginalID()));
     parameters.insert("scrollback_name", QVariant(this->GetTarget()));
     if (this->GetSession() && this->GetSession()->GetType() == SessionType_IRC)
         parameters.insert("network_id", QVariant(((IRCSession*)this->GetSession())->GetSID()));

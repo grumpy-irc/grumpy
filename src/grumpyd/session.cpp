@@ -268,6 +268,11 @@ void Session::processCommand(QHash<QString, QVariant> parameters)
     if (!irc)
         return;
     QString rx = parameters["command"].toString();
+    if (!irc->IsConnected())
+    {
+        this->TransferError(GP_CMD_RAW, "Not connected", GP_EIRCNOTCONN);
+        return;
+    }
     irc->GetNetwork()->TransferRaw(rx);
 }
 

@@ -109,4 +109,10 @@ void Configuration::Save()
     delete settings;
 }
 
+unsigned int GrumpyIRC::Configuration::GetValueAsUInt(QString key, unsigned int none)
+{
+    if (!this->Options.contains(key))
+        return none;
 
+    return this->Options[key].toUInt();
+}

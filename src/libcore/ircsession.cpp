@@ -52,26 +52,29 @@ IRCSession *IRCSession::Open(Scrollback *system_window, libirc::ServerAddress &s
 
 IRCSession::IRCSession(QHash<QString, QVariant> sx, Scrollback *root)
 {
+    this->init();
     this->systemWindow = NULL;
-    this->network = NULL;
     this->Root = root;
     this->LoadHash(sx);
-    IRCSession::Sessions_Lock.lock();
-    IRCSession::Sessions.append(this);
-    this->SID = lastID++;
-    IRCSession::Sessions_Lock.unlock();
 }
 
 IRCSession::IRCSession(Scrollback *system, Scrollback *root)
 {
+    this->init();
     this->Root = root;
-    this->network = NULL;
     this->systemWindow = system;
     this->systemWindow->SetSession(this);
-    IRCSession::Sessions_Lock.lock();
-    IRCSession::Sessions.append(this);
-    this->SID = lastID++;
-    IRCSession::Sessions_Lock.unlock();
+}
+
+IRCSession::IRCSession(unsigned int id, Scrollback *system, Scrollback *root)
+{
+    this->_ssl = false;
+    this->network = NULL;
+    this->SID = id;
+    this->_port = 0;
+    this->Root = root;
+    this->systemWindow = system;
+    this->systemWindow->SetSession(this);
 }
 
 IRCSession::~IRCSession()
@@ -176,6 +179,10 @@ void IRCSession::Connect(libircclient::Network *Network)
         throw new Exception("You can't connect to ircsession that is active, disconnect first", BOOST_CURRENT_FUNCTION);
 
     this->systemWindow->InsertText("Connecting to " + Network->GetServerAddress());
+    this->_hostname = Network->GetServerAddress();
+    this->_name = _hostname;
+    this->_port = Network->GetPort();
+    this->_nick = Network->GetNick();
     delete this->network;
     this->network = Network;
     connect(this->network, SIGNAL(Event_RawOutgoing(QByteArray)), this, SLOT(OnOutgoingRawMessage(QByteArray)));
@@ -273,7 +280,7 @@ void IRCSession::SyncWindows(QHash<QString, QVariant> windows, QHash<QString, Sc
         scrollback->LoadHash(scrollback_h);
         // Set a pointer to this network so that wrappers that render the user lists can have some direct access to it
         scrollback->SetNetwork(this->GetNetwork());
-        if (scrollback->GetType() == ScrollbackType_Channel)
+        if (scrollback->GetType() == ScrollbackType_Channel && !scrollback->IsDead())
         {
             // This is a channel so we need to insert all users to list
             // first get a respective channel from network structure
@@ -295,6 +302,17 @@ bool IRCSession::isRetrievingWhoInfo(QString channel)
     return this->retrievingWho.contains(channel.toLower());
 }
 
+void IRCSession::init()
+{
+    this->_ssl = false;
+    this->network = NULL;
+    IRCSession::Sessions_Lock.lock();
+    IRCSession::Sessions.append(this);
+    this->SID = lastID++;
+    IRCSession::Sessions_Lock.unlock();
+    this->_port = 0;
+}
+
 Scrollback *IRCSession::GetScrollbackForUser(QString user)
 {
     QString user_l = user.toLower();
@@ -314,6 +332,12 @@ QHash<QString, QVariant> IRCSession::ToHash(int max_items)
 {
     QHash<QString, QVariant> hash;
     SERIALIZE(SID);
+    SERIALIZE(_nick);
+    SERIALIZE(_name);
+    SERIALIZE(_hostname);
+    SERIALIZE(_password);
+    SERIALIZE(_port);
+    SERIALIZE(_ssl);
     if (this->network)
         hash.insert("network", QVariant(this->network->ToHash()));
     QHash<QString, QVariant> channels_hash;
@@ -330,6 +354,12 @@ QHash<QString, QVariant> IRCSession::ToHash(int max_items)
 void IRCSession::LoadHash(QHash<QString, QVariant> hash)
 {
     UNSERIALIZE_UINT(SID);
+    UNSERIALIZE_STRING(_nick);
+    UNSERIALIZE_BOOL(_ssl);
+    UNSERIALIZE_STRING(_name);
+    UNSERIALIZE_UINT(_port);
+    UNSERIALIZE_STRING(_password);
+    UNSERIALIZE_STRING(_hostname);
     if (hash.contains("network"))
         this->network = new libircclient::Network(hash["network"].toHash());
 
@@ -338,8 +368,8 @@ void IRCSession::LoadHash(QHash<QString, QVariant> hash)
 
     // we register a new system window and then we load it
     QString name = "Unknown host";
-    if (this->network)
-        name = this->network->GetServerAddress();
+    if (!_name.isEmpty())
+        name = _name;
     this->systemWindow = Core::GrumpyCore->NewScrollback(this->Root, name, ScrollbackType_System);
     this->systemWindow->LoadHash(hash["systemWindow"].toHash());
 
@@ -445,7 +475,46 @@ void IRCSession::RegisterChannel(libircclient::Channel *channel, Scrollback *win
 QString IRCSession::GetLocalUserModeAsString(Scrollback *window)
 {
     Q_UNUSED(window);
+    if (!this->IsConnected())
+        return "";
+
+    // Fetch a current user mode
     return this->GetNetwork()->GetLocalUserMode().ToString();
+}
+
+QString IRCSession::GetName() const
+{
+    return this->_name;
+}
+
+QString IRCSession::GetHostname() const
+{
+    return this->_hostname;
+}
+
+QString IRCSession::GetNick() const
+{
+    return this->_nick;
+}
+
+QString IRCSession::GetPassword() const
+{
+    return this->_password;
+}
+
+QString IRCSession::GetIdent() const
+{
+    return this->_ident;
+}
+
+bool IRCSession::UsingSSL() const
+{
+    return this->_ssl;
+}
+
+unsigned int IRCSession::GetPort() const
+{
+    return this->_port;
 }
 
 void IRCSession::OnOutgoingRawMessage(QByteArray message)

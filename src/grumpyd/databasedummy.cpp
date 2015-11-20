@@ -51,7 +51,52 @@ void DatabaseDummy::RemoveScrollback(User *owner, Scrollback *sx)
 
 }
 
+void DatabaseDummy::UpdateRoles()
+{
+
+}
+
 void DatabaseDummy::StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem *item)
+{
+
+}
+
+void DatabaseDummy::LoadSessions()
+{
+
+}
+
+void DatabaseDummy::UpdateNetwork(IRCSession *session)
+{
+
+}
+
+void DatabaseDummy::LoadWindows()
+{
+
+}
+
+void DatabaseDummy::LoadText()
+{
+
+}
+
+void DatabaseDummy::StoreScrollback(User *owner, Scrollback *sx)
+{
+
+}
+
+void DatabaseDummy::StoreNetwork(IRCSession *session)
+{
+
+}
+
+void DatabaseDummy::StoreUser(User *item)
+{
+
+}
+
+void DatabaseDummy::UpdateUser(User *user)
 {
 
 }

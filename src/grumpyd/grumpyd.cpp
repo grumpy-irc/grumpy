@@ -32,7 +32,7 @@ Grumpyd *Grumpyd::grumpyd = NULL;
 
 QString Grumpyd::GetCFPath()
 {
-    QString cf = QCoreApplication::applicationDirPath() + "/" + "etc" + "/";
+    QString cf = QCoreApplication::applicationDirPath() + "/etc/";
     if (!QDir().exists(cf))
         QDir().mkpath(cf);
     return cf;
@@ -40,7 +40,7 @@ QString Grumpyd::GetCFPath()
 
 QString Grumpyd::GetDFPath()
 {
-    QString cf = QCoreApplication::applicationDirPath() + "/" + "var" + "/";
+    QString cf = QCoreApplication::applicationDirPath() + "/var/";
     if (!QDir().exists(cf))
         QDir().mkpath(cf);
     return cf;
@@ -113,6 +113,9 @@ void Grumpyd::Main()
     this->databaseBackend = InstantiateStorage(CONF->GetStorage());
     this->databaseBackend->LoadRoles();
     this->databaseBackend->LoadUsers();
+    this->databaseBackend->LoadWindows();
+    this->databaseBackend->LoadSessions();
+    this->databaseBackend->LoadText();
     GRUMPY_LOG("Starting listeners");
     if (!this->listener->listen(QHostAddress::Any, GP_DEFAULT_PORT))
     {

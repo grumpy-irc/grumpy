@@ -71,6 +71,7 @@ namespace GrumpyIRC
              *                   with IRCSession::Open() instead of calling this directly
              */
             IRCSession(Scrollback *system, Scrollback *root = NULL);
+            IRCSession(unsigned int id, Scrollback *system, Scrollback *root = NULL);
             virtual ~IRCSession();
             virtual Scrollback *GetSystemWindow();
             //! Return a first scrollback that matches the name, keep in mind that scrollbacks may have same name, for unique
@@ -105,6 +106,13 @@ namespace GrumpyIRC
             //! Used mostly only for synchronization with grumpyd
             virtual void RegisterChannel(libircclient::Channel *channel, Scrollback *window);
             QString GetLocalUserModeAsString(Scrollback *window);
+            QString GetName() const;
+            QString GetHostname() const;
+            QString GetNick() const;
+            QString GetPassword() const;
+            QString GetIdent() const;
+            bool UsingSSL() const;
+            unsigned int GetPort() const;
             Scrollback *Root;
         signals:
             //! Emited when a new window for this session is open, needed by grumpyd for network sync
@@ -155,6 +163,13 @@ namespace GrumpyIRC
             void SyncWindows(QHash<QString, QVariant> windows, QHash<QString, Scrollback*> *hash);
             //! Sessions have unique ID that distinct them from sessions made to same irc network
             unsigned int SID;
+            unsigned int _port;
+            bool _ssl;
+            QString _hostname;
+            QString _name;
+            QString _ident;
+            QString _nick;
+            QString _password;
             QList<NetworkSniffer_Item*> data;
             QHash<QString, Scrollback*> channels;
             libircclient::Network *network;
@@ -162,6 +177,7 @@ namespace GrumpyIRC
             Scrollback *systemWindow;
         private:
             bool isRetrievingWhoInfo(QString channel);
+            void init();
             QList<QString> retrievingWho;
     };
 }

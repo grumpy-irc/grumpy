@@ -14,6 +14,8 @@
 #include "virtualscrollback.h"
 #include "userconfiguration.h"
 #include "user.h"
+#include "databasebackend.h"
+#include "grumpyd.h"
 #include "session.h"
 #include "../libcore/core.h"
 #include "../libcore/eventhandler.h"
@@ -34,6 +36,7 @@ SyncableIRCSession *SyncableIRCSession::Open(Scrollback *system_window, libirc::
     SyncableIRCSession *sx = new SyncableIRCSession(system_window, owner);
     libircclient::Network *nx = new libircclient::Network(server, server.GetHost());
     sx->Connect(nx);
+    Grumpyd::GetBackend()->StoreNetwork(sx);
     return sx;
 }
 
@@ -47,6 +50,24 @@ SyncableIRCSession::SyncableIRCSession(Scrollback *system, User *user, Scrollbac
 {
     this->owner = user;
     ((VirtualScrollback*)this->systemWindow)->SetOwner(owner);
+}
+
+SyncableIRCSession::SyncableIRCSession(unsigned int id, Scrollback *system, User *user, QList<Scrollback *> sl) : IRCSession(id, system, NULL)
+{
+    this->owner = user;
+    foreach (Scrollback *sx, sl)
+    {
+        if (sx->GetType() == ScrollbackType_Channel)
+        {
+            this->channels.insert(sx->GetTarget().toLower(), sx);
+        } else if (sx->GetType() == ScrollbackType_User)
+        {
+            this->users.insert(sx->GetTarget().toLower(), sx);
+        } else
+        {
+            // System window? Ignoring
+        }
+    }
 }
 
 void SyncableIRCSession::Connect(libircclient::Network *Network)
@@ -75,6 +96,11 @@ void SyncableIRCSession::ResyncChannel(libircclient::Channel *channel)
     hash.insert("channel_name", QVariant(channel->GetName()));
     hash.insert("channel", QVariant(channel->ToHash()));
     session->SendToEverySession(GP_CMD_CHANNEL_RESYNC, hash);
+}
+
+User *SyncableIRCSession::GetOwner() const
+{
+    return this->owner;
 }
 
 void SyncableIRCSession::ResyncChannel(libircclient::Channel *channel, QHash<QString, QVariant> cx)
@@ -125,6 +151,36 @@ void SyncableIRCSession::RequestDisconnect(Scrollback *window, QString reason, b
     ((VirtualScrollback*)this->systemWindow)->PartialSync();
 }
 
+void SyncableIRCSession::SetHostname(QString text)
+{
+    this->_hostname = text;
+}
+
+void SyncableIRCSession::SetName(QString text)
+{
+    this->_name = text;
+}
+
+void SyncableIRCSession::SetNick(QString text)
+{
+    this->_nick = text;
+}
+
+void SyncableIRCSession::SetIdent(QString text)
+{
+    this->_ident = text;
+}
+
+void SyncableIRCSession::SetSSL(bool is_ssl)
+{
+    this->_ssl = is_ssl;
+}
+
+void SyncableIRCSession::SetPort(unsigned int port)
+{
+    this->_port = port;
+}
+
 SyncableIRCSession::~SyncableIRCSession()
 {
 
@@ -140,6 +196,8 @@ void SyncableIRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
     IRCSession::OnIRCSelfJoin(channel);
     if (this->channels.contains(channel->GetName().toLower()))
     {
+        // Store in SQL
+        Grumpyd::GetBackend()->UpdateNetwork(this);
         // Propagate this new window to every connected user
         VirtualScrollback *sx = (VirtualScrollback*)this->channels[channel->GetName().toLower()];
         if (sx->PropertyBag.contains("initialized"))
@@ -156,7 +214,7 @@ void SyncableIRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
         if (!session)
             return;
         QHash<QString, QVariant> parameters;
-        parameters.insert("scrollback_id", QVariant(sx->GetID()));
+        parameters.insert("scrollback_id", QVariant(sx->GetOriginalID()));
         parameters.insert("network_id", QVariant(this->GetSID()));
         parameters.insert("channel", QVariant(channel->ToHash()));
         session->SendToEverySession(GP_CMD_CHANNEL_JOIN, parameters);
@@ -268,6 +326,7 @@ void SyncableIRCSession::OnTopicInfo(libircclient::Parser *px, libircclient::Cha
 
 void SyncableIRCSession::OnInfo(libircclient::Parser *px)
 {
+    Q_UNUSED(px);
     Session *session = this->owner->GetAnyGPSession();
     if (!session)
         return;
