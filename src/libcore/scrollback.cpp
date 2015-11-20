@@ -409,6 +409,7 @@ ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclie
 {
     this->_type = type;
     this->_id = id;
+    this->_self = self;
     this->_text = text;
     this->_datetime = QDateTime::currentDateTime();
     if (user == NULL)
@@ -421,6 +422,7 @@ ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclie
 {
     this->_type = type;
     this->_id = id;
+    this->_self = self;
     this->_text = text;
     this->_datetime = QDateTime::currentDateTime();
     this->_user = user;
