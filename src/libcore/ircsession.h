@@ -89,6 +89,7 @@ namespace GrumpyIRC
             virtual void Connect(libircclient::Network *Network);
             void SendMessage(Scrollback *window, QString text);
             virtual bool IsConnected() const;
+            virtual void SetNetwork(libircclient::Network *nt);
             void SendNotice(Scrollback *window, QString text);
             virtual QList<NetworkSniffer_Item*> GetSniffer();
             SessionType GetType();

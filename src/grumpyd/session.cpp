@@ -338,6 +338,9 @@ void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
     } else if (text == GP_CMD_SERVER)
     {
         this->processNew(parameters);
+    } else if (text == GP_CMD_RECONNECT)
+    {
+        this->processReconnect(parameters);
     } else if (text == GP_CMD_REQUEST_ITEMS)
     {
         this->processRequest(parameters);
@@ -448,6 +451,29 @@ void Session::processSetup(QHash<QString, QVariant> parameters)
     QHash<QString, QVariant> result;
     result.insert("done", QVariant(true));
     this->protocol->SendProtocolCommand(GP_CMD_INIT, result);
+}
+
+void Session::processReconnect(QHash<QString, QVariant> parameters)
+{
+    if (!this->IsAuthorized(PRIVILEGE_USE_IRC))
+    {
+        this->PermissionDeny(GP_CMD_RECONNECT);
+        return;
+    }
+
+    SyncableIRCSession* irc = this->loggedUser->GetSIRCSession(parameters["network_id"].toUInt());
+    if (!irc)
+    {
+        this->TransferError(GP_CMD_REMOVE, "Network not found :(", GP_ENETWORKNOTFOUND);
+        return;
+    }
+
+    if (irc->IsConnected())
+    {
+
+    }
+
+    irc->Connect();
 }
 
 void Session::processRemove(QHash<QString, QVariant> parameters)

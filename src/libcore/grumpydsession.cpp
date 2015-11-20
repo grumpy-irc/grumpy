@@ -455,12 +455,15 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVarian
         if (parameters.contains("source"))
             source = parameters["source"].toString();
         this->systemWindow->InsertText("Permission denied: " + source, ScrollbackItemType_SystemError);
+    } else if (text == GP_CMD_ERROR)
+    {
+        this->systemWindow->InsertText("Error: " + parameters["description"].toString(), ScrollbackItemType_SystemError);
     } else
     {
         QHash<QString, QVariant> params;
         params.insert("source", text);
         this->gp->SendProtocolCommand(GP_CMD_UNKNOWN, params);
-        this->systemWindow->InsertText("Unknown command from grumpyd " + text, ScrollbackItemType_SystemError);
+        this->systemWindow->InsertText("Unknown command from grumpyd " + QString::number(text), ScrollbackItemType_SystemError);
     }
 }
 
@@ -469,7 +472,6 @@ void GrumpydSession::processNewScrollbackItem(QHash<QString, QVariant> hash)
     if (!hash.contains("network_id"))
         return;
     // Fetch the network this item belongs to
-    IRCSession *session = NULL;
     unsigned int sid = hash["network_id"].toUInt();
     if (!hash.contains("scrollback"))
     {
@@ -563,6 +565,12 @@ void GrumpydSession::processNetworkResync(QHash<QString, QVariant> hash)
 
     libircclient::Network resynced_network(hash["network"].toHash());
     libircclient::Network *nt = session->GetNetwork();
+    if (nt == NULL)
+    {
+        libirc::ServerAddress server(session->GetHostname(), session->UsingSSL(), session->GetPort(), session->GetNick(), session->GetPassword());
+        nt = new libircclient::Network(server, session->GetName());
+        session->SetNetwork(nt);
+    }
     nt->SetCUModes(resynced_network.GetCUModes());
     nt->SetCCModes(resynced_network.GetCCModes());
     nt->SetChannelUserPrefixes(resynced_network.GetChannelUserPrefixes());

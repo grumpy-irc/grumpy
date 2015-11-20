@@ -31,6 +31,7 @@ namespace GrumpyIRC
             SyncableIRCSession(unsigned int id, Scrollback *system, User *user, QList<Scrollback*> sl);
             ~SyncableIRCSession();
             void Connect(libircclient::Network *Network);
+            void Connect();
             void ResyncChannel(libircclient::Channel* channel);
             User *GetOwner() const;
             void ResyncChannel(libircclient::Channel *channel, QHash<QString, QVariant> cx);

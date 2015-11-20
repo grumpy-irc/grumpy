@@ -226,6 +226,12 @@ bool IRCSession::IsConnected() const
     return false;
 }
 
+void IRCSession::SetNetwork(libircclient::Network *nt)
+{
+    delete this->network;
+    this->network = nt;
+}
+
 void IRCSession::SendNotice(Scrollback *window, QString text)
 {
     if (!this->IsConnected())
