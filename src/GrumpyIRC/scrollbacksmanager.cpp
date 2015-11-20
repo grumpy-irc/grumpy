@@ -136,6 +136,8 @@ void ScrollbacksManager::SwitchWindow(ScrollbackFrame *window)
     this->currentWidget->Focus();
 
     // Redraw the buffer contents if needed
+    MainWindow::Main->SetWN(window->GetTitle());
+
     window->EnableState(false);
     window->SetVisible(true);
     window->RefreshHtmlIfNeeded();
