@@ -333,7 +333,9 @@ void ScrollbackFrame::Menu(QPoint pn)
         this->textEdit->copy();
     } else if (selectedItem == menuRetrieveTopic)
     {
-        //wx->RequestPart();
+        if (this->GetSession())
+            return;
+        this->GetSession()->SendRaw(this->GetScrollback(), "TOPIC " + this->GetScrollback()->GetTarget());
     } else if (selectedItem == menuChanSet)
     {
         if (!this->GetScrollback()->GetNetwork())
@@ -352,8 +354,8 @@ void ScrollbackFrame::Menu(QPoint pn)
 
 void ScrollbackFrame::OnClosed()
 {
-    // The wrapped scrollback is being closed we must unregister this frame and delete it,
-    // before we do that we need to reset the pointer to scrollback, because the destructor
+    // The wrapped scrollback is being closed, we must unregister this frame and delete it,
+    // before we do that, we need to reset the pointer to scrollback, because the destructor
     // of this class naturally tries to delete the scrollback, which would fail as it
     // would already be deleted by then, this event is called from destructor of scrollback,
     // so calling delete on it would have unexpectable results
