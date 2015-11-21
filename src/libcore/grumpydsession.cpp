@@ -133,7 +133,15 @@ void GrumpydSession::RequestRemove(Scrollback *window)
 
     if (window == this->systemWindow)
     {
-        // very funny. yep
+        foreach(IRCSession *nw, this->sessionList.values())
+        {
+            nw->RequestRemove(nw->GetSystemWindow());
+            delete nw;
+        }
+        this->sessionList.clear();
+        this->scrollbackHash.clear();
+        delete this->gp;
+        this->gp = NULL;
         return;
     }
 
