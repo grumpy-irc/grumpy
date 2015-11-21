@@ -180,10 +180,11 @@ void DatabaseLite::LoadSessions()
         throw new Exception("Unable to load networks from db: " + this->LastError, BOOST_CURRENT_FUNCTION);
 
     unsigned int network = 0;
+    unsigned int lnid = 0;
     while (network < networks->Count())
     {
         SqlRow row = networks->GetRow(network++);
-        int nid = row.GetField(1).toUInt();
+        unsigned int nid = row.GetField(1).toUInt();
         User *user = User::GetUser(row.GetField(2).toUInt());
         if (!user)
         {
@@ -240,11 +241,15 @@ void DatabaseLite::LoadSessions()
         session->SetSSL(Generic::Int2Bool(row.GetField(5).toInt()));
         session->SetPort(row.GetField(4).toUInt());
         session->SetName(row.GetField(11).toString());
+        if (lnid < nid)
+            lnid = nid;
         user->RegisterSession(session);
 
         next:
             continue;
     }
+
+    SyncableIRCSession::SetLastNID(lnid);
 
     delete networks;
 }

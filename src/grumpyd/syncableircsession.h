@@ -24,6 +24,7 @@ namespace GrumpyIRC
     {
             Q_OBJECT
         public:
+            static void SetLastNID(unsigned int nid);
             static SyncableIRCSession *Open(Scrollback *system_window, libirc::ServerAddress &server, User *owner);
 
             SyncableIRCSession(QHash<QString, QVariant> sx, User *user, Scrollback *root = NULL);

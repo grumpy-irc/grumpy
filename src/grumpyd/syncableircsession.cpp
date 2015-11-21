@@ -213,6 +213,11 @@ void SyncableIRCSession::SetIdent(QString text)
     this->_ident = text;
 }
 
+void GrumpyIRC::SyncableIRCSession::SetLastNID(unsigned int nid)
+{
+    IRCSession::lastID = nid + 1;
+}
+
 void SyncableIRCSession::SetSSL(bool is_ssl)
 {
     this->_ssl = is_ssl;
