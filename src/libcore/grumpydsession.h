@@ -114,6 +114,8 @@ namespace GrumpyIRC
             void SendRaw(Scrollback *window, QString raw);
             void SendAction(Scrollback *window, QString text);
             void SendNotice(Scrollback *window, QString text);
+			void SendMessage(Scrollback *window, QString target, QString message);
+			void SendNotice(Scrollback *window, QString target, QString message);
             void SendProtocolCommand(unsigned int command, QHash<QString, QVariant> parameters);
             IRCSession *GetSession(unsigned int nsid);
             QString GetLocalUserModeAsString(Scrollback *window);

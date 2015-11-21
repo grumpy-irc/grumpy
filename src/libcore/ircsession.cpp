@@ -218,6 +218,30 @@ void IRCSession::Connect(libircclient::Network *Network)
     this->network->Connect();
 }
 
+void GrumpyIRC::IRCSession::SendMessage(Scrollback * window, QString target, QString text)
+{
+	if (!this->IsConnected())
+	{
+		this->GetSystemWindow()->InsertText("Can't send messages to a disconnected network");
+		return;
+	}
+	this->GetNetwork()->SendMessage(text, target);
+	// Write the message to active window
+	window->InsertText(ScrollbackItem("[ >> " + target + " ]: " + text, ScrollbackItemType_Message, this->GetNetwork()->GetLocalUserInfo(), 0, true));
+}
+
+void GrumpyIRC::IRCSession::SendNotice(Scrollback * window, QString target, QString text)
+{
+	if (!this->IsConnected())
+	{
+		this->GetSystemWindow()->InsertText("Can't send notices to a disconnected network");
+		return;
+	}
+	this->GetNetwork()->SendNotice(text, target);
+	// Write the message to active window
+	window->InsertText(ScrollbackItem("[ >> " + target + " ]: " + text, ScrollbackItemType_Notice, this->GetNetwork()->GetLocalUserInfo(), 0, true));
+}
+
 bool IRCSession::IsConnected() const
 {
     if (this->network && this->network->IsConnected())

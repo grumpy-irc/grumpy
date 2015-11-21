@@ -29,14 +29,10 @@ QList<GrumpydSession*> GrumpydSession::Sessions;
 
 GrumpydSession::GrumpydSession(Scrollback *System, QString Hostname, QString UserName, QString Pass, int Port, bool ssl)
 {
-    this->gp = new libgp::GP();
+	this->gp = NULL;
     this->systemWindow = System;
     this->hostname = Hostname;
-    connect(this->gp, SIGNAL(Event_Connected()), this, SLOT(OnConnected()));
-    connect(this->gp, SIGNAL(Event_IncomingCommand(gp_command_t,QHash<QString,QVariant>)), this, SLOT(OnIncomingCommand(gp_command_t,QHash<QString,QVariant>)));
-    connect(this->gp, SIGNAL(Event_SslHandshakeFailure(QList<QSslError>,bool*)), this, SLOT(OnSslHandshakeFailure(QList<QSslError>,bool*)));
     this->systemWindow->SetSession(this);
-    this->gp->SetCompression(6);
     this->port = Port;
     this->syncInit = QDateTime::currentDateTime();
     this->username = UserName;
@@ -71,6 +67,10 @@ void GrumpydSession::Open(libirc::ServerAddress server)
 
 bool GrumpydSession::IsConnected() const
 {
+	if (!this->gp)
+		return false;
+
+	// Figure out from underlying gp info
     return this->gp->IsConnected();
 }
 
@@ -230,6 +230,16 @@ void GrumpydSession::SendNotice(Scrollback *window, QString text)
     this->gp->SendProtocolCommand(GP_CMD_MESSAGE, parameters);
 }
 
+void GrumpyIRC::GrumpydSession::SendMessage(Scrollback * window, QString target, QString message)
+{
+
+}
+
+void GrumpyIRC::GrumpydSession::SendNotice(Scrollback * window, QString target, QString message)
+{
+
+}
+
 void GrumpydSession::SendProtocolCommand(unsigned int command, QHash<QString, QVariant> parameters)
 {
     if (!this->gp)
@@ -273,8 +283,14 @@ void GrumpydSession::RequestReconnect(Scrollback *window)
     if (window == this->systemWindow)
     {
         // Reconnect grumpyd
-
-        return;
+		foreach(IRCSession *nw, this->sessionList.values())
+			nw->RequestRemove(nw->GetSystemWindow());
+		this->sessionList.clear();
+		this->scrollbackHash.clear();
+		delete this->gp;
+		this->gp = NULL;
+		this->Connect();
+		return;
     }
 
     IRCSession *ircs = this->GetSessionFromWindow(window);
@@ -300,6 +316,12 @@ void GrumpydSession::Connect()
 {
     if (this->IsConnected())
         return;
+	this->gp = new libgp::GP();
+	connect(this->gp, SIGNAL(Event_Connected()), this, SLOT(OnConnected()));
+	connect(this->gp, SIGNAL(Event_IncomingCommand(gp_command_t, QHash<QString, QVariant>)), this, SLOT(OnIncomingCommand(gp_command_t, QHash<QString, QVariant>)));
+	connect(this->gp, SIGNAL(Event_SslHandshakeFailure(QList<QSslError>, bool*)), this, SLOT(OnSslHandshakeFailure(QList<QSslError>, bool*)));
+	this->gp->SetCompression(6);
+	this->systemWindow->SetDead(false);
     this->systemWindow->InsertText("Connecting to " + this->hostname);
     // Connect grumpy
     this->gp->Connect(this->hostname, this->port, this->SSL);

@@ -73,9 +73,40 @@ static int SystemCommand_Notice(SystemCommand *command, CommandArgs args)
         GRUMPY_ERROR(QObject::tr("This command requires some text"));
         return 1;
     }
-    ScrollbackFrame *scrollback = MainWindow::Main->GetScrollbackManager()->GetCurrentScrollback();
-    scrollback->GetSession()->SendNotice(scrollback->GetScrollback(), args.ParameterLine);
+    Scrollback *sx = MainWindow::Main->GetScrollbackManager()->GetCurrentScrollback()->GetScrollback();
+	if (sx->GetType() == ScrollbackType_System)
+	{
+		if (args.Parameters.count() < 2)
+		{
+			GRUMPY_ERROR(QObject::tr("This command requires target and some text"));
+			return 1;
+		}
+		QString target = args.Parameters[0];
+		QString text = args.ParameterLine.mid(target.size() + 1);
+		Scrollback *sx = MainWindow::Main->GetCurrentScrollbackFrame()->GetScrollback();
+		sx->GetSession()->SendNotice(sx, target, text);
+	}
+	else
+	{
+		sx->GetSession()->SendNotice(sx, args.ParameterLine);
+	}
     return 0;
+}
+
+static int SystemCommand_SendMessage(SystemCommand *command, CommandArgs args)
+{
+	if (args.Parameters.size() < 2)
+	{
+		GRUMPY_ERROR("You need to provide at least 2 parameters");
+		return 1;
+	}
+
+	// MSG should just echo the message to current window
+	QString target = args.Parameters[0];
+	QString text = args.ParameterLine.mid(target.size() + 1);
+	Scrollback *sx = MainWindow::Main->GetCurrentScrollbackFrame()->GetScrollback();
+	sx->GetSession()->SendMessage(sx, target, text);
+	return 0;
 }
 
 static int SystemCommand_NextSessionNick(SystemCommand *command, CommandArgs args)
@@ -255,6 +286,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("quit", (SC_Callback)SystemCommand_Exit));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("server", (SC_Callback)SystemCommand_Server));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("nick", (SC_Callback)SystemCommand_Nick));
+	CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("msg", (SC_Callback)SystemCommand_SendMessage));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("me", (SC_Callback)SystemCommand_Act));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("notice", (SC_Callback)SystemCommand_Notice));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.netstat", (SC_Callback)SystemCommand_Netstat));
