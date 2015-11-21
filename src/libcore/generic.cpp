@@ -34,6 +34,11 @@ QString Generic::Bool2String(bool boolean)
     return "false";
 }
 
+bool GrumpyIRC::Generic::Int2Bool(int integer)
+{
+    return integer != 0;
+}
+
 bool Generic::IsGrumpy(Scrollback *window)
 {
     if (!window)
@@ -52,6 +57,14 @@ QStringList Generic::Trim(QStringList list)
         if (!item.isEmpty())
             result << item;
     return result;
+}
+
+int GrumpyIRC::Generic::Bool2Int(bool value)
+{
+    if (value)
+        return 1;
+    else
+        return 0;
 }
 
 int Generic::MessageBox(QString title, QString message, GrumpyIRC::Generic::MessageBox_Type type, QObject *parent)

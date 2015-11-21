@@ -40,6 +40,8 @@ namespace GrumpyIRC
         LIBCORESHARED_EXPORT bool String2Bool(QString string);
         LIBCORESHARED_EXPORT QString Bool2String(bool boolean);
         LIBCORESHARED_EXPORT QStringList Trim(QStringList list);
+        LIBCORESHARED_EXPORT int Bool2Int(bool value);
+        LIBCORESHARED_EXPORT bool Int2Bool(int integer);
         LIBCORESHARED_EXPORT bool IsGrumpy(Scrollback *window);
         LIBCORESHARED_EXPORT int MessageBox(QString title, QString message, MessageBox_Type type, QObject *parent = 0);
         LIBCORESHARED_EXPORT QByteArray VariantToByteArray(QVariant data);

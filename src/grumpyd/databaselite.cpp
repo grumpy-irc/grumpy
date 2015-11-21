@@ -237,7 +237,7 @@ void DatabaseLite::LoadSessions()
         session->SetHostname(row.GetField(3).toString());
         session->SetIdent(row.GetField(7).toString());
         session->SetNick(row.GetField(6).toString());
-        session->SetSSL(row.GetField(5).toBool());
+        session->SetSSL(Generic::Int2Bool(row.GetField(5).toInt()));
         session->SetPort(row.GetField(4).toUInt());
         session->SetName(row.GetField(11).toString());
         user->RegisterSession(session);
@@ -327,7 +327,7 @@ void DatabaseLite::LoadText()
                 last_item = row.GetField(1).toUInt();
                 QString text = row.GetField(9).toString();
                 ScrollbackItemType type = static_cast<ScrollbackItemType>(row.GetField(5).toInt());
-                bool self = row.GetField(10).toBool();
+                bool self = Generic::Int2Bool(row.GetField(10).toInt());
                 libircclient::User user;
                 user.SetNick(row.GetField(6).toString());
                 user.SetIdent(row.GetField(7).toString());
@@ -629,7 +629,7 @@ SqlResult *DatabaseLite::ExecuteQuery_Bind(QString sql, QList<QVariant> paramete
                 x = sqlite3_bind_int(statement, current_parameter++, (int)item.toUInt());
                 break;
             case QVariant::Bool:
-                x = sqlite3_bind_int(statement, current_parameter++, (int)item.toBool());
+                x = sqlite3_bind_int(statement, current_parameter++, Generic::Bool2Int(item.toBool()));
                 break;
             case QVariant::LongLong:
                 x = sqlite3_bind_int64(statement, current_parameter++, item.toLongLong());
