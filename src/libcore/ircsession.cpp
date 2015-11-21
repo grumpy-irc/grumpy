@@ -181,6 +181,7 @@ void IRCSession::Connect(libircclient::Network *Network)
     this->systemWindow->InsertText("Connecting to " + Network->GetServerAddress() + ":" + QString::number(Network->GetPort()));
     this->_hostname = Network->GetServerAddress();
     this->_name = _hostname;
+    this->_ssl = Network->IsSSL();
     this->_port = Network->GetPort();
     this->_nick = Network->GetNick();
     delete this->network;

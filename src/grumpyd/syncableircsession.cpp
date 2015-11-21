@@ -249,7 +249,8 @@ void SyncableIRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
             return;
         }
         sx->PropertyBag.insert("initialized", QVariant(true));
-        sx->SetOwner(this->owner);
+        if (!sx->GetOwner())
+            sx->SetOwner(this->owner);
         sx->Sync();
         // Now sync the channel with all connected users, we need to do this after we sync the window so that client can assign the window pointer to chan
         Session *session = this->owner->GetAnyGPSession();

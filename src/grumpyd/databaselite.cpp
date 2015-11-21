@@ -298,7 +298,7 @@ void DatabaseLite::LoadWindows()
             throw new Exception("Multiple scrollbacks with same ID", BOOST_CURRENT_FUNCTION);
         scrollbacks.insert(scrollback_id, sx);
     }
-    VirtualScrollback::SetLastID(max_id);
+    VirtualScrollback::SetLastID(++max_id);
 
     delete windows;
 }
