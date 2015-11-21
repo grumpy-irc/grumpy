@@ -479,7 +479,7 @@ void Session::processReconnect(QHash<QString, QVariant> parameters)
     SyncableIRCSession* irc = this->loggedUser->GetSIRCSession(parameters["network_id"].toUInt());
     if (!irc)
     {
-        this->TransferError(GP_CMD_REMOVE, "Network not found :(", GP_ENETWORKNOTFOUND);
+        this->TransferError(GP_CMD_RECONNECT, "Network not found :(", GP_ENETWORKNOTFOUND);
         return;
     }
 

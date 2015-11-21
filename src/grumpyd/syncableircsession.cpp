@@ -112,6 +112,7 @@ void SyncableIRCSession::Connect()
     connect(this->network, SIGNAL(Event_Welcome(libircclient::Parser*)), this, SLOT(OnUnknown(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_ChannelModeChanged(libircclient::Parser*, libircclient::Channel*)), this, SLOT(OnChannelMODE(libircclient::Parser*,libircclient::Channel*)));
     connect(this->network, SIGNAL(Event_ChannelUserModeChanged(libircclient::Parser*, libircclient::Channel*, libircclient::User*)), this, SLOT(OnUMODE(libircclient::Parser*,libircclient::Channel*,libircclient::User*)));
+    this->systemWindow->InsertText("Connecting to " + network->GetServerAddress() + ":" + QString::number(server.GetPort()));
     this->systemWindow->SetDead(false);
     this->network->Connect();
     (((VirtualScrollback*)this->systemWindow)->PartialSync());
