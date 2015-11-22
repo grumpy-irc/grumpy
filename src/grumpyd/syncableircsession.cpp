@@ -43,6 +43,7 @@ SyncableIRCSession *SyncableIRCSession::Open(Scrollback *system_window, libirc::
 SyncableIRCSession::SyncableIRCSession(QHash<QString, QVariant> sx, User *user, Scrollback *root) : IRCSession(sx, root)
 {
     this->owner = user;
+    
     ((VirtualScrollback*)this->systemWindow)->SetOwner(owner);
 }
 

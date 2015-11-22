@@ -336,6 +336,8 @@ bool IRCSession::isRetrievingWhoInfo(QString channel)
 void IRCSession::init()
 {
     this->_ssl = false;
+    this->snifferEnabled = true;
+    this->maxSnifferBufferSize = 2000;
     this->network = NULL;
     IRCSession::Sessions_Lock.lock();
     IRCSession::Sessions.append(this);
@@ -550,7 +552,11 @@ unsigned int IRCSession::GetPort() const
 
 void IRCSession::OnOutgoingRawMessage(QByteArray message)
 {
+    if (!this->snifferEnabled)
+        return;
     this->data.append(new NetworkSniffer_Item(message, true));
+    if (this->data.size() > this->maxSnifferBufferSize)
+        this->data.removeFirst();
 }
 
 void IRCSession::SendMessage(Scrollback *window, QString text)
@@ -930,7 +936,11 @@ void IRCSession::rmWindow(Scrollback *window)
 
 void IRCSession::OnIncomingRawMessage(QByteArray message)
 {
+    if (!this->snifferEnabled)
+        return;
     this->data.append(new NetworkSniffer_Item(message, false));
+    while (this->data.size() > this->maxSnifferBufferSize)
+        this->data.removeFirst();
 }
 
 void IRCSession::OnConnectionFail(QAbstractSocket::SocketError er)

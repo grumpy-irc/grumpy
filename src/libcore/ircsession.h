@@ -175,6 +175,8 @@ namespace GrumpyIRC
             QString _password;
             QList<NetworkSniffer_Item*> data;
             QHash<QString, Scrollback*> channels;
+            bool snifferEnabled;
+            unsigned int maxSnifferBufferSize;
             libircclient::Network *network;
             QHash<QString, Scrollback*> users;
             Scrollback *systemWindow;
