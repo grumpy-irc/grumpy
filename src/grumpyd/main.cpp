@@ -16,6 +16,7 @@
 //#include <iostream>
 #include "corewrapper.h"
 #include "scrollbackfactory.h"
+#include "gdeventhandler.h"
 #include "grumpyconf.h"
 #include "grumpyd.h"
 #include "../libcore/configuration.h"
@@ -145,6 +146,7 @@ int main(int argc, char *argv[])
 
         GrumpyIRC::CoreWrapper::GrumpyCore = new GrumpyIRC::Core();
         // Install our own scrollback factory that creates scrollbacks which are automagically network synced
+        GrumpyIRC::CoreWrapper::GrumpyCore->SetSystemEventHandler(new GrumpyIRC::GDEventHandler());
         GrumpyIRC::CoreWrapper::GrumpyCore->InstallFactory(new GrumpyIRC::ScrollbackFactory());
         GrumpyIRC::CoreWrapper::GrumpyCore->InitCfg();
         // Save the configuration immediately so that we have the configuration file

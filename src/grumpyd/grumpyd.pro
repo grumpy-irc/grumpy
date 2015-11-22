@@ -26,7 +26,8 @@ SOURCES += main.cpp \
     grumpyconf.cpp \
     databasedummy.cpp \
     userconfiguration.cpp \
-    databaselite.cpp
+    databaselite.cpp \
+    gdeventhandler.cpp
 
 HEADERS += \
     corewrapper.h \
@@ -45,7 +46,8 @@ HEADERS += \
     grumpyconf.h \
     databasedummy.h \
     userconfiguration.h \
-    databaselite.h
+    databaselite.h \
+    gdeventhandler.h
 
 RESOURCES += \
     resources.qrc
