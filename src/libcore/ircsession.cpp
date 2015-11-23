@@ -168,6 +168,15 @@ QList<Scrollback *> IRCSession::GetScrollbacks()
     return sx;
 }
 
+QList<Scrollback *> IRCSession::GetUserScrollbacks()
+{
+    QList<Scrollback*> sx;
+
+    // Fetch all windows we manage
+    sx.append(this->users.values());
+    return sx;
+}
+
 QList<Scrollback *> IRCSession::GetChannelScrollbacks()
 {
     QList<Scrollback*> sx;
@@ -366,6 +375,7 @@ QHash<QString, QVariant> IRCSession::ToHash(int max_items)
     foreach (QString user, this->users.keys())
         users_hash.insert(user, QVariant(this->users[user]->ToHash(max_items)));
     hash.insert("channels", QVariant(channels_hash));
+    hash.insert("users", QVariant(users_hash));
     hash.insert("systemWindow", QVariant(this->systemWindow->ToHash(max_items)));
     return hash;
 }
@@ -445,6 +455,8 @@ void IRCSession::RequestReconnect(Scrollback *window)
         throw new Exception("You can't use this reconnect method for a network that never was connected", BOOST_CURRENT_FUNCTION);
 
     this->systemWindow->SetDead(false);
+    foreach (Scrollback *s, this->GetUserScrollbacks())
+        s->SetDead(false);
     this->network->Reconnect();
 }
 
