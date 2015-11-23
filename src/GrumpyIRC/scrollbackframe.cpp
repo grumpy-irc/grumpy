@@ -263,6 +263,7 @@ void ScrollbackFrame::OnDead()
 
 void ScrollbackFrame::OnFinishSortBulk()
 {
+    this->userFrame->NeedsUpdate = true;
     this->userFrame->Sort();
 }
 

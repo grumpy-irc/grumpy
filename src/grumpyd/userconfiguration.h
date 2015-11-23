@@ -25,6 +25,8 @@ namespace GrumpyIRC
             UserConf(user_id_t user);
             void Save();
             void Load();
+            void SetHash(QHash<QString, QVariant> hash);
+            QHash<QString, QVariant> ToHash();
             user_id_t User;
     };
 }

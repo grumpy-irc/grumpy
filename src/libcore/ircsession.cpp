@@ -217,6 +217,8 @@ void IRCSession::Connect(libircclient::Network *Network)
     connect(this->network, SIGNAL(Event_Welcome(libircclient::Parser*)), this, SLOT(OnUnknown(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_ChannelModeChanged(libircclient::Parser*, libircclient::Channel*)), this, SLOT(OnChannelMODE(libircclient::Parser*,libircclient::Channel*)));
     connect(this->network, SIGNAL(Event_ChannelUserModeChanged(libircclient::Parser*, libircclient::Channel*, libircclient::User*)), this, SLOT(OnUMODE(libircclient::Parser*,libircclient::Channel*,libircclient::User*)));
+    connect(this->network, SIGNAL(Event_MyInfo(libircclient::Parser*)), this, SLOT(OnUnknown(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_ISUPPORT(libircclient::Parser*)), this, SLOT(OnUnknown(libircclient::Parser*)));
     this->network->Connect();
     this->timerUL.start(this->ulistUpdateTime);
 }

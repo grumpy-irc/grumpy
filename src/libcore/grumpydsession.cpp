@@ -472,6 +472,7 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVarian
         this->systemWindow->InsertText("Synchronizing networks");
         this->gp->SendProtocolCommand(GP_CMD_NETWORK_INFO);
         this->syncInit = QDateTime::currentDateTime();
+        this->gp->SendProtocolCommand(GP_CMD_OPTIONS);
     } else if (text == GP_CMD_SCROLLBACK_LOAD_NEW_ITEM)
     {
         this->processNewScrollbackItem(parameters);

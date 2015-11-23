@@ -59,6 +59,7 @@ User::User(QString Name, QString Password, user_id_t User_ID)
     this->role = NULL;
     this->id = User_ID;
     this->conf = new UserConf(User_ID);
+    this->conf->Load();
     this->password = Password;
 }
 

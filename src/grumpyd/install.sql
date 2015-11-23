@@ -82,7 +82,6 @@ CREATE TABLE settings
 (
     "id" INTEGER PRIMARY KEY NOT NULL,
     "user_id" INTEGER NOT NULL,
-    "name" TEXT NOT NULL,
     "value" BLOB
 );
 

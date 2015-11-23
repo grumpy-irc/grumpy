@@ -31,3 +31,13 @@ void UserConf::Load()
     this->Options = Grumpyd::grumpyd->GetBackend()->GetConfiguration(this->User);
 }
 
+void UserConf::SetHash(QHash<QString, QVariant> hash)
+{
+    this->Options = hash;
+}
+
+QHash<QString, QVariant> UserConf::ToHash()
+{
+    return this->Options;
+}
+

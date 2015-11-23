@@ -21,6 +21,7 @@
 #include "databasebackend.h"
 #include "grumpyconf.h"
 #include "corewrapper.h"
+#include "userconfiguration.h"
 #include "grumpyd.h"
 #include "user.h"
 #include "security.h"
@@ -365,6 +366,9 @@ void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
     } else if (text == GP_CMD_INIT)
     {
         this->processSetup(parameters);
+    } else if (text == GP_CMD_OPTIONS)
+    {
+        this->processOptions(parameters);
     } else
     {
         // We received some unknown packet, send it back to client so that it at least knows we don't support this
@@ -489,6 +493,43 @@ void Session::processReconnect(QHash<QString, QVariant> parameters)
     }
 
     irc->Connect();
+}
+
+void Session::processOptions(QHash<QString, QVariant> parameters)
+{
+    if (!this->IsAuthorized(PRIVILEGE_USE_IRC))
+    {
+        this->PermissionDeny(GP_CMD_OPTIONS);
+        return;
+    }
+
+    QHash<QString, QVariant> reply;
+    if (parameters.contains("get"))
+    {
+        QHash <QString, QVariant> option;
+        foreach (QVariant key, parameters["get"].toList())
+        {
+            QString kx = key.toString();
+            option.insert(kx, this->loggedUser->GetConfiguration()->GetValue(kx));
+        }
+        reply.insert("options", QVariant(option));
+        this->protocol->SendProtocolCommand(GP_CMD_OPTIONS, reply);
+    } else if (parameters.contains("set"))
+    {
+        QHash<QString, QVariant> ox = parameters["set"].toHash();
+        foreach (QString key, ox.keys())
+            this->loggedUser->GetConfiguration()->SetValue(key, ox[key]);
+
+        this->loggedUser->GetConfiguration()->Save();
+    } else if (parameters.contains("override"))
+    {
+        this->loggedUser->GetConfiguration()->SetHash(parameters["override"].toHash());
+        this->loggedUser->GetConfiguration()->Save();
+    } else
+    {
+        reply.insert("options", QVariant(this->loggedUser->GetConfiguration()->ToHash()));
+        this->protocol->SendProtocolCommand(GP_CMD_OPTIONS, reply);
+    }
 }
 
 void Session::processRemove(QHash<QString, QVariant> parameters)
