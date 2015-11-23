@@ -30,6 +30,7 @@ namespace GrumpyIRC
             void UpdateColor();
             bool lowerThan(const QStandardItem &other) const;
             bool operator<(const QStandardItem &other) const;
+            bool IsSystem = false;
 
 		private:
             QBrush standardBrush;

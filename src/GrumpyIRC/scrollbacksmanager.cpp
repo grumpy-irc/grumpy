@@ -36,9 +36,9 @@ ScrollbacksManager::~ScrollbacksManager()
     delete this->ui;
 }
 
-ScrollbackFrame *ScrollbacksManager::CreateWindow(QString name, ScrollbackFrame *parent, bool focus, bool is_deletable, Scrollback *scrollback)
+ScrollbackFrame *ScrollbacksManager::CreateWindow(QString name, ScrollbackFrame *parent, bool focus, bool is_deletable, Scrollback *scrollback, bool is_system)
 {
-    ScrollbackFrame *window = new ScrollbackFrame(parent, NULL, scrollback);
+    ScrollbackFrame *window = new ScrollbackFrame(parent, NULL, scrollback, is_system);
     window->SetWindowName(name);
     this->Scrollbacks.append(window);
     window->IsDeletable = is_deletable;

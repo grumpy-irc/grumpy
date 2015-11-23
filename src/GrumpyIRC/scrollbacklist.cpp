@@ -54,6 +54,7 @@ void ScrollbackList::RegisterWindow(ScrollbackFrame *scrollback, ScrollbackList_
     else
         root = this->GetRootTreeItem();
     ScrollbackList_Node *node = new ScrollbackList_Node(scrollback);
+    node->IsSystem = scrollback->IsSystem;
     scrollback->TreeNode = node;
     root->appendRow(node);
     this->ui->treeView->expand(root->index());

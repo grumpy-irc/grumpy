@@ -44,7 +44,7 @@ namespace GrumpyIRC
              * \param focus
              * \return
              */
-            ScrollbackFrame *CreateWindow(QString name, ScrollbackFrame *parent = NULL, bool focus = false, bool is_deletable = true, Scrollback *scrollback = NULL);
+            ScrollbackFrame *CreateWindow(QString name, ScrollbackFrame *parent = NULL, bool focus = false, bool is_deletable = true, Scrollback *scrollback = NULL, bool is_system = false);
             ScrollbackFrame *GetWindowFromID(scrollback_id_t id);
             ScrollbackFrame *GetWindowFromScrollback(Scrollback *scrollback);
             void DestroyWindow(ScrollbackFrame *window);

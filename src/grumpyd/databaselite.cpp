@@ -299,6 +299,8 @@ void DatabaseLite::LoadWindows()
         VirtualScrollback *sx = (VirtualScrollback*)Core::GrumpyCore->NewScrollback(parent_ptr, target, st);
         sx->SetOriginalID(scrollback_id);
         sx->SetOwner(user, true);
+        if (!sx->PropertyBag.contains("initialized"))
+            sx->PropertyBag.insert("initialized", QVariant(true));
         if (scrollbacks.contains(scrollback_id))
             throw new Exception("Multiple scrollbacks with same ID", BOOST_CURRENT_FUNCTION);
         scrollbacks.insert(scrollback_id, sx);

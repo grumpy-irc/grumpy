@@ -20,6 +20,7 @@ using namespace GrumpyIRC;
 ScrollbackList_Node::ScrollbackList_Node(ScrollbackFrame *sb) : QStandardItem(sb->GetWindowName())
 {
     this->scrollback = sb;
+    this->IsSystem = false;
     this->RebuildCache();
     this->UpdateColor();
     this->UpdateIcon();
@@ -101,6 +102,10 @@ void ScrollbackList_Node::UpdateColor()
 
 bool ScrollbackList_Node::lowerThan(const QStandardItem &other) const
 {
+    ScrollbackList_Node *node = (ScrollbackList_Node*)&other;
+    if (node->IsSystem != this->IsSystem)
+        return this->IsSystem;
+
     return QString::localeAwareCompare(other.text(), this->text()) > 0;
 }
 

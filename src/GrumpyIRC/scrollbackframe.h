@@ -53,7 +53,7 @@ namespace GrumpyIRC
         public:
             static irc2htmlcode::Parser parser;
 
-            explicit ScrollbackFrame(ScrollbackFrame *parentWindow = NULL, QWidget *parent = NULL, Scrollback *_scrollback = NULL);
+            explicit ScrollbackFrame(ScrollbackFrame *parentWindow = NULL, QWidget *parent = NULL, Scrollback *_scrollback = NULL, bool is_system = false);
             ~ScrollbackFrame();
             QString GetWindowName() const;
             void InsertText(QString text, ScrollbackItemType item = ScrollbackItemType_System);
@@ -97,6 +97,7 @@ namespace GrumpyIRC
             bool Highlighting;
             void SetVisible(bool is_visible);
             ScrollbackList_Node *TreeNode;
+            bool IsSystem;
         private slots:
             void _insertText_(ScrollbackItem item);
             void UserList_Insert(libircclient::User *ux, bool bulk);

@@ -281,7 +281,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->tray.show();
     this->tray.setToolTip("Grumpy IRC");
     // Create a system scrollback
-    this->systemWindow = this->scrollbackWindow->CreateWindow("System Window", NULL, true, false);
+    this->systemWindow = this->scrollbackWindow->CreateWindow("System Window", NULL, true, false, NULL, true);
     // Register built-in commands
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("quit", (SC_Callback)SystemCommand_Exit));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("server", (SC_Callback)SystemCommand_Server));

@@ -39,8 +39,9 @@ using namespace GrumpyIRC;
 
 irc2htmlcode::Parser ScrollbackFrame::parser;
 
-ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent, Scrollback *_scrollback) : QFrame(parent), ui(new Ui::ScrollbackFrame)
+ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent, Scrollback *_scrollback, bool is_system) : QFrame(parent), ui(new Ui::ScrollbackFrame)
 {
+    this->IsSystem = is_system;
     this->textEdit = new STextBox(this);
     this->ui->setupUi(this);
     this->inputBox = new InputBox(this);
