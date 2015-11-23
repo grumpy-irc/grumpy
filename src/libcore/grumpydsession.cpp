@@ -519,10 +519,10 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVarian
 
 void GrumpydSession::processNewScrollbackItem(QHash<QString, QVariant> hash)
 {
-    if (!hash.contains("network_id"))
-        return;
+    //if (!hash.contains("network_id"))
+    //    return;
     // Fetch the network this item belongs to
-    unsigned int sid = hash["network_id"].toUInt();
+    //unsigned int sid = hash["network_id"].toUInt();
     if (!hash.contains("scrollback"))
     {
         GRUMPY_DEBUG("Missing scrollback id for item", 2);
@@ -737,10 +737,19 @@ void GrumpydSession::processSResync(QHash<QString, QVariant> parameters)
         if (!root)
             root = this->systemWindow;
     }
-    Scrollback *result = Core::GrumpyCore->NewScrollback(root, parameters["name"].toString(), ScrollbackType_User);
-    result->SetSession(this);
-    result->LoadHash(parameters["scrollback"].toHash());
-    this->scrollbackHash.insert(result->GetOriginalID(), result);
+    Scrollback *result = this->GetScrollback(parameters["scrollback"].toHash()["_original_id"].toUInt());
+    if (result)
+    {
+        // Restore the original
+        result->LoadHash(parameters["scrollback"].toHash());
+    } else
+    {
+        result = Core::GrumpyCore->NewScrollback(root, parameters["name"].toString(), ScrollbackType_User);
+        result->SetSession(this);
+        result->LoadHash(parameters["scrollback"].toHash());
+        this->scrollbackHash.insert(result->GetOriginalID(), result);
+    }
+    // Recover the lists
     if (result->GetType() == ScrollbackType_Channel)
     {
         // if this is a channel we also need to fill up some information about the user list

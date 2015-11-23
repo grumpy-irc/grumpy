@@ -63,7 +63,7 @@ Session::Session(qintptr socket_ptr, bool ssl)
     this->IsRunning = true;
     SessionList.append(this);
     sessions_lock->unlock();
-    this->MaxScrollbackSyncItems = 200;
+    this->MaxScrollbackSyncItems = 80;
     this->loggedUser = NULL;
     if (ssl)
     {
@@ -421,7 +421,7 @@ void Session::processRequest(QHash<QString, QVariant> parameters)
     Scrollback *scrollback = this->GetScrollback(sx);
     if (!scrollback)
     {
-        GRUMPY_ERROR("Unable to find scrollback i " + QString::number(sx) + " for user " + this->loggedUser->GetName());
+        GRUMPY_ERROR("Unable to find scrollback " + QString::number(sx) + " for user " + this->loggedUser->GetName());
         this->TransferError(GP_CMD_REQUEST_ITEMS, "dScrollback not found", GP_ESCROLLBACKNOTFOUND);
         return;
     }

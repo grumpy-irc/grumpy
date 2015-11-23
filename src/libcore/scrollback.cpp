@@ -266,6 +266,7 @@ void Scrollback::LoadHash(QHash<QString, QVariant> hash)
     UNSERIALIZE_UINT(_original_id);
     if (hash.contains("items"))
     {
+        this->_items.clear();
         QList<QVariant> items_l;
         items_l = hash["items"].toList();
         foreach (QVariant item, items_l)
