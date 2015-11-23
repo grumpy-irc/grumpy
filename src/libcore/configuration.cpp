@@ -92,7 +92,9 @@ void Configuration::Load()
         settings = new QSettings(this->configuration_path, QSettings::IniFormat);
     foreach (QString key, settings->allKeys())
         this->SetValue(key, settings->value(key));
+#ifdef GRUMPY_DEBUG
     qDebug() << (QString("Configuration path: ") + settings->fileName());
+#endif
     delete settings;
 }
 

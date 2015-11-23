@@ -32,6 +32,7 @@ Skin::Skin()
     this->Error = QColor(255, 102, 102);
     this->Warning = QColor(255, 162, 162);
     this->SystemColor = QColor(71, 245, 92);
+    this->UserListAwayColor = QColor(180, 180, 180);
     this->TextColor = QColor(255, 255, 255);
 #ifdef GRUMPY_WIN
     if (QFontDatabase().families().contains("Consolas"))

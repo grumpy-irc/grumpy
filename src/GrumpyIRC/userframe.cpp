@@ -127,12 +127,17 @@ QString UserFrame::GenerateTip(libircclient::User *ux)
     QString text = ux->ToString();
     if (ux->GetRealname().length())
         text += "\n" + ux->GetRealname();
+    if (ux->IsAway)
+        text += "\nIs away now.";
 
     return text;
 }
 
 static QColor getColor(libircclient::User *ux)
 {
+    if (ux->IsAway)
+        return Skin::GetDefault()->UserListAwayColor;
+
     if (ux->CUMode == 0 || !Skin::GetDefault()->ModeColors.contains(ux->CUMode))
         return Skin::GetDefault()->TextColor;
     

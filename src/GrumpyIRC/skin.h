@@ -31,6 +31,7 @@ namespace GrumpyIRC
             QPalette Palette();
             QFont TextFont;
             QColor TextColor;
+            QColor UserListAwayColor;
             QColor HighligtedColor;
             QColor SystemInfo;
             QColor Error;

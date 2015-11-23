@@ -66,6 +66,7 @@ namespace GrumpyIRC
             void OnWHO(libircclient::Parser *px, libircclient::Channel *channel, libircclient::User *user);
             void OnMODE(libircclient::Parser *px);
             void OnChannelMODE(libircclient::Parser *px, libircclient::Channel *channel);
+            void OnUserAwayStatusChange(libircclient::Parser *px, libircclient::Channel *ch, libircclient::User *ux);
         private:
             void resyncULRemove(libircclient::Channel *channel, QString user);
             void resyncUL(libircclient::Channel *channel, int mode, libircclient::User *user);

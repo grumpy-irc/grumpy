@@ -434,6 +434,12 @@ void SyncableIRCSession::OnChannelMODE(libircclient::Parser *px, libircclient::C
     this->ResyncChannel(channel, cx);
 }
 
+void SyncableIRCSession::OnUserAwayStatusChange(libircclient::Parser *px, libircclient::Channel *ch, libircclient::User *ux)
+{
+    IRCSession::OnUserAwayStatusChange(px, ch, ux);
+    this->resyncUL(ch, GRUMPY_UL_UPDATE, ux);
+}
+
 void SyncableIRCSession::resyncULRemove(libircclient::Channel *channel, QString user)
 {
     Session *session = this->owner->GetAnyGPSession();

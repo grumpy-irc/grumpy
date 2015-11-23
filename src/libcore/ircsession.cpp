@@ -212,6 +212,7 @@ void IRCSession::Connect(libircclient::Network *Network)
     connect(this->network, SIGNAL(Event_ModeInfo(libircclient::Parser*)), this, SLOT(OnMODEInfo(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_CreationTime(libircclient::Parser*)), this, SLOT(OnMODETIME(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_Mode(libircclient::Parser*)), this, SLOT(OnMODE(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_UserAwayStatusChange(libircclient::Parser*,libircclient::Channel*,libircclient::User*)), this, SLOT(OnUserAwayStatusChange(libircclient::Parser*,libircclient::Channel*,libircclient::User*)));
     connect(this->network, SIGNAL(Event_NickCollision(libircclient::Parser*)), this, SLOT(OnNickConflict(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_Welcome(libircclient::Parser*)), this, SLOT(OnUnknown(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_ChannelModeChanged(libircclient::Parser*, libircclient::Channel*)), this, SLOT(OnChannelMODE(libircclient::Parser*,libircclient::Channel*)));
@@ -555,7 +556,7 @@ void IRCSession::OnOutgoingRawMessage(QByteArray message)
     if (!this->snifferEnabled)
         return;
     this->data.append(new NetworkSniffer_Item(message, true));
-    if (this->data.size() > this->maxSnifferBufferSize)
+    if ((unsigned int)this->data.size() > this->maxSnifferBufferSize)
         this->data.removeFirst();
 }
 
@@ -826,6 +827,15 @@ void IRCSession::OnMODE(libircclient::Parser *px)
         this->systemWindow->InsertText(ScrollbackItem(px->GetSourceInfo() + " set your mode " + px->GetText()));
 }
 
+void IRCSession::OnUserAwayStatusChange(libircclient::Parser *px, libircclient::Channel *ch, libircclient::User *ux)
+{
+    Scrollback *scrollback = this->GetScrollbackForChannel(ch->GetName());
+    if (!scrollback)
+        return;
+
+    scrollback->UserListChange(ux->GetNick(), ux, UserListChange_Alter);
+}
+
 void IRCSession::OnChannelMODE(libircclient::Parser *px, libircclient::Channel *channel)
 {
     Scrollback *sx = this->GetScrollback(channel->GetName());
@@ -939,7 +949,7 @@ void IRCSession::OnIncomingRawMessage(QByteArray message)
     if (!this->snifferEnabled)
         return;
     this->data.append(new NetworkSniffer_Item(message, false));
-    while (this->data.size() > this->maxSnifferBufferSize)
+    while (((unsigned int)this->data.size()) > this->maxSnifferBufferSize)
         this->data.removeFirst();
 }
 
