@@ -168,6 +168,15 @@ QList<Scrollback *> IRCSession::GetScrollbacks()
     return sx;
 }
 
+QList<Scrollback *> IRCSession::GetChannelScrollbacks()
+{
+    QList<Scrollback*> sx;
+
+    // Fetch all windows we manage
+    sx.append(this->channels.values());
+    return sx;
+}
+
 unsigned int IRCSession::GetSID()
 {
     return this->SID;
@@ -227,6 +236,9 @@ void IRCSession::SetNetwork(libircclient::Network *nt)
 {
     delete this->network;
     this->network = nt;
+
+    foreach(Scrollback *scrollback, this->GetScrollbacks())
+        scrollback->SetNetwork(nt);
 }
 
 void IRCSession::SendNotice(Scrollback *window, QString text)

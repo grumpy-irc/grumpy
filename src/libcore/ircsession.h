@@ -86,6 +86,7 @@ namespace GrumpyIRC
             virtual Scrollback *GetScrollbackForUser(QString user);
             virtual libircclient::Network *GetNetwork(Scrollback *window = 0);
             virtual QList<Scrollback*> GetScrollbacks();
+            virtual QList<Scrollback*> GetChannelScrollbacks();
             virtual unsigned int GetSID();
             virtual void Connect(libircclient::Network *Network);
 			void SendMessage(Scrollback *window, QString target, QString text);

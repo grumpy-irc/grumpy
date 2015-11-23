@@ -15,8 +15,10 @@
 #include <QDebug>
 #include "mainwindow.h"
 #include "scrollbacklist.h"
+#include "../libcore/exception.h"
 #include "../libcore/networksession.h"
 #include "../libcore/ircsession.h"
+#include "../libcore/grumpydsession.h"
 #include "packetsnifferwin.h"
 #include "grumpydcfwin.h"
 #include "skin.h"
@@ -101,6 +103,7 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     QAction *menuReconnect = NULL;
     QAction *menuDisconnect = NULL;
     QAction *menuSniffer = NULL;
+    QAction *menuJoinAll = NULL;
 
     if (!wx->IsDeletable || !wx->IsDead())
         menuClose->setEnabled(false);
@@ -134,6 +137,8 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
         if (wx->IsDead())
             menuPart->setEnabled(false);
         Menu.addAction(menuPart);
+        menuJoinAll = new QAction(QObject::tr("Rejoin all dead channels on this network"), &Menu);
+        Menu.addAction(menuJoinAll);
     }
     if (wx->IsNetwork())
     {
@@ -179,6 +184,24 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     } else if (selectedItem == menuReconnect)
     {
         wx->Reconnect();
+    } else if (selectedItem == menuJoinAll)
+    {
+        IRCSession *irc_session = NULL;
+        if (wx->GetSession()->GetType() == SessionType_Grumpyd)
+        {
+            GrumpydSession *session = (GrumpydSession*)wx->GetSession();
+            irc_session = session->GetSessionFromWindow(wx->GetScrollback());
+        } else if (wx->GetSession()->GetType() == SessionType_IRC)
+        {
+            irc_session = (IRCSession*)wx->GetSession();
+        }
+        if (!irc_session)
+            throw new NullPointerException("irc_session", BOOST_CURRENT_FUNCTION);
+        foreach (Scrollback *channel, irc_session->GetChannelScrollbacks())
+        {
+            if (channel->IsDead())
+                wx->TransferRaw("JOIN " + channel->GetTarget());
+        }
     }
 }
 
