@@ -52,7 +52,7 @@ IRCSession *IRCSession::Open(Scrollback *system_window, libirc::ServerAddress &s
 
 IRCSession::IRCSession(QHash<QString, QVariant> sx, Scrollback *root)
 {
-    this->init();
+    this->init(false);
     this->systemWindow = NULL;
     this->Root = root;
     this->LoadHash(sx);
@@ -60,7 +60,7 @@ IRCSession::IRCSession(QHash<QString, QVariant> sx, Scrollback *root)
 
 IRCSession::IRCSession(Scrollback *system, Scrollback *root)
 {
-    this->init();
+    this->init(false);
     this->Root = root;
     this->systemWindow = system;
     this->systemWindow->SetSession(this);
@@ -68,10 +68,8 @@ IRCSession::IRCSession(Scrollback *system, Scrollback *root)
 
 IRCSession::IRCSession(unsigned int id, Scrollback *system, Scrollback *root)
 {
-    this->_ssl = false;
-    this->network = NULL;
+    this->init(true);
     this->SID = id;
-    this->_port = 0;
     this->Root = root;
     this->systemWindow = system;
     this->systemWindow->SetSession(this);
@@ -326,7 +324,7 @@ bool IRCSession::isRetrievingWhoInfo(QString channel)
     return this->retrievingWho.contains(channel.toLower());
 }
 
-void IRCSession::init()
+void IRCSession::init(bool preindexed)
 {
     this->_ssl = false;
     this->snifferEnabled = true;
@@ -334,10 +332,13 @@ void IRCSession::init()
     connect(&this->timerUL, SIGNAL(timeout()), this, SLOT(OnUpdateUserList()));
     this->maxSnifferBufferSize = 2000;
     this->network = NULL;
-    IRCSession::Sessions_Lock.lock();
-    IRCSession::Sessions.append(this);
-    this->SID = lastID++;
-    IRCSession::Sessions_Lock.unlock();
+    if (!preindexed)
+    {
+        IRCSession::Sessions_Lock.lock();
+        IRCSession::Sessions.append(this);
+        this->SID = lastID++;
+        IRCSession::Sessions_Lock.unlock();
+    }
     this->_port = 0;
 }
 

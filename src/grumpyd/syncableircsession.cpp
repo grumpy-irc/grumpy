@@ -74,7 +74,9 @@ SyncableIRCSession::SyncableIRCSession(unsigned int id, Scrollback *system, User
 void SyncableIRCSession::Connect(libircclient::Network *Network)
 {
     IRCSession::Connect(Network);
-    this->connInternalSocketSignals();
+
+    connect(this->network, SIGNAL(Event_MyInfo(libircclient::Parser*)), this, SLOT(OnInfo(libircclient::Parser*)));
+
 }
 
 void SyncableIRCSession::Connect()

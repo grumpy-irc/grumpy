@@ -191,7 +191,7 @@ namespace GrumpyIRC
             Scrollback *systemWindow;
         private:
             bool isRetrievingWhoInfo(QString channel);
-            void init();
+            void init(bool preindexed);
             QList<QString> retrievingWho;
     };
 }
