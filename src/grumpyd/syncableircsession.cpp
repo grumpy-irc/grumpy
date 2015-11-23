@@ -117,6 +117,7 @@ void SyncableIRCSession::Connect()
     this->systemWindow->SetDead(false);
     this->network->Connect();
     (((VirtualScrollback*)this->systemWindow)->PartialSync());
+    this->timerUL.start(this->ulistUpdateTime);
 }
 
 void SyncableIRCSession::ResyncChannel(libircclient::Channel *channel)

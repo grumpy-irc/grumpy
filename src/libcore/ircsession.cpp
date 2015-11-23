@@ -218,6 +218,7 @@ void IRCSession::Connect(libircclient::Network *Network)
     connect(this->network, SIGNAL(Event_ChannelModeChanged(libircclient::Parser*, libircclient::Channel*)), this, SLOT(OnChannelMODE(libircclient::Parser*,libircclient::Channel*)));
     connect(this->network, SIGNAL(Event_ChannelUserModeChanged(libircclient::Parser*, libircclient::Channel*, libircclient::User*)), this, SLOT(OnUMODE(libircclient::Parser*,libircclient::Channel*,libircclient::User*)));
     this->network->Connect();
+    this->timerUL.start(this->ulistUpdateTime);
 }
 
 void GrumpyIRC::IRCSession::SendMessage(Scrollback * window, QString target, QString text)
@@ -338,6 +339,8 @@ void IRCSession::init()
 {
     this->_ssl = false;
     this->snifferEnabled = true;
+    this->ulistUpdateTime = 10;//20 * 60000;
+    connect(&this->timerUL, SIGNAL(timeout()), this, SLOT(OnUpdateUserList()));
     this->maxSnifferBufferSize = 2000;
     this->network = NULL;
     IRCSession::Sessions_Lock.lock();
@@ -745,6 +748,8 @@ void IRCSession::OnWHO(libircclient::Parser *px, libircclient::Channel *channel,
 {
     if (!channel || !user)
         return;
+    if (this->ignoringWho.contains(channel->GetName().toLower()))
+        return;
     if (!this->retrievingWho.contains(channel->GetName().toLower()))
         this->systemWindow->InsertText("WHO: " + px->GetParameterLine() + ": " + px->GetText());
     // The user in respective channel was likely updated by libirc now
@@ -789,6 +794,13 @@ void IRCSession::OnWhoEnd(libircclient::Parser *px)
         return;
     QString name = px->GetParameters()[1].toLower();
 
+    // Remove ignored name
+    if (this->ignoringWho.contains(name))
+    {
+        this->ignoringWho.removeAll(name);
+        return;
+    }
+
     if (this->retrievingWho.contains(name))
         this->retrievingWho.removeOne(name);
     else
@@ -817,6 +829,17 @@ void IRCSession::OnMODETIME(libircclient::Parser *px)
 
     Scrollback *sc = this->channels[lx[1].toLower()];
     sc->InsertText("Channel was created at " + QDateTime::fromTime_t(lx[2].toUInt()).toString());
+}
+
+void IRCSession::OnUpdateUserList()
+{
+    if (!this->network)
+        return;
+    foreach (libircclient::Channel *channel, this->network->GetChannels())
+    {
+        this->ignoringWho.append(channel->GetName().toLower());
+        this->GetNetwork()->TransferRaw("WHO " + channel->GetName(), libircclient::Priority_Low);
+    }
 }
 
 void IRCSession::OnMODE(libircclient::Parser *px)
@@ -893,6 +916,7 @@ void IRCSession::processME(libircclient::Parser *px, QString message)
 
 void IRCSession::SetDead()
 {
+    this->timerUL.stop();
     foreach (Scrollback *sx, this->users)
         sx->SetDead(true);
     foreach (Scrollback *sx, this->channels)

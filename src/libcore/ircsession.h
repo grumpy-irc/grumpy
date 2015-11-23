@@ -18,6 +18,7 @@
 
 #include <QMutex>
 #include <QObject>
+#include <QTimer>
 #include <QDateTime>
 #include <QString>
 #include <QAbstractSocket>
@@ -148,6 +149,7 @@ namespace GrumpyIRC
             virtual void OnWhoEnd(libircclient::Parser *px);
             virtual void OnMODEInfo(libircclient::Parser *px);
             virtual void OnMODETIME(libircclient::Parser *px);
+            virtual void OnUpdateUserList();
             virtual void OnMODE(libircclient::Parser *px);
             virtual void OnUserAwayStatusChange(libircclient::Parser *px, libircclient::Channel *ch, libircclient::User *ux);
             virtual void OnChannelMODE(libircclient::Parser *px, libircclient::Channel *channel);
@@ -165,6 +167,7 @@ namespace GrumpyIRC
             void _gs_ResyncNickChange(QString new_, QString old_);
             void rmWindow(Scrollback *window);
             void SyncWindows(QHash<QString, QVariant> windows, QHash<QString, Scrollback*> *hash);
+            QTimer timerUL;
             //! Sessions have unique ID that distinct them from sessions made to same irc network
             unsigned int SID;
             unsigned int _port;
@@ -175,8 +178,10 @@ namespace GrumpyIRC
             QString _nick;
             QString _password;
             QList<NetworkSniffer_Item*> data;
+            QList<QString> ignoringWho;
             QHash<QString, Scrollback*> channels;
             bool snifferEnabled;
+            int ulistUpdateTime;
             unsigned int maxSnifferBufferSize;
             libircclient::Network *network;
             QHash<QString, Scrollback*> users;

@@ -1,4 +1,5 @@
 project(GrumpyIRC)
+add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/MP>)
 cmake_minimum_required (VERSION 2.8.0)
 
 # Settings
