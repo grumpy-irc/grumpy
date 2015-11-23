@@ -162,6 +162,7 @@ namespace GrumpyIRC
             //! Returns a configuration of grumpy, this method is overriden by grumpyd so that it returns
             //! the configuration for every user
             virtual Configuration *GetConfiguration();
+            virtual void connInternalSocketSignals();
             //! This is only called by grumpy session, used for resync, pretty much just a performance tweaks
             //! so that we don't need to call GP_CMD_RESYNC_CHANNEL just for a simple nick change
             void _gs_ResyncNickChange(QString new_, QString old_);

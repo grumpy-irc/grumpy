@@ -48,6 +48,7 @@ namespace GrumpyIRC
             void SetPort(unsigned int port);
         protected:
             Configuration *GetConfiguration();
+            void connInternalSocketSignals();
         //signals:
         public slots:
             void OnIRCSelfJoin(libircclient::Channel *channel);
