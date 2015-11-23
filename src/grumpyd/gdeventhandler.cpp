@@ -30,7 +30,7 @@ void GDEventHandler::OnDebug(QString text, unsigned int verbosity)
 {
     if (GCFG->Verbosity >= verbosity)
     {
-    openlog ("grumpyd", LOG_PID | LOG_DAEMON);
+    openlog ("grumpyd", LOG_PID | LOG_DAEMON, 0);
     syslog (LOG_DEBUG, "%s", text.toStdString().c_str());
     closelog ();
     }
@@ -38,14 +38,14 @@ void GDEventHandler::OnDebug(QString text, unsigned int verbosity)
 
 void GDEventHandler::OnError(QString text)
 {
-    openlog ("grumpyd", LOG_PID | LOG_DAEMON);
+    openlog ("grumpyd", LOG_PID | LOG_DAEMON, 0);
     syslog (LOG_ERR, "%s", text.toStdString().c_str());
     closelog ();
 }
 
 void GDEventHandler::OnSystemLog(QString text)
 {
-    openlog ("grumpyd", LOG_PID | LOG_DAEMON);
+    openlog ("grumpyd", LOG_PID | LOG_DAEMON, 0);
 
     syslog (LOG_INFO, "%s", text.toStdString().c_str());
 
