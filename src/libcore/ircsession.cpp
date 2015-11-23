@@ -339,7 +339,7 @@ void IRCSession::init()
 {
     this->_ssl = false;
     this->snifferEnabled = true;
-    this->ulistUpdateTime = 10;//20 * 60000;
+    this->ulistUpdateTime = 20 * 60000;
     connect(&this->timerUL, SIGNAL(timeout()), this, SLOT(OnUpdateUserList()));
     this->maxSnifferBufferSize = 2000;
     this->network = NULL;
