@@ -195,6 +195,27 @@ void SyncableIRCSession::RequestDisconnect(Scrollback *window, QString reason, b
     ((VirtualScrollback*)this->systemWindow)->PartialSync();
 }
 
+Scrollback *SyncableIRCSession::GetScrollbackForUser(QString user)
+{
+    VirtualScrollback *scrollback = (VirtualScrollback*)IRCSession::GetScrollbackForUser(user);
+    if (!scrollback)
+        throw new Exception("Underlying session returned NULL scrollback", BOOST_CURRENT_FUNCTION);
+
+    if (scrollback->PropertyBag.contains("initialized"))
+        return scrollback;
+
+    // Store in SQL
+    Grumpyd::GetBackend()->UpdateNetwork(this);
+    scrollback->PropertyBag.insert("initialized", QVariant(true));
+
+    if (!scrollback->GetOwner())
+        scrollback->SetOwner(this->owner);
+
+    scrollback->Sync();
+    Grumpyd::GetBackend()->StoreScrollback(this->owner, scrollback);
+    return scrollback;
+}
+
 void SyncableIRCSession::SetHostname(QString text)
 {
     this->_hostname = text;

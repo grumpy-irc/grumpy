@@ -98,3 +98,13 @@ void ScrollbackList_Node::UpdateColor()
             break;
     }
 }
+
+bool ScrollbackList_Node::lowerThan(const QStandardItem &other) const
+{
+    return QString::localeAwareCompare(other.text(), this->text()) > 0;
+}
+
+bool ScrollbackList_Node::operator<(const QStandardItem &other) const
+{
+    return this->lowerThan(other);
+}

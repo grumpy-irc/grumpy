@@ -39,6 +39,7 @@ namespace GrumpyIRC
             void Resync(QHash<QString, QVariant> network);
             void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete);
             void RegisterScrollback(Scrollback *window);
+            Scrollback *GetScrollbackForUser(QString user);
             void SetHostname(QString text);
             void SetName(QString text);
             void SetNick(QString text);

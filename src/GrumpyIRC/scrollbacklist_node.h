@@ -28,6 +28,8 @@ namespace GrumpyIRC
             void RebuildCache();
             void UpdateIcon();
             void UpdateColor();
+            bool lowerThan(const QStandardItem &other) const;
+            bool operator<(const QStandardItem &other) const;
 
 		private:
             QBrush standardBrush;
