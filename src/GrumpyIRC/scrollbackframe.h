@@ -67,6 +67,8 @@ namespace GrumpyIRC
 
         public:
             static void InitializeThread();
+            static QList<ScrollbackFrame*> ScrollbackFrames;
+            static QMutex ScrollbackFrames_m;
             static irc2htmlcode::Parser parser;
 
             explicit ScrollbackFrame(ScrollbackFrame *parentWindow = NULL, QWidget *parent = NULL, Scrollback *_scrollback = NULL, bool is_system = false);
@@ -135,12 +137,15 @@ namespace GrumpyIRC
             friend class ScrollbackFrame_WorkerThread;
             void clearItems();
             void writeText(ScrollbackItem item, int highlighted = 0);
+            QString itemsToString(QList<ScrollbackItem> items);
             bool isVisible;
             QTimer scroller;
             bool isClean;
             int maxItems;
             int currentScrollbar;
+            QString unwrittenBlock;
             QList<ScrollbackItem> unwritten;
+            QMutex unwritten_m;
             libircclient::Network *precachedNetwork;
             STextBox *textEdit;
             bool needsRefresh;

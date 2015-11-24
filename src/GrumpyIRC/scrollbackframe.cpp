@@ -12,6 +12,7 @@
 
 #include <QScrollBar>
 #include <QMenu>
+#include <QStringBuilder>
 #include "mainwindow.h"
 #include "../libcore/exception.h"
 #include "../libcore/configuration.h"
@@ -23,7 +24,6 @@
 #include "../libirc/libircclient/user.h"
 #include "corewrapper.h"
 #include "grumpyconf.h"
-#include <QClipboard>
 #include "channelwin.h"
 #include "highlighter.h"
 #include "hooks.h"
@@ -37,6 +37,8 @@
 
 using namespace GrumpyIRC;
 
+QList<ScrollbackFrame*> ScrollbackFrame::ScrollbackFrames;
+QMutex ScrollbackFrame::ScrollbackFrames_m;
 ScrollbackFrame_WorkerThread *ScrollbackFrame::WorkerThread = NULL;
 irc2htmlcode::Parser ScrollbackFrame::parser;
 
@@ -48,6 +50,9 @@ void ScrollbackFrame::InitializeThread()
 
 ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent, Scrollback *_scrollback, bool is_system) : QFrame(parent), ui(new Ui::ScrollbackFrame)
 {
+    ScrollbackFrames_m.lock();
+    ScrollbackFrames.append(this);
+    ScrollbackFrames_m.unlock();
     this->IsSystem = is_system;
     this->textEdit = new STextBox(this);
     this->ui->setupUi(this);
@@ -80,6 +85,7 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     connect(this->scrollback, SIGNAL(Event_Closed()), this, SLOT(OnClosed()));
     connect(this->scrollback, SIGNAL(Event_UserListBulkDone()), this, SLOT(OnFinishSortBulk()));
     connect(this->scrollback, SIGNAL(Event_UserRefresh(libircclient::User*)), this, SLOT(UserList_Refresh(libircclient::User*)));
+    connect(this->scrollback, SIGNAL(Event_Resync()), this, SLOT(OnDead()));
     connect(this->scrollback, SIGNAL(Event_StateModified()), this, SLOT(OnState()));
     connect(this->textEdit, SIGNAL(Event_Link(QString)), this, SLOT(OnLink(QString)));
     this->textEdit->SetStyleSheet(ScrollbackFrame::parser.GetStyle());
@@ -90,6 +96,9 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
 
 ScrollbackFrame::~ScrollbackFrame()
 {
+    ScrollbackFrames_m.lock();
+    ScrollbackFrames.removeOne(this);
+    ScrollbackFrames_m.unlock();
     delete this->scrollback;
     delete this->userFrame;
     //! \todo Handle deletion of TreeNode from list of scbs
@@ -225,6 +234,7 @@ void ScrollbackFrame::_insertText_(ScrollbackItem item)
     }
     if (!this->IsVisible())
     {
+        this->unwritten_m.lock();
         while (this->unwritten.size() > this->maxItems)
         {
             this->unwritten.removeAt(0);
@@ -232,6 +242,7 @@ void ScrollbackFrame::_insertText_(ScrollbackItem item)
                 this->clearItems();
         }
         this->unwritten.append(item);
+        this->unwritten_m.unlock();
         this->needsRefresh = true;
     } else
     {
@@ -398,6 +409,24 @@ void ScrollbackFrame::writeText(ScrollbackItem item, int highlighted)
     this->isClean = false;
 }
 
+QString ScrollbackFrame::itemsToString(QList<ScrollbackItem> items)
+{
+    bool is_first = true;
+    QString temp;
+    while (items.size())
+    {
+        ScrollbackItem item = items.at(0);
+        bool is_hg = Highlighter::IsMatch(&item, this->GetNetwork());
+        if (!is_first)
+            temp.append("<br>\n");
+        is_first = false;
+        temp.append(ItemToString(item, is_hg));
+        //this->writeText(this->unwritten.at(0));
+        items.removeAt(0);
+    }
+    return temp;
+}
+
 void ScrollbackFrame::SetWindowName(QString title)
 {
     this->_name = title;
@@ -516,6 +545,8 @@ void ScrollbackFrame::EnableState(bool enable)
     this->scrollback->IgnoreState = !enable;
     if (!enable)
     {
+        if (this->scrollback->GetState() == ScrollbackState_Normal)
+            return;
         this->scrollback->SetState(ScrollbackState_Normal, true);
         if (this->IsGrumpy())
         {
@@ -575,11 +606,25 @@ void ScrollbackFrame::RequestMore(unsigned int count)
 void ScrollbackFrame::RefreshHtml()
 {
     this->needsRefresh = false;
-    while (this->unwritten.size())
+    QString string = "";
+    bool is_first = true;
+    this->unwritten_m.lock();
+    if (!this->unwrittenBlock.isEmpty())
     {
-        this->writeText(this->unwritten.at(0));
-        this->unwritten.removeAt(0);
+        // This is a slow operation and probably will block worker thread, but that doesn't really matter
+        this->textEdit->appendHtml(this->unwrittenBlock);
+        this->unwrittenBlock.clear();
     }
+    if (!this->unwritten.isEmpty())
+    {
+        string = this->itemsToString(this->unwritten);
+        this->unwritten.clear();
+    }
+    this->unwritten_m.unlock();
+    this->buffer += string;
+    if (!string.isEmpty())
+        this->textEdit->AppendHtml(string);
+    this->isClean = false;
 }
 
 void ScrollbackFrame::RefreshHtmlIfNeeded()
@@ -674,7 +719,28 @@ void ScrollbackFrame_WorkerThread::run()
 {
     while (this->isRunning())
     {
+        QList<ScrollbackFrame*> list;
+        ScrollbackFrame::ScrollbackFrames_m.lock();
+        list.append(ScrollbackFrame::ScrollbackFrames);
+        ScrollbackFrame::ScrollbackFrames_m.unlock();
+        foreach (ScrollbackFrame *s, list)
+        {
+            if (s->unwritten.isEmpty())
+                continue;
 
-        this->msleep(200);
+            // let's process all unwritten items of this scrollback into html text
+            s->unwritten_m.lock();
+            if (s->unwritten.isEmpty())
+            {
+                s->unwritten_m.unlock();
+                continue;
+            }
+            if (!s->unwrittenBlock.isEmpty())
+                s->unwrittenBlock += "<br>\n";
+            s->unwrittenBlock += s->itemsToString(s->unwritten);
+            s->unwritten.clear();
+            s->unwritten_m.unlock();
+        }
+        this->msleep(2000);
     }
 }

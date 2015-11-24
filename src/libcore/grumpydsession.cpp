@@ -788,6 +788,7 @@ void GrumpydSession::processPSResync(QHash<QString, QVariant> parameters)
     }
     // let's resync most of the stuff
     origin->LoadHash(parameters["scrollback"].toHash());
+    origin->Resync(NULL);
 }
 
 void GrumpydSession::freememory()

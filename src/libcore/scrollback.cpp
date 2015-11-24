@@ -226,7 +226,11 @@ QHash<QString, QVariant> Scrollback::ToHash(int max)
     {
         while (max > 0)
         {
-            ScrollbackItem item = this->_items.at(this->_items.count() - 1 - max--);
+            int id = this->_items.count() - max--;
+            if (id < 0)
+                throw new Exception("Negative index", BOOST_CURRENT_FUNCTION);
+
+            ScrollbackItem item = this->_items.at(id);
             variant_items_list.append(QVariant(item.ToHash()));
         }
     }
@@ -277,15 +281,18 @@ void Scrollback::LoadHash(QHash<QString, QVariant> hash)
 
 void Scrollback::Resync(Scrollback *target)
 {
-    this->SetDead(target->IsDead());
-    this->SetTarget(target->GetTarget());
-    this->SetMaxItemsSize(target->GetMaxItemsSize());
-    foreach (QString key, target->PropertyBag.keys())
+    if (target != NULL)
     {
-        if (!this->PropertyBag.contains(key))
-            this->PropertyBag.insert(key, target->PropertyBag[key]);
-        else
-            this->PropertyBag[key] = target->PropertyBag[key];
+        this->SetDead(target->IsDead());
+        this->SetTarget(target->GetTarget());
+        this->SetMaxItemsSize(target->GetMaxItemsSize());
+        foreach (QString key, target->PropertyBag.keys())
+        {
+            if (!this->PropertyBag.contains(key))
+                this->PropertyBag.insert(key, target->PropertyBag[key]);
+            else
+                this->PropertyBag[key] = target->PropertyBag[key];
+        }
     }
     emit this->Event_Resync();
 }

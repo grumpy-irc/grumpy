@@ -279,6 +279,8 @@ QList<QString> IRCSession::GetChannels(Scrollback *window)
 {
     Q_UNUSED(window);
     QList<QString> channel_names;
+    if (!this->network)
+        return channel_names;
     foreach (libircclient::Channel *cx, this->network->GetChannels())
         channel_names.append(cx->GetName());
     return channel_names;
