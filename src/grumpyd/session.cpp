@@ -145,6 +145,20 @@ void Session::SendToEverySession(gp_command_t command, QHash<QString, QVariant> 
         xx->protocol->SendProtocolCommand(command, parameters);
 }
 
+void Session::SendToOtherSessions(gp_command_t command, QHash<QString, QVariant> parameters)
+{
+    if (!this->loggedUser)
+        return;
+
+    foreach (Session *xx, this->loggedUser->GetGPSessions())
+    {
+        if (xx != this)
+        {
+            xx->protocol->SendProtocolCommand(command, parameters);
+        }
+    }
+}
+
 Scrollback *Session::GetScrollback(scrollback_id_t scrollback_id)
 {
     Scrollback *result = NULL;
@@ -357,6 +371,9 @@ void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
     } else if (text == GP_CMD_RECONNECT)
     {
         this->processReconnect(parameters);
+    } else if (text == GP_CMD_SCROLLBACK_PARTIAL_RESYNC)
+    {
+        this->processResync(parameters);
     } else if (text == GP_CMD_REQUEST_ITEMS)
     {
         this->processRequest(parameters);
@@ -470,6 +487,30 @@ void Session::processSetup(QHash<QString, QVariant> parameters)
     QHash<QString, QVariant> result;
     result.insert("done", QVariant(true));
     this->protocol->SendProtocolCommand(GP_CMD_INIT, result);
+}
+
+void Session::processResync(QHash<QString, QVariant> parameters)
+{
+    if (!this->IsAuthorized(PRIVILEGE_USE_IRC))
+    {
+        this->PermissionDeny(GP_CMD_SCROLLBACK_PARTIAL_RESYNC);
+        return;
+    }
+
+    QHash<QString, QVariant> scrollback = parameters["scrollback"].toHash();
+    if (!scrollback.contains("_original_id"))
+        return;
+    Scrollback *origin = this->GetScrollback(scrollback["_original_id"].toUInt());
+    if (!origin)
+    {
+        //this->systemWindow->InsertText("RESYNC ERROR: Failed to resync scrollback with id " + QString::number(scrollback["_original_id"].toUInt()), ScrollbackItemType_SystemError);
+        return;
+    }
+    // let's resync most of the stuff
+    origin->LoadHash(parameters["scrollback"].toHash());
+    // we need to resync this with other clients as well
+    // let's just forward this
+    this->SendToOtherSessions(GP_CMD_SCROLLBACK_PARTIAL_RESYNC, parameters);
 }
 
 void Session::processReconnect(QHash<QString, QVariant> parameters)

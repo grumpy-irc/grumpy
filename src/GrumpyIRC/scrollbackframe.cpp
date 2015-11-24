@@ -37,7 +37,14 @@
 
 using namespace GrumpyIRC;
 
+ScrollbackFrame_WorkerThread *ScrollbackFrame::WorkerThread = NULL;
 irc2htmlcode::Parser ScrollbackFrame::parser;
+
+void ScrollbackFrame::InitializeThread()
+{
+    WorkerThread = new ScrollbackFrame_WorkerThread();
+    WorkerThread->start();
+}
 
 ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent, Scrollback *_scrollback, bool is_system) : QFrame(parent), ui(new Ui::ScrollbackFrame)
 {
@@ -508,7 +515,20 @@ void ScrollbackFrame::EnableState(bool enable)
     // Update the state
     this->scrollback->IgnoreState = !enable;
     if (!enable)
+    {
         this->scrollback->SetState(ScrollbackState_Normal, true);
+        if (this->IsGrumpy())
+        {
+            GrumpydSession *session = (GrumpydSession*)this->GetSession();
+            // Resync the information that the window was read
+            QHash<QString, QVariant> parameters;
+            parameters.insert("_original_id", this->scrollback->GetOriginalID());
+            parameters.insert("scrollbackState", static_cast<int>(this->scrollback->GetState()));
+            QHash<QString, QVariant> px;
+            px.insert("scrollback", parameters);
+            session->SendProtocolCommand(GP_CMD_SCROLLBACK_PARTIAL_RESYNC, px);
+        }
+    }
 }
 
 void ScrollbackFrame::RequestPart()
@@ -644,3 +664,17 @@ void ScrollbackFrame::SetVisible(bool is_visible)
     this->isVisible = is_visible;
 }
 
+
+ScrollbackFrame_WorkerThread::ScrollbackFrame_WorkerThread()
+{
+
+}
+
+void ScrollbackFrame_WorkerThread::run()
+{
+    while (this->isRunning())
+    {
+
+        this->msleep(200);
+    }
+}

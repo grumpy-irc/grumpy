@@ -772,16 +772,22 @@ void GrumpydSession::processSResync(QHash<QString, QVariant> parameters)
 
 void GrumpydSession::processPSResync(QHash<QString, QVariant> parameters)
 {
-    Scrollback scrollback(parameters["scrollback"].toHash());
+    //Scrollback scrollback(parameters["scrollback"].toHash());
     // find a scrollback with this id
-    Scrollback *origin = this->GetScrollback(scrollback.GetOriginalID());
+    QHash<QString, QVariant> scrollback = parameters["scrollback"].toHash();
+    if (!scrollback.contains("_original_id"))
+    {
+        this->systemWindow->InsertText("RESYNC ERROR: Failed to resync scrollback, missing original_id", ScrollbackItemType_SystemError);
+        return;
+    }
+    Scrollback *origin = this->GetScrollback(scrollback["_original_id"].toUInt());
     if (!origin)
     {
-        this->systemWindow->InsertText("RESYNC ERROR: Failed to resync scrollback with id " + QString::number(scrollback.GetOriginalID()), ScrollbackItemType_SystemError);
+        this->systemWindow->InsertText("RESYNC ERROR: Failed to resync scrollback with id " + QString::number(scrollback["_original_id"].toUInt()), ScrollbackItemType_SystemError);
         return;
     }
     // let's resync most of the stuff
-    origin->Resync(&scrollback);
+    origin->LoadHash(parameters["scrollback"].toHash());
 }
 
 void GrumpydSession::freememory()

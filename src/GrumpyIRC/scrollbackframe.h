@@ -15,6 +15,8 @@
 
 #include <QFrame>
 #include <QStandardItemModel>
+#include <QThread>
+#include <QMutex>
 #include <QTimer>
 #include "stextbox.h"
 #include "../libirc2htmlcode/parser.h"
@@ -44,13 +46,27 @@ namespace GrumpyIRC
     class ScrollbackList_Node;
     class ScrollbackList_Window;
     class UserFrame;
+    class ScrollbackFrame;
     class NetworkSession;
+
+    /*!
+     * \brief The ScrollbackFrame_WorkerThread class processes CPU intensive items on background in order to speed up grumpy
+     */
+    class ScrollbackFrame_WorkerThread : public QThread
+    {
+            Q_OBJECT
+        public:
+            ScrollbackFrame_WorkerThread();
+        protected:
+            void run();
+    };
 
     class ScrollbackFrame : public QFrame
     {
             Q_OBJECT
 
         public:
+            static void InitializeThread();
             static irc2htmlcode::Parser parser;
 
             explicit ScrollbackFrame(ScrollbackFrame *parentWindow = NULL, QWidget *parent = NULL, Scrollback *_scrollback = NULL, bool is_system = false);
@@ -98,6 +114,8 @@ namespace GrumpyIRC
             void SetVisible(bool is_visible);
             ScrollbackList_Node *TreeNode;
             bool IsSystem;
+        protected:
+            static ScrollbackFrame_WorkerThread *WorkerThread;
         private slots:
             void _insertText_(ScrollbackItem item);
             void UserList_Insert(libircclient::User *ux, bool bulk);
@@ -114,6 +132,7 @@ namespace GrumpyIRC
             void OnClosed();
             void NetworkChanged(libircclient::Network *network);
         private:
+            friend class ScrollbackFrame_WorkerThread;
             void clearItems();
             void writeText(ScrollbackItem item, int highlighted = 0);
             bool isVisible;

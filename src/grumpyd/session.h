@@ -50,6 +50,7 @@ namespace GrumpyIRC
             bool IsAuthorized(QString permission);
             //! Transfer data to every session this user has, so that every session connected as this user receives it
             void SendToEverySession(gp_command_t command, QHash<QString, QVariant> parameters);
+            void SendToOtherSessions(gp_command_t command, QHash<QString, QVariant> parameters);
             Scrollback *GetScrollback(scrollback_id_t scrollback_id);
             void TransferError(gp_command_t source, QString description, int id);
             void PermissionDeny(gp_command_t source);
@@ -74,6 +75,7 @@ namespace GrumpyIRC
             void processIrcQuit(QHash<QString, QVariant> parameters);
             void processRequest(QHash<QString, QVariant> parameters);
             void processSetup(QHash<QString, QVariant> parameters);
+            void processResync(QHash<QString, QVariant> parameters);
             void processReconnect(QHash<QString, QVariant> parameters);
             void processOptions(QHash<QString, QVariant> parameters);
             void processRemove(QHash<QString, QVariant> parameters);
