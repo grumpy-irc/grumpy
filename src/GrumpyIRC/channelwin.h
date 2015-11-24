@@ -13,6 +13,10 @@
 #ifndef CHANNELWIN_H
 #define CHANNELWIN_H
 
+#include "../libcore/definitions.h"
+
+#include <QList>
+#include <QCheckBox>
 #include <QDialog>
 
 namespace Ui
@@ -42,12 +46,12 @@ namespace GrumpyIRC
 
         private slots:
             void on_pushButton_clicked();
-
             void on_plainTextEdit_textChanged();
 
         private:
             bool ignore;
             bool updateTopic;
+            QList<QCheckBox*> checkBoxesMode;
             NetworkSession *_ns;
             libircclient::Network *_network;
             libircclient::Channel *_channel;

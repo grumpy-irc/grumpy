@@ -149,6 +149,7 @@ namespace GrumpyIRC
             void processNetworkResync(QHash<QString, QVariant> hash);
             void processChannel(QHash<QString, QVariant> hash);
             void processNick(QHash<QString, QVariant> hash);
+            void processPreferences(QHash<QString, QVariant> hash);
             void processRequest(QHash<QString, QVariant> hash);
             void processChannelResync(QHash<QString, QVariant> hash);
             void processSResync(QHash<QString, QVariant> parameters);

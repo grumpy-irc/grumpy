@@ -60,6 +60,7 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     ScrollbackFrames_m.unlock();
     this->IsSystem = is_system;
     this->textEdit = new STextBox(this);
+    this->ShowJQP = true;
     this->ui->setupUi(this);
     this->inputBox = new InputBox(this);
     this->ui->splitter->addWidget(this->textEdit);
@@ -231,6 +232,20 @@ static QString ItemToString(ScrollbackItem item, bool highlighted)
 
 void ScrollbackFrame::_insertText_(ScrollbackItem item)
 {
+    if (!this->ShowJQP)
+    {
+        switch(item.GetType())
+        {
+            case ScrollbackItemType_Join:
+            case ScrollbackItemType_Nick:
+            case ScrollbackItemType_Quit:
+            case ScrollbackItemType_Part:
+                return;
+
+            default:
+                break;
+        }
+    }
     int highlighted = GRUMPY_H_NOT;
     if (Highlighter::IsMatch(&item, this->GetNetwork()))
     {
@@ -346,12 +361,17 @@ void ScrollbackFrame::Menu(QPoint pn)
     Menu.addAction(menuCopy);
     QAction *menuRetrieveTopic = NULL;
     QAction *menuChanSet = NULL;
+    QAction *menuViewJQP = NULL;
     if (this->IsChannel())
     {
         menuRetrieveTopic = new QAction(QObject::tr("Retrieve topic"), &Menu);
         Menu.addAction(menuRetrieveTopic);
         menuChanSet = new QAction(QObject::tr("Channel settings"), &Menu);
         Menu.addAction(menuChanSet);
+        menuViewJQP = new QAction(QObject::tr("Display join / quit / part / nick"), &Menu);
+        Menu.addAction(menuViewJQP);
+        menuViewJQP->setCheckable(true);
+        menuViewJQP->setChecked(this->ShowJQP);
     }
 
     QAction* selectedItem = Menu.exec(globalPos);
@@ -378,6 +398,10 @@ void ScrollbackFrame::Menu(QPoint pn)
         // We need to close this window when the session gets deleted otherwise we could access deleted memory
         connect(this->GetSession(), SIGNAL(Event_Deleted()), window, SLOT(close()));
         window->show();
+    } else if (selectedItem == menuViewJQP)
+    {
+        this->ShowJQP = !this->ShowJQP;
+        this->Refresh();
     }
 }
 

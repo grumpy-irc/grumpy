@@ -509,7 +509,10 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVarian
     } else if (text == GP_CMD_ERROR)
     {
         this->systemWindow->InsertText("Error: " + parameters["description"].toString(), ScrollbackItemType_SystemError);
-    } else
+    } else if (text == GP_CMD_OPTIONS)
+    {
+        this->processPreferences(parameters);
+    }else
     {
         QHash<QString, QVariant> params;
         params.insert("source", text);
@@ -657,6 +660,11 @@ void GrumpydSession::processNick(QHash<QString, QVariant> hash)
         session->GetNetwork()->_st_SetNick(new_);
     }
     session->_gs_ResyncNickChange(new_, old_);
+}
+
+void GrumpydSession::processPreferences(QHash<QString, QVariant> hash)
+{
+
 }
 
 void GrumpydSession::processRequest(QHash<QString, QVariant> hash)
