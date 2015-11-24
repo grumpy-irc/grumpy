@@ -87,6 +87,8 @@ void SyncableIRCSession::Connect()
     this->connInternalSocketSignals();
     this->systemWindow->InsertText("Connecting to " + network->GetServerAddress() + ":" + QString::number(server.GetPort()));
     this->systemWindow->SetDead(false);
+    foreach (Scrollback *s, this->GetUserScrollbacks())
+        s->SetDead(false);
     this->network->Connect();
     (((VirtualScrollback*)this->systemWindow)->PartialSync());
     this->timerUL.start(this->ulistUpdateTime);
