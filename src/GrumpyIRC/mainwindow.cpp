@@ -43,6 +43,7 @@ MainWindow *MainWindow::Main;
 
 static void Exit()
 {
+    ScrollbackFrame::ExitThread();
     GCFG->SetValue("mainwindow_state", QVariant(MainWindow::Main->saveState()));
     GCFG->SetValue("mainwindow_geometry", QVariant(MainWindow::Main->saveGeometry()));
     GCFG->Save();

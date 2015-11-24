@@ -42,6 +42,11 @@ QMutex ScrollbackFrame::ScrollbackFrames_m;
 ScrollbackFrame_WorkerThread *ScrollbackFrame::WorkerThread = NULL;
 irc2htmlcode::Parser ScrollbackFrame::parser;
 
+void ScrollbackFrame::ExitThread()
+{
+    WorkerThread->exit();
+}
+
 void ScrollbackFrame::InitializeThread()
 {
     WorkerThread = new ScrollbackFrame_WorkerThread();
@@ -263,6 +268,8 @@ void ScrollbackFrame::UserList_Refresh(libircclient::User *ux)
 void ScrollbackFrame::OnState()
 {
     this->UpdateColor();
+    if (this->TreeNode)
+        this->TreeNode->UpdateToolTip();
 }
 
 void ScrollbackFrame::UserList_Remove(QString user, bool bulk)
@@ -278,6 +285,8 @@ void ScrollbackFrame::UserList_Rename(QString old, libircclient::User *us)
 void ScrollbackFrame::OnDead()
 {
     this->UpdateIcon();
+    if (this->TreeNode)
+        this->TreeNode->UpdateToolTip();
 }
 
 void ScrollbackFrame::OnFinishSortBulk()
@@ -387,6 +396,8 @@ void ScrollbackFrame::NetworkChanged(libircclient::Network *network)
 {
     this->userFrame->SetNetwork(network);
     this->precachedNetwork = network;
+    if (this->TreeNode)
+        this->TreeNode->UpdateToolTip();
 }
 
 void ScrollbackFrame::clearItems()
@@ -722,7 +733,6 @@ void ScrollbackFrame_WorkerThread::run()
         QList<ScrollbackFrame*> list;
         ScrollbackFrame::ScrollbackFrames_m.lock();
         list.append(ScrollbackFrame::ScrollbackFrames);
-        ScrollbackFrame::ScrollbackFrames_m.unlock();
         foreach (ScrollbackFrame *s, list)
         {
             if (s->unwritten.isEmpty())
@@ -741,6 +751,7 @@ void ScrollbackFrame_WorkerThread::run()
             s->unwritten.clear();
             s->unwritten_m.unlock();
         }
+        ScrollbackFrame::ScrollbackFrames_m.unlock();
         this->msleep(2000);
     }
 }

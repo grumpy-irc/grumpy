@@ -66,6 +66,7 @@ namespace GrumpyIRC
             Q_OBJECT
 
         public:
+            static void ExitThread();
             static void InitializeThread();
             static QList<ScrollbackFrame*> ScrollbackFrames;
             static QMutex ScrollbackFrames_m;

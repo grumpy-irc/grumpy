@@ -12,7 +12,10 @@
 
 #include "scrollbacklist_node.h"
 #include "skin.h"
+#include "../libirc/libircclient/network.h"
+#include "../libirc/libircclient/channel.h"
 #include "../libcore/scrollback.h"
+#include "../libcore/networksession.h"
 #include "scrollbackframe.h"
 
 using namespace GrumpyIRC;
@@ -23,6 +26,7 @@ ScrollbackList_Node::ScrollbackList_Node(ScrollbackFrame *sb) : QStandardItem(sb
     this->IsSystem = false;
     this->RebuildCache();
     this->UpdateColor();
+    this->UpdateToolTip();
     this->UpdateIcon();
 }
 
@@ -79,6 +83,34 @@ void ScrollbackList_Node::UpdateIcon()
                 break;
         }
     }
+}
+
+void ScrollbackList_Node::UpdateToolTip()
+{
+    QString tool_tip = "<b>" + this->text() + "</b>";
+    if (this->scrollback->IsChannel() && this->scrollback->GetSession())
+    {
+        libircclient::Channel *channel = this->scrollback->GetSession()->GetChannel(this->scrollback->GetScrollback());
+        if (!channel)
+            return;
+        tool_tip += " Topic: " + channel->GetTopic();
+        //tool_tip += "<br>User count: " + channel-
+    } else if (this->scrollback->IsNetwork() && this->scrollback->GetSession())
+    {
+        libircclient::Network *network = this->scrollback->GetSession()->GetNetwork(this->scrollback->GetScrollback());
+        if (!network)
+            return;
+        if (network->IsSSL())
+            tool_tip += " Using ssl";
+        QString version = network->GetServerVersion();
+        if (!version.isEmpty())
+        {
+            tool_tip += " Version: " + version;
+        }
+    }
+    /*if (this->scrollback->IsDead())
+        tool_tip += "<br>Window is dead";*/
+    this->setToolTip(tool_tip);
 }
 
 void ScrollbackList_Node::UpdateColor()

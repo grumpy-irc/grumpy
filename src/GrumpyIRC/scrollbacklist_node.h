@@ -27,6 +27,7 @@ namespace GrumpyIRC
 			ScrollbackFrame *GetScrollback();
             void RebuildCache();
             void UpdateIcon();
+            void UpdateToolTip();
             void UpdateColor();
             bool lowerThan(const QStandardItem &other) const;
             bool operator<(const QStandardItem &other) const;
