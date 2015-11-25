@@ -50,6 +50,8 @@ namespace GrumpyIRC
             QString GetNoticeFormat();
             QString GetMessageFormat();
             QString GetActionFormat();
+            QString GetDefaultKickReason();
+            void SetDefaultKickReason(QString text);
             bool FirstRun();
     };
 }

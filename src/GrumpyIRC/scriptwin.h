@@ -20,17 +20,33 @@ namespace Ui
     class ScriptWin;
 }
 
+namespace libircclient
+{
+    class User;
+    class Mode;
+    class Channel;
+    class Network;
+}
+
 namespace GrumpyIRC
 {
+    class ScrollbackFrame;
+
     class ScriptWin : public QDialog
     {
             Q_OBJECT
 
         public:
-            explicit ScriptWin(QWidget *parent = 0);
+            explicit ScriptWin(ScrollbackFrame *parent = 0);
             ~ScriptWin();
+            void Set(QString input);
+
+        private slots:
+            void on_pushButton_clicked();
 
         private:
+            libircclient::Network *Network;
+            ScrollbackFrame *parentFrame;
             Ui::ScriptWin *ui;
     };
 }

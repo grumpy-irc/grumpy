@@ -106,6 +106,16 @@ QString GrumpyConf::GetActionFormat()
     return GCFG->GetValueAsString("action_format", "* $nick $string");
 }
 
+QString GrumpyConf::GetDefaultKickReason()
+{
+    return GCFG->GetValueAsString("kick", "Such user. Much kicked.");
+}
+
+void GrumpyConf::SetDefaultKickReason(QString text)
+{
+
+}
+
 bool GrumpyConf::FirstRun()
 {
     return GCFG->GetValueAsBool("first_run", true);

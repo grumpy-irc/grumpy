@@ -13,6 +13,31 @@
   <property name="windowTitle">
    <string>Execute</string>
   </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>120</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Script edit hints:&lt;br&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;#&lt;/span&gt; Is a comment&lt;br&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;/&lt;/span&gt;echo Stuff prefixed with command prefix is executed as a grumpy command&lt;br&gt;Everything else is executed as a RAW&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;You are about to execute following commands on the server:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPlainTextEdit" name="plainTextEdit"/>
+   </item>
+   <item>
+    <widget class="QPushButton" name="pushButton">
+     <property name="text">
+      <string>Execute</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>

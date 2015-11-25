@@ -12,6 +12,7 @@
 
 #include "../libirc/libircclient/network.h"
 #include "scrollbackframe.h"
+#include "grumpyconf.h"
 #include "../libcore/exception.h"
 #include "userframe.h"
 #include "userframeitem.h"
@@ -92,8 +93,14 @@ void UserFrame::on_listWidget_customContextMenuRequested(const QPoint &pos)
 
     Menu.addSeparator();
 
+    QAction *menuKick = new QAction(QObject::tr("Kick"), &Menu);
     QAction *menuBan = new QAction(QObject::tr("Ban"), &Menu);
+    QAction *menuKickBan = new QAction(QObject::tr("Kick and ban"), &Menu);
+    QAction *menuIgnore = new QAction(QObject::tr("Ignore"), &Menu);
+    Menu.addAction(menuKick);
     Menu.addAction(menuBan);
+    Menu.addAction(menuKickBan);
+    Menu.addAction(menuIgnore);
 
     QAction* selectedItem = Menu.exec(globalPos);
     if (!selectedItem)
@@ -120,6 +127,21 @@ void UserFrame::on_listWidget_customContextMenuRequested(const QPoint &pos)
         this->ChangeMode("+v");
     else if (selectedItem == menuWhois)
         this->Whois();
+}
+
+void UserFrame::kick()
+{
+
+}
+
+void UserFrame::kb()
+{
+
+}
+
+void UserFrame::ban()
+{
+
 }
 
 QString UserFrame::GenerateTip(libircclient::User *ux)

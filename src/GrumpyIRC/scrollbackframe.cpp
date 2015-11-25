@@ -26,6 +26,7 @@
 #include "grumpyconf.h"
 #include "channelwin.h"
 #include "highlighter.h"
+#include "scriptwin.h"
 #include "hooks.h"
 #include "scrollbacklist_node.h"
 #include "skin.h"
@@ -387,12 +388,15 @@ void ScrollbackFrame::Menu(QPoint pn)
         this->GetSession()->SendRaw(this->GetScrollback(), "TOPIC " + this->GetScrollback()->GetTarget());
     } else if (selectedItem == menuChanSet)
     {
-        if (!this->GetScrollback()->GetNetwork())
+        if (!this->GetSession() || !this->GetScrollback()->GetNetwork())
             return;
+
         libircclient::Network *network = this->GetSession()->GetNetwork(this->scrollback);
         libircclient::Channel *channel = this->GetSession()->GetChannel(this->scrollback);
+
         if (!channel || !network)
             return;
+
         ChannelWin *window = new ChannelWin(this->GetSession(), network, channel, this);
         window->setAttribute(Qt::WA_DeleteOnClose);
         // We need to close this window when the session gets deleted otherwise we could access deleted memory
@@ -606,6 +610,17 @@ void ScrollbackFrame::RequestPart()
 void ScrollbackFrame::ToggleSecure()
 {
     this->inputBox->Secure();
+}
+
+void ScrollbackFrame::ExecuteScript(QString text)
+{
+    if (!this->GetSession())
+        return;
+    ScriptWin *wx = new ScriptWin(this);
+    wx->Set(text);
+    wx->setAttribute(Qt::WA_DeleteOnClose);
+    connect(this->GetSession(), SIGNAL(Event_Deleted()), wx, SLOT(close()));
+    wx->show();
 }
 
 void ScrollbackFrame::RequestJoin()

@@ -10,17 +10,57 @@
 
 // Copyright (c) Petr Bena 2015
 
+#include "../libcore/networksession.h"
+#include "../libcore/core.h"
+#include "corewrapper.h"
+#include "../libcore/exception.h"
+#include "scrollbackframe.h"
+#include "../libcore/commandprocessor.h"
 #include "scriptwin.h"
+#include "skin.h"
 #include "ui_scriptwin.h"
 
 using namespace GrumpyIRC;
 
-ScriptWin::ScriptWin(QWidget *parent) : QDialog(parent), ui(new Ui::ScriptWin)
+ScriptWin::ScriptWin(ScrollbackFrame *parent) : QDialog(parent), ui(new Ui::ScriptWin)
 {
     this->ui->setupUi(this);
+    this->parentFrame = parent;
+    this->ui->plainTextEdit->setFont(Skin::GetDefault()->TextFont);
+    this->ui->plainTextEdit->setPalette(Skin::GetDefault()->Palette());
 }
 
 ScriptWin::~ScriptWin()
 {
     delete this->ui;
+}
+
+void ScriptWin::Set(QString input)
+{
+    this->ui->plainTextEdit->setPlainText(input);
+    this->ui->pushButton->setFocus();
+}
+
+void GrumpyIRC::ScriptWin::on_pushButton_clicked()
+{
+    QStringList ls = this->ui->plainTextEdit->toPlainText().split("\n");
+    foreach (QString line, ls)
+    {
+        if (line.startsWith("#") || line.isEmpty())
+            continue;
+
+        if (line.startsWith(CoreWrapper::GrumpyCore->GetCommandProcessor()->CommandPrefix))
+        {
+            // This is a command
+            CoreWrapper::GrumpyCore->GetCommandProcessor()->ProcessText(line, this->parentFrame->GetScrollback());
+            continue;
+        }
+
+        // Send as a raw command
+        if (!this->parentFrame->GetSession())
+            throw new NullPointerException("this->parentFrame->GetSession()", BOOST_CURRENT_FUNCTION);
+
+        this->parentFrame->GetSession()->SendRaw(this->parentFrame->GetScrollback(), line);
+    }
+    this->close();
 }

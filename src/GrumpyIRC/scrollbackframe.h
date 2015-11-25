@@ -97,6 +97,7 @@ namespace GrumpyIRC
             void EnableState(bool enable);
             void RequestPart();
             void ToggleSecure();
+            void ExecuteScript(QString text);
             void RequestJoin();
             void Reconnect();
             void RequestDisconnect();
