@@ -27,6 +27,7 @@ namespace Ui
 namespace libircclient
 {
     class User;
+    class Mode;
     class Channel;
     class Network;
 }
@@ -47,14 +48,13 @@ namespace GrumpyIRC
         private slots:
             void on_pushButton_clicked();
             void on_plainTextEdit_textChanged();
-
+            void OnMode(bool toggled);
             void on_tableWidget_2_customContextMenuRequested(const QPoint &pos);
-
             void on_tableWidget_3_customContextMenuRequested(const QPoint &pos);
-
             void on_tableWidget_4_customContextMenuRequested(const QPoint &pos);
 
         private:
+            libircclient::Mode *chanmode;
             bool ignore;
             bool updateTopic;
             QList<QCheckBox*> checkBoxesMode;

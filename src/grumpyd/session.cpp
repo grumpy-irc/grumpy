@@ -353,8 +353,13 @@ void Session::processInfo(QHash<QString, QVariant> parameters)
     }
     if (!parameters.contains("type"))
         return;
-    if (parameters["type"].toString() == "+b")
+    QString tx = parameters["type"].toString();
+    if (tx == "+b")
         irc->RetrieveChannelBanList(NULL, parameters["channel_name"].toString());
+    else if (tx == "+I")
+        irc->RetrieveChannelInviteList(NULL, parameters["channel_name"].toString());
+    else if (tx == "+e")
+        irc->RetrieveChannelExceptionList(NULL, parameters["channel_name"].toString());
 }
 
 void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)

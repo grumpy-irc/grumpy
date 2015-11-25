@@ -31,6 +31,14 @@ unsigned int IRCSession::lastID = 2;
 QMutex IRCSession::Sessions_Lock;
 QList<IRCSession*> IRCSession::Sessions;
 
+void IRCSession::Exit(QString message)
+{
+    foreach (IRCSession *session, Sessions)
+    {
+        session->RequestDisconnect(NULL, message, true);
+    }
+}
+
 IRCSession *IRCSession::Open(Scrollback *system_window, libirc::ServerAddress &server, QString network, QString nick, QString ident, QString username)
 {
     if (!server.IsValid())
@@ -506,6 +514,28 @@ void IRCSession::RegisterChannel(libircclient::Channel *channel, Scrollback *win
     this->channels.insert(channel->GetName().toLower(), window);
     if (!this->GetNetwork()->GetChannel(channel->GetName()))
         this->GetNetwork()->_st_InsertChannel(channel);
+}
+
+void IRCSession::RetrieveChannelExceptionList(Scrollback *window, QString channel_name)
+{
+    Q_UNUSED(window);
+    if (!this->network)
+        return;
+
+    QString ln = channel_name.toLower();
+    this->ignoringBans.append(ln);
+    this->GetNetwork()->TransferRaw("MODE " + channel_name + " +e", libircclient::Priority_Low);
+}
+
+void IRCSession::RetrieveChannelInviteList(Scrollback *window, QString channel_name)
+{
+    Q_UNUSED(window);
+    if (!this->network)
+        return;
+
+    QString ln = channel_name.toLower();
+    this->ignoringBans.append(ln);
+    this->GetNetwork()->TransferRaw("MODE " + channel_name + " +I", libircclient::Priority_Low);
 }
 
 void IRCSession::RetrieveChannelBanList(Scrollback *window, QString channel_name)

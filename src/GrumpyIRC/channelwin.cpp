@@ -23,6 +23,7 @@ using namespace GrumpyIRC;
 
 ChannelWin::ChannelWin(NetworkSession *session, libircclient::Network *network, libircclient::Channel *channel, ScrollbackFrame *parent) : QDialog(parent), ui(new Ui::ChannelWin)
 {
+    this->chanmode = new libircclient::Mode();
     this->ui->setupUi(this);
     this->ignore = true;
     this->_ns = session;
@@ -50,6 +51,7 @@ ChannelWin::ChannelWin(NetworkSession *session, libircclient::Network *network, 
         this->ui->tableWidget->insertRow(row);
         QCheckBox *modeBox = new QCheckBox(this);
         modeBox->setText(QString(QChar(mode)));
+        connect(modeBox, SIGNAL(clicked(bool)), this, SLOT(OnMode(bool)));
         this->checkBoxesMode.append(modeBox);
         if (channel->GetMode().Includes(mode))
             modeBox->setChecked(true);
@@ -103,6 +105,7 @@ ChannelWin::ChannelWin(NetworkSession *session, libircclient::Network *network, 
 
 ChannelWin::~ChannelWin()
 {
+    delete this->chanmode;
     delete this->ui;
 }
 
@@ -110,6 +113,8 @@ void GrumpyIRC::ChannelWin::on_pushButton_clicked()
 {
     if (this->updateTopic)
         this->_ns->SendRaw(((ScrollbackFrame*)this->parent())->GetScrollback(), "TOPIC " + this->_channel->GetName() + " :" + this->ui->plainTextEdit->toPlainText());
+    if (!this->chanmode->IsEmpty())
+        this->_ns->SendRaw(((ScrollbackFrame*)this->parent())->GetScrollback(), "MODE " + this->_channel->GetName() + " " + this->chanmode->ToString());
     this->close();
 }
 
@@ -118,6 +123,15 @@ void GrumpyIRC::ChannelWin::on_plainTextEdit_textChanged()
     if (this->ignore)
         return;
     this->updateTopic = true;
+}
+
+void ChannelWin::OnMode(bool toggled)
+{
+    QCheckBox *checkBox = (QCheckBox*)QObject::sender();
+    if (toggled)
+        this->chanmode->SetMode("+" + checkBox->text());
+    else
+        this->chanmode->SetMode("-" + checkBox->text());
 }
 
 void GrumpyIRC::ChannelWin::on_tableWidget_2_customContextMenuRequested(const QPoint &pos)

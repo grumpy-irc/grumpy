@@ -103,6 +103,7 @@ SyncableIRCSession *User::ConnectToIRCServer(libirc::ServerAddress info)
 {
     Scrollback *system_window = CoreWrapper::GrumpyCore->NewScrollback(NULL, info.GetHost(), ScrollbackType_System);
     SyncableIRCSession *session = SyncableIRCSession::Open(system_window, info, this);
+    session->AutomaticallyRetrieveBanList = this->conf->GetValueAsBool("AutomaticallyRetrieveBanList", false);
     this->sessions.append(session);
     return session;
 }

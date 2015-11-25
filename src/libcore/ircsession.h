@@ -60,6 +60,7 @@ namespace GrumpyIRC
             Q_OBJECT
             friend class GrumpydSession;
         public:
+            static void Exit(QString message);
             static IRCSession *Open(Scrollback *system_window, libirc::ServerAddress &server, QString network = "", QString nick = "",
                                     QString ident = "", QString username = "");
             static QMutex Sessions_Lock;
@@ -111,6 +112,8 @@ namespace GrumpyIRC
             libircclient::User *GetSelfNetworkID(Scrollback *window);
             //! Used mostly only for synchronization with grumpyd
             virtual void RegisterChannel(libircclient::Channel *channel, Scrollback *window);
+            void RetrieveChannelExceptionList(Scrollback *window, QString channel_name);
+            void RetrieveChannelInviteList(Scrollback *window, QString channel_name);
             void RetrieveChannelBanList(Scrollback *window, QString channel_name);
             QString GetLocalUserModeAsString(Scrollback *window);
             QString GetName() const;
