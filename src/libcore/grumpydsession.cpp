@@ -306,6 +306,19 @@ QString GrumpydSession::GetLocalUserModeAsString(Scrollback *window)
     return ircs->GetLocalUserModeAsString(window);
 }
 
+void GrumpydSession::RetrieveChannelBanList(Scrollback *window, QString channel_name)
+{
+    IRCSession *ircs = this->GetSessionFromWindow(window);
+    if (!ircs)
+        return;
+
+    QHash<QString, QVariant> info;
+    info.insert("network_id", QVariant(ircs->GetSID()));
+    info.insert("channel_name", QVariant(channel_name));
+    info.insert("type", "+b");
+    this->SendProtocolCommand(GP_CMD_REQUEST_INFO, info);
+}
+
 void GrumpydSession::RequestReconnect(Scrollback *window)
 {
     if (window == this->systemWindow)

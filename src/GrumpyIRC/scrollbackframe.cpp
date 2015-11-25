@@ -382,7 +382,7 @@ void ScrollbackFrame::Menu(QPoint pn)
         this->textEdit->copy();
     } else if (selectedItem == menuRetrieveTopic)
     {
-        if (this->GetSession())
+        if (!this->GetSession())
             return;
         this->GetSession()->SendRaw(this->GetScrollback(), "TOPIC " + this->GetScrollback()->GetTarget());
     } else if (selectedItem == menuChanSet)

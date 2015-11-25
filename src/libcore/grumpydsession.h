@@ -70,6 +70,7 @@
 #define GP_CMD_INIT                        24
 #define GP_CMD_RECONNECT                   25
 #define GP_CMD_REMOVE                      26
+#define GP_CMD_REQUEST_INFO                27
 
 namespace libirc
 {
@@ -119,6 +120,7 @@ namespace GrumpyIRC
             void SendProtocolCommand(unsigned int command, QHash<QString, QVariant> parameters);
             IRCSession *GetSession(unsigned int nsid);
             QString GetLocalUserModeAsString(Scrollback *window);
+            void RetrieveChannelBanList(Scrollback *window, QString channel_name);
             void RequestRemove(Scrollback *window);
             void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete);
             void RequestPart(Scrollback *window);

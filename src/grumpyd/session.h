@@ -83,6 +83,7 @@ namespace GrumpyIRC
             void processCommand(QHash<QString, QVariant> parameters);
             //! Called when user wants to connect to new IRC server
             void processNew(QHash<QString, QVariant> info);
+            void processInfo(QHash<QString, QVariant> parameters);
 
             QTcpSocket *socket;
             QString peer;

@@ -331,6 +331,32 @@ void Session::processNew(QHash<QString, QVariant> info)
     this->SendToEverySession(GP_CMD_NETWORK_INFO, parameters);
 }
 
+void Session::processInfo(QHash<QString, QVariant> parameters)
+{
+    if (!this->IsAuthorized(PRIVILEGE_USE_IRC))
+    {
+        this->PermissionDeny(GP_CMD_REQUEST_INFO);
+        return;
+    }
+
+    if (!parameters.contains("network_id"))
+    {
+        this->TransferError(GP_CMD_REQUEST_INFO, "No network provided", GP_ENOSERVER);
+        return;
+    }
+
+    SyncableIRCSession* irc = this->loggedUser->GetSIRCSession(parameters["network_id"].toUInt());
+    if (!irc)
+    {
+        this->TransferError(GP_CMD_REQUEST_INFO, "Network not found", GP_ENETWORKNOTFOUND);
+        return;
+    }
+    if (!parameters.contains("type"))
+        return;
+    if (parameters["type"].toString() == "+b")
+        irc->RetrieveChannelBanList(NULL, parameters["channel_name"].toString());
+}
+
 void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
 {
     if (text == GP_CMD_HELLO)
@@ -377,6 +403,9 @@ void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
     } else if (text == GP_CMD_REQUEST_ITEMS)
     {
         this->processRequest(parameters);
+    } else if (text == GP_CMD_REQUEST_INFO)
+    {
+        this->processInfo(parameters);
     } else if (text == GP_CMD_REMOVE)
     {
         this->processRemove(parameters);

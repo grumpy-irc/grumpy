@@ -81,6 +81,7 @@ void SyncableIRCSession::Connect(libircclient::Network *Network)
 
 void SyncableIRCSession::Connect()
 {
+    this->free();
     delete this->network;
     libirc::ServerAddress server(this->_hostname, this->_ssl, this->_port, this->_nick, this->_password);
     this->network = new libircclient::Network(server, this->_name);

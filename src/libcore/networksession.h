@@ -52,6 +52,7 @@ namespace GrumpyIRC
 			virtual void SendNotice(Scrollback *window, QString target, QString message) = 0;
             virtual Scrollback *GetSystemWindow()=0;
             virtual libircclient::Channel *GetChannel(Scrollback *window)=0;
+            virtual void RetrieveChannelBanList(Scrollback *window, QString channel_name)=0;
             virtual void RequestReconnect(Scrollback *window)=0;
             virtual void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete) = 0;
             //! Request the selected window to be removed from window tree

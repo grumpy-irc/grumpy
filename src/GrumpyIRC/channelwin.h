@@ -48,6 +48,12 @@ namespace GrumpyIRC
             void on_pushButton_clicked();
             void on_plainTextEdit_textChanged();
 
+            void on_tableWidget_2_customContextMenuRequested(const QPoint &pos);
+
+            void on_tableWidget_3_customContextMenuRequested(const QPoint &pos);
+
+            void on_tableWidget_4_customContextMenuRequested(const QPoint &pos);
+
         private:
             bool ignore;
             bool updateTopic;

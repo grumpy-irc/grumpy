@@ -111,6 +111,7 @@ namespace GrumpyIRC
             libircclient::User *GetSelfNetworkID(Scrollback *window);
             //! Used mostly only for synchronization with grumpyd
             virtual void RegisterChannel(libircclient::Channel *channel, Scrollback *window);
+            void RetrieveChannelBanList(Scrollback *window, QString channel_name);
             QString GetLocalUserModeAsString(Scrollback *window);
             QString GetName() const;
             QString GetHostname() const;
@@ -120,6 +121,7 @@ namespace GrumpyIRC
             bool UsingSSL() const;
             unsigned int GetPort() const;
             Scrollback *Root;
+            bool AutomaticallyRetrieveBanList;
         signals:
             //! Emited when a new window for this session is open, needed by grumpyd for network sync
             void Event_ScrollbackIsOpen(Scrollback *window);
@@ -156,10 +158,16 @@ namespace GrumpyIRC
             virtual void OnUserAwayStatusChange(libircclient::Parser *px, libircclient::Channel *ch, libircclient::User *ux);
             virtual void OnChannelMODE(libircclient::Parser *px, libircclient::Channel *channel);
             virtual void OnUMODE(libircclient::Parser *px, libircclient::Channel *channel, libircclient::User *user);
+            virtual void OnPMODE(libircclient::Parser *px, char mode);
+            virtual void OnError(libircclient::Parser *px, QString error);
+            virtual void OnEndOfBans(libircclient::Parser *px);
+            virtual void OnEndOfInvites(libircclient::Parser *px);
+            virtual void OnEndOfExcepts(libircclient::Parser *px);
         protected:
             static unsigned int lastID;
 
             virtual void processME(libircclient::Parser *px, QString message);
+            virtual void free();
             virtual void SetDead();
             //! Returns a configuration of grumpy, this method is overriden by grumpyd so that it returns
             //! the configuration for every user
@@ -182,6 +190,9 @@ namespace GrumpyIRC
             QString _password;
             QList<NetworkSniffer_Item*> data;
             QList<QString> ignoringWho;
+            QList<QString> ignoringBans;
+            QList<QString> ignoringExceptions;
+            QList<QString> ignoringInvites;
             QHash<QString, Scrollback*> channels;
             bool snifferEnabled;
             int ulistUpdateTime;

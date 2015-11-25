@@ -191,6 +191,7 @@ unsigned int IRCSession::GetSID()
 
 void IRCSession::Connect(libircclient::Network *Network)
 {
+    this->free();
     if (this->IsConnected())
         throw new Exception("You can't connect to ircsession that is active, disconnect first", BOOST_CURRENT_FUNCTION);
 
@@ -328,6 +329,7 @@ bool IRCSession::isRetrievingWhoInfo(QString channel)
 
 void IRCSession::init(bool preindexed)
 {
+    this->AutomaticallyRetrieveBanList = false;
     this->_ssl = false;
     this->snifferEnabled = true;
     this->ulistUpdateTime = 20 * 60000;
@@ -506,6 +508,16 @@ void IRCSession::RegisterChannel(libircclient::Channel *channel, Scrollback *win
         this->GetNetwork()->_st_InsertChannel(channel);
 }
 
+void IRCSession::RetrieveChannelBanList(Scrollback *window, QString channel_name)
+{
+    if (!this->network)
+        return;
+
+    QString ln = channel_name.toLower();
+    this->ignoringBans.append(ln);
+    this->GetNetwork()->TransferRaw("MODE " + channel_name + " +b", libircclient::Priority_Low);
+}
+
 QString IRCSession::GetLocalUserModeAsString(Scrollback *window)
 {
     Q_UNUSED(window);
@@ -596,8 +608,10 @@ void IRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
 	// Request some information about users in the channel
     if (!this->retrievingWho.contains(ln))
         this->retrievingWho.append(ln);
-    this->GetNetwork()->TransferRaw("MODE " + channel->GetName());
-	this->GetNetwork()->TransferRaw("WHO " + channel->GetName());
+    this->GetNetwork()->TransferRaw("MODE " + channel->GetName(), libircclient::Priority_Low);
+    if (this->AutomaticallyRetrieveBanList)
+        this->RetrieveChannelBanList(NULL, ln);
+    this->GetNetwork()->TransferRaw("WHO " + channel->GetName(), libircclient::Priority_Low);
 }
 
 void IRCSession::OnIRCSelfNICK(libircclient::Parser *px, QString previous, QString nick)
@@ -890,6 +904,42 @@ void IRCSession::OnUMODE(libircclient::Parser *px, libircclient::Channel *channe
     scrollback->UserListChange(user->GetNick(), user, UserListChange_Refresh);
 }
 
+void IRCSession::OnPMODE(libircclient::Parser *px, char mode)
+{
+    if (px->GetParameters().size() < 2)
+        return;
+    QString channel = px->GetParameters()[1].toLower();
+    if (this->ignoringBans.contains(channel))
+        return;
+    this->OnUnknown(px);
+}
+
+void IRCSession::OnError(libircclient::Parser *px, QString error)
+{
+    this->systemWindow->InsertText("Parser error (" + error + "): " + px->GetRaw(), ScrollbackItemType_SystemWarning);
+}
+
+void IRCSession::OnEndOfBans(libircclient::Parser *px)
+{
+    if (px->GetParameters().size() < 2)
+        return;
+    QString channel = px->GetParameters()[1].toLower();
+    if (this->ignoringBans.contains(channel))
+        this->ignoringBans.removeOne(channel);
+    else
+        this->OnUnknown(px);
+}
+
+void IRCSession::OnEndOfInvites(libircclient::Parser *px)
+{
+
+}
+
+void IRCSession::OnEndOfExcepts(libircclient::Parser *px)
+{
+
+}
+
 void IRCSession::processME(libircclient::Parser *px, QString message)
 {
     Scrollback *sx = NULL;
@@ -909,6 +959,14 @@ void IRCSession::processME(libircclient::Parser *px, QString message)
         return;
     }
     sx->InsertText(ScrollbackItem(message, ScrollbackItemType_Act, px->GetSourceUserInfo()));
+}
+
+void IRCSession::free()
+{
+    this->ignoringBans.clear();
+    this->ignoringExceptions.clear();
+    this->ignoringWho.clear();
+    this->ignoringInvites.clear();
 }
 
 void IRCSession::SetDead()
@@ -961,6 +1019,10 @@ void IRCSession::connInternalSocketSignals()
     connect(this->network, SIGNAL(Event_ChannelUserModeChanged(libircclient::Parser*, libircclient::Channel*, libircclient::User*)), this, SLOT(OnUMODE(libircclient::Parser*,libircclient::Channel*,libircclient::User*)));
     connect(this->network, SIGNAL(Event_MyInfo(libircclient::Parser*)), this, SLOT(OnUnknown(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_ISUPPORT(libircclient::Parser*)), this, SLOT(OnUnknown(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_EndOfInvites(libircclient::Parser*)), this, SLOT(OnEndOfInvites(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_EndOfBans(libircclient::Parser*)), this, SLOT(OnEndOfBans(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_Broken(libircclient::Parser*,QString)), this, SLOT(OnError(libircclient::Parser*,QString)));
+    connect(this->network, SIGNAL(Event_PMode(libircclient::Parser*,char)), this, SLOT(OnPMODE(libircclient::Parser*,char)));
 }
 
 void IRCSession::_gs_ResyncNickChange(QString new_, QString old_)

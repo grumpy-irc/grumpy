@@ -49,7 +49,6 @@
     <property name="title">
      <string>Scrollback</string>
     </property>
-    <addaction name="actionResync"/>
     <addaction name="actionLoad_more_items_from_remote"/>
     <addaction name="actionToggle_secret"/>
    </widget>

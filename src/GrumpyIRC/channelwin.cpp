@@ -58,6 +58,47 @@ ChannelWin::ChannelWin(NetworkSession *session, libircclient::Network *network, 
         row++;
     }
     this->ui->tableWidget->resizeRowsToContents();
+
+    // Bans
+    QStringList heading_1;
+    heading_1 << "Ban" << "Set on" << "Set by";
+    this->ui->tableWidget_2->verticalHeader()->setVisible(false);
+    this->ui->tableWidget_2->setColumnCount(heading_1.size());
+    this->ui->tableWidget_2->setShowGrid(false);
+    QList<libircclient::ChannelPMode> list_b = channel->GetBans();
+    this->ui->tableWidget_2->setHorizontalHeaderLabels(heading_1);
+    int ib = 0;
+    foreach (libircclient::ChannelPMode ban, list_b)
+    {
+        this->ui->tableWidget_2->insertRow(ib);
+        this->ui->tableWidget_2->setItem(ib, 0, new QTableWidgetItem(ban.Parameter));
+        this->ui->tableWidget_2->setItem(ib, 1, new QTableWidgetItem(ban.SetOn.toString()));
+        this->ui->tableWidget_2->setItem(ib, 2, new QTableWidgetItem(ban.SetBy.ToString()));
+        ib++;
+    }
+
+    this->ui->tableWidget_2->resizeColumnsToContents();
+    this->ui->tableWidget_2->resizeRowsToContents();
+
+    // Exceptions
+    QStringList heading_2;
+    heading_2 << "Exception" << "Set on" << "Set by";
+    this->ui->tableWidget_3->verticalHeader()->setVisible(false);
+    this->ui->tableWidget_3->setColumnCount(heading_2.size());
+    this->ui->tableWidget_3->setHorizontalHeaderLabels(heading_2);
+    this->ui->tableWidget_3->setShowGrid(false);
+    QList<libircclient::ChannelPMode> list_e = channel->GetExceptions();
+    int ie = 0;
+    foreach (libircclient::ChannelPMode exception, list_e)
+    {
+        this->ui->tableWidget_3->insertRow(ie);
+        this->ui->tableWidget_3->setItem(ie, 0, new QTableWidgetItem(exception.Parameter));
+        this->ui->tableWidget_3->setItem(ie, 1, new QTableWidgetItem(exception.SetOn.toString()));
+        this->ui->tableWidget_3->setItem(ie, 2, new QTableWidgetItem(exception.SetBy.ToString()));
+        ie++;
+    }
+    this->ui->tableWidget_3->resizeColumnsToContents();
+    this->ui->tableWidget_3->resizeRowsToContents();
 }
 
 ChannelWin::~ChannelWin()
@@ -77,4 +118,19 @@ void GrumpyIRC::ChannelWin::on_plainTextEdit_textChanged()
     if (this->ignore)
         return;
     this->updateTopic = true;
+}
+
+void GrumpyIRC::ChannelWin::on_tableWidget_2_customContextMenuRequested(const QPoint &pos)
+{
+
+}
+
+void GrumpyIRC::ChannelWin::on_tableWidget_3_customContextMenuRequested(const QPoint &pos)
+{
+
+}
+
+void GrumpyIRC::ChannelWin::on_tableWidget_4_customContextMenuRequested(const QPoint &pos)
+{
+
 }
