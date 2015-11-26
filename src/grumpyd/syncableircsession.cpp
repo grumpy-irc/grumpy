@@ -89,7 +89,13 @@ void SyncableIRCSession::Connect()
     this->systemWindow->InsertText("Connecting to " + network->GetServerAddress() + ":" + QString::number(server.GetPort()));
     this->systemWindow->SetDead(false);
     foreach (Scrollback *s, this->GetUserScrollbacks())
+    {
         s->SetDead(false);
+
+        // Tell clients now
+        // let's hope it's not gonna spam hard
+        ((VirtualScrollback*)s)->PartialSync();
+    }
     this->network->Connect();
     (((VirtualScrollback*)this->systemWindow)->PartialSync());
     this->timerUL.start(this->ulistUpdateTime);

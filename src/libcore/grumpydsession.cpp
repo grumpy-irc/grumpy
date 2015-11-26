@@ -80,9 +80,9 @@ void GrumpydSession::SendMessage(Scrollback *window, QString text)
     if (!ircs)
         return;
     QHash<QString, QVariant> parameters;
+    parameters.insert("type", QVariant(GP_MESSAGETYPE_NORMAL));
     parameters.insert("network_id", QVariant(ircs->GetSID()));
     parameters.insert("scrollback_id", QVariant(window->GetOriginalID()));
-    parameters.insert("me", QVariant(false));
     parameters.insert("text", QVariant(text));
     this->gp->SendProtocolCommand(GP_CMD_MESSAGE, parameters);
 }
