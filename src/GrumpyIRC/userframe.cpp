@@ -93,6 +93,15 @@ void UserFrame::on_listWidget_customContextMenuRequested(const QPoint &pos)
 
     Menu.addSeparator();
 
+    QMenu *menuCT = new QMenu("CTCP", &Menu);
+    QAction *ctcpV = new QAction("VERSION", &Menu);
+    QAction *ctcpP = new QAction("PING", &Menu);
+    //QAction *ctcpT = new QAction
+    //
+    menuCT->addAction(ctcpV);
+    menuCT->addAction(ctcpP);
+    Menu.addMenu(menuCT);
+
     QAction *menuKick = new QAction(QObject::tr("Kick"), &Menu);
     QAction *menuBan = new QAction(QObject::tr("Ban"), &Menu);
     QAction *menuKickBan = new QAction(QObject::tr("Kick and ban"), &Menu);
@@ -127,6 +136,10 @@ void UserFrame::on_listWidget_customContextMenuRequested(const QPoint &pos)
         this->ChangeMode("+v");
     else if (selectedItem == menuWhois)
         this->Whois();
+    else if (selectedItem == ctcpP)
+        this->ctcp("PING");
+    else if (selectedItem == ctcpV)
+        this->ctcp("VERSION");
 }
 
 void UserFrame::kick()
@@ -137,6 +150,15 @@ void UserFrame::kick()
 void UserFrame::kb()
 {
 
+}
+
+void UserFrame::ctcp(QString text)
+{
+    foreach (libircclient::User user, this->SelectedUsers())
+    {
+        //this->parentFrame->TransferRaw("PRIVMSG " + user.GetNick());
+        this->parentFrame->SendCtcp(user.GetNick(), text, "");
+    }
 }
 
 void UserFrame::ban()

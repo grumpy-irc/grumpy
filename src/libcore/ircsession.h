@@ -94,6 +94,7 @@ namespace GrumpyIRC
 			void SendMessage(Scrollback *window, QString target, QString text);
 			void SendNotice(Scrollback *window, QString target, QString text);
             void SendMessage(Scrollback *window, QString text);
+            void SendCTCP(Scrollback *window, QString target, QString ctcp, QString param);
             virtual bool IsConnected() const;
             virtual void SetNetwork(libircclient::Network *nt);
             void SendNotice(Scrollback *window, QString text);

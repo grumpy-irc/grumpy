@@ -119,8 +119,8 @@ void GrumpydSession::SendAction(Scrollback *window, QString text)
     if (!ircs)
         return;
     QHash<QString, QVariant> parameters;
+    parameters.insert("type", QVariant(GP_MESSAGETYPE_ACTION));
     parameters.insert("network_id", QVariant(ircs->GetSID()));
-    parameters.insert("me", QVariant(true));
     parameters.insert("scrollback_id", QVariant(window->GetOriginalID()));
     parameters.insert("text", QVariant(text));
     this->gp->SendProtocolCommand(GP_CMD_MESSAGE, parameters);
@@ -167,14 +167,7 @@ void GrumpydSession::RequestDisconnect(Scrollback *window, QString reason, bool 
     if (window == this->systemWindow)
     {
         // User wants to disconnect whole grumpyd session
-        this->systemWindow->SetDead(true);
-        // flag every scrollback as dead
-        foreach (IRCSession *session, this->sessionList.values())
-        {
-            foreach (Scrollback *window, session->GetScrollbacks())
-                window->SetDead(true);
-        }
-        this->scrollbackHash.clear();
+        this->kill();
         this->gp->Disconnect();
         if (auto_delete)
             delete this;
@@ -230,10 +223,9 @@ void GrumpydSession::SendNotice(Scrollback *window, QString text)
     if (!ircs)
         return;
     QHash<QString, QVariant> parameters;
+    parameters.insert("type", QVariant(GP_MESSAGETYPE_NOTICE));
     parameters.insert("network_id", QVariant(ircs->GetSID()));
     parameters.insert("scrollback_id", QVariant(window->GetOriginalID()));
-    parameters.insert("is_notice", QVariant(false));
-    parameters.insert("me", QVariant(false));
     parameters.insert("text", QVariant(text));
     this->gp->SendProtocolCommand(GP_CMD_MESSAGE, parameters);
 }
@@ -244,12 +236,26 @@ void GrumpyIRC::GrumpydSession::SendMessage(Scrollback * window, QString target,
     if (!ircs)
         return;
     QHash<QString, QVariant> parameters;
+    parameters.insert("type", QVariant(GP_MESSAGETYPE_NORMAL));
     parameters.insert("target", target);
     parameters.insert("network_id", QVariant(ircs->GetSID()));
     parameters.insert("scrollback_id", QVariant(window->GetOriginalID()));
-    parameters.insert("is_notice", QVariant(false));
-    parameters.insert("me", QVariant(false));
     parameters.insert("text", QVariant(message));
+    this->gp->SendProtocolCommand(GP_CMD_MESSAGE, parameters);
+}
+
+void GrumpydSession::SendCTCP(Scrollback *window, QString target, QString ctcp, QString param)
+{
+    IRCSession *ircs = this->GetSessionFromWindow(window);
+    if (!ircs)
+        return;
+    QHash<QString, QVariant> parameters;
+    parameters.insert("type", QVariant(GP_MESSAGETYPE_ISCTCP));
+    parameters.insert("network_id", QVariant(ircs->GetSID()));
+    parameters.insert("scrollback_id", QVariant(window->GetOriginalID()));
+    parameters.insert("name", QVariant(ctcp));
+    parameters.insert("target", QVariant(target));
+    parameters.insert("text", QVariant(param));
     this->gp->SendProtocolCommand(GP_CMD_MESSAGE, parameters);
 }
 
@@ -259,11 +265,10 @@ void GrumpyIRC::GrumpydSession::SendNotice(Scrollback * window, QString target, 
     if (!ircs)
         return;
     QHash<QString, QVariant> parameters;
+    parameters.insert("type", QVariant(GP_MESSAGETYPE_NOTICE));
     parameters.insert("network_id", QVariant(ircs->GetSID()));
     parameters.insert("scrollback_id", QVariant(window->GetOriginalID()));
-    parameters.insert("is_notice", QVariant(true));
     parameters.insert("target", target);
-    parameters.insert("me", QVariant(false));
     parameters.insert("text", QVariant(message));
     this->gp->SendProtocolCommand(GP_CMD_MESSAGE, parameters);
 }
@@ -360,6 +365,7 @@ void GrumpydSession::Connect()
     this->gp = new libgp::GP();
     connect(this->gp, SIGNAL(Event_Connected()), this, SLOT(OnConnected()));
     connect(this->gp, SIGNAL(Event_IncomingCommand(gp_command_t, QHash<QString, QVariant>)), this, SLOT(OnIncomingCommand(gp_command_t, QHash<QString, QVariant>)));
+    connect(this->gp, SIGNAL(Event_ConnectionFailed(QString,int)), this, SLOT(OnError(QString,int)));
     connect(this->gp, SIGNAL(Event_SslHandshakeFailure(QList<QSslError>, bool*)), this, SLOT(OnSslHandshakeFailure(QList<QSslError>, bool*)));
     this->gp->SetCompression(6);
     this->systemWindow->SetDead(false);
@@ -420,6 +426,11 @@ void GrumpydSession::OnConnected()
     QHash<QString, QVariant> parameters;
     parameters.insert("version", QString(GRUMPY_VERSION_STRING));
     this->gp->SendProtocolCommand(GP_CMD_HELLO, parameters);
+}
+
+void GrumpydSession::OnError(QString reason, int num)
+{
+    this->closeError(reason);
 }
 
 void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVariant> parameters)
@@ -532,6 +543,18 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVarian
         this->gp->SendProtocolCommand(GP_CMD_UNKNOWN, params);
         this->systemWindow->InsertText("Unknown command from grumpyd " + QString::number(text), ScrollbackItemType_SystemError);
     }
+}
+
+void GrumpydSession::kill()
+{
+    this->systemWindow->SetDead(true);
+    // flag every scrollback as dead
+    foreach (IRCSession *session, this->sessionList.values())
+    {
+        foreach (Scrollback *window, session->GetScrollbacks())
+            window->SetDead(true);
+    }
+    this->scrollbackHash.clear();
 }
 
 void GrumpydSession::processNewScrollbackItem(QHash<QString, QVariant> hash)

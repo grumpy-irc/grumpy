@@ -244,9 +244,7 @@ void Session::processMessage(QHash<QString, QVariant> parameters)
     // We have the original ID of scrollback so let's find it here
     unsigned int nsid = parameters["network_id"].toUInt();
     scrollback_id_t sid = parameters["scrollback_id"].toUInt();
-    bool is_action = parameters["me"].toBool();
-    bool is_notice = parameters.contains("is_notice") && parameters["is_notice"].toBool();
-	QString target;
+    QString target;
 	if (parameters.contains("target"))
         target = parameters["target"].toString();
     // let's find the network
@@ -263,24 +261,45 @@ void Session::processMessage(QHash<QString, QVariant> parameters)
         GRUMPY_ERROR("Unable to find scrollback id " + QString::number(sid) + " message can't be delivered for user " + this->loggedUser->GetName());
         return;
     }
-    QString rx = parameters["text"].toString();
-    if (is_notice)
+    if (!parameters.contains("type"))
     {
-        if (target.isEmpty())
-            irc->SendNotice(scrollback, rx);
-        else
-            irc->SendNotice(scrollback, target, rx);
+        this->TransferError(GP_CMD_MESSAGE, "Unknown message type", GP_ERROR);
+        return;
     }
-    else if (!is_action)
+    int type = parameters["type"].toInt();
+    QString text = parameters["text"].toString();
+    switch (type)
     {
-        if (target.isEmpty())
-            irc->SendMessage(scrollback, rx);
-        else
-            irc->SendMessage(scrollback, target, rx);
-    }
-    else
-    {
-        irc->SendAction(scrollback, rx);
+        case GP_MESSAGETYPE_ACTION:
+        {
+            irc->SendAction(scrollback, text);
+        }
+            break;
+        case GP_MESSAGETYPE_ISCTCP:
+        {
+            irc->SendCTCP(scrollback, target, parameters["name"].toString(), text);
+        }
+            break;
+        case GP_MESSAGETYPE_NORMAL:
+        {
+            if (target.isEmpty())
+                irc->SendMessage(scrollback, text);
+            else
+                irc->SendMessage(scrollback, target, text);
+        }
+            break;
+
+        case GP_MESSAGETYPE_NOTICE:
+        {
+            if (target.isEmpty())
+                irc->SendNotice(scrollback, text);
+            else
+                irc->SendNotice(scrollback, target, text);
+        }
+            return;
+        default:
+            this->TransferError(GP_CMD_MESSAGE, "Unsupported message type", GP_ERROR);
+            return;
     }
 }
 

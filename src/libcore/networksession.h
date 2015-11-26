@@ -44,6 +44,7 @@ namespace GrumpyIRC
             virtual void SendAction(Scrollback *window, QString text)=0;
             virtual void SendMessage(Scrollback *window, QString text)=0;
             virtual void SendRaw(Scrollback *window, QString raw)=0;
+            virtual void SendCTCP(Scrollback *window, QString target, QString ctcp, QString param)=0;
             virtual void SendNotice(Scrollback *window, QString text)=0;
             virtual QList<QString> GetChannels(Scrollback *window)=0;
             virtual libircclient::User *GetSelfNetworkID(Scrollback *window)=0;

@@ -57,6 +57,9 @@ namespace GrumpyIRC
             Q_OBJECT
         public:
             ScrollbackFrame_WorkerThread();
+            void Sleep(int msec);
+            bool IsRunning;
+            bool IsFinished;
         protected:
             void run();
     };
@@ -103,6 +106,7 @@ namespace GrumpyIRC
             void RequestDisconnect();
             void RequestMore(unsigned int count);
             void RefreshHtml();
+            void SendCtcp(QString target, QString ctcp, QString text);
             void RefreshHtmlIfNeeded();
             libircclient::Network *GetNetwork();
             void TransferRaw(QString data);

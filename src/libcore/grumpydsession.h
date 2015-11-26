@@ -30,6 +30,11 @@
 #define GRUMPY_UL_UPDATE 3
 #define GRUMPY_UL_REMOVE 4
 
+#define GP_MESSAGETYPE_NORMAL 1
+#define GP_MESSAGETYPE_ACTION 2
+#define GP_MESSAGETYPE_NOTICE 3
+#define GP_MESSAGETYPE_ISCTCP 4
+
 #define GP_EALREADYLOGGEDIN      -1
 #define GP_EINVALIDLOGINPARAMS   -2
 #define GP_ENOSERVER             -3
@@ -116,6 +121,7 @@ namespace GrumpyIRC
             void SendAction(Scrollback *window, QString text);
             void SendNotice(Scrollback *window, QString text);
             void SendMessage(Scrollback *window, QString target, QString message);
+            void SendCTCP(Scrollback *window, QString target, QString ctcp, QString param);
             void SendNotice(Scrollback *window, QString target, QString message);
             void SendProtocolCommand(unsigned int command, QHash<QString, QVariant> parameters);
             IRCSession *GetSession(unsigned int nsid);
@@ -142,9 +148,11 @@ namespace GrumpyIRC
             void OnDisconnect();
             void OnTimeout();
             void OnConnected();
+            void OnError(QString reason, int num);
             void OnIncomingCommand(gp_command_t text, QHash<QString, QVariant> parameters);
 
         private:
+            void kill();
             void processNewScrollbackItem(QHash<QString, QVariant> hash);
             void processNetwork(QHash<QString, QVariant> hash);
             void processULSync(QHash<QString, QVariant> hash);

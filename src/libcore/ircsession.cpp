@@ -616,6 +616,15 @@ void IRCSession::SendMessage(Scrollback *window, QString text)
     window->InsertText(ScrollbackItem(text, ScrollbackItemType_Message, this->GetNetwork()->GetLocalUserInfo(), 0, true));
 }
 
+void IRCSession::SendCTCP(Scrollback *window, QString target, QString ctcp, QString param)
+{
+    Q_UNUSED(window);
+    if (!this->network)
+        return;
+
+    this->network->SendCtcp(ctcp, param, target);
+}
+
 void IRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
 {
     if (channel->GetName().isEmpty())

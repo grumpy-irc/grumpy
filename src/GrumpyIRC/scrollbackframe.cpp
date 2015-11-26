@@ -45,7 +45,12 @@ irc2htmlcode::Parser ScrollbackFrame::parser;
 
 void ScrollbackFrame::ExitThread()
 {
-    WorkerThread->exit();
+    WorkerThread->IsRunning = false;
+    while (!WorkerThread->IsFinished)
+    {
+        WorkerThread->Sleep(100);
+    }
+    //WorkerThread->exit();
 }
 
 void ScrollbackFrame::InitializeThread()
@@ -677,6 +682,12 @@ void ScrollbackFrame::RefreshHtml()
     this->isClean = false;
 }
 
+void ScrollbackFrame::SendCtcp(QString target, QString ctcp, QString text)
+{
+    if (this->GetSession())
+        this->GetSession()->SendCtcp(this->GetScrollback(), target, ctcp, text);
+}
+
 void ScrollbackFrame::RefreshHtmlIfNeeded()
 {
     if (this->needsRefresh)
@@ -762,12 +773,18 @@ void ScrollbackFrame::SetVisible(bool is_visible)
 
 ScrollbackFrame_WorkerThread::ScrollbackFrame_WorkerThread()
 {
+    this->IsRunning = true;
+    this->IsFinished = false;
+}
 
+void ScrollbackFrame_WorkerThread::Sleep(int msec)
+{
+    this->msleep(msec);
 }
 
 void ScrollbackFrame_WorkerThread::run()
 {
-    while (this->isRunning())
+    while (this->IsRunning)
     {
         QList<ScrollbackFrame*> list;
         ScrollbackFrame::ScrollbackFrames_m.lock();
@@ -791,6 +808,7 @@ void ScrollbackFrame_WorkerThread::run()
             s->unwritten_m.unlock();
         }
         ScrollbackFrame::ScrollbackFrames_m.unlock();
-        this->msleep(2000);
+        this->msleep(200);
     }
+    this->IsFinished = true;
 }

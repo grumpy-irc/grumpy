@@ -58,6 +58,7 @@ namespace GrumpyIRC
         private:
             void kick();
             void kb();
+            void ctcp(QString text);
             void ban();
             QString GenerateTip(libircclient::User *ux);
             QHash<char, unsigned int> userCounts;
