@@ -338,7 +338,7 @@ bool IRCSession::isRetrievingWhoInfo(QString channel)
 
 void IRCSession::init(bool preindexed)
 {
-    this->AutomaticallyRetrieveBanList = false;
+    this->AutomaticallyRetrieveBanList = true;
     this->_ssl = false;
     this->snifferEnabled = true;
     this->ulistUpdateTime = 20 * 60000;
