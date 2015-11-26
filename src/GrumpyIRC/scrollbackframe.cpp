@@ -685,7 +685,7 @@ void ScrollbackFrame::RefreshHtml()
 void ScrollbackFrame::SendCtcp(QString target, QString ctcp, QString text)
 {
     if (this->GetSession())
-        this->GetSession()->SendCtcp(this->GetScrollback(), target, ctcp, text);
+        this->GetSession()->SendCTCP(this->GetScrollback(), target, ctcp, text);
 }
 
 void ScrollbackFrame::RefreshHtmlIfNeeded()

@@ -27,7 +27,8 @@ SOURCES += core.cpp \
     terminalparser.cpp \
     grumpydsession.cpp \
     networksession.cpp \
-    favorite.cpp
+    favorite.cpp \
+    query.cpp
 
 HEADERS += core.h\
         libcore_global.h \
@@ -45,7 +46,8 @@ HEADERS += core.h\
     terminalparser.h \
     grumpydsession.h \
     networksession.h \
-    favorite.h
+    favorite.h \
+    query.h
 
 unix {
     target.path = /usr/lib
