@@ -843,7 +843,7 @@ void GrumpydSession::freememory()
 void GrumpydSession::closeError(QString error)
 {
     this->gp->Disconnect();
-    this->systemWindow->SetDead(true);
+    this->kill();
     this->systemWindow->InsertText("Connection failure: " + error, ScrollbackItemType_SystemError);
 }
 
