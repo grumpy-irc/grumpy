@@ -125,13 +125,13 @@ Scrollback *IRCSession::GetScrollback(scrollback_id_t sid)
 
     foreach (Scrollback *scrollback, this->users.values())
     {
-        if (scrollback->GetID() == sid)
+        if (scrollback->GetOriginalID() == sid)
             return scrollback;
     }
 
     foreach (Scrollback *scrollback, this->channels.values())
     {
-        if (scrollback->GetID() == sid)
+        if (scrollback->GetOriginalID() == sid)
             return scrollback;
     }
 
@@ -273,10 +273,11 @@ void IRCSession::SendNotice(Scrollback *window, QString text)
 
 Scrollback *IRCSession::GetScrollbackForChannel(QString channel)
 {
-    if (!this->channels.contains(channel.toLower()))
+    channel = channel.toLower();
+    if (!this->channels.contains(channel))
         return NULL;
 
-    return this->channels[channel.toLower()];
+    return this->channels[channel];
 }
 
 SessionType IRCSession::GetType()

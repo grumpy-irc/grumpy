@@ -328,18 +328,23 @@ void DatabaseLite::LoadText()
                 throw new Exception("Unable to fetch: " + this->LastError, BOOST_CURRENT_FUNCTION);
 
             unsigned int item = 0;
+            if (scrollback->GetTarget() == "wm-bot")
+            {
+                int i;
+                i = 2;
+            }
             while (item < text->Count())
             {
                 SqlRow row = text->GetRow(item++);
                 last_item = row.GetField(1).toUInt();
-                QString text = row.GetField(9).toString();
+                QString item_text = row.GetField(9).toString();
                 ScrollbackItemType type = static_cast<ScrollbackItemType>(row.GetField(5).toInt());
                 bool self = Generic::Int2Bool(row.GetField(10).toInt());
                 libircclient::User user;
                 user.SetNick(row.GetField(6).toString());
                 user.SetIdent(row.GetField(7).toString());
                 user.SetHost(row.GetField(8).toString());
-                ScrollbackItem tm(text, type, user, last_item, self);
+                ScrollbackItem tm(item_text, type, user, last_item, self);
                 scrollback->ImportText(tm);
             }
 

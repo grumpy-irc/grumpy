@@ -490,7 +490,7 @@ ScrollbackFrame *ScrollbackFrame::GetParent()
     return this->_parent;
 }
 
-unsigned long ScrollbackFrame::GetID()
+scrollback_id_t ScrollbackFrame::GetID()
 {
     return this->scrollback->GetID();
 }

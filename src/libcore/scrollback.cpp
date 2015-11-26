@@ -361,6 +361,9 @@ void Scrollback::UserListChange(QString nick, libircclient::User *user, UserList
 
 void Scrollback::InsertText(ScrollbackItem item)
 {
+    if (item.GetType() == ScrollbackItemType_Join && this->GetType() != ScrollbackType_Channel)
+        throw new Exception("meep", "");
+
     item.SetID(this->_lastItemID++);
     this->_items.append(item);
     if (!this->IgnoreState)

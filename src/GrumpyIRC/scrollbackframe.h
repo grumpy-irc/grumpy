@@ -88,7 +88,7 @@ namespace GrumpyIRC
             bool IsVisible();
             bool IsDead();
 			ScrollbackFrame *GetParent();
-            unsigned long GetID();
+            scrollback_id_t GetID();
             NetworkSession *GetSession();
             Scrollback *GetScrollback();
             UserFrame *GetUserFrame();
