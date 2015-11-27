@@ -49,6 +49,7 @@ namespace GrumpyIRC
             void SetPort(unsigned int port);
         protected:
             Configuration *GetConfiguration();
+            void SetDisconnected();
             void connInternalSocketSignals();
         //signals:
         public slots:
@@ -58,6 +59,7 @@ namespace GrumpyIRC
             void OnIRCSelfNICK(libircclient::Parser *px, QString previous, QString nick);
             void OnKICK(libircclient::Parser *px, libircclient::Channel *channel);
             void OnPart(libircclient::Parser *px, libircclient::Channel *channel);
+            void OnConnectionFail(QAbstractSocket::SocketError er);
             void OnSelf_KICK(libircclient::Parser *px, libircclient::Channel *channel);
             void OnTOPIC(libircclient::Parser *px, libircclient::Channel *channel, QString previous_one);
             void OnQuit(libircclient::Parser *px, libircclient::Channel *channel);

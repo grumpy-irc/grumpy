@@ -1009,6 +1009,11 @@ void IRCSession::free()
     this->ignoringInvites.clear();
 }
 
+void IRCSession::SetDisconnected()
+{
+    this->SetDead();
+}
+
 void IRCSession::SetDead()
 {
     this->timerUL.stop();
@@ -1063,6 +1068,8 @@ void IRCSession::connInternalSocketSignals()
     connect(this->network, SIGNAL(Event_EndOfBans(libircclient::Parser*)), this, SLOT(OnEndOfBans(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_Broken(libircclient::Parser*,QString)), this, SLOT(OnError(libircclient::Parser*,QString)));
     connect(this->network, SIGNAL(Event_PMode(libircclient::Parser*,char)), this, SLOT(OnPMODE(libircclient::Parser*,char)));
+    connect(this->network, SIGNAL(Event_Disconnected()), this, SLOT(OnDisconnect()));
+    connect(this->network, SIGNAL(Event_ConnectionError(QString,int)), this, SLOT(OnFailure(QString,int)));
 }
 
 void IRCSession::_gs_ResyncNickChange(QString new_, QString old_)
@@ -1119,6 +1126,11 @@ void IRCSession::OnConnectionFail(QAbstractSocket::SocketError er)
     this->SetDead();
 }
 
+void IRCSession::OnDisconnect()
+{
+    this->SetDisconnected();
+}
+
 void IRCSession::OnMessage(libircclient::Parser *px)
 {
     Scrollback *sx = NULL;
@@ -1138,6 +1150,11 @@ void IRCSession::OnMessage(libircclient::Parser *px)
         return;
     }
     sx->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Message, px->GetSourceUserInfo()));
+}
+
+void IRCSession::OnFailure(QString reason, int code)
+{
+    this->systemWindow->InsertText("Connection failed: " + reason + " (ec: " + QString::number(code) + ") ");
 }
 
 void IRCSession::OnIRCJoin(libircclient::Parser *px, libircclient::User *user, libircclient::Channel *channel)

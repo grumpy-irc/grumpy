@@ -91,8 +91,8 @@ namespace GrumpyIRC
             virtual QList<Scrollback*> GetChannelScrollbacks();
             virtual unsigned int GetSID();
             virtual void Connect(libircclient::Network *Network);
-			void SendMessage(Scrollback *window, QString target, QString text);
-			void SendNotice(Scrollback *window, QString target, QString text);
+            void SendMessage(Scrollback *window, QString target, QString text);
+            void SendNotice(Scrollback *window, QString target, QString text);
             void SendMessage(Scrollback *window, QString text);
             void SendCTCP(Scrollback *window, QString target, QString ctcp, QString param);
             virtual bool IsConnected() const;
@@ -134,7 +134,9 @@ namespace GrumpyIRC
             virtual void OnOutgoingRawMessage(QByteArray message);
             virtual void OnIncomingRawMessage(QByteArray message);
             virtual void OnConnectionFail(QAbstractSocket::SocketError er);
+            virtual void OnDisconnect();
             virtual void OnMessage(libircclient::Parser *px);
+            virtual void OnFailure(QString reason, int code);
             virtual void OnIRCJoin(libircclient::Parser *px, libircclient::User *user, libircclient::Channel *channel);
             virtual void OnUnknown(libircclient::Parser *px);
             virtual void OnNICK(libircclient::Parser *px, QString old_, QString new_);
@@ -172,6 +174,7 @@ namespace GrumpyIRC
 
             virtual void processME(libircclient::Parser *px, QString message);
             virtual void free();
+            virtual void SetDisconnected();
             virtual void SetDead();
             //! Returns a configuration of grumpy, this method is overriden by grumpyd so that it returns
             //! the configuration for every user

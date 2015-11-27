@@ -242,10 +242,22 @@ Configuration *SyncableIRCSession::GetConfiguration()
     return this->owner->GetConfiguration();
 }
 
+void SyncableIRCSession::SetDisconnected()
+{
+    IRCSession::SetDisconnected();
+    foreach (Scrollback *sx, this->users)
+        ((VirtualScrollback*)sx)->PartialSync();
+    foreach (Scrollback *sx, this->channels)
+        ((VirtualScrollback*)sx)->PartialSync();
+    ((VirtualScrollback*)this->systemWindow)->PartialSync();
+}
+
 void SyncableIRCSession::connInternalSocketSignals()
 {
     IRCSession::connInternalSocketSignals();
     connect(this->network, SIGNAL(Event_MyInfo(libircclient::Parser*)), this, SLOT(OnInfo(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_CPMInserted(libircclient::Parser*,libircclient::ChannelPMode,libircclient::Channel*)), this, SLOT(OnPModeInsert(libircclient::Parser*,libircclient::ChannelPMode,libircclient::Channel*)));
+    connect(this->network, SIGNAL(Event_CPMRemoved(libircclient::Parser*,libircclient::ChannelPMode,libircclient::Channel*)), this, SLOT(OnPModeRemove(libircclient::Parser*,libircclient::ChannelPMode,libircclient::Channel*)));
 }
 
 void SyncableIRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
@@ -326,6 +338,16 @@ void SyncableIRCSession::OnPart(libircclient::Parser *px, libircclient::Channel 
     if (!px->GetSourceUserInfo())
         return;
     this->resyncULRemove(channel, px->GetSourceUserInfo()->GetNick());
+}
+
+void SyncableIRCSession::OnConnectionFail(QAbstractSocket::SocketError er)
+{
+    IRCSession::OnConnectionFail(er);
+    foreach (Scrollback *sx, this->users)
+        ((VirtualScrollback*)sx)->PartialSync();
+    foreach (Scrollback *sx, this->channels)
+        ((VirtualScrollback*)sx)->PartialSync();
+    ((VirtualScrollback*)this->systemWindow)->PartialSync();
 }
 
 void SyncableIRCSession::OnSelf_KICK(libircclient::Parser *px, libircclient::Channel *channel)
