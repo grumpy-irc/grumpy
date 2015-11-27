@@ -26,6 +26,7 @@
 #include "syslogwindow.h"
 #include "scrollbacksmanager.h"
 #include "skin.h"
+#include "../libirc/libircclient/channel.h"
 #include "../libirc/libircclient/network.h"
 #include "../libirc/libirc/serveraddress.h"
 #include "../libcore/eventhandler.h"
@@ -272,10 +273,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->setCentralWidget(this->scrollbackWindow);
     this->statusFrame = new QLabel(this);
     this->identFrame = new QLabel(this);
+    this->overviewFrame = new QLabel(this);
     this->ui->statusBar->addPermanentWidget(this->identFrame);
     this->addDockWidget(Qt::LeftDockWidgetArea, this->windowList);
     this->addDockWidget(Qt::BottomDockWidgetArea, this->syslogWindow);
     this->addDockWidget(Qt::RightDockWidgetArea, this->userWidget);
+    this->ui->statusBar->addPermanentWidget(this->overviewFrame);
     this->ui->statusBar->addPermanentWidget(this->statusFrame);
     ScrollbacksManager::Global = this->scrollbackWindow;
     this->syslogWindow->hide();
@@ -422,6 +425,14 @@ void MainWindow::UpdateStatus()
         this->identFrame->setText("");
     else
         this->identFrame->setText(self_ident->ToString() + " " + mode);
+    QString extra = this->GetCurrentScrollbackFrame()->GetTitle();
+    if (this->GetCurrentScrollbackFrame()->IsChannel() && this->GetCurrentScrollbackFrame()->GetSession())
+    {
+        libircclient::Channel *channel = this->GetCurrentScrollbackFrame()->GetSession()->GetChannel(this->GetCurrentScrollbackFrame()->GetScrollback());
+        if (channel && !channel->GetMode().IsEmpty())
+            extra += QString(" (") + channel->GetMode().ToString() + QString(")   ");
+    }
+    this->overviewFrame->setText(extra);
 }
 
 void MainWindow::OpenUrl(QString url)

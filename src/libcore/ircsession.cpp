@@ -120,7 +120,7 @@ Scrollback *IRCSession::GetScrollback(QString name)
 
 Scrollback *IRCSession::GetScrollback(scrollback_id_t sid)
 {
-    if (this->systemWindow->GetID() == sid)
+    if (this->systemWindow->GetOriginalID() == sid)
         return this->systemWindow;
 
     foreach (Scrollback *scrollback, this->users.values())
@@ -552,7 +552,7 @@ void IRCSession::RetrieveChannelBanList(Scrollback *window, QString channel_name
 QString IRCSession::GetLocalUserModeAsString(Scrollback *window)
 {
     Q_UNUSED(window);
-    if (!this->IsConnected())
+    if (!this->network)
         return "";
 
     // Fetch a current user mode

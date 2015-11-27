@@ -20,14 +20,22 @@
 
 using namespace GrumpyIRC;
 
+QList<ScrollbackList_Node*> ScrollbackList_Node::NodesList;
+
 ScrollbackList_Node::ScrollbackList_Node(ScrollbackFrame *sb) : QStandardItem(sb->GetWindowName())
 {
+    NodesList.append(this);
     this->scrollback = sb;
     this->IsSystem = false;
     this->RebuildCache();
     this->UpdateColor();
     this->UpdateToolTip();
     this->UpdateIcon();
+}
+
+ScrollbackList_Node::~ScrollbackList_Node()
+{
+    NodesList.removeOne(this);
 }
 
 ScrollbackFrame *ScrollbackList_Node::GetScrollback()

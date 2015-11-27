@@ -16,6 +16,8 @@
 #include <QDockWidget>
 #include <QStandardItemModel>
 
+class QTimer;
+
 namespace Ui
 {
     class ScrollbackList;
@@ -36,6 +38,7 @@ namespace GrumpyIRC
             void UnregisterWindow(ScrollbackList_Node *node, ScrollbackList_Node *parent_n);
 
         private slots:
+            void OnUpdate();
             void on_treeView_activated(const QModelIndex &index);
             void on_treeView_customContextMenuRequested(const QPoint &pos);
             void on_treeView_clicked(const QModelIndex &index);
@@ -46,6 +49,7 @@ namespace GrumpyIRC
             void closeWindow();
             ScrollbackFrame *selectedWindow();
 			QStandardItem *root;
+            QTimer *timer;
             QStandardItemModel *model;
             Ui::ScrollbackList *ui;
     };

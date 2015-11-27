@@ -32,6 +32,8 @@ using namespace GrumpyIRC;
 
 ScrollbackList::ScrollbackList(QWidget *parent) : QDockWidget(parent), ui(new Ui::ScrollbackList)
 {
+    this->timer = new QTimer();
+    connect (this->timer, SIGNAL(timeout()), this, SLOT(OnUpdate()));
     this->ui->setupUi(this);
     this->ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
     this->model = new QStandardItemModel(0, 2, this);
@@ -41,10 +43,12 @@ ScrollbackList::ScrollbackList(QWidget *parent) : QDockWidget(parent), ui(new Ui
     this->ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     this->ui->treeView->setHeaderHidden(true);
     this->ui->treeView->setPalette(Skin::GetDefault()->Palette());
+    this->timer->start(2000);
 }
 
 ScrollbackList::~ScrollbackList()
 {
+    delete this->timer;
     delete this->ui;
 }
 
@@ -76,6 +80,18 @@ void ScrollbackList::UnregisterWindow(ScrollbackList_Node *node, ScrollbackList_
     if (parent_n != NULL)
         parent = this->model->indexFromItem(parent_n);
     this->model->removeRow(index.row(), parent);
+}
+
+void ScrollbackList::OnUpdate()
+{
+    foreach (ScrollbackList_Node *node, ScrollbackList_Node::NodesList)
+    {
+        if ((node->GetScrollback()->LastMenuTooltipUpdate.secsTo(QDateTime::currentDateTime())) > 20)
+        {
+            node->GetScrollback()->LastMenuTooltipUpdate = QDateTime::currentDateTime();
+            node->UpdateToolTip();
+        }
+    }
 }
 
 void GrumpyIRC::ScrollbackList::on_treeView_activated(const QModelIndex &index)
