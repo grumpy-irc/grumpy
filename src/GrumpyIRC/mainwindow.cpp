@@ -274,6 +274,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->statusFrame = new QLabel(this);
     this->identFrame = new QLabel(this);
     this->overviewFrame = new QLabel(this);
+    this->overviewFrame->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    this->identFrame->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    this->statusFrame->setTextInteractionFlags(Qt::TextSelectableByMouse);
     this->ui->statusBar->addPermanentWidget(this->identFrame);
     this->addDockWidget(Qt::LeftDockWidgetArea, this->windowList);
     this->addDockWidget(Qt::BottomDockWidgetArea, this->syslogWindow);
@@ -430,7 +433,7 @@ void MainWindow::UpdateStatus()
     {
         libircclient::Channel *channel = this->GetCurrentScrollbackFrame()->GetSession()->GetChannel(this->GetCurrentScrollbackFrame()->GetScrollback());
         if (channel && !channel->GetMode().IsEmpty())
-            extra += QString(" (") + channel->GetMode().ToString() + QString(")   ");
+            extra += QString(" <b>(") + channel->GetMode().ToString() + QString(")</b>");
     }
     this->overviewFrame->setText(extra);
 }

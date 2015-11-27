@@ -72,6 +72,7 @@ namespace GrumpyIRC
             void OnPModeInsert(libircclient::Parser *px, libircclient::ChannelPMode mode, libircclient::Channel *channel);
             void OnPModeRemove(libircclient::Parser *px, libircclient::ChannelPMode mode, libircclient::Channel *channel);
             void OnMODE(libircclient::Parser *px);
+            void OnMODEInfo(libircclient::Parser* px, libircclient::Channel *channel);
             void OnChannelMODE(libircclient::Parser *px, libircclient::Channel *channel);
             void OnUserAwayStatusChange(libircclient::Parser *px, libircclient::Channel *ch, libircclient::User *ux);
         private:

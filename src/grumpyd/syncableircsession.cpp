@@ -489,6 +489,15 @@ void SyncableIRCSession::OnMODE(libircclient::Parser *px)
     this->Resync(hash);
 }
 
+void SyncableIRCSession::OnMODEInfo(libircclient::Parser *px, libircclient::Channel* channel)
+{
+    IRCSession::OnMODEInfo(px, channel);
+
+    QHash<QString, QVariant> cx;
+    cx.insert("_localMode", channel->GetMode().ToHash());
+    this->ResyncChannel(channel, cx);
+}
+
 void SyncableIRCSession::OnChannelMODE(libircclient::Parser *px, libircclient::Channel *channel)
 {
     IRCSession::OnChannelMODE(px, channel);

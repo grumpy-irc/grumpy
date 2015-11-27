@@ -858,7 +858,7 @@ void IRCSession::OnWhoEnd(libircclient::Parser *px)
         this->systemWindow->InsertText("End of WHO for " + name);
 }
 
-void IRCSession::OnMODEInfo(libircclient::Parser *px)
+void IRCSession::OnMODEInfo(libircclient::Parser *px, libircclient::Channel *channel)
 {
     QStringList lx = px->GetParameters();
     if (lx.size() < 3)
@@ -867,7 +867,7 @@ void IRCSession::OnMODEInfo(libircclient::Parser *px)
         return;
 
     Scrollback *sc = this->channels[lx[1].toLower()];
-    sc->InsertText("MODE for " + lx[1] + " is: " + lx[2]);
+    sc->InsertText("MODE for " + channel->GetName() + " is: " + lx[2]);
 }
 
 void IRCSession::OnMODETIME(libircclient::Parser *px)
@@ -1054,7 +1054,7 @@ void IRCSession::connInternalSocketSignals()
     connect(this->network, SIGNAL(Event_EndOfWHO(libircclient::Parser*)), this, SLOT(OnWhoEnd(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_WHO(libircclient::Parser*,libircclient::Channel*,libircclient::User*)), this, SLOT(OnWHO(libircclient::Parser*,libircclient::Channel*,libircclient::User*)));
     connect(this->network, SIGNAL(Event_TOPICWhoTime(libircclient::Parser*,libircclient::Channel*)), this, SLOT(OnTOPICWhoTime(libircclient::Parser*,libircclient::Channel*)));
-    connect(this->network, SIGNAL(Event_ModeInfo(libircclient::Parser*)), this, SLOT(OnMODEInfo(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_ModeInfo(libircclient::Parser*,libircclient::Channel*)), this, SLOT(OnMODEInfo(libircclient::Parser*,libircclient::Channel*)));
     connect(this->network, SIGNAL(Event_CreationTime(libircclient::Parser*)), this, SLOT(OnMODETIME(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_Mode(libircclient::Parser*)), this, SLOT(OnMODE(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_UserAwayStatusChange(libircclient::Parser*,libircclient::Channel*,libircclient::User*)), this, SLOT(OnUserAwayStatusChange(libircclient::Parser*,libircclient::Channel*,libircclient::User*)));
