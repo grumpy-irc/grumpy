@@ -503,6 +503,9 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVarian
     } else if (text == GP_CMD_USERLIST_SYNC)
     {
         this->processULSync(parameters);
+    } else if (text == GP_CMD_RESYNC_MODE)
+    {
+        this->processChannelModeSync(parameters);
     } else if (text == GP_CMD_INIT)
     {
         QHash<QString, QVariant> params;
@@ -701,6 +704,26 @@ void GrumpydSession::processNick(QHash<QString, QVariant> hash)
 void GrumpydSession::processPreferences(QHash<QString, QVariant> hash)
 {
 
+}
+
+void GrumpydSession::processChannelModeSync(QHash<QString, QVariant> hash)
+{
+    IRCSession *session = this->GetSession(hash["network_id"].toUInt());
+    if (!session)
+        return;
+    libircclient::Channel *channel = session->GetNetwork()->GetChannel(hash["channel_name"].toString());
+    if (!channel)
+        return;
+    int mt = hash["type"].toInt();
+    if (mt == GP_MODETYPE_PMODE)
+    {
+        libircclient::ChannelPMode mode(hash["mode"].toHash());
+        QString type = hash["operation"].toString();
+        if (type == "insert")
+            channel->SetPMode(mode);
+        else if (type == "remove")
+            channel->RemovePMode(mode);
+    }
 }
 
 void GrumpydSession::processRequest(QHash<QString, QVariant> hash)

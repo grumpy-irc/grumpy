@@ -13,6 +13,7 @@
 #ifndef SYNCABLEIRCSESSION_H
 #define SYNCABLEIRCSESSION_H
 
+#include "../libirc/libircclient/mode.h"
 #include "../libcore/ircsession.h"
 
 namespace GrumpyIRC
@@ -66,6 +67,8 @@ namespace GrumpyIRC
             void OnEndOfNames(libircclient::Parser *px);
             void OnUMODE(libircclient::Parser *px, libircclient::Channel *channel, libircclient::User *user);
             void OnWHO(libircclient::Parser *px, libircclient::Channel *channel, libircclient::User *user);
+            void OnPModeInsert(libircclient::Parser *px, libircclient::ChannelPMode mode, libircclient::Channel *channel);
+            void OnPModeRemove(libircclient::Parser *px, libircclient::ChannelPMode mode, libircclient::Channel *channel);
             void OnMODE(libircclient::Parser *px);
             void OnChannelMODE(libircclient::Parser *px, libircclient::Channel *channel);
             void OnUserAwayStatusChange(libircclient::Parser *px, libircclient::Channel *ch, libircclient::User *ux);

@@ -76,6 +76,14 @@
 #define GP_CMD_RECONNECT                   25
 #define GP_CMD_REMOVE                      26
 #define GP_CMD_REQUEST_INFO                27
+#define GP_CMD_RESYNC_MODE                 28
+
+#define GP_MODETYPE_UMODE 1
+#define GP_MODETYPE_PMODE 2
+#define GP_MODETYPE_CMODE 3
+#define GP_MODETYPE_RMODE 4
+#define GP_MODETYPE_SMODE 5
+#define GP_MODETYPE_KMODE 6
 
 namespace libirc
 {
@@ -160,6 +168,7 @@ namespace GrumpyIRC
             void processChannel(QHash<QString, QVariant> hash);
             void processNick(QHash<QString, QVariant> hash);
             void processPreferences(QHash<QString, QVariant> hash);
+            void processChannelModeSync(QHash<QString, QVariant> hash);
             void processRequest(QHash<QString, QVariant> hash);
             void processChannelResync(QHash<QString, QVariant> hash);
             void processSResync(QHash<QString, QVariant> parameters);

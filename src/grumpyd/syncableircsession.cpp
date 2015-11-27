@@ -422,6 +422,42 @@ void SyncableIRCSession::OnWHO(libircclient::Parser *px, libircclient::Channel *
     this->resyncUL(channel, GRUMPY_UL_UPDATE, user);
 }
 
+void SyncableIRCSession::OnPModeInsert(libircclient::Parser *px, libircclient::ChannelPMode mode, libircclient::Channel *channel)
+{
+    if (!channel)
+        return;
+
+    Session *session = this->owner->GetAnyGPSession();
+    if (!session)
+        return;
+
+    QHash<QString, QVariant> parameters;
+    parameters.insert("network_id", QVariant(this->GetSID()));
+    parameters.insert("type", QVariant(GP_MODETYPE_PMODE));
+    parameters.insert("channel_name", QVariant(channel->GetName()));
+    parameters.insert("operation", "insert");
+    parameters.insert("mode", QVariant(mode.ToHash()));
+    session->SendToEverySession(GP_CMD_RESYNC_MODE, parameters);
+}
+
+void SyncableIRCSession::OnPModeRemove(libircclient::Parser *px, libircclient::ChannelPMode mode, libircclient::Channel *channel)
+{
+    if (!channel)
+        return;
+
+    Session *session = this->owner->GetAnyGPSession();
+    if (!session)
+        return;
+
+    QHash<QString, QVariant> parameters;
+    parameters.insert("network_id", QVariant(this->GetSID()));
+    parameters.insert("channel_name", QVariant(channel->GetName()));
+    parameters.insert("type", QVariant(GP_MODETYPE_PMODE));
+    parameters.insert("operation", "remove");
+    parameters.insert("mode", QVariant(mode.ToHash()));
+    session->SendToEverySession(GP_CMD_RESYNC_MODE, parameters);
+}
+
 void SyncableIRCSession::OnMODE(libircclient::Parser *px)
 {
     IRCSession::OnMODE(px);
