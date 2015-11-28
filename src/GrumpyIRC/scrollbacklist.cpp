@@ -232,7 +232,7 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     } else if (selectedItem == menuAuto)
     {
         if (wx->GetSession())
-            wx->GetSession()->SetAutoreconnect(wx->GetScrollback(),!menuAuto->isChecked());
+            wx->GetSession()->SetAutoreconnect(wx->GetScrollback(), menuAuto->isChecked());
     }
 }
 
