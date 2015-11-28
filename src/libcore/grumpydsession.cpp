@@ -31,6 +31,7 @@ GrumpydSession::GrumpydSession(Scrollback *System, QString Hostname, QString Use
 {
 	this->gp = NULL;
     this->systemWindow = System;
+    this->AutoReconnect = true;
     this->hostname = Hostname;
     this->systemWindow->SetSession(this);
     this->port = Port;

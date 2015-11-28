@@ -338,6 +338,7 @@ bool IRCSession::isRetrievingWhoInfo(QString channel)
 
 void IRCSession::init(bool preindexed)
 {
+    this->AutoReconnect = false;
     this->AutomaticallyRetrieveBanList = true;
     this->_ssl = false;
     this->snifferEnabled = true;

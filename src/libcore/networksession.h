@@ -62,6 +62,7 @@ namespace GrumpyIRC
             virtual void RequestRemove(Scrollback *window)=0;
             virtual void RequestPart(Scrollback *window)=0;
             virtual SessionType GetType()=0;
+            bool AutoReconnect;
 
         signals:
             void Event_Deleted();

@@ -28,7 +28,9 @@ SOURCES += core.cpp \
     grumpydsession.cpp \
     networksession.cpp \
     favorite.cpp \
-    query.cpp
+    query.cpp \
+    extension.cpp \
+    cppextension.cpp
 
 HEADERS += core.h\
         libcore_global.h \
@@ -47,7 +49,9 @@ HEADERS += core.h\
     grumpydsession.h \
     networksession.h \
     favorite.h \
-    query.h
+    query.h \
+    extension.h \
+    cppextension.h
 
 unix {
     target.path = /usr/lib

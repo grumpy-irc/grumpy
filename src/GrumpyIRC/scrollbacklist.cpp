@@ -88,8 +88,18 @@ void ScrollbackList::OnUpdate()
     {
         if ((node->GetScrollback()->LastMenuTooltipUpdate.secsTo(QDateTime::currentDateTime())) > 20)
         {
+            Scrollback *scrollback = node->GetScrollback()->GetScrollback();
             node->GetScrollback()->LastMenuTooltipUpdate = QDateTime::currentDateTime();
             node->UpdateToolTip();
+            if (scrollback->IsDead() && scrollback->GetType() == ScrollbackType_System)
+            {
+                // This is a disconnected network most likely, let's reconnect it
+                if (!scrollback->GetSession())
+                    return;
+                // Reconnect the network if we want to do that
+                if (scrollback->GetSession()->AutoReconnect)
+                    scrollback->GetSession()->RequestReconnect(scrollback);
+            }
         }
     }
 }
