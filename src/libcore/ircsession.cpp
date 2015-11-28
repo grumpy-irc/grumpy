@@ -484,6 +484,7 @@ libircclient::Channel *IRCSession::GetChannel(Scrollback *window)
 
 void IRCSession::RequestDisconnect(Scrollback *window, QString reason, bool auto_delete)
 {
+    this->AutoReconnect = false;
     Q_UNUSED(window);
     if (!this->IsConnected())
         return;

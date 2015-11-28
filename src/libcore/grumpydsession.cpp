@@ -163,6 +163,7 @@ QList<QString> GrumpydSession::GetChannels(Scrollback *window)
 
 void GrumpydSession::RequestDisconnect(Scrollback *window, QString reason, bool auto_delete)
 {
+    this->AutoReconnect = false;
     if (!this->IsConnected())
         return;
     if (window == this->systemWindow)

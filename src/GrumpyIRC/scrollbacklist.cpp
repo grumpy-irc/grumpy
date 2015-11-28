@@ -140,7 +140,8 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
         Menu.addAction(menuInsrFavorites);
         menuAuto = new QAction("Automatically connect", &Menu);
         menuAuto->setCheckable(true);
-        menuAuto->setChecked(false);
+        if (wx->GetSession())
+            menuAuto->setChecked(wx->GetSession()->AutoReconnect);
         Menu.addAction(menuAuto);
     }
 
@@ -228,6 +229,10 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
             if (channel->IsDead())
                 wx->TransferRaw("JOIN " + channel->GetTarget());
         }
+    } else if (selectedItem == menuAuto)
+    {
+        if (wx->GetSession())
+            wx->GetSession()->AutoReconnect = !wx->GetSession()->AutoReconnect;
     }
 }
 
