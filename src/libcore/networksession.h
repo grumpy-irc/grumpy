@@ -39,6 +39,8 @@ namespace GrumpyIRC
         public:
             NetworkSession();
             virtual ~NetworkSession();
+            virtual bool IsAutoreconnect(Scrollback *window)=0;
+            virtual void SetAutoreconnect(Scrollback *window, bool reconnect)=0;
             virtual bool IsConnected() const=0;
             virtual libircclient::Network *GetNetwork(Scrollback *window = 0)=0;
             virtual void SendAction(Scrollback *window, QString text)=0;
@@ -49,8 +51,8 @@ namespace GrumpyIRC
             virtual QList<QString> GetChannels(Scrollback *window)=0;
             virtual libircclient::User *GetSelfNetworkID(Scrollback *window)=0;
             virtual QString GetLocalUserModeAsString(Scrollback *window)=0;
-			virtual void SendMessage(Scrollback *window, QString target, QString message)=0;
-			virtual void SendNotice(Scrollback *window, QString target, QString message) = 0;
+            virtual void SendMessage(Scrollback *window, QString target, QString message)=0;
+            virtual void SendNotice(Scrollback *window, QString target, QString message) = 0;
             virtual Scrollback *GetSystemWindow()=0;
             virtual libircclient::Channel *GetChannel(Scrollback *window)=0;
             virtual void RetrieveChannelBanList(Scrollback *window, QString channel_name)=0;
@@ -62,8 +64,6 @@ namespace GrumpyIRC
             virtual void RequestRemove(Scrollback *window)=0;
             virtual void RequestPart(Scrollback *window)=0;
             virtual SessionType GetType()=0;
-            bool AutoReconnect;
-
         signals:
             void Event_Deleted();
 

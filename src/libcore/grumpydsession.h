@@ -141,6 +141,8 @@ namespace GrumpyIRC
             void RequestBL(Scrollback *window, scrollback_id_t from, unsigned int size);
             void RequestReconnect(Scrollback *window);
             void Connect();
+            bool IsAutoreconnect(Scrollback *window);
+            void SetAutoreconnect(Scrollback *window, bool reconnect);
             libircclient::User *GetSelfNetworkID(Scrollback *window);
             unsigned long long GetCompressedBytesRcvd();
             unsigned long long GetCompressedBytesSent();
@@ -176,6 +178,7 @@ namespace GrumpyIRC
             void processPSResync(QHash<QString, QVariant> parameters);
             void freememory();
             void closeError(QString error);
+            bool AutoReconnect;
             QDateTime syncInit;
             bool syncing;
             libgp::GP *gp;

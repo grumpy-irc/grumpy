@@ -97,7 +97,7 @@ void ScrollbackList::OnUpdate()
                 if (!scrollback->GetSession())
                     return;
                 // Reconnect the network if we want to do that
-                if (scrollback->GetSession()->AutoReconnect)
+                if (scrollback->GetSession()->IsAutoreconnect(scrollback))
                     scrollback->GetSession()->RequestReconnect(scrollback);
             }
         }
@@ -141,7 +141,7 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
         menuAuto = new QAction("Automatically connect", &Menu);
         menuAuto->setCheckable(true);
         if (wx->GetSession())
-            menuAuto->setChecked(wx->GetSession()->AutoReconnect);
+            menuAuto->setChecked(wx->GetSession()->IsAutoreconnect(wx->GetScrollback()));
         Menu.addAction(menuAuto);
     }
 
@@ -232,7 +232,7 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     } else if (selectedItem == menuAuto)
     {
         if (wx->GetSession())
-            wx->GetSession()->AutoReconnect = !wx->GetSession()->AutoReconnect;
+            wx->GetSession()->SetAutoreconnect(wx->GetScrollback(),!menuAuto->isChecked());
     }
 }
 

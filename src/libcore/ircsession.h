@@ -124,6 +124,8 @@ namespace GrumpyIRC
             QString GetIdent() const;
             bool UsingSSL() const;
             unsigned int GetPort() const;
+            bool IsAutoreconnect(Scrollback *window);
+            void SetAutoreconnect(Scrollback *window, bool reconnect);
             Scrollback *Root;
             bool AutomaticallyRetrieveBanList;
         signals:
@@ -195,6 +197,7 @@ namespace GrumpyIRC
             QString _ident;
             QString _nick;
             QString _password;
+            bool _autoReconnect;
             QList<NetworkSniffer_Item*> data;
             QList<QString> ignoringWho;
             QList<QString> ignoringBans;

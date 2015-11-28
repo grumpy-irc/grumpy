@@ -338,7 +338,7 @@ bool IRCSession::isRetrievingWhoInfo(QString channel)
 
 void IRCSession::init(bool preindexed)
 {
-    this->AutoReconnect = false;
+    this->_autoReconnect = false;
     this->AutomaticallyRetrieveBanList = true;
     this->_ssl = false;
     this->snifferEnabled = true;
@@ -379,6 +379,7 @@ QHash<QString, QVariant> IRCSession::ToHash(int max_items)
     SERIALIZE(_name);
     SERIALIZE(_hostname);
     SERIALIZE(_password);
+    SERIALIZE(_autoReconnect);
     SERIALIZE(_port);
     SERIALIZE(_ssl);
     if (this->network)
@@ -398,6 +399,7 @@ QHash<QString, QVariant> IRCSession::ToHash(int max_items)
 void IRCSession::LoadHash(QHash<QString, QVariant> hash)
 {
     UNSERIALIZE_UINT(SID);
+    UNSERIALIZE_BOOL(_autoReconnect);
     UNSERIALIZE_STRING(_nick);
     UNSERIALIZE_BOOL(_ssl);
     UNSERIALIZE_STRING(_name);
@@ -484,7 +486,7 @@ libircclient::Channel *IRCSession::GetChannel(Scrollback *window)
 
 void IRCSession::RequestDisconnect(Scrollback *window, QString reason, bool auto_delete)
 {
-    this->AutoReconnect = false;
+    this->_autoReconnect = false;
     Q_UNUSED(window);
     if (!this->IsConnected())
         return;
@@ -594,6 +596,18 @@ bool IRCSession::UsingSSL() const
 unsigned int IRCSession::GetPort() const
 {
     return this->_port;
+}
+
+bool IRCSession::IsAutoreconnect(Scrollback *window)
+{
+    Q_UNUSED(window);
+    return this->_autoReconnect;
+}
+
+void IRCSession::SetAutoreconnect(Scrollback *window, bool reconnect)
+{
+    Q_UNUSED(window);
+    this->_autoReconnect = reconnect;
 }
 
 void IRCSession::OnOutgoingRawMessage(QByteArray message)

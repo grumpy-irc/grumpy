@@ -163,11 +163,11 @@ QList<QString> GrumpydSession::GetChannels(Scrollback *window)
 
 void GrumpydSession::RequestDisconnect(Scrollback *window, QString reason, bool auto_delete)
 {
-    this->AutoReconnect = false;
     if (!this->IsConnected())
         return;
     if (window == this->systemWindow)
     {
+        this->AutoReconnect = false;
         // User wants to disconnect whole grumpyd session
         this->kill();
         this->gp->Disconnect();
@@ -374,6 +374,30 @@ void GrumpydSession::Connect()
     this->systemWindow->InsertText("Connecting to " + this->hostname);
     // Connect grumpy
     this->gp->Connect(this->hostname, this->port, this->SSL);
+}
+
+bool GrumpydSession::IsAutoreconnect(Scrollback *window)
+{
+    if (window == this->systemWindow)
+        return this->AutoReconnect;
+
+    IRCSession *ircs = this->GetSessionFromWindow(window);
+    if (!ircs)
+        return false;
+
+    return ircs->IsAutoreconnect(window);
+}
+
+void GrumpydSession::SetAutoreconnect(Scrollback *window, bool reconnect)
+{
+    if (window == this->systemWindow)
+        this->AutoReconnect = reconnect;
+
+    IRCSession *ircs = this->GetSessionFromWindow(window);
+    if (!ircs)
+        return;
+
+    return ircs->SetAutoreconnect(window, reconnect);
 }
 
 libircclient::User *GrumpydSession::GetSelfNetworkID(Scrollback *window)
