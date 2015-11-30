@@ -46,6 +46,7 @@ namespace GrumpyIRC
             void InsertSession(Session *sx);
             QString GetName() const;
             void RemoveSession(Session *sx);
+            void RemoveIRCSession(SyncableIRCSession *session);
             SyncableIRCSession *ConnectToIRCServer(libirc::ServerAddress info);
             void RegisterSession(SyncableIRCSession *session);
             bool IsAuthorized(QString perm);

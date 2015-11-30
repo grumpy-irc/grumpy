@@ -46,6 +46,11 @@ void DatabaseDummy::SetConfiguration(user_id_t user, QHash<QString, QVariant> da
 
 }
 
+void DatabaseDummy::RemoveNetwork(IRCSession *session)
+{
+
+}
+
 void DatabaseDummy::RemoveScrollback(User *owner, Scrollback *sx)
 {
 

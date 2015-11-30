@@ -649,5 +649,28 @@ void Session::processRemove(QHash<QString, QVariant> parameters)
         return;
     }
 
+    if (scrollback == irc->GetSystemWindow())
+    {
+        // User wants to remove whole network from database, first we need to check if it's disconnected and send response if it's not
+        if (irc->IsConnected())
+        {
+            this->TransferError(GP_CMD_REMOVE, "Network you requested to remove is still connected to server", GP_ERROR);
+            return;
+        }
 
+        // Now remove the network
+        irc->RequestRemove(scrollback);
+        // Drop the network from user's db
+        Grumpyd::GetBackend()->RemoveNetwork(irc);
+        this->loggedUser->RemoveIRCSession(irc);
+        delete irc;
+    } else
+    {
+        if (!scrollback->IsDead())
+        {
+            this->TransferError(GP_CMD_REMOVE, "You can't remove scrollback that is still in use", GP_ERROR);
+            return;
+        }
+        irc->RequestRemove(scrollback);
+    }
 }

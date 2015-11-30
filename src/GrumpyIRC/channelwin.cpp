@@ -101,6 +101,26 @@ ChannelWin::ChannelWin(NetworkSession *session, libircclient::Network *network, 
     }
     this->ui->tableWidget_3->resizeColumnsToContents();
     this->ui->tableWidget_3->resizeRowsToContents();
+
+    // Invites
+    QStringList heading_in;
+    heading_in << "Invite" << "Set on" << "Set by";
+    this->ui->tableWidget_4->verticalHeader()->setVisible(false);
+    this->ui->tableWidget_4->setColumnCount(heading_in.size());
+    this->ui->tableWidget_4->setHorizontalHeaderLabels(heading_in);
+    this->ui->tableWidget_4->setShowGrid(false);
+    QList<libircclient::ChannelPMode> list_i = channel->GetExceptions();
+    ie = 0;
+    foreach (libircclient::ChannelPMode in, list_i)
+    {
+        this->ui->tableWidget_4->insertRow(ie);
+        this->ui->tableWidget_4->setItem(ie, 0, new QTableWidgetItem(in.Parameter));
+        this->ui->tableWidget_4->setItem(ie, 1, new QTableWidgetItem(in.SetOn.toString()));
+        this->ui->tableWidget_4->setItem(ie, 2, new QTableWidgetItem(in.SetBy.ToString()));
+        ie++;
+    }
+    this->ui->tableWidget_4->resizeColumnsToContents();
+    this->ui->tableWidget_4->resizeRowsToContents();
 }
 
 ChannelWin::~ChannelWin()

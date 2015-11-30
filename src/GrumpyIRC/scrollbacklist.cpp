@@ -126,6 +126,7 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     QAction *menuSettings = NULL;
     QAction *menuPart = NULL;
     QAction *menuJoin = NULL;
+    QAction *menuHide = NULL;
     QAction *menuReconnect = NULL;
     QAction *menuDisconnect = NULL;
     QAction *menuSniffer = NULL;
@@ -149,6 +150,8 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     {
         menuSettings = new QAction("Settings", &Menu);
         Menu.addAction(menuSettings);
+        menuHide = new QAction(QObject::tr("Hide window"), &Menu);
+        Menu.addAction(menuHide);
     }
 
     if (wx->IsChannel())

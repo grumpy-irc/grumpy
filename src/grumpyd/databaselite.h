@@ -72,6 +72,7 @@ namespace GrumpyIRC
             void UpdateUser(User *user);
             void ClearScrollback(User *owner, Scrollback *sx);
             void ClearScrollback(unsigned int id, unsigned int user_id);
+            void RemoveNetwork(IRCSession *session);
             void RemoveScrollback(unsigned int id);
             void UpdateNetwork(IRCSession *session);
             void RemoveScrollback(User *owner, Scrollback *sx);

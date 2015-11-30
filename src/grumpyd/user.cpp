@@ -83,6 +83,11 @@ void User::RemoveSession(Session *sx)
     this->sessions_gp.removeAll(sx);
 }
 
+void User::RemoveIRCSession(SyncableIRCSession *session)
+{
+    this->sessions.removeAll(session);
+}
+
 void User::SetRole(Role *rx)
 {
     this->role = rx;

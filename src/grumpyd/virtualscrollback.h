@@ -34,6 +34,7 @@ namespace GrumpyIRC
             ~VirtualScrollback();
             User *GetOwner() const;
             void Sync();
+            void Close();
             void PartialSync();
             void SetLastItemID(scrollback_id_t id);
             void SetOwner(User *user, bool restored = false);

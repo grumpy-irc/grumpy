@@ -390,7 +390,10 @@ void DatabaseLite::StoreScrollback(User *owner, Scrollback *sx)
         params << QString::number(parent->GetOriginalID());
     result = this->ExecuteQuery_Bind(sql, params);
     if (result->InError)
+    {
+        delete result;
         throw new Exception("Unable to insert scrollback to db: " + this->LastError, BOOST_CURRENT_FUNCTION);
+    }
 
     delete result;
 }
@@ -414,7 +417,10 @@ void DatabaseLite::StoreUser(User *item)
 
     SqlResult *result = this->ExecuteQuery_Bind(SQL, Parameters);
     if (result->InError)
+    {
+        delete result;
         throw new Exception("Unable to store user record: " + this->LastError, BOOST_CURRENT_FUNCTION);
+    }
 
     delete result;
 }
@@ -436,7 +442,10 @@ void DatabaseLite::ClearScrollback(User *owner, Scrollback *sx)
     result = this->ExecuteQuery_Bind(sql, params);
 
     if (result->InError)
+    {
+        delete result;
         throw new Exception("Unable to remove items from db: " + this->LastError, BOOST_CURRENT_FUNCTION);
+    }
 
     delete result;
 }
@@ -453,7 +462,30 @@ void DatabaseLite::ClearScrollback(unsigned int id, unsigned int user_id)
     result = this->ExecuteQuery_Bind(sql, params);
 
     if (result->InError)
+    {
+        delete result;
         throw new Exception("Unable to remove items from db: " + this->LastError, BOOST_CURRENT_FUNCTION);
+    }
+
+    delete result;
+}
+
+void DatabaseLite::RemoveNetwork(IRCSession *session)
+{
+    QString sql = "DELETE FROM networks WHERE user_id = ? AND network_id = ?;";
+    SqlResult *result;
+    QList<QVariant> params;
+
+    params << ((SyncableIRCSession*)session)->GetOwner()->GetID();
+    params << session->GetSID();
+
+    result = this->ExecuteQuery_Bind(sql, params);
+
+    if (result->InError)
+    {
+        delete result;
+        throw new Exception("Unable to remove network using sql: " + this->LastError, BOOST_CURRENT_FUNCTION);
+    }
 
     delete result;
 }
@@ -469,7 +501,10 @@ void DatabaseLite::RemoveScrollback(unsigned int id)
     result = this->ExecuteQuery_Bind(sql, params);
 
     if (result->InError)
+    {
+        delete result;
         throw new Exception("Unable to remove scrollback using sql: " + this->LastError, BOOST_CURRENT_FUNCTION);
+    }
 
     delete result;
 }

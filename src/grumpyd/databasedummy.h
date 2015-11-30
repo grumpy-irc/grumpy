@@ -26,6 +26,7 @@ namespace GrumpyIRC
             void LoadUsers();
             QHash<QString, QVariant> GetConfiguration(user_id_t user);
             void SetConfiguration(user_id_t user, QHash<QString, QVariant> data);
+            void RemoveNetwork(IRCSession *session);
             void RemoveScrollback(User *owner, Scrollback *sx);
             void UpdateRoles();
             void StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem *item);

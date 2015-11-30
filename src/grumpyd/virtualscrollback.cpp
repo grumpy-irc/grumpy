@@ -153,3 +153,20 @@ void VirtualScrollback::InsertText(ScrollbackItem item)
     xx->SendToEverySession(GP_CMD_SCROLLBACK_LOAD_NEW_ITEM, parameters);
 }
 
+void VirtualScrollback::Close()
+{
+    if (!this->owner)
+        throw new Exception("VirtualScrollback NULL owner", BOOST_CURRENT_FUNCTION);
+    Grumpyd::GetBackend()->RemoveScrollback(this->owner, this);
+    Session *gs = this->owner->GetAnyGPSession();
+    if (!gs)
+        return;
+    // Deliver information about this message to everyone
+    QHash<QString, QVariant> parameters;
+    parameters.insert("scrollback", QVariant(this->GetOriginalID()));
+    parameters.insert("scrollback_name", QVariant(this->GetTarget()));
+    if (this->GetSession() && this->GetSession()->GetType() == SessionType_IRC)
+        parameters.insert("network_id", QVariant(((IRCSession*)this->GetSession())->GetSID()));
+    gs->SendToEverySession(GP_CMD_REMOVE, parameters);
+}
+

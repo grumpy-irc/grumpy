@@ -145,10 +145,13 @@ void GrumpydSession::RequestRemove(Scrollback *window)
         this->gp = NULL;
         return;
     }
-
+    IRCSession *ircs = this->GetSessionFromWindow(window);
+    if (!ircs)
+        return;
     // This is fairly complex, we can't remove window here and keep it in grumpyd, so we need to remotely request its removal
     QHash<QString, QVariant> parameters;
     parameters.insert("scrollback_id", QVariant(window->GetOriginalID()));
+    parameters.insert("network_id", ircs->GetSID());
     this->SendProtocolCommand(GP_CMD_REMOVE, parameters);
 }
 
@@ -504,6 +507,9 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVarian
     } else if (text == GP_CMD_SCROLLBACK_RESYNC)
     {
         this->processSResync(parameters);
+    } else if (text == GP_CMD_REMOVE)
+    {
+        this->processRemove(parameters);
     } else if (text == GP_CMD_NICK)
     {
         this->processNick(parameters);
@@ -882,6 +888,37 @@ void GrumpydSession::processPSResync(QHash<QString, QVariant> parameters)
     // let's resync most of the stuff
     origin->LoadHash(parameters["scrollback"].toHash());
     origin->Resync(NULL);
+}
+
+void GrumpydSession::processRemove(QHash<QString, QVariant> parameters)
+{
+    if (!parameters.contains("scrollback"))
+        return;
+    Scrollback *scrollback = this->GetScrollback(parameters["scrollback"].toUInt());
+    if (!scrollback)
+        return;
+    if (scrollback == this->systemWindow)
+        return;
+    IRCSession *session = this->GetSessionFromWindow(scrollback);
+    if (!session)
+        return;
+    if (!scrollback->IsDead())
+    {
+        this->closeError("Server requested illegal operation: removal of a window which is being used");
+        return;
+    }
+    if (session->GetSystemWindow() == scrollback)
+    {
+        // We remove whole network here
+        if (!this->sessionList.contains(scrollback))
+            throw new GrumpyIRC::Exception("Hash table is not consistent with server", BOOST_CURRENT_FUNCTION);
+
+        this->sessionList.remove(scrollback);
+        session->RequestRemove(scrollback);
+        delete session;
+        return;
+    }
+    session->RequestRemove(scrollback);
 }
 
 void GrumpydSession::freememory()
