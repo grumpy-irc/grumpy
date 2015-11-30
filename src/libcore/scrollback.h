@@ -69,6 +69,9 @@ namespace GrumpyIRC
     class LIBCORESHARED_EXPORT ScrollbackItem : public libirc::SerializableItem
     {
         public:
+#ifdef GRUMPY_EXTREME
+            static unsigned long long TotalIC;
+#endif
             ScrollbackItem(QHash<QString, QVariant> hash);
             ScrollbackItem(QString text, scrollback_id_t id=0, bool self = false);
             ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User *user = NULL, scrollback_id_t id=0, bool self = false);

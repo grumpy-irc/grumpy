@@ -20,6 +20,10 @@ QList<Scrollback*> Scrollback::ScrollbackList;
 QMutex Scrollback::ScrollbackList_Mutex;
 scrollback_id_t Scrollback::lastID = 1;
 
+#ifdef GRUMPY_EXTREME
+unsigned long long ScrollbackItem::TotalIC = 0;
+#endif
+
 Scrollback::Scrollback(ScrollbackType Type, Scrollback *parent)
 {
     this->_maxItems = 800000;
@@ -402,6 +406,9 @@ void Scrollback::InsertText(QString text, ScrollbackItemType type)
 
 ScrollbackItem::ScrollbackItem(QHash<QString, QVariant> hash)
 {
+#ifdef GRUMPY_EXTREME
+    ScrollbackItem::TotalIC++;
+#endif
     this->_type = ScrollbackItemType_System;
     this->_self = false;
     this->LoadHash(hash);
@@ -409,6 +416,9 @@ ScrollbackItem::ScrollbackItem(QHash<QString, QVariant> hash)
 
 ScrollbackItem::ScrollbackItem(QString text, scrollback_id_t id, bool self)
 {
+#ifdef GRUMPY_EXTREME
+    ScrollbackItem::TotalIC++;
+#endif
     this->_type = ScrollbackItemType_System;
     this->_id = id;
     this->_self = self;
@@ -418,6 +428,9 @@ ScrollbackItem::ScrollbackItem(QString text, scrollback_id_t id, bool self)
 
 ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User *user, scrollback_id_t id, bool self)
 {
+#ifdef GRUMPY_EXTREME
+    ScrollbackItem::TotalIC++;
+#endif
     this->_type = type;
     this->_id = id;
     this->_self = self;
@@ -431,6 +444,9 @@ ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclie
 
 ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User user, scrollback_id_t id, bool self)
 {
+#ifdef GRUMPY_EXTREME
+    ScrollbackItem::TotalIC++;
+#endif
     this->_type = type;
     this->_id = id;
     this->_self = self;
@@ -446,7 +462,9 @@ void ScrollbackItem::SetID(scrollback_id_t id)
 
 ScrollbackItem::~ScrollbackItem()
 {
-    
+#ifdef GRUMPY_EXTREME
+    ScrollbackItem::TotalIC--;
+#endif
 }
 
 QString ScrollbackItem::GetText() const
