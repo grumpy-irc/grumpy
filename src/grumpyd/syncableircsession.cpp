@@ -193,7 +193,6 @@ Scrollback *SyncableIRCSession::GetScrollbackForUser(QString user)
         scrollback->SetOwner(this->owner);
 
     scrollback->Sync();
-    Grumpyd::GetBackend()->StoreScrollback(this->owner, scrollback);
     return scrollback;
 }
 
