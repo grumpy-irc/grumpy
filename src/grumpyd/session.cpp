@@ -95,6 +95,9 @@ Session::Session(qintptr socket_ptr, bool ssl)
 
 Session::~Session()
 {
+    sessions_lock->lock();
+    SessionList.removeOne(this);
+    sessions_lock->unlock();
     // deletion of socket is performed by destructor of protocol
     GRUMPY_LOG("Session for " + this->peer + " destroyed");
     delete this->protocol;
@@ -103,9 +106,6 @@ Session::~Session()
         // Remove the session from list of sessions this user has open
         this->loggedUser->RemoveSession(this);
     }
-    sessions_lock->lock();
-    SessionList.removeOne(this);
-    sessions_lock->unlock();
 }
 
 void Session::run()

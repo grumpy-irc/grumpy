@@ -13,6 +13,7 @@
 #include <QCoreApplication>
 #include <QFile>
 #include <QProcess>
+#include <csignal>
 //#include <iostream>
 #include "corewrapper.h"
 #include "scrollbackfactory.h"
@@ -38,6 +39,9 @@
 #define EDAEMONIZEFAILED    -1
 #define EUNHANDLEDEXCEPTION -2
 #define EPIDMKER            -3
+
+//////////////////////////////////////////////////////////////////
+// Terminal parameters
 
 int daemonize()
 {
@@ -103,6 +107,29 @@ int pid(GrumpyIRC::TerminalParser *parser, QStringList params)
     return TP_RESULT_OK;
 }
 
+//////////////////////////////////////////////////////////////////
+// Signal handler
+
+void grumpyd_terminate()
+{
+    // Delete instance of grumpyd first
+    delete GrumpyIRC::Grumpyd::grumpyd;
+
+    // Delete the core, that should handle most of the memory deallocation
+    delete GrumpyIRC::CoreWrapper::GrumpyCore;
+}
+
+void signal_handler(int sn)
+{
+    GRUMPY_LOG("Received signal: " + QString::number(sn));
+    GRUMPY_LOG("Exiting");
+    grumpyd_terminate();
+    exit(0);
+}
+
+//////////////////////////////////////////////////////////////////
+// Main
+
 int main(int argc, char *argv[])
 {
     try
@@ -143,6 +170,10 @@ int main(int argc, char *argv[])
             }
             pf.write(QString::number(QCoreApplication::applicationPid()).toLatin1());
         }
+
+        // Register signals
+        signal(SIGTERM, signal_handler);
+        signal(SIGINT, signal_handler);
 
         GrumpyIRC::CoreWrapper::GrumpyCore = new GrumpyIRC::Core();
         // Install our own scrollback factory that creates scrollbacks which are automagically network synced

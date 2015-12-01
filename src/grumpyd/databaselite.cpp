@@ -748,17 +748,17 @@ SqlResult *DatabaseLite::ExecuteQuery_Bind(QString sql, QStringList parameters)
     int current_parameter = 1;
     this->LastStatement = sql;
     this->master_lock.lock();
-    int x = sqlite3_prepare_v2(this->database, sql.toUtf8().constData(), sql.length() + 1, &statement, NULL);
-    if (!this->Evaluate(x))
+    int statement_rv = sqlite3_prepare_v2(this->database, sql.toUtf8().constData(), sql.length() + 1, &statement, NULL);
+    if (!this->Evaluate(statement_rv))
         goto on_error;
     foreach (QString text, parameters)
     {
-        x = sqlite3_bind_text(statement, current_parameter++, text.toUtf8().constData(), -1, SQLITE_TRANSIENT);
-        if (!this->Evaluate(x))
+        statement_rv = sqlite3_bind_text(statement, current_parameter++, text.toUtf8().constData(), -1, SQLITE_TRANSIENT);
+        if (!this->Evaluate(statement_rv))
             goto on_error;
     }
-    x = sqlite3_step(statement);
-    while (x == SQLITE_ROW)
+    statement_rv = sqlite3_step(statement);
+    while (statement_rv == SQLITE_ROW)
     {
         int column_count = sqlite3_column_count(statement);
         QList<QVariant> row;
@@ -789,12 +789,12 @@ SqlResult *DatabaseLite::ExecuteQuery_Bind(QString sql, QStringList parameters)
             }
             value++;
         }
-        x = sqlite3_step(statement);
+        statement_rv = sqlite3_step(statement);
         result->columns = column_count;
         result->Rows.append(SqlRow(row));
     }
 
-    if (!this->Evaluate(x))
+    if (!this->Evaluate(statement_rv))
         goto on_error;
 
     sqlite3_finalize(statement);
