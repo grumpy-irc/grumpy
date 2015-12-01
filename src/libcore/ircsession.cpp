@@ -615,7 +615,7 @@ void IRCSession::OnOutgoingRawMessage(QByteArray message)
     if (!this->snifferEnabled)
         return;
     this->data.append(new NetworkSniffer_Item(message, true));
-    if ((unsigned int)this->data.size() > this->maxSnifferBufferSize)
+    while ((unsigned int)this->data.size() > this->maxSnifferBufferSize)
         this->data.removeFirst();
 }
 

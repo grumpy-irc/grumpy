@@ -76,8 +76,8 @@ namespace GrumpyIRC
             ScrollbackItem(QString text, scrollback_id_t id=0, bool self = false);
             ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User *user = NULL, scrollback_id_t id=0, bool self = false);
             ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User user, scrollback_id_t id=0, bool self = false);
-            virtual void SetID(scrollback_id_t id);
             virtual ~ScrollbackItem();
+            virtual void SetID(scrollback_id_t id);
             virtual QString GetText() const;
             //! Items in scrollback are indexed with this so that we can sync only newest items.
             //! If you need older items, request them from the lowest ID you have.

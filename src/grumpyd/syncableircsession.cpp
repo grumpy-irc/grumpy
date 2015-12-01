@@ -43,6 +43,7 @@ SyncableIRCSession *SyncableIRCSession::Open(Scrollback *system_window, libirc::
 SyncableIRCSession::SyncableIRCSession(QHash<QString, QVariant> sx, User *user, Scrollback *root) : IRCSession(sx, root)
 {
     this->owner = user;
+    this->snifferEnabled = false;
     
     ((VirtualScrollback*)this->systemWindow)->SetOwner(owner);
 }
@@ -50,12 +51,16 @@ SyncableIRCSession::SyncableIRCSession(QHash<QString, QVariant> sx, User *user, 
 SyncableIRCSession::SyncableIRCSession(Scrollback *system, User *user, Scrollback *root) : IRCSession(system, root)
 {
     this->owner = user;
+    this->snifferEnabled = false;
+
     ((VirtualScrollback*)this->systemWindow)->SetOwner(owner);
 }
 
 SyncableIRCSession::SyncableIRCSession(unsigned int id, Scrollback *system, User *user, QList<Scrollback *> sl) : IRCSession(id, system, NULL)
 {
     this->owner = user;
+    this->snifferEnabled = false;
+
     foreach (Scrollback *sx, sl)
     {
         if (sx->GetType() == ScrollbackType_Channel)
