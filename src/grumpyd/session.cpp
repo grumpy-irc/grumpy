@@ -666,7 +666,7 @@ void Session::processRemove(QHash<QString, QVariant> parameters)
         delete irc;
     } else
     {
-        if (!scrollback->IsDead())
+        if (!scrollback->IsDead() && scrollback->GetType() != ScrollbackType_User)
         {
             this->TransferError(GP_CMD_REMOVE, "You can't remove scrollback that is still in use", GP_ERROR);
             return;

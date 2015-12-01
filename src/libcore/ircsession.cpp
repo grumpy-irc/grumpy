@@ -447,7 +447,7 @@ void IRCSession::SendRaw(Scrollback *window, QString raw)
 
 void IRCSession::RequestRemove(Scrollback *window)
 {
-    if (!window->IsDead())
+    if (!window->IsDead() && window->GetType() != ScrollbackType_User)
         return;
     if (window == this->systemWindow)
     {

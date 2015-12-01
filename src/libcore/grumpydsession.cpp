@@ -129,7 +129,7 @@ void GrumpydSession::SendAction(Scrollback *window, QString text)
 
 void GrumpydSession::RequestRemove(Scrollback *window)
 {
-    if (!window->IsDead())
+    if (!window->IsDead() && window->GetType() != ScrollbackType_User)
         return;
 
     if (window == this->systemWindow)
@@ -902,7 +902,7 @@ void GrumpydSession::processRemove(QHash<QString, QVariant> parameters)
     IRCSession *session = this->GetSessionFromWindow(scrollback);
     if (!session)
         return;
-    if (!scrollback->IsDead())
+    if (!scrollback->IsDead() && scrollback->GetType() != ScrollbackType_User)
     {
         this->closeError("Server requested illegal operation: removal of a window which is being used");
         return;

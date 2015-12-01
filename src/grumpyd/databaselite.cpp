@@ -298,6 +298,7 @@ void DatabaseLite::LoadWindows()
         ScrollbackType st = static_cast<ScrollbackType>(row.GetField(3).toInt());
         VirtualScrollback *sx = (VirtualScrollback*)Core::GrumpyCore->NewScrollback(parent_ptr, target, st);
         sx->SetOriginalID(scrollback_id);
+        sx->SetLastItemID(row.GetField(5).toInt());
         sx->SetOwner(user, true);
         if (!sx->PropertyBag.contains("initialized"))
             sx->PropertyBag.insert("initialized", QVariant(true));

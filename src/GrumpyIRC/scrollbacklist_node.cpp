@@ -35,7 +35,7 @@ ScrollbackList_Node::ScrollbackList_Node(ScrollbackFrame *sb) : QStandardItem(sb
 
 ScrollbackList_Node::~ScrollbackList_Node()
 {
-    NodesList.removeOne(this);
+    NodesList.removeAll(this);
 }
 
 ScrollbackFrame *ScrollbackList_Node::GetScrollback()

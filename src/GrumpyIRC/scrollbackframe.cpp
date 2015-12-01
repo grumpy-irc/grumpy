@@ -557,7 +557,7 @@ bool ScrollbackFrame::IsDead()
 
 void ScrollbackFrame::RequestClose()
 {
-    if (!this->IsDead())
+    if (!this->IsDead() && this->GetScrollback()->GetType() != ScrollbackType_User)
     {
         return;
     }
