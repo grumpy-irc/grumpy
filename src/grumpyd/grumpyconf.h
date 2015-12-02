@@ -17,15 +17,14 @@
     #undef GCFG
 #endif
 
-#define GCFG CoreWrapper::GrumpyCore->GetConfiguration()
-
-#ifdef CONF
-#error "CONF is already defined, redefinig is not supported, grumpy can't be compiled with libraries that define their own CONF option"
-#endif
-#define CONF GrumpyIRC::GrumpyConf::Conf
-
 #include "../libcore/definitions.h"
 #include <QVariant>
+
+#ifdef CONF
+    #undef CONF
+#endif
+#define GCFG CoreWrapper::GrumpyCore->GetConfiguration()
+#define CONF GrumpyIRC::GrumpyConf::Conf
 
 namespace GrumpyIRC
 {

@@ -20,7 +20,7 @@ using namespace GrumpyIRC;
 void Hooks::OnScrollbackItemHighlight(ScrollbackFrame *scrollback, ScrollbackItem *item)
 {
     // Triggered when any item is highlighted by system
-    if (!scrollback->IsVisible())
+    if (!scrollback->IsVisible() || !MainWindow::Main->isActiveWindow())
     {
         if (item->GetUser().GetNick().isEmpty() == false)
             MainWindow::Main->Notify(scrollback->GetTitle(), item->GetUser().GetNick() + ": " + item->GetText());
