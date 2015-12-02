@@ -504,7 +504,7 @@ void GrumpyIRC::MainWindow::on_actionAbout_triggered()
 
 void GrumpyIRC::MainWindow::on_actionLoad_more_items_from_remote_triggered()
 {
-    this->GetScrollbackManager()->GetCurrentScrollback()->RequestMore(100);
+    this->GetScrollbackManager()->GetCurrentScrollback()->RequestMore(1200);
 }
 
 void GrumpyIRC::MainWindow::on_actionPreferences_triggered()

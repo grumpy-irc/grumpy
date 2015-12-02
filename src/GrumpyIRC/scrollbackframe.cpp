@@ -655,7 +655,7 @@ void ScrollbackFrame::RequestMore(unsigned int count)
     ScrollbackItem first_item = this->GetScrollback()->GetFirst();
     if (first_item.GetID() == 0)
         return;
-    grumpy->RequestBL(this->GetScrollback(), first_item.GetID(), 200);
+    grumpy->RequestBL(this->GetScrollback(), first_item.GetID(), count);
     this->currentScrollbar = this->textEdit->verticalScrollBar()->value();
 }
 
