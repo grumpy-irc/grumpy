@@ -23,6 +23,8 @@ using namespace GrumpyIRC;
 
 CommandProcessor::CommandProcessor()
 {
+    this->SplitLong = true;
+    this->LongSize = 300;
     this->CommandPrefix = '/';
 }
 
@@ -106,6 +108,18 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
     if (window->IsDead() != true && (window->GetType() == ScrollbackType_Channel || window->GetType() == ScrollbackType_User))
     {
         // This is a channel window, so we send this as a message to the channel
+        if (this->SplitLong && command.size() > (int)this->LongSize)
+        {
+            QStringList messages;
+            while (command.size() > (int)this->LongSize)
+            {
+                messages.append(command.mid(0, (int)this->LongSize));
+                command = command.mid((int)this->LongSize);
+            }
+            foreach (QString text, messages)
+                window->GetSession()->SendMessage(window, text);
+            return 0;
+        }
         window->GetSession()->SendMessage(window, command);
     }
     else
