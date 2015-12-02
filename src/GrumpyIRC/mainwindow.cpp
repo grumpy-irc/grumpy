@@ -48,7 +48,7 @@ static void Exit()
     IRCSession::Exit(CONF->GetQuitMessage());
     GCFG->SetValue("mainwindow_state", QVariant(MainWindow::Main->saveState()));
     GCFG->SetValue("mainwindow_geometry", QVariant(MainWindow::Main->saveGeometry()));
-    GCFG->Save();
+    CONF->Save();
     QApplication::exit(0);
 }
 

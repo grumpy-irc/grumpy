@@ -19,6 +19,7 @@
 #endif
 #include "mainwindow.h"
 #include "corewrapper.h"
+#include "grumpyconf.h"
 #include "../libcore/exception.h"
 #include "grumpyeventhandler.h"
 #include "../libcore/autocompletionengine.h"
@@ -57,6 +58,7 @@ int main(int argc, char *argv[])
         // Initialize core first
         CoreWrapper::GrumpyCore = new Core();
         CoreWrapper::GrumpyCore->InitCfg();
+        GrumpyConf::Conf->Load();
         CoreWrapper::GrumpyCore->SetSystemEventHandler(new GrumpyEventHandler());
         CoreWrapper::GrumpyCore->InstallFactory(new WidgetFactory());
         Highlighter::Init();

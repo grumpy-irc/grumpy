@@ -36,6 +36,16 @@ bool Highlighter::IsMatch(ScrollbackItem *text, libircclient::Network *network)
     return false;
 }
 
+Highlighter::Highlighter(QHash<QString, QVariant> hash)
+{
+    this->CaseSensitive = false;
+    this->IsRegex = false;
+    this->Messages = true;
+    this->MatchingSelf = false;
+    Highlighter_Data.append(this);
+    this->LoadHash(hash);
+}
+
 Highlighter::Highlighter(QString text)
 {
     this->CaseSensitive = false;
@@ -49,6 +59,26 @@ Highlighter::Highlighter(QString text)
 Highlighter::~Highlighter()
 {
     Highlighter_Data.removeOne(this);
+}
+
+QHash<QString, QVariant> Highlighter::ToHash()
+{
+    QHash<QString, QVariant> hash;
+    SERIALIZE(CaseSensitive);
+    SERIALIZE(IsRegex);
+    SERIALIZE(definition);
+    SERIALIZE(Messages);
+    SERIALIZE(MatchingSelf);
+    return hash;
+}
+
+void Highlighter::LoadHash(QHash<QString, QVariant> hash)
+{
+    UNSERIALIZE_BOOL(CaseSensitive);
+    UNSERIALIZE_BOOL(IsRegex);
+    UNSERIALIZE_BOOL(Messages);
+    UNSERIALIZE_BOOL(MatchingSelf);
+    UNSERIALIZE_STRING(definition);
 }
 
 bool Highlighter::IsMatching(ScrollbackItem *text, libircclient::Network *network)

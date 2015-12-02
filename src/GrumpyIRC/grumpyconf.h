@@ -36,6 +36,7 @@ namespace GrumpyIRC
             GrumpyConf();
             Configuration *GetConfiguration();
             QString GetQuitMessage();
+            QString GetRawQuitMessage();
             void SetQuitMessage(QString text);
             void SetNick(QString nick);
             QString GetIdent();
@@ -53,6 +54,8 @@ namespace GrumpyIRC
             QString GetDefaultKickReason();
             void SetDefaultKickReason(QString text);
             bool FirstRun();
+            void Load();
+            void Save();
     };
 }
 

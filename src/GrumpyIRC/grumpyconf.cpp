@@ -11,6 +11,7 @@
 // Copyright (c) Petr Bena 2015
 
 #include "corewrapper.h"
+#include "highlighter.h"
 #include "grumpyconf.h"
 #include "../libcore/configuration.h"
 #include "../libcore/core.h"
@@ -31,9 +32,14 @@ Configuration *GrumpyConf::GetConfiguration()
 
 QString GrumpyConf::GetQuitMessage()
 {
-    QString qm = GCFG->GetValueAsString("quit_message", "GrumpyIRC v. $version. Such client. WOW. Much quit.");
+    QString qm = this->GetRawQuitMessage();
     qm.replace("$version", GRUMPY_VERSION_STRING);
     return qm;
+}
+
+QString GrumpyConf::GetRawQuitMessage()
+{
+    return GCFG->GetValueAsString("quit_message", "GrumpyIRC v. $version. Such client. WOW. Much quit.");
 }
 
 void GrumpyConf::SetQuitMessage(QString text)
@@ -119,5 +125,31 @@ void GrumpyConf::SetDefaultKickReason(QString text)
 bool GrumpyConf::FirstRun()
 {
     return GCFG->GetValueAsBool("first_run", true);
+}
+
+void GrumpyConf::Load()
+{
+    GCFG->Load();
+    if (GCFG->Contains("highlights"))
+    {
+        qDeleteAll(Highlighter::Highlighter_Data);
+        QList<QVariant> list = GCFG->GetValue("highlights").toList();
+        foreach (QVariant item, list)
+        {
+            new Highlighter(item.toHash());
+        }
+    }
+}
+
+void GrumpyConf::Save()
+{
+    GCFG->SetValue("first_run", false);
+    QList<QVariant> ql;
+    foreach (Highlighter *item, Highlighter::Highlighter_Data)
+    {
+        ql.append(item->ToHash());
+    }
+    GCFG->SetValue("highlights", QVariant(ql));
+    GCFG->Save();
 }
 

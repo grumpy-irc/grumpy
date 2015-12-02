@@ -43,5 +43,6 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
     CONF->SetIdent(this->ui->leIdent->text());
     CONF->SetQuitMessage(this->ui->lineEdit->text());
     CONF->SetName(this->ui->lineEdit_2->text());
+    CONF->Save();
     this->close();
 }

@@ -33,6 +33,11 @@ Configuration::~Configuration()
     this->Options.clear();
 }
 
+bool Configuration::Contains(QString key)
+{
+    return this->Options.contains(key);
+}
+
 QVariant Configuration::GetValue(QString key)
 {
     if (!this->Options.contains(key))

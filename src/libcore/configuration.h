@@ -29,6 +29,7 @@ namespace GrumpyIRC
 
             Configuration();
             virtual ~Configuration();
+            virtual bool Contains(QString key);
             virtual QVariant GetValue(QString key);
             virtual void SetAlternativeConfigFile(QString file);
             virtual bool GetValueAsBool(QString key, bool none = false);
