@@ -176,7 +176,7 @@ QString UserFrame::generateBan()
             while(current_batch_size-- > 0)
             {
                 mode += "b";
-                parameters += (users.at(0).GetHost()) + " ";
+                parameters += "*!*@" + (users.at(0).GetHost()) + " ";
                 users.removeAt(0);
             }
 
@@ -210,11 +210,11 @@ void UserFrame::changeModes(char prefix, char mode)
         int current_batch_size = 4;
         if (ul.count() < current_batch_size)
             current_batch_size = ul.count();
-        QString modes = prefix;
+        QString modes = QString(prefix);
         QString parameters;
         while(current_batch_size-- > 0)
         {
-            modes += mode;
+            modes += QString(mode);
             parameters += (ul.at(0).GetNick()) + " ";
             ul.removeAt(0);
         }
