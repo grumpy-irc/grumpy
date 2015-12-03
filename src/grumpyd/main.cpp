@@ -107,6 +107,14 @@ int pid(GrumpyIRC::TerminalParser *parser, QStringList params)
     return TP_RESULT_OK;
 }
 
+int dbcl(GrumpyIRC::TerminalParser *parser, QStringList params)
+{
+    (void)params;
+    (void)parser;
+    CONF->AutoFix = true;
+    return TP_RESULT_OK;
+}
+
 //////////////////////////////////////////////////////////////////
 // Signal handler
 
@@ -144,6 +152,7 @@ int main(int argc, char *argv[])
         tp->Register('d', "daemonize", "Will start grumpyd as system service", 0, (GrumpyIRC::TP_Callback)service);
         tp->Register('k', "config", "Specify a path to configuration file", 1, (GrumpyIRC::TP_Callback)config);
         tp->Register(0, "dummy", "Use dummy as a storage backend, useful for debugging.", 0, (GrumpyIRC::TP_Callback)dummy);
+        tp->Register(0, "cleanup", "Remove invalid objects from the database permanently.", 0, (GrumpyIRC::TP_Callback)dbcl);
         if (!tp->Parse(argc, argv))
         {
             // We processed some argument which requires the application to exit

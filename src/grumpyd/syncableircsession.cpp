@@ -520,6 +520,13 @@ void SyncableIRCSession::OnUserAwayStatusChange(libircclient::Parser *px, libirc
     this->resyncUL(ch, GRUMPY_UL_UPDATE, ux);
 }
 
+void SyncableIRCSession::rmWindow(Scrollback *window)
+{
+    IRCSession::rmWindow(window);
+    // Update the network in database storage
+    Grumpyd::GetBackend()->UpdateNetwork(this);
+}
+
 void SyncableIRCSession::resyncULRemove(libircclient::Channel *channel, QString user)
 {
     Session *session = this->owner->GetAnyGPSession();

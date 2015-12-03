@@ -184,9 +184,9 @@ namespace GrumpyIRC
             virtual void connInternalSocketSignals();
             //! This is only called by grumpy session, used for resync, pretty much just a performance tweaks
             //! so that we don't need to call GP_CMD_RESYNC_CHANNEL just for a simple nick change
-            void _gs_ResyncNickChange(QString new_, QString old_);
-            void rmWindow(Scrollback *window);
-            void SyncWindows(QHash<QString, QVariant> windows, QHash<QString, Scrollback*> *hash);
+            virtual void _gs_ResyncNickChange(QString new_, QString old_);
+            virtual void rmWindow(Scrollback *window);
+            virtual void SyncWindows(QHash<QString, QVariant> windows, QHash<QString, Scrollback*> *hash);
             QTimer timerUL;
             //! Sessions have unique ID that distinct them from sessions made to same irc network
             unsigned int SID;
