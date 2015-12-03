@@ -77,6 +77,14 @@ QString Configuration::GetValueAsString(QString key, QString default_value)
     return this->Options[key].toString();
 }
 
+int Configuration::GetValueAsInt(QString key, int none)
+{
+    if (!this->Options.contains(key))
+        return none;
+
+    return this->Options[key].toInt();
+}
+
 void Configuration::SetValue(QString key, QVariant value)
 {
     if (!this->Options.contains(key))

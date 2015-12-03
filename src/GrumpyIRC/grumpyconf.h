@@ -54,6 +54,10 @@ namespace GrumpyIRC
             QString GetDefaultKickReason();
             bool Batches();
             void SetDefaultKickReason(QString text);
+            void SetSplitMaxSize(int size);
+            int GetSplitMaxSize();
+            void SetSplit(bool split);
+            bool GetSplit();
             bool FirstRun();
             void Load();
             void Save();

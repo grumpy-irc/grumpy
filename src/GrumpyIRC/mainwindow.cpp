@@ -303,6 +303,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpyd", (SC_Callback)SystemCommand_Grumpy));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("raw", (SC_Callback)SystemCommand_RAW));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("echo", (SC_Callback)SystemCommand_echo));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->LongSize = CONF->GetSplitMaxSize();
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->SplitLong = CONF->GetSplit();
     // Welcome user
     this->ui->actionOpen_window->setVisible(false);
     this->systemWindow->InsertText(QString("Grumpy irc version " + GCFG->GetVersion()));

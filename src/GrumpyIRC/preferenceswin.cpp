@@ -24,6 +24,8 @@ PreferencesWin::PreferencesWin(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
     this->ui->leNickFix->setText(CONF->GetAlterNick());
     this->ui->lineEdit->setText(CONF->GetQuitMessage());
     this->ui->lineEdit_2->setText(CONF->GetName());
+    this->ui->lineEdit_3->setText(QString::number(CONF->GetSplitMaxSize()));
+    this->ui->checkBoxSplitMs->setChecked(CONF->GetSplit());
 }
 
 PreferencesWin::~PreferencesWin()
@@ -43,6 +45,8 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
     CONF->SetIdent(this->ui->leIdent->text());
     CONF->SetQuitMessage(this->ui->lineEdit->text());
     CONF->SetName(this->ui->lineEdit_2->text());
+    CONF->SetSplitMaxSize(this->ui->lineEdit_3->text().toInt());
+    CONF->SetSplit(this->ui->checkBoxSplitMs->isChecked());
     CONF->Save();
     this->close();
 }

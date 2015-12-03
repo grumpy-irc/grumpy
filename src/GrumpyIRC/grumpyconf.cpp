@@ -124,7 +124,27 @@ bool GrumpyConf::Batches()
 
 void GrumpyConf::SetDefaultKickReason(QString text)
 {
+    GCFG->SetValue("kick", text);
+}
 
+void GrumpyConf::SetSplitMaxSize(int size)
+{
+    GCFG->SetValue("split_max_word_size", size);
+}
+
+int GrumpyConf::GetSplitMaxSize()
+{
+    return GCFG->GetValueAsInt("split_max_word_size", 200);
+}
+
+void GrumpyConf::SetSplit(bool split)
+{
+    GCFG->SetValue("split", split);
+}
+
+bool GrumpyConf::GetSplit()
+{
+    return GCFG->GetValueAsBool("split", true);
 }
 
 bool GrumpyConf::FirstRun()
