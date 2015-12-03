@@ -52,6 +52,7 @@ namespace GrumpyIRC
             QString GetMessageFormat();
             QString GetActionFormat();
             QString GetDefaultKickReason();
+            bool Batches();
             void SetDefaultKickReason(QString text);
             bool FirstRun();
             void Load();

@@ -24,6 +24,7 @@ using namespace GrumpyIRC;
 
 ScriptWin::ScriptWin(ScrollbackFrame *parent) : QDialog(parent), ui(new Ui::ScriptWin)
 {
+    this->setAttribute(Qt::WA_DeleteOnClose);
     this->ui->setupUi(this);
     this->parentFrame = parent;
     this->ui->plainTextEdit->setFont(Skin::GetDefault()->TextFont);

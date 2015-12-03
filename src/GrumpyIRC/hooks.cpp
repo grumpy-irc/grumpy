@@ -17,7 +17,7 @@
 
 using namespace GrumpyIRC;
 
-void Hooks::OnScrollbackItemHighlight(ScrollbackFrame *scrollback, ScrollbackItem *item)
+void UiHooks::OnScrollbackItemHighlight(ScrollbackFrame *scrollback, ScrollbackItem *item)
 {
     // Triggered when any item is highlighted by system
     if (!scrollback->IsVisible() || !MainWindow::Main->isActiveWindow())
@@ -29,8 +29,4 @@ void Hooks::OnScrollbackItemHighlight(ScrollbackFrame *scrollback, ScrollbackIte
     }
 }
 
-Hooks::Hooks()
-{
-
-}
 

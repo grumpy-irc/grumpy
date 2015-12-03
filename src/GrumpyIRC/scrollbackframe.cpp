@@ -256,7 +256,7 @@ void ScrollbackFrame::_insertText_(ScrollbackItem item)
     int highlighted = GRUMPY_H_NOT;
     if (Highlighter::IsMatch(&item, this->GetNetwork()))
     {
-        Hooks::OnScrollbackItemHighlight(this, &item);
+        UiHooks::OnScrollbackItemHighlight(this, &item);
         highlighted = GRUMPY_H_YES;
     }
     if (!this->IsVisible())

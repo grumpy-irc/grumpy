@@ -10,21 +10,9 @@
 
 // Copyright (c) Petr Bena 2015
 
-#ifndef GUIHOOKS_H
-#define GUIHOOKS_H
+#include "hooks.h"
+#include "scrollback.h"
 
-#include "../libcore/definitions.h"
+using namespace GrumpyIRC;
 
-namespace GrumpyIRC
-{
-    class ScrollbackFrame;
-    class ScrollbackItem;
 
-    class UiHooks
-    {
-        public:
-            static void OnScrollbackItemHighlight(ScrollbackFrame *scrollback, ScrollbackItem *item);
-    };
-}
-
-#endif // HOOKS_H

@@ -56,10 +56,13 @@ namespace GrumpyIRC
             void on_listWidget_customContextMenuRequested(const QPoint &pos);
 
         private:
+            QString generateKick();
+            QString generateBan();
             void kick();
+            void changeModes(char prefix, char mode);
+            void ban();
             void kb();
             void ctcp(QString text);
-            void ban();
             QString GenerateTip(libircclient::User *ux);
             QHash<char, unsigned int> userCounts;
             ScrollbackFrame *parentFrame;

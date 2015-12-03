@@ -16,6 +16,7 @@
 #include "../libcore/exception.h"
 #include "userframe.h"
 #include "userframeitem.h"
+#include "scriptwin.h"
 #include "ui_userframe.h"
 #include <QListWidgetItem>
 #include <QMenu>
@@ -140,16 +141,97 @@ void UserFrame::on_listWidget_customContextMenuRequested(const QPoint &pos)
         this->ctcp("PING");
     else if (selectedItem == ctcpV)
         this->ctcp("VERSION");
+    else if (selectedItem == menuKick)
+        this->kick();
+    else if (selectedItem == menuBan)
+        this->ban();
+    else if (selectedItem == menuKickBan)
+        this->kb();
+}
+
+QString UserFrame::generateKick()
+{
+    QString results;
+    foreach (libircclient::User user, this->SelectedUsers())
+    {
+        //this->parentFrame->TransferRaw("PRIVMSG " + user.GetNick());
+        results += "KICK " + this->parentFrame->GetScrollback()->GetTarget() + " " + user.GetNick() + " :" + CONF->GetDefaultKickReason() + "\n";
+    }
+    return results;
+}
+
+QString UserFrame::generateBan()
+{
+    QString results;
+    if (CONF->Batches())
+    {
+        QList<libircclient::User> users = this->SelectedUsers();
+        while (!users.isEmpty())
+        {
+            int current_batch_size = 4;
+            if (users.count() < current_batch_size)
+                current_batch_size = users.count();
+            QString mode = "+";
+            QString parameters;
+            while(current_batch_size-- > 0)
+            {
+                mode += "b";
+                parameters += (users.at(0).GetHost()) + " ";
+                users.removeAt(0);
+            }
+
+            results += "MODE " + this->parentFrame->GetScrollback()->GetTarget() + " " + mode + " " + parameters.trimmed() + "\n";
+        }
+    } else
+    {
+        foreach (libircclient::User user, this->SelectedUsers())
+        {
+            //this->parentFrame->TransferRaw("PRIVMSG " + user.GetNick());
+            results += "MODE " + this->parentFrame->GetScrollback()->GetTarget() + " +b *!*@" + user.GetHost() + "\n";
+        }
+    }
+    return results;
 }
 
 void UserFrame::kick()
 {
+    QString script = this->generateKick();
+    ScriptWin *script_win = new ScriptWin(this->parentFrame);
+    script_win->Set(script);
+    script_win->show();
+}
 
+void UserFrame::changeModes(char prefix, char mode)
+{
+    QList<libircclient::User> ul = this->SelectedUsers();
+    QString results;
+    while (!ul.isEmpty())
+    {
+        int current_batch_size = 4;
+        if (ul.count() < current_batch_size)
+            current_batch_size = ul.count();
+        QString modes = prefix;
+        QString parameters;
+        while(current_batch_size-- > 0)
+        {
+            modes += mode;
+            parameters += (ul.at(0).GetNick()) + " ";
+            ul.removeAt(0);
+        }
+
+        results += "MODE " + this->parentFrame->GetScrollback()->GetTarget() + " " + modes + " " + parameters.trimmed() + "\n";
+    }
+    ScriptWin *script_window = new ScriptWin(this->parentFrame);
+    script_window->Set(results);
+    script_window->show();
 }
 
 void UserFrame::kb()
 {
-
+    QString script = this->generateBan() + this->generateKick();
+    ScriptWin *script_win = new ScriptWin(this->parentFrame);
+    script_win->Set(script);
+    script_win->show();
 }
 
 void UserFrame::ctcp(QString text)
@@ -163,7 +245,10 @@ void UserFrame::ctcp(QString text)
 
 void UserFrame::ban()
 {
-
+    QString script = this->generateBan();
+    ScriptWin *script_win = new ScriptWin(this->parentFrame);
+    script_win->Set(script);
+    script_win->show();
 }
 
 QString UserFrame::GenerateTip(libircclient::User *ux)
@@ -307,17 +392,21 @@ QList<QString> UserFrame::GetUsers()
         ul.append(user.GetNick());
 
     return ul;
-
 }
 
 void UserFrame::ChangeMode(QString mode)
 {
     QString channel_name = this->parentFrame->GetScrollback()->GetTarget();
-
-    // Change the mode for every user
-    // that is selected
-    foreach (libircclient::User u, this->SelectedUsers())
-        this->parentFrame->TransferRaw("MODE " + channel_name + " " + mode + " " + u.GetNick());
+    QList<libircclient::User> users = this->SelectedUsers();
+    if (users.size() > 1)
+    {
+        if (mode.size() < 2)
+            throw new Exception("Invalid mode", BOOST_CURRENT_FUNCTION);
+        this->changeModes(mode[0].toLatin1(), mode[1].toLatin1());
+    } else
+    {
+        this->parentFrame->TransferRaw("MODE " + channel_name + " " + mode + " " + users.at(0).GetNick());
+    }
 }
 
 void UserFrame::Whois()
