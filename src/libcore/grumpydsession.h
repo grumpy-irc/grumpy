@@ -148,6 +148,8 @@ namespace GrumpyIRC
             unsigned long long GetCompressedBytesSent();
             unsigned long long GetBytesRcvd();
             unsigned long long GetBytesSent();
+            unsigned long long GetPacketsSent();
+            unsigned long long GetPacketsRcvd();
             QString Version;
 
         signals:

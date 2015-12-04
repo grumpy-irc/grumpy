@@ -163,8 +163,13 @@ static int SystemCommand_Netstat(SystemCommand *command, CommandArgs command_arg
     cs = session->GetCompressedBytesSent();
     ur = session->GetBytesRcvd();
     us = session->GetBytesSent();
+    sx->InsertText("Network stats for this grumpy session:");
+    sx->InsertText("-----------------------------------------------------");
     sx->InsertText("Compressed bytes rcvd: " + QString::number(cr));
     sx->InsertText("Compressed bytes sent: " + QString::number(cs));
+    sx->InsertText("Bytes rcvd: " + QString::number(ur));
+    sx->InsertText("Bytes sent: " + QString::number(us));
+    sx->InsertText("-----------------------------------------------------");
     if (cs > 0 && cr > 0)
     {
         double ratio_rcvd = (((double)cr - (double)ur) / (double)ur) * -100;
@@ -172,8 +177,9 @@ static int SystemCommand_Netstat(SystemCommand *command, CommandArgs command_arg
         sx->InsertText("Compression ratio for rcvd: " + QString::number(ratio_rcvd));
         sx->InsertText("Compression ratio for sent: " + QString::number(ratio_sent));
     }
-    sx->InsertText("Bytes rcvd:" + QString::number(ur));
-    sx->InsertText("Bytes sent:" + QString::number(us));
+    sx->InsertText("-----------------------------------------------------");
+    sx->InsertText("Packets rcvd: " + QString::number(session->GetPacketsRcvd()));
+    sx->InsertText("Packets sent: " + QString::number(session->GetPacketsSent()));
     return 0;
 }
 

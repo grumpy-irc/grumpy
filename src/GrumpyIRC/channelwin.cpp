@@ -174,7 +174,7 @@ void GrumpyIRC::ChannelWin::on_tableWidget_4_customContextMenuRequested(const QP
 
 void ChannelWin::headings()
 {
-    this->ui->tab_2->setWindowTitle(QObject::tr("Bans") + QString(" (") + QString::number(this->ui->tableWidget_2->rowCount()) + ")");
-    this->ui->tab_3->setWindowTitle(QObject::tr("Exceptions") + " (" + QString::number(this->ui->tableWidget_3->rowCount()) + ")");
-    this->ui->tab_4->setWindowTitle(QObject::tr("Invites") + " (" + QString::number(this->ui->tableWidget_4->rowCount()) + ")");
+    this->ui->tabWidget->setTabText(1, QObject::tr("Bans") + QString(" (") + QString::number(this->ui->tableWidget_2->rowCount()) + ")");
+    this->ui->tabWidget->setTabText(2, QObject::tr("Exceptions") + " (" + QString::number(this->ui->tableWidget_3->rowCount()) + ")");
+    this->ui->tabWidget->setTabText(3, QObject::tr("Invites") + " (" + QString::number(this->ui->tableWidget_4->rowCount()) + ")");
 }

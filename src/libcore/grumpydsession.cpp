@@ -432,6 +432,16 @@ unsigned long long GrumpydSession::GetBytesSent()
     return this->gp->GetBytesSent();
 }
 
+unsigned long long GrumpydSession::GetPacketsSent()
+{
+    return this->gp->GetPacketsSent();
+}
+
+unsigned long long GrumpydSession::GetPacketsRcvd()
+{
+    return this->gp->GetPacketsRecv();
+}
+
 void GrumpydSession::OnSslHandshakeFailure(QList<QSslError> errors, bool *ok)
 {
     foreach(QSslError x, errors)

@@ -15,4 +15,7 @@
 
 using namespace GrumpyIRC;
 
+void Hooks::OnScrollback_InsertText(Scrollback *scrollback, ScrollbackItem *item)
+{
 
+}

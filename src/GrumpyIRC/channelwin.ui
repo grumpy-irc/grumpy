@@ -106,6 +106,9 @@
          <property name="contextMenuPolicy">
           <enum>Qt::CustomContextMenu</enum>
          </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
       </layout>
@@ -120,6 +123,9 @@
          <property name="contextMenuPolicy">
           <enum>Qt::CustomContextMenu</enum>
          </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
       </layout>
@@ -133,6 +139,9 @@
         <widget class="QTableWidget" name="tableWidget_4">
          <property name="contextMenuPolicy">
           <enum>Qt::CustomContextMenu</enum>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

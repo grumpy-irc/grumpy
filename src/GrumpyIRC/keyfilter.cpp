@@ -29,6 +29,30 @@ bool KeyFilter::eventFilter(QObject *obj, QEvent *event)
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
         if (keyEvent->modifiers().testFlag(Qt::AltModifier) || keyEvent->modifiers().testFlag(Qt::ShiftModifier))
             return QObject::eventFilter(obj, event);
+        if (keyEvent->modifiers().testFlag(Qt::ControlModifier))
+        {
+            if (keyEvent->key() == Qt::Key_U)
+            {
+                this->parentInput->InsertAtCurrentPosition(QString((char)1));
+                return true;
+            }
+            if (keyEvent->key() == Qt::Key_B)
+            {
+                this->parentInput->InsertAtCurrentPosition(QString((char)2));
+                return true;
+            }
+            if (keyEvent->key() == Qt::Key_I)
+            {
+                this->parentInput->InsertAtCurrentPosition(QString((char)16));
+                return true;
+            }
+            if (keyEvent->key() == Qt::Key_K)
+            {
+                this->parentInput->InsertAtCurrentPosition(QString((char)3));
+                return true;
+            }
+            return QObject::eventFilter(obj, event);
+        }
         if (keyEvent->key() == Qt::Key_Down)
         {
             this->parentInput->History();

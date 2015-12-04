@@ -122,6 +122,12 @@ void InputBox::Focus()
     this->ui->textEdit->setFocus();
 }
 
+void InputBox::InsertAtCurrentPosition(QString text)
+{
+    if (!this->isPassword)
+        this->ui->textEdit->insertPlainText(text);
+}
+
 void InputBox::InsertEnter()
 {
     this->ui->textEdit->insertPlainText("\n");

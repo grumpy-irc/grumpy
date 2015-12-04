@@ -13,14 +13,18 @@
 #ifndef HOOKS_H
 #define HOOKS_H
 
+#include "libcore_global.h"
 #include "definitions.h"
 
 namespace GrumpyIRC
 {
-    class Hooks
-    {
-        //public:
+    class Scrollback;
+    class ScrollbackItem;
 
+    class LIBCORESHARED_EXPORT Hooks
+    {
+        public:
+            void OnScrollback_InsertText(Scrollback *scrollback, ScrollbackItem *item);
     };
 }
 

@@ -31,6 +31,20 @@ PreferencesWin::PreferencesWin(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
     this->ui->lineEdit_2->setText(CONF->GetName());
     this->ui->lineEdit_3->setText(QString::number(CONF->GetSplitMaxSize()));
     this->ui->checkBoxSplitMs->setChecked(CONF->GetSplit());
+
+    QStringList heading_1;
+    heading_1 << "Highlighted text" << "Is regex" << "Matching" << "Enabled";
+    this->ui->tableWidget->verticalHeader()->setVisible(false);
+    this->ui->tableWidget->setColumnCount(heading_1.size());
+    this->ui->tableWidget->setShowGrid(false);
+    this->ui->tableWidget->setHorizontalHeaderLabels(heading_1);
+
+    QStringList heading_2;
+    heading_2 << "Ignored text" << "Is regex" << "Matching" << "Enabled";
+    this->ui->tableWidget_2->verticalHeader()->setVisible(false);
+    this->ui->tableWidget_2->setColumnCount(heading_2.size());
+    this->ui->tableWidget_2->setShowGrid(false);
+    this->ui->tableWidget_2->setHorizontalHeaderLabels(heading_2);
 }
 
 PreferencesWin::~PreferencesWin()

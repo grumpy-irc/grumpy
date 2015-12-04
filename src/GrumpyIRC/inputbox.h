@@ -37,6 +37,7 @@ namespace GrumpyIRC
             void Secure();
             void Complete();
             void Focus();
+            void InsertAtCurrentPosition(QString text);
             void InsertEnter();
             void History(bool up = false);
 
