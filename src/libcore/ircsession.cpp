@@ -342,6 +342,7 @@ void IRCSession::init(bool preindexed)
     this->AutomaticallyRetrieveBanList = true;
     this->_ssl = false;
     this->snifferEnabled = true;
+    this->highlightCollector = NULL;
     this->ulistUpdateTime = 20 * 60000;
     connect(&this->timerUL, SIGNAL(timeout()), this, SLOT(OnUpdateUserList()));
     this->maxSnifferBufferSize = 2000;

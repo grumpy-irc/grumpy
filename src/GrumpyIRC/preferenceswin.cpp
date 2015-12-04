@@ -10,8 +10,13 @@
 
 // Copyright (c) Petr Bena 2015
 
+#include "../libcore/autocompletionengine.h"
+#include "../libcore/commandprocessor.h"
+#include "../libcore/configuration.h"
+#include "../libcore/core.h"
 #include "preferenceswin.h"
 #include "ui_preferenceswin.h"
+#include "corewrapper.h"
 #include "grumpyconf.h"
 
 using namespace GrumpyIRC;
@@ -22,7 +27,7 @@ PreferencesWin::PreferencesWin(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
     this->ui->leIdent->setText(CONF->GetIdent());
     this->ui->leNick->setText(CONF->GetNick());
     this->ui->leNickFix->setText(CONF->GetAlterNick());
-    this->ui->lineEdit->setText(CONF->GetQuitMessage());
+    this->ui->lineEdit->setText(CONF->GetRawQuitMessage());
     this->ui->lineEdit_2->setText(CONF->GetName());
     this->ui->lineEdit_3->setText(QString::number(CONF->GetSplitMaxSize()));
     this->ui->checkBoxSplitMs->setChecked(CONF->GetSplit());
@@ -47,6 +52,8 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
     CONF->SetName(this->ui->lineEdit_2->text());
     CONF->SetSplitMaxSize(this->ui->lineEdit_3->text().toInt());
     CONF->SetSplit(this->ui->checkBoxSplitMs->isChecked());
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->LongSize = CONF->GetSplitMaxSize();
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->SplitLong = CONF->GetSplit();
     CONF->Save();
     this->close();
 }

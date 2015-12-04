@@ -24,7 +24,7 @@ scrollback_id_t Scrollback::lastID = 1;
 unsigned long long ScrollbackItem::TotalIC = 0;
 #endif
 
-Scrollback::Scrollback(ScrollbackType Type, Scrollback *parent)
+Scrollback::Scrollback(ScrollbackType Type, Scrollback *parent, bool scrollback_hidden)
 {
     this->_maxItems = 800000;
     this->parentSx = parent;
@@ -33,6 +33,7 @@ Scrollback::Scrollback(ScrollbackType Type, Scrollback *parent)
     ScrollbackList_Mutex.unlock();
     this->session = NULL;
     this->_dead = false;
+    this->_sbHidden = scrollback_hidden;
     this->IgnoreState = false;
     this->_lastItemID = 0;
     this->_network = NULL;
@@ -51,6 +52,7 @@ Scrollback::Scrollback(QHash<QString, QVariant> hash)
     ScrollbackList_Mutex.unlock();
     this->session = NULL;
     this->_dead = false;
+    this->_sbHidden = false;
     this->_lastItemID   = 0;
     this->_network = NULL;
     this->_original_id = 0;
@@ -117,6 +119,18 @@ void Scrollback::SetSession(NetworkSession *Session)
 scrollback_id_t Scrollback::GetLastID()
 {
     return this->_lastItemID;
+}
+
+void Scrollback::Show()
+{
+    this->_sbHidden = false;
+    emit this->Event_Show();
+}
+
+void Scrollback::Hide()
+{
+    this->_sbHidden = true;
+    emit this->Event_Hide();
 }
 
 int Scrollback::GetSICount()
@@ -247,11 +261,17 @@ void Scrollback::FinishBulk()
     emit this->Event_UserListBulkDone();
 }
 
+bool Scrollback::IsHidden() const
+{
+    return this->_sbHidden;
+}
+
 QHash<QString, QVariant> Scrollback::ToPartialHash()
 {
     QHash<QString, QVariant> hash;
     SERIALIZE(_dead);
     SERIALIZE(_original_id);
+    SERIALIZE(_sbHidden);
     SERIALIZE(PropertyBag);
     SERIALIZE(_maxItems);
     hash.insert("scrollbackState", static_cast<int>(this->scrollbackState));
@@ -265,6 +285,7 @@ void Scrollback::LoadHash(QHash<QString, QVariant> hash)
     UNSERIALIZE_HASH(PropertyBag);
     UNSERIALIZE_STRING(_target);
     UNSERIALIZE_BOOL(_dead);
+    UNSERIALIZE_BOOL(_sbHidden);
     UNSERIALIZE_UINT(_maxItems);
     UNSERIALIZE_UINT(_lastItemID);
     if (hash.contains("type"))

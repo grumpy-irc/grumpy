@@ -36,7 +36,6 @@ SOURCES += main.cpp\
     stextbox.cpp \
     channelwin.cpp \
     scriptwin.cpp \
-    highlighter.cpp \
     favoriteswin.cpp \
     grumpydcfwin.cpp \
     linkhandler.cpp \
@@ -67,7 +66,6 @@ HEADERS  += mainwindow.h \
     stextbox.h \
     channelwin.h \
     scriptwin.h \
-    highlighter.h \
     favoriteswin.h \
     grumpydcfwin.h \
     linkhandler.h \

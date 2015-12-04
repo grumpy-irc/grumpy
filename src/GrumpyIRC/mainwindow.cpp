@@ -10,6 +10,19 @@
 
 // Copyright (c) Petr Bena 2015
 
+#include "../libirc/libircclient/channel.h"
+#include "../libirc/libircclient/network.h"
+#include "../libirc/libirc/serveraddress.h"
+#include "../libgp/gp.h"
+#include "../libcore/core.h"
+#include "../libcore/configuration.h"
+#include "../libcore/commandprocessor.h"
+#include "../libcore/eventhandler.h"
+#include "../libcore/exception.h"
+#include "../libcore/generic.h"
+#include "../libcore/grumpydsession.h"
+#include "../libcore/highlighter.h"
+#include "../libcore/ircsession.h"
 #include "aboutwin.h"
 #include "corewrapper.h"
 #include "mainwindow.h"
@@ -22,21 +35,9 @@
 #include "grumpyconf.h"
 #include "preferenceswin.h"
 #include "scrollbackframe.h"
-#include "../libcore/generic.h"
 #include "syslogwindow.h"
 #include "scrollbacksmanager.h"
 #include "skin.h"
-#include "../libirc/libircclient/channel.h"
-#include "../libirc/libircclient/network.h"
-#include "../libirc/libirc/serveraddress.h"
-#include "../libcore/eventhandler.h"
-#include "../libgp/gp.h"
-#include "../libcore/grumpydsession.h"
-#include "../libcore/exception.h"
-#include "../libcore/ircsession.h"
-#include "../libcore/core.h"
-#include "../libcore/configuration.h"
-#include "../libcore/commandprocessor.h"
 
 using namespace GrumpyIRC;
 
@@ -284,6 +285,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->ui->statusBar->addPermanentWidget(this->overviewFrame);
     this->ui->statusBar->addPermanentWidget(this->statusFrame);
     ScrollbacksManager::Global = this->scrollbackWindow;
+    if (CONF->FirstRun())
+        new Highlighter("$nick");
     this->syslogWindow->hide();
     this->tray.setIcon(this->windowIcon());
     this->tray.show();

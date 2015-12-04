@@ -11,7 +11,7 @@
 // Copyright (c) Petr Bena 2015
 
 #include "corewrapper.h"
-#include "highlighter.h"
+#include "../libcore/highlighter.h"
 #include "grumpyconf.h"
 #include "../libcore/configuration.h"
 #include "../libcore/core.h"

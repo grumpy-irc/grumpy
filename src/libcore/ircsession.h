@@ -205,6 +205,7 @@ namespace GrumpyIRC
             QList<QString> ignoringInvites;
             QHash<QString, Scrollback*> channels;
             bool snifferEnabled;
+            Scrollback *highlightCollector;
             int ulistUpdateTime;
             unsigned int maxSnifferBufferSize;
             libircclient::Network *network;

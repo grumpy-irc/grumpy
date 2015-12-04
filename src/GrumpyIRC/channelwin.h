@@ -54,6 +54,7 @@ namespace GrumpyIRC
             void on_tableWidget_4_customContextMenuRequested(const QPoint &pos);
 
         private:
+            void headings();
             libircclient::Mode *chanmode;
             bool ignore;
             bool updateTopic;

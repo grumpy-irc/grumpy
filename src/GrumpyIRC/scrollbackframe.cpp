@@ -25,7 +25,7 @@
 #include "corewrapper.h"
 #include "grumpyconf.h"
 #include "channelwin.h"
-#include "highlighter.h"
+#include "../libcore/highlighter.h"
 #include "scriptwin.h"
 #include "hooks.h"
 #include "scrollbacklist_node.h"

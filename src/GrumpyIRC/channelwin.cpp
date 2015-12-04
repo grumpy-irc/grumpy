@@ -119,8 +119,11 @@ ChannelWin::ChannelWin(NetworkSession *session, libircclient::Network *network, 
         this->ui->tableWidget_4->setItem(ie, 2, new QTableWidgetItem(in.SetBy.ToString()));
         ie++;
     }
+
     this->ui->tableWidget_4->resizeColumnsToContents();
     this->ui->tableWidget_4->resizeRowsToContents();
+
+    this->headings();
 }
 
 ChannelWin::~ChannelWin()
@@ -167,4 +170,11 @@ void GrumpyIRC::ChannelWin::on_tableWidget_3_customContextMenuRequested(const QP
 void GrumpyIRC::ChannelWin::on_tableWidget_4_customContextMenuRequested(const QPoint &pos)
 {
 
+}
+
+void ChannelWin::headings()
+{
+    this->ui->tab_2->setWindowTitle(QObject::tr("Bans") + QString(" (") + QString::number(this->ui->tableWidget_2->rowCount()) + ")");
+    this->ui->tab_3->setWindowTitle(QObject::tr("Exceptions") + " (" + QString::number(this->ui->tableWidget_3->rowCount()) + ")");
+    this->ui->tab_4->setWindowTitle(QObject::tr("Invites") + " (" + QString::number(this->ui->tableWidget_4->rowCount()) + ")");
 }

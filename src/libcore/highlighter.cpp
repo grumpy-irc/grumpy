@@ -13,18 +13,17 @@
 #include "../libcore/scrollback.h"
 #include "../libirc/libircclient/network.h"
 #include "highlighter.h"
-#include "grumpyconf.h"
 
 using namespace GrumpyIRC;
 
 QList<Highlighter*> Highlighter::Highlighter_Data;
 
-void Highlighter::Init()
+/*void Highlighter::Init()
 {
     if (!CONF->FirstRun())
         return;
     new Highlighter("$nick");
-}
+}*/
 
 bool Highlighter::IsMatch(ScrollbackItem *text, libircclient::Network *network)
 {

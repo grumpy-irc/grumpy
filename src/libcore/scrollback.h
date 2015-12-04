@@ -125,7 +125,7 @@ namespace GrumpyIRC
             static QList<Scrollback*> ScrollbackList;
             static QMutex ScrollbackList_Mutex;
 
-            Scrollback(ScrollbackType Type = ScrollbackType_System, Scrollback *parent = NULL);
+            Scrollback(ScrollbackType Type = ScrollbackType_System, Scrollback *parent = NULL, bool scrollback_hidden = false);
             Scrollback(QHash<QString, QVariant> hash);
             virtual ~Scrollback();
             virtual void Close();
@@ -154,9 +154,12 @@ namespace GrumpyIRC
             virtual libircclient::Network *GetNetwork() const;
             virtual void SetDead(bool dead);
             virtual scrollback_id_t GetLastID();
+            virtual void Show();
+            virtual void Hide();
             virtual int GetSICount();
             virtual Scrollback *GetParentScrollback();
             virtual void FinishBulk();
+            virtual bool IsHidden() const;
             virtual void PrependItems(QList<ScrollbackItem> list);
             ScrollbackItem FetchItem(scrollback_id_t id);
             QList<QVariant> FetchBacklog(scrollback_id_t from, unsigned int size);
@@ -187,8 +190,10 @@ namespace GrumpyIRC
             void Event_SessionModified(NetworkSession *Session);
             void Event_StateModified();
             void Event_UserListBulkDone();
+            void Event_Show();
             void Event_Reload();
             void Event_UserRemoved(QString name, bool bulk);
+            void Event_Hide();
             void Event_Resync();
             //! Called when some meta-information for user is changed, such as away status
             //! so that it can be updated in associated widgets
@@ -198,6 +203,7 @@ namespace GrumpyIRC
             static scrollback_id_t lastID;
 
             scrollback_id_t _lastItemID;
+            bool _sbHidden;
             ScrollbackState scrollbackState;
             libircclient::Network *_network;
             Scrollback *parentSx;

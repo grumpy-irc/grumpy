@@ -15,13 +15,14 @@
 
 #include "definitions.h"
 #include "../libirc/libirc/serializableitem.h"
+#include "libcore_global.h"
 
 #include <QList>
 #include <QString>
 
 namespace GrumpyIRC
 {
-    class Favorite : public libirc::SerializableItem
+    class LIBCORESHARED_EXPORT Favorite : public libirc::SerializableItem
     {
         public:
             Favorite();

@@ -13,7 +13,8 @@
 #ifndef HIGHLIGHTER_H
 #define HIGHLIGHTER_H
 
-#include "../libcore/definitions.h"
+#include "libcore_global.h"
+#include "definitions.h"
 #include "../libirc/libirc/serializableitem.h"
 #include <QRegExp>
 #include <QList>
@@ -28,10 +29,10 @@ namespace GrumpyIRC
 {
     class ScrollbackItem;
 
-    class Highlighter : public libirc::SerializableItem
+    class LIBCORESHARED_EXPORT Highlighter : public libirc::SerializableItem
     {
         public:
-            static void Init();
+            //static void Init();
             static bool IsMatch(ScrollbackItem *text, libircclient::Network *network);
             static QList<Highlighter*> Highlighter_Data;
 

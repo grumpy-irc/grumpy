@@ -31,7 +31,8 @@ SOURCES += core.cpp \
     query.cpp \
     extension.cpp \
     cppextension.cpp \
-    hooks.cpp
+    hooks.cpp \
+    highlighter.cpp
 
 HEADERS += core.h\
         libcore_global.h \
@@ -53,7 +54,8 @@ HEADERS += core.h\
     query.h \
     extension.h \
     cppextension.h \
-    hooks.h
+    hooks.h \
+    highlighter.h
 
 unix {
     target.path = /usr/lib
