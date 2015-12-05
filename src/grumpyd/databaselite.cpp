@@ -266,11 +266,6 @@ void DatabaseLite::LoadText()
                 throw new Exception("Unable to fetch: " + this->LastError, BOOST_CURRENT_FUNCTION);
 
             unsigned int item = 0;
-            if (scrollback->GetTarget() == "wm-bot")
-            {
-                int i;
-                i = 2;
-            }
             while (item < text->Count())
             {
                 SqlRow row = text->GetRow(item++);
