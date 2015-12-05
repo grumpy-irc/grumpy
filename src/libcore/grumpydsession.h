@@ -121,6 +121,7 @@ namespace GrumpyIRC
             Scrollback *GetSystemWindow();
             QList<QString> GetChannels(Scrollback *window);
             SessionType GetType();
+            bool IsAway(Scrollback *scrollback = NULL);
             libircclient::Network *GetNetwork(Scrollback *window = NULL);
             virtual void Open(libirc::ServerAddress server);
             bool IsConnected() const;

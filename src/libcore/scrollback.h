@@ -161,8 +161,8 @@ namespace GrumpyIRC
             virtual void FinishBulk();
             virtual bool IsHidden() const;
             virtual void PrependItems(QList<ScrollbackItem> list);
-            ScrollbackItem FetchItem(scrollback_id_t id);
-            QList<QVariant> FetchBacklog(scrollback_id_t from, unsigned int size);
+            virtual ScrollbackItem FetchItem(scrollback_id_t id);
+            virtual QList<QVariant> FetchBacklog(scrollback_id_t from, unsigned int size);
             QHash<QString, QVariant> ToHash(int max = 200);
             QHash<QString, QVariant> ToPartialHash();
             void LoadHash(QHash<QString, QVariant> hash);

@@ -41,6 +41,7 @@ namespace GrumpyIRC
             virtual ~NetworkSession();
             virtual bool IsAutoreconnect(Scrollback *window)=0;
             virtual void SetAutoreconnect(Scrollback *window, bool reconnect)=0;
+            virtual bool IsAway(Scrollback *scrollback = NULL)=0;
             virtual bool IsConnected() const=0;
             virtual libircclient::Network *GetNetwork(Scrollback *window = 0)=0;
             virtual void SendAction(Scrollback *window, QString text)=0;

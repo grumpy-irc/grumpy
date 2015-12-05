@@ -13,9 +13,10 @@
 #ifndef DATABASELITE_H
 #define DATABASELITE_H
 
+#include "../libcore/sqlite.h"
 #include "databasebackend.h"
 
-#ifdef GRUMPYD_SQLITE
+#ifdef GRUMPY_SQLITE
 
 #include <QMutex>
 
@@ -23,33 +24,7 @@ struct sqlite3;
 
 namespace GrumpyIRC
 {
-    class DatabaseLite;
-
-    class SqlRow
-    {
-        public:
-            SqlRow(QList<QVariant> rx);
-            ~SqlRow();
-            QVariant GetField(unsigned int column);
-            int Columns();
-        private:
-            QList<QVariant> data;
-    };
-
-    class SqlResult
-    {
-        public:
-            SqlResult();
-            ~SqlResult();
-            int GetColumns();
-            SqlRow GetRow(unsigned int rowid);
-            unsigned int Count();
-            bool InError;
-        private:
-            QList<SqlRow> Rows;
-            int columns;
-            friend class DatabaseLite;
-    };
+    class SQLite;
 
     class DatabaseLite : public DatabaseBackend
     {
@@ -74,26 +49,16 @@ namespace GrumpyIRC
             void ClearScrollback(unsigned int id, unsigned int user_id);
             void RemoveNetwork(IRCSession *session);
             void RemoveScrollback(unsigned int id);
+            QList<QVariant> FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size);
             void UpdateNetwork(IRCSession *session);
             void RemoveScrollback(User *owner, Scrollback *sx);
             void UpdateRoles();
-            QString GetPath();
-
-            bool Evaluate(int data);
-            qint64 LastRow();
-            bool ExecuteNonQuery(QString sql);
-            SqlResult *ExecuteQuery(QString sql);
-            SqlResult *ExecuteQuery_Bind(QString sql, QString parameter);
-            SqlResult *ExecuteQuery_Bind(QString sql, QList<QVariant> parameters);
-            SqlResult *ExecuteQuery_Bind(QString sql, QStringList parameters);
             int GetLastUserID();
             QString LastStatement;
             QString LastError;
         private:
-            QMutex master_lock;
             int last_user_id;
-            sqlite3 *database;
-            QString datafile;
+            SQLite *database;
     };
 }
 

@@ -93,6 +93,15 @@ IRCSession::~IRCSession()
     delete this->network;
 }
 
+bool IRCSession::IsAway(Scrollback *scrollback)
+{
+    Q_UNUSED(scrollback);
+    if (!this->network)
+        return false;
+
+    return this->network->IsAway();
+}
+
 Scrollback *IRCSession::GetSystemWindow()
 {
     return this->systemWindow;
@@ -992,12 +1001,29 @@ void IRCSession::OnEndOfBans(libircclient::Parser *px)
 
 void IRCSession::OnEndOfInvites(libircclient::Parser *px)
 {
-
+    if (px->GetParameters().size() < 2)
+        return;
+    QString channel = px->GetParameters()[1].toLower();
+    if (this->ignoringInvites.contains(channel))
+        this->ignoringInvites.removeOne(channel);
+    else
+        this->OnUnknown(px);
 }
 
 void IRCSession::OnEndOfExcepts(libircclient::Parser *px)
 {
+    if (px->GetParameters().size() < 2)
+        return;
+    QString channel = px->GetParameters()[1].toLower();
+    if (this->ignoringExceptions.contains(channel))
+        this->ignoringExceptions.removeOne(channel);
+    else
+        this->OnUnknown(px);
+}
 
+void IRCSession::OnGeneric(libircclient::Parser *px)
+{
+    this->systemWindow->InsertText(px->GetRaw());
 }
 
 void IRCSession::processME(libircclient::Parser *px, QString message)
@@ -1090,6 +1116,8 @@ void IRCSession::connInternalSocketSignals()
     connect(this->network, SIGNAL(Event_PMode(libircclient::Parser*,char)), this, SLOT(OnPMODE(libircclient::Parser*,char)));
     connect(this->network, SIGNAL(Event_Disconnected()), this, SLOT(OnDisconnect()));
     connect(this->network, SIGNAL(Event_ConnectionError(QString,int)), this, SLOT(OnFailure(QString,int)));
+    connect(this->network, SIGNAL(Event_NowAway(libircclient::Parser*)), this, SLOT(OnGeneric(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_UnAway(libircclient::Parser*)), this, SLOT(OnGeneric(libircclient::Parser*)));
 }
 
 void IRCSession::_gs_ResyncNickChange(QString new_, QString old_)

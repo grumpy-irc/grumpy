@@ -33,6 +33,8 @@ namespace GrumpyIRC
             VirtualScrollback(ScrollbackType Type = ScrollbackType_System, Scrollback *parent = NULL);
             ~VirtualScrollback();
             User *GetOwner() const;
+            QList<QVariant> OriginFetchBacklog(scrollback_id_t from, unsigned int size);
+            QList<QVariant> FetchBacklog(scrollback_id_t from, unsigned int size);
             void Sync();
             void Close();
             void PartialSync();

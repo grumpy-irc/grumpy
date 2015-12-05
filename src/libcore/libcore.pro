@@ -32,7 +32,8 @@ SOURCES += core.cpp \
     extension.cpp \
     cppextension.cpp \
     hooks.cpp \
-    highlighter.cpp
+    highlighter.cpp \
+    sqlite.cpp
 
 HEADERS += core.h\
         libcore_global.h \
@@ -55,7 +56,8 @@ HEADERS += core.h\
     extension.h \
     cppextension.h \
     hooks.h \
-    highlighter.h
+    highlighter.h \
+    sqlite.h
 
 unix {
     target.path = /usr/lib

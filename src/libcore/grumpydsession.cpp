@@ -114,6 +114,16 @@ SessionType GrumpydSession::GetType()
     return SessionType_Grumpyd;
 }
 
+bool GrumpyIRC::GrumpydSession::IsAway(Scrollback *scrollback)
+{
+    if (!scrollback)
+        return false;
+    IRCSession *ircs = this->GetSessionFromWindow(scrollback);
+    if (!ircs)
+        return false;
+    return ircs->IsAway();
+}
+
 void GrumpydSession::SendAction(Scrollback *window, QString text)
 {
     IRCSession *ircs = this->GetSessionFromWindow(window);

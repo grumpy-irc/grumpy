@@ -75,6 +75,7 @@ namespace GrumpyIRC
             IRCSession(Scrollback *system, Scrollback *root = NULL);
             IRCSession(unsigned int id, Scrollback *system, Scrollback *root = NULL);
             virtual ~IRCSession();
+            bool IsAway(Scrollback *scrollback = NULL);
             virtual Scrollback *GetSystemWindow();
             //! Return a first scrollback that matches the name, keep in mind that scrollbacks may have same name, for unique
             //! instance use SID of the give scrollback
@@ -171,6 +172,7 @@ namespace GrumpyIRC
             virtual void OnEndOfBans(libircclient::Parser *px);
             virtual void OnEndOfInvites(libircclient::Parser *px);
             virtual void OnEndOfExcepts(libircclient::Parser *px);
+            virtual void OnGeneric(libircclient::Parser *px);
         protected:
             static unsigned int lastID;
 

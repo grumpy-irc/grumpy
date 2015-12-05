@@ -28,7 +28,14 @@ if (NOT QT5_BUILD)
 endif()
 
 ADD_DEFINITIONS(${QT_DEFINITIONS})
+
+if (SQLITE)
+  set(src ${src} "../sqlite/sqlite3.c")
+  ADD_DEFINITIONS(-DGRUMPY_SQLITE)
+endif()
+
 ADD_DEFINITIONS( -DLIBCORE_LIBRARY -DQT_USE_QSTRINGBUILDER )
+
 
 ADD_LIBRARY(core SHARED ${src} ${headers})
 if (QT5_BUILD)

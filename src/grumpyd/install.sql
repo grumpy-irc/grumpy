@@ -74,6 +74,8 @@ CREATE TABLE scrollback_items
     "self" NUMERIC
 );
 
+CREATE INDEX idx_scrollback_items_su ON scrollback_items(scrollback_id, user_id);
+CREATE INDEX idx_scrollback_items_sud ON scrollback_items(scrollback_id, user_id, item_id);
 CREATE INDEX idx_scrollback_item_scrollback_id ON scrollback_items(scrollback_id);
 CREATE INDEX idx_scrollback_item_single_id ON scrollback_items(item_id);
 CREATE INDEX idx_scrollback_item_user ON scrollback_items(user_id);

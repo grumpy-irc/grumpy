@@ -42,6 +42,16 @@ User *VirtualScrollback::GetOwner() const
     return this->owner;
 }
 
+QList<QVariant> VirtualScrollback::OriginFetchBacklog(scrollback_id_t from, unsigned int size)
+{
+    return Scrollback::FetchBacklog(from, size);
+}
+
+QList<QVariant> VirtualScrollback::FetchBacklog(scrollback_id_t from, unsigned int size)
+{
+    return Grumpyd::GetBackend()->FetchBacklog(this, from, size);
+}
+
 void VirtualScrollback::Sync()
 {
     if (this->owner == NULL)

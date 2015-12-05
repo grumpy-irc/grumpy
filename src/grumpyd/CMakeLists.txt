@@ -32,8 +32,7 @@ if (NOT QT5_BUILD)
 endif()
 
 if (SQLITE)
-  set(src ${src} "../sqlite/sqlite3.c")
-  ADD_DEFINITIONS(-DGRUMPYD_SQLITE)
+  ADD_DEFINITIONS(-DGRUMPY_SQLITE)
 endif()
 
 ADD_DEFINITIONS(${QT_DEFINITIONS})

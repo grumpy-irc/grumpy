@@ -99,7 +99,7 @@ static DatabaseBackend *InstantiateStorage(QString type)
 {
     if (type == "DatabaseDummy")
         return new DatabaseDummy();
-#ifdef GRUMPYD_SQLITE
+#ifdef GRUMPY_SQLITE
     else if (type == "DatabaseLite")
         return new DatabaseLite();
 #endif

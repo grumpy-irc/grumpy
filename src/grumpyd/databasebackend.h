@@ -20,6 +20,7 @@
 namespace GrumpyIRC
 {
     class User;
+    class VirtualScrollback;
     class Scrollback;
     class Session;
     class IRCSession;
@@ -37,6 +38,7 @@ namespace GrumpyIRC
             virtual void LoadText()=0;
             virtual void StoreUser(User *item)=0;
             virtual void StoreNetwork(IRCSession *session)=0;
+            virtual QList<QVariant> FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size)=0;
             virtual void UpdateUser(User *user)=0;
             virtual void RemoveNetwork(IRCSession *session)=0;
             virtual void RemoveScrollback(User *owner, Scrollback *sx)=0;

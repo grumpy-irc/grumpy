@@ -11,6 +11,7 @@
 // Copyright (c) Petr Bena 2015
 
 #include "databasedummy.h"
+#include "virtualscrollback.h"
 #include "security.h"
 #include "user.h"
 
@@ -54,6 +55,11 @@ void DatabaseDummy::RemoveNetwork(IRCSession *session)
 void DatabaseDummy::RemoveScrollback(User *owner, Scrollback *sx)
 {
 
+}
+
+QList<QVariant> DatabaseDummy::FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size)
+{
+    return scrollback->OriginFetchBacklog(from, size);
 }
 
 void DatabaseDummy::UpdateRoles()
