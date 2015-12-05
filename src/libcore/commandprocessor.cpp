@@ -116,6 +116,8 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
                 messages.append(command.mid(0, (int)this->LongSize));
                 command = command.mid((int)this->LongSize);
             }
+            if (!command.isEmpty())
+                messages.append(command);
             foreach (QString text, messages)
                 window->GetSession()->SendMessage(window, text);
             return 0;

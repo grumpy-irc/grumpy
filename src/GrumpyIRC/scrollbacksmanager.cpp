@@ -124,13 +124,13 @@ void ScrollbacksManager::SwitchWindow(ScrollbackFrame *window)
     // Switch the user widget
     UserWidget *usrw = MainWindow::Main->GetUsers();
     usrw->SetFrame(window->GetUserFrame());
-    if (window->GetScrollback()->GetType() == ScrollbackType_System)
+    if (window->GetScrollback()->GetType() == ScrollbackType_Channel)
+    {
+        usrw->show();
+    } else
     {
         // Hide the user widget
         usrw->hide();
-    } else
-    {
-        usrw->show();
     }
     this->currentWidget = window;
     this->currentWidget->Focus();
