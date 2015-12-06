@@ -14,18 +14,9 @@
 #include <QMenu>
 #include <QStringBuilder>
 #include "mainwindow.h"
-#include "../libcore/exception.h"
-#include "../libcore/configuration.h"
-#include "../libcore/generic.h"
-#include "../libcore/ircsession.h"
-#include "../libcore/grumpydsession.h"
-#include "../libcore/networksession.h"
-#include "../libcore/core.h"
-#include "../libirc/libircclient/user.h"
 #include "corewrapper.h"
 #include "grumpyconf.h"
 #include "channelwin.h"
-#include "../libcore/highlighter.h"
 #include "scriptwin.h"
 #include "hooks.h"
 #include "scrollbacklist_node.h"
@@ -35,6 +26,15 @@
 #include "userframe.h"
 #include "inputbox.h"
 #include "ui_scrollbackframe.h"
+#include "../libcore/exception.h"
+#include "../libcore/configuration.h"
+#include "../libcore/generic.h"
+#include "../libcore/highlighter.h"
+#include "../libcore/ircsession.h"
+#include "../libcore/grumpydsession.h"
+#include "../libcore/networksession.h"
+#include "../libcore/core.h"
+#include "../libirc/libircclient/user.h"
 
 using namespace GrumpyIRC;
 

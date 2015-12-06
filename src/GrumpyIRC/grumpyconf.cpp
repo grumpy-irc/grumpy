@@ -117,6 +117,16 @@ QString GrumpyConf::GetDefaultKickReason()
     return GCFG->GetValueAsString("kick", "Such user. Much kicked.");
 }
 
+QString GrumpyConf::GetDefaultAwayReason()
+{
+    return GCFG->GetValueAsString("reason_away", "I am currently not here");
+}
+
+void GrumpyConf::SetDefaultAwayReason(QString reason)
+{
+    GCFG->SetValue("reason_away", reason);
+}
+
 bool GrumpyConf::Batches()
 {
     return GCFG->GetValueAsBool("mode_batching", true);

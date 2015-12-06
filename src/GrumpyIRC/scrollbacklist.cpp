@@ -19,6 +19,7 @@
 #include "../libcore/networksession.h"
 #include "../libcore/ircsession.h"
 #include "../libcore/grumpydsession.h"
+#include "grumpyconf.h"
 #include "packetsnifferwin.h"
 #include "grumpydcfwin.h"
 #include "skin.h"
@@ -123,6 +124,8 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     Menu.addAction(menuClose);
     QAction *menuInsrFavorites = NULL;
     QAction *menuAuto = NULL;
+    QAction *menuAway_Set = NULL;
+    QAction *menuAway_Uns = NULL;
     QAction *menuSettings = NULL;
     QAction *menuPart = NULL;
     QAction *menuJoin = NULL;
@@ -144,6 +147,10 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
         if (wx->GetSession())
             menuAuto->setChecked(wx->GetSession()->IsAutoreconnect(wx->GetScrollback()));
         Menu.addAction(menuAuto);
+        menuAway_Set = new QAction("Set away", &Menu);
+        menuAway_Uns = new QAction("Unset away", &Menu);
+        Menu.addAction(menuAway_Uns);
+        Menu.addAction(menuAway_Set);
     }
 
     if (wx->IsGrumpy())
@@ -214,6 +221,14 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     } else if (selectedItem == menuReconnect)
     {
         wx->Reconnect();
+    } else if (selectedItem == menuAway_Set)
+    {
+        if (wx->GetSession())
+            wx->GetSession()->SendRaw(wx->GetScrollback(), "AWAY :" + CONF->GetDefaultAwayReason());
+    } else if (selectedItem == menuAway_Uns)
+    {
+        if (wx->GetSession())
+            wx->GetSession()->SendRaw(wx->GetScrollback(), "AWAY");
     } else if (selectedItem == menuJoinAll)
     {
         IRCSession *irc_session = NULL;
