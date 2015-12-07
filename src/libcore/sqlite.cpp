@@ -163,7 +163,7 @@ SqlResult *SQLite::ExecuteQuery_Bind(QString sql, QList<QVariant> parameters)
                 x = sqlite3_bind_int(statement, current_parameter++, item.toInt());
                 break;
             case QVariant::ByteArray:
-                x = sqlite3_bind_blob(statement, current_parameter++, item.toByteArray().data(), item.toByteArray().size(), SQLITE_TRANSIENT);
+                x = sqlite3_bind_blob(statement, current_parameter++, item.toByteArray().constData(), item.toByteArray().size(), SQLITE_TRANSIENT);
                 break;
             case QVariant::String:
                 x = sqlite3_bind_text(statement, current_parameter++, item.toString().toUtf8().constData(), -1, SQLITE_TRANSIENT);
@@ -205,7 +205,11 @@ SqlResult *SQLite::ExecuteQuery_Bind(QString sql, QList<QVariant> parameters)
                     row.append(QVariant(StringFromUnsignedChar(sqlite3_column_text(statement, value))));
                     break;
                 case SQLITE_BLOB:
-                    row.append(QVariant(QByteArray((char*)sqlite3_column_blob(statement, value))));
+                {
+                    int size = sqlite3_column_bytes(statement, value);
+                    QByteArray bytes((const char*)sqlite3_column_blob(statement, value), size);
+                    row.append(bytes);
+                }
                     break;
                 case SQLITE_NULL:
                     row.append(QVariant());

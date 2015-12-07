@@ -24,6 +24,7 @@ GrumpydCfWin::GrumpydCfWin(GrumpydSession *session, QWidget *parent) : QDialog(p
     this->ui->checkBox->setChecked(this->getBool("offline_ms_bool", true));
     this->ui->plainTextEdit->setPlainText(this->getString("session_on_conn_raw", "AWAY"));
     this->ui->plainTextEdit_2->setPlainText(this->getString("session_on_disc_raw", "AWAY: " + CONF->GetDefaultAwayReason()));
+    this->ui->lineEdit->setText(this->getString("offline_ms_text", this->ui->lineEdit->text()));
 }
 
 GrumpydCfWin::~GrumpydCfWin()
@@ -34,10 +35,15 @@ GrumpydCfWin::~GrumpydCfWin()
 void GrumpyIRC::GrumpydCfWin::on_buttonBox_accepted()
 {
     this->set("offline_ms_bool", QVariant(this->ui->checkBox->isChecked()));
-    this->set("offline_ms_bool", QVariant(this->ui->checkBox->isChecked()));
     this->set("offline_ms_text", QVariant(this->ui->lineEdit->text()));
+    this->set("default_nick", this->ui->lineEdit_3->text());
+    this->set("default_ident", this->ui->lineEdit_4->text());
+    this->set("session_on_conn_raw", this->ui->plainTextEdit->toPlainText());
+    this->set("session_on_disc_raw", this->ui->plainTextEdit_2->toPlainText());
+    QHash<QString, QVariant> hash;
+    hash.insert("merge", this->GrumpySession->Preferences);
     //this->set("away_msg", QVariant(this->ui->lineEdit_2->text()));
-    this->GrumpySession->SendProtocolCommand(GP_CMD_OPTIONS, this->GrumpySession->Preferences);
+    this->GrumpySession->SendProtocolCommand(GP_CMD_OPTIONS, hash);
 }
 
 template <typename T>

@@ -22,6 +22,7 @@
 #include "../libcore/core.h"
 #include "user.h"
 #include "security.h"
+#include <QDataStream>
 #include "databaselite.h"
 #include <string>
 #include <QFile>
@@ -59,6 +60,24 @@ QString DatabaseLite::GetSource(QString name)
         throw new Exception("Unable to open internal resource: " + name, BOOST_CURRENT_FUNCTION);
 
     return QString(file.readAll());
+}
+
+static QByteArray ToArray(QHash<QString, QVariant> data)
+{
+    QByteArray result;
+    QDataStream stream(&result, QIODevice::ReadWrite);
+    stream.setVersion(QDataStream::Qt_4_2);
+    stream << data;
+    return result;
+}
+
+static QHash<QString, QVariant> FromArray(QByteArray data)
+{
+    QDataStream stream(&data, QIODevice::ReadWrite);
+    stream.setVersion(QDataStream::Qt_4_2);
+    QHash<QString, QVariant> rx;
+    stream >> rx;
+    return rx;
 }
 
 DatabaseLite::DatabaseLite()
@@ -290,9 +309,23 @@ void DatabaseLite::LoadText()
 
 QHash<QString, QVariant> DatabaseLite::GetConfiguration(user_id_t user)
 {
-    QHash<QString, QVariant> results;
-
-    return results;
+    QList<QVariant> parameters;
+    parameters << user;
+    QString sql = "SELECT value FROM settings WHERE user_id = ?;";
+    SqlResult *result = this->database->ExecuteQuery_Bind(sql, parameters);
+    if (result->InError)
+    {
+        delete result;
+        throw new Exception("Unable to retrieve user settings from sql: " + this->LastError, BOOST_CURRENT_FUNCTION);
+    }
+    if (result->Count() == 0)
+    {
+        delete result;
+        return QHash<QString, QVariant>();
+    }
+    QHash<QString, QVariant> hash = FromArray(result->GetRow(0).GetField(0).toByteArray());
+    delete result;
+    return hash;
 }
 
 int DatabaseLite::GetLastUserID()
@@ -302,7 +335,49 @@ int DatabaseLite::GetLastUserID()
 
 void DatabaseLite::SetConfiguration(user_id_t user, QHash<QString, QVariant> data)
 {
+    QList<QVariant> parameters;
+    parameters << user; // << ToArray(data);
 
+    // First we need to check if there is a record for this user
+    QString sql = "SELECT count(1) FROM settings where user_id = ?;";
+    SqlResult *rx = this->database->ExecuteQuery_Bind(sql, parameters);
+    if (rx->InError)
+    {
+        delete rx;
+        throw new Exception("Unable to store user settings to sql: " + this->LastError, BOOST_CURRENT_FUNCTION);
+    }
+    if (!rx->Count())
+    {
+        delete rx;
+        throw new Exception("SELECT count(1) returned 0 items", BOOST_CURRENT_FUNCTION);
+    }
+    SqlRow row = rx->GetRow(0);
+    int results = row.GetField(0).toInt();
+    if (results > 1)
+    {
+        delete rx;
+        throw new Exception("User has more than 1 blob hash", BOOST_CURRENT_FUNCTION);
+    }
+    delete rx;
+    if (!results)
+    {
+        parameters << ToArray(data);
+        // New settings
+        sql = "INSERT INTO settings(user_id, value) VALUES (?, ?);";
+        rx = this->database->ExecuteQuery_Bind(sql, parameters);
+    } else
+    {
+        parameters.clear();
+        parameters << ToArray(data) << user;
+        sql = "UPDATE settings SET value = ? WHERE user_id = ?;";
+        rx = this->database->ExecuteQuery_Bind(sql, parameters);
+    }
+    if (rx->InError)
+    {
+        delete rx;
+        throw new Exception("Unable to store user data to sql: " + this->LastError, BOOST_CURRENT_FUNCTION);
+    }
+    delete rx;
 }
 
 void DatabaseLite::StoreScrollback(User *owner, Scrollback *sx)

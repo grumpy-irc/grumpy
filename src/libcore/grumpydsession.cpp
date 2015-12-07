@@ -757,6 +757,25 @@ void GrumpydSession::processNick(QHash<QString, QVariant> hash)
 void GrumpydSession::processPreferences(QHash<QString, QVariant> hash)
 {
     this->Preferences = Generic::MergeHash(this->Preferences, hash);
+    // Automatically fix some missing default preferences
+    bool is_missing = false;
+    if (!this->Preferences.contains("offline_ms_bool"))
+    {
+        is_missing = true;
+        this->Preferences.insert("offline_ms_bool", true);
+    }
+    if (!this->Preferences.contains("offline_ms_text"))
+    {
+        is_missing = true;
+        this->Preferences.insert("offline_ms_text", "I am current away, your message was logged and I will read it when I return");
+    }
+    if (is_missing)
+    {
+        this->systemWindow->InsertText("No default user preferences found for this user, fixing up");
+        QHash<QString, QVariant> values;
+        values.insert("merge", this->Preferences);
+        this->SendProtocolCommand(GP_CMD_OPTIONS, values);
+    }
 }
 
 void GrumpydSession::processChannelModeSync(QHash<QString, QVariant> hash)

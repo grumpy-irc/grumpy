@@ -31,6 +31,7 @@ namespace GrumpyIRC
     class User
     {
         public:
+            static QString EncryptPw(QString Password);
             static QList<User*> UserInfo;
             /*!
              * \brief Login try to login user using the provided credentials, if login is successful a pointer is returned

@@ -10,6 +10,7 @@
 
 // Copyright (c) Petr Bena 2015
 
+#include <QCryptographicHash>
 #include "corewrapper.h"
 #include "user.h"
 #include "security.h"
@@ -23,6 +24,11 @@
 using namespace GrumpyIRC;
 
 QList<User*> User::UserInfo;
+
+QString User::EncryptPw(QString Password)
+{
+    return QString(QCryptographicHash::hash(Password.toUtf8(), QCryptographicHash::Md5).toHex());
+}
 
 User *User::Login(QString user, QString pw)
 {

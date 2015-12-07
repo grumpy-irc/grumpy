@@ -461,7 +461,7 @@ void Session::processLogin(QHash<QString, QVariant> parameters)
         this->TransferError(GP_CMD_LOGIN, "Invalid parameters", GP_EINVALIDLOGINPARAMS);
         return;
     }
-    this->loggedUser = User::Login(parameters["username"].toString(), parameters["password"].toString());
+    this->loggedUser = User::Login(parameters["username"].toString(), User::EncryptPw(parameters["password"].toString()));
     if (this->loggedUser)
     {
         if (!this->IsAuthorized(PRIVILEGE_LOGIN))
@@ -529,7 +529,7 @@ void Session::processSetup(QHash<QString, QVariant> parameters)
     }
 
     // Register a new user account
-    User *user = new User(parameters["username"].toString(), parameters["password"].toString(), 0);
+    User *user = new User(parameters["username"].toString(), User::EncryptPw(parameters["password"].toString()), 0);
     if (!Role::Roles.contains("root"))
         throw new Exception("Built-in root not found", BOOST_CURRENT_FUNCTION);
     user->SetRole(Role::Roles["root"]);
@@ -618,6 +618,10 @@ void Session::processOptions(QHash<QString, QVariant> parameters)
     } else if (parameters.contains("override"))
     {
         this->loggedUser->GetConfiguration()->SetHash(parameters["override"].toHash());
+        this->loggedUser->GetConfiguration()->Save();
+    } else if (parameters.contains("merge"))
+    {
+        this->loggedUser->GetConfiguration()->SetHash(parameters["merge"].toHash());
         this->loggedUser->GetConfiguration()->Save();
     } else
     {

@@ -5,7 +5,7 @@ TARGET = grumpyd
 CONFIG += console
 CONFIG -= app_bundle
 
-DEFINES += GRUMPYD_SQLITE
+DEFINES += GRUMPY_SQLITE
 
 TEMPLATE = app
 
