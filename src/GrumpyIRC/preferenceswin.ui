@@ -119,6 +119,13 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
+        <widget class="QCheckBox" name="checkBox">
+         <property name="text">
+          <string>Disable all checks for valid SSL certificate</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QCheckBox" name="checkBoxSplitMs">
          <property name="text">
           <string>Split message that are longer than:</string>

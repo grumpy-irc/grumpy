@@ -122,6 +122,16 @@ QString GrumpyConf::GetDefaultAwayReason()
     return GCFG->GetValueAsString("reason_away", "I am currently not here");
 }
 
+void GrumpyConf::SetIgnoreSSLProblems(bool set)
+{
+    GCFG->SetValue("ignore_ssl", set);
+}
+
+bool GrumpyConf::GetIgnoreSSLProblems()
+{
+    return GCFG->GetValueAsBool("ignore_ssl", true);
+}
+
 void GrumpyConf::SetDefaultAwayReason(QString reason)
 {
     GCFG->SetValue("reason_away", reason);

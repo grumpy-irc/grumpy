@@ -29,7 +29,7 @@ namespace GrumpyIRC
             Q_OBJECT
 
         public:
-            explicit GrumpydCfWin(QWidget *parent = 0);
+            explicit GrumpydCfWin(GrumpydSession *session, QWidget *parent = 0);
             ~GrumpydCfWin();
             GrumpydSession *GrumpySession;
 
@@ -37,6 +37,10 @@ namespace GrumpyIRC
             void on_buttonBox_accepted();
 
         private:
+            template <typename T>
+            void set(QString key, T value);
+            QString getString(QString key, QString missing);
+            bool getBool(QString key, bool default_bool);
             Ui::GrumpydCfWin *ui;
     };
 }

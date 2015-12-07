@@ -11,15 +11,19 @@
 // Copyright (c) Petr Bena 2015
 
 #include "../libcore/grumpydsession.h"
+#include "grumpyconf.h"
 #include "grumpydcfwin.h"
 #include "ui_grumpydcfwin.h"
 
 using namespace GrumpyIRC;
 
-GrumpydCfWin::GrumpydCfWin(QWidget *parent) : QDialog(parent), ui(new Ui::GrumpydCfWin)
+GrumpydCfWin::GrumpydCfWin(GrumpydSession *session, QWidget *parent) : QDialog(parent), ui(new Ui::GrumpydCfWin)
 {
     ui->setupUi(this);
-    //this->GrumpySession = NULL
+    this->GrumpySession = session;
+    this->ui->checkBox->setChecked(this->getBool("offline_ms_bool", true));
+    this->ui->plainTextEdit->setPlainText(this->getString("session_on_conn_raw", "AWAY"));
+    this->ui->plainTextEdit_2->setPlainText(this->getString("session_on_disc_raw", "AWAY: " + CONF->GetDefaultAwayReason()));
 }
 
 GrumpydCfWin::~GrumpydCfWin()
@@ -29,10 +33,32 @@ GrumpydCfWin::~GrumpydCfWin()
 
 void GrumpyIRC::GrumpydCfWin::on_buttonBox_accepted()
 {
-    QHash<QString, QVariant> results;
-    results.insert("offline_ms_bool", QVariant(this->ui->checkBox->isChecked()));
-    results.insert("offline_ms_text", QVariant(this->ui->lineEdit->text()));
-    //results.insert("away", QVariant(false))
-    results.insert("away_msg", QVariant(this->ui->lineEdit_2->text()));
-    this->GrumpySession->SendProtocolCommand(GP_CMD_OPTIONS, results);
+    this->set("offline_ms_bool", QVariant(this->ui->checkBox->isChecked()));
+    this->set("offline_ms_bool", QVariant(this->ui->checkBox->isChecked()));
+    this->set("offline_ms_text", QVariant(this->ui->lineEdit->text()));
+    //this->set("away_msg", QVariant(this->ui->lineEdit_2->text()));
+    this->GrumpySession->SendProtocolCommand(GP_CMD_OPTIONS, this->GrumpySession->Preferences);
+}
+
+template <typename T>
+void GrumpydCfWin::set(QString key, T value)
+{
+    if (this->GrumpySession->Preferences.contains(key))
+        this->GrumpySession->Preferences[key] = value;
+    else
+        this->GrumpySession->Preferences.insert(key, value);
+}
+
+QString GrumpydCfWin::getString(QString key, QString missing)
+{
+    if (this->GrumpySession->Preferences.contains(key))
+        return this->GrumpySession->Preferences[key].toString();
+    return missing;
+}
+
+bool GrumpydCfWin::getBool(QString key, bool default_bool)
+{
+    if (this->GrumpySession->Preferences.contains(key))
+        return this->GrumpySession->Preferences[key].toBool();
+    return default_bool;
 }

@@ -454,15 +454,22 @@ QList<QVariant> DatabaseLite::FetchBacklog(VirtualScrollback *scrollback, scroll
         size = from;
     }
 
+    scrollback_id_t first;
+    if (((long)from - (long)size) < 0)
+        first = 0;
+    else
+        first = from - size;
+
     QList<QVariant> input;
     input << QVariant(scrollback->GetOwner()->GetID())
           << QVariant(scrollback->GetOriginalID())
-          << QVariant(from);
+          << QVariant(from)
+          << QVariant(first);
     scrollback_id_t last_item = 0;
     SqlResult *text = this->database->ExecuteQuery_Bind("SELECT id, item_id, user_id, scrollback_id, date, type, nick, ident, host, text, self "\
                                                         "FROM scrollback_items "\
-                                                        "WHERE user_id = ? AND scrollback_id = ? AND item_id < ? "\
-                                                        "ORDER BY item_id ASC LIMIT " + QString::number(size) + ";", input);
+                                                        "WHERE user_id = ? AND scrollback_id = ? AND item_id < ? AND item_id >= ? "\
+                                                        "ORDER BY item_id ASC;", input);
     if (text->InError)
         throw new Exception("Unable to fetch: " + this->LastError, BOOST_CURRENT_FUNCTION);
 

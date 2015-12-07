@@ -113,3 +113,15 @@ QVariant Generic::VariantFromByteArray(QByteArray data)
     stream >> result;
     return result;
 }
+
+QHash<QString, QVariant> Generic::MergeHash(QHash<QString, QVariant> x, QHash<QString, QVariant> y)
+{
+    foreach (QString key, y.keys())
+    {
+        if (x.contains(key))
+            x[key] = y[key];
+        else
+            x.insert(key, y[key]);
+    }
+    return x;
+}

@@ -10,14 +10,15 @@
 
 // Copyright (c) Petr Bena 2015
 
-#include "core.h"
-#include "eventhandler.h"
-#include "grumpydsession.h"
 #include "../libirc/libircclient/network.h"
 #include "../libirc/libircclient/user.h"
 #include "../libirc/libircclient/channel.h"
+#include "core.h"
+#include "eventhandler.h"
+#include "grumpydsession.h"
 #include "ircsession.h"
 #include "exception.h"
+#include "generic.h"
 #include "scrollback.h"
 #include <QTcpSocket>
 #include <QDataStream>
@@ -755,7 +756,7 @@ void GrumpydSession::processNick(QHash<QString, QVariant> hash)
 
 void GrumpydSession::processPreferences(QHash<QString, QVariant> hash)
 {
-
+    this->Preferences = Generic::MergeHash(this->Preferences, hash);
 }
 
 void GrumpydSession::processChannelModeSync(QHash<QString, QVariant> hash)
