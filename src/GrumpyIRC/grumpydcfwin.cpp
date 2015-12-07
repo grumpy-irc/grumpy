@@ -23,7 +23,7 @@ GrumpydCfWin::GrumpydCfWin(GrumpydSession *session, QWidget *parent) : QDialog(p
     this->GrumpySession = session;
     this->ui->checkBox->setChecked(this->getBool("offline_ms_bool", true));
     this->ui->plainTextEdit->setPlainText(this->getString("session_on_conn_raw", "AWAY"));
-    this->ui->plainTextEdit_2->setPlainText(this->getString("session_on_disc_raw", "AWAY: " + CONF->GetDefaultAwayReason()));
+    this->ui->plainTextEdit_2->setPlainText(this->getString("session_on_disc_raw", "AWAY :" + CONF->GetDefaultAwayReason()));
     this->ui->lineEdit->setText(this->getString("offline_ms_text", this->ui->lineEdit->text()));
 }
 

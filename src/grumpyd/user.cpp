@@ -172,6 +172,8 @@ void User::SendRawToIrcs(QString raw)
     {
         foreach (QString line, raw.split("\n"))
         {
+            if (line.startsWith("#"))
+                continue;
             if (line.isEmpty())
                 continue;
             session->SendRaw(session->GetSystemWindow(), line);
