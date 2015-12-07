@@ -76,6 +76,16 @@ User::~User()
 
 void User::InsertSession(Session *sx)
 {
+    if (this->sessions_gp.isEmpty())
+    {
+        this->sessions_gp.append(sx);
+        // This is a first session to connect, let's check if there is a hook
+        if (this->conf->Contains("session_on_conn_raw"))
+        {
+            this->SendRawToIrcs(this->conf->GetValueAsString("session_on_conn_raw"));
+        }
+        return;
+    }
     this->sessions_gp.append(sx);
 }
 
@@ -87,6 +97,13 @@ QString User::GetName() const
 void User::RemoveSession(Session *sx)
 {
     this->sessions_gp.removeAll(sx);
+    if (this->sessions_gp.isEmpty())
+    {
+        if (this->conf->Contains("session_on_disc_raw"))
+        {
+            this->SendRawToIrcs(this->conf->GetValueAsString("session_on_disc_raw"));
+        }
+    }
 }
 
 void User::RemoveIRCSession(SyncableIRCSession *session)
@@ -144,6 +161,21 @@ QList<SyncableIRCSession *> User::GetSIRCSessions()
 UserConf *User::GetConfiguration()
 {
     return this->conf;
+}
+
+void User::SendRawToIrcs(QString raw)
+{
+    if (raw.isEmpty())
+        return;
+    foreach (SyncableIRCSession *session, this->sessions)
+    {
+        foreach (QString line, raw.split("\n"))
+        {
+            if (line.isEmpty())
+                continue;
+            session->SendRaw(session->GetSystemWindow(), line);
+        }
+    }
 }
 
 Role *User::GetRole()

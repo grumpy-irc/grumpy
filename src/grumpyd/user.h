@@ -59,6 +59,7 @@ namespace GrumpyIRC
             SyncableIRCSession *GetSIRCSession(unsigned int sid);
             QList<SyncableIRCSession*> GetSIRCSessions();
             UserConf *GetConfiguration();
+            void SendRawToIrcs(QString raw);
             Role *GetRole();
             user_id_t GetID();
             void SetRole(Role *rx);
