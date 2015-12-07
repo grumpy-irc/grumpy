@@ -11,6 +11,7 @@
 // Copyright (c) Petr Bena 2015
 
 #include <QCryptographicHash>
+#include <QStringList>
 #include "corewrapper.h"
 #include "user.h"
 #include "security.h"
