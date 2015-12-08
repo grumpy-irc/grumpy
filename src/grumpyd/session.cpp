@@ -583,7 +583,8 @@ void Session::processReconnect(QHash<QString, QVariant> parameters)
 
     if (irc->IsConnected())
     {
-
+        this->TransferError(GP_CMD_RECONNECT, "Network is connected", GP_ENETWORKNOTFOUND);
+        return;
     }
 
     irc->Connect();

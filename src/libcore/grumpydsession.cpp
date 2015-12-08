@@ -756,7 +756,7 @@ void GrumpydSession::processNick(QHash<QString, QVariant> hash)
 
 void GrumpydSession::processPreferences(QHash<QString, QVariant> hash)
 {
-    this->Preferences = Generic::MergeHash(this->Preferences, hash);
+    this->Preferences = Generic::MergeHash(this->Preferences, hash["options"].toHash());
     // Automatically fix some missing default preferences
     bool is_missing = false;
     if (!this->Preferences.contains("offline_ms_bool"))
