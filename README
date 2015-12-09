@@ -16,6 +16,7 @@ Some features:
   and build a different interface on top of it
 * Very scalable and extendable
 * Support all IRC standards and networks
+* Supports IRCv3 protocol (http://ircv3.net/)
 * Extensible and very powerfull auto-completion mechanism
 
 Grumpy is currently a work in progress and is unfinished. Use on your own risk.
