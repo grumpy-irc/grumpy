@@ -1118,6 +1118,7 @@ void IRCSession::connInternalSocketSignals()
     connect(this->network, SIGNAL(Event_ConnectionError(QString,int)), this, SLOT(OnFailure(QString,int)));
     connect(this->network, SIGNAL(Event_NowAway(libircclient::Parser*)), this, SLOT(OnGeneric(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_UnAway(libircclient::Parser*)), this, SLOT(OnGeneric(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_CAP(libircclient::Parser*)), this, SLOT(OnGeneric(libircclient::Parser*)));
 }
 
 void IRCSession::_gs_ResyncNickChange(QString new_, QString old_)

@@ -267,18 +267,20 @@ static QColor getColor(libircclient::User *ux)
     if (ux->IsAway)
         return Skin::GetDefault()->UserListAwayColor;
 
-    if (ux->CUMode == 0 || !Skin::GetDefault()->ModeColors.contains(ux->CUMode))
+    char cumode = ux->GetHighestCUMode();
+
+    if (cumode == 0 || !Skin::GetDefault()->ModeColors.contains(cumode))
         return Skin::GetDefault()->TextColor;
     
-    return Skin::GetDefault()->ModeColors[ux->CUMode];
+    return Skin::GetDefault()->ModeColors[cumode];
 }
 
 void UserFrame::InsertUser(libircclient::User *user, bool bulk)
 {
     if (!this->network)
         return;
-    if (this->userCounts.contains(user->CUMode))
-        this->userCounts[user->CUMode]++;
+    if (this->userCounts.contains(user->GetHighestCUMode()))
+        this->userCounts[user->GetHighestCUMode()]++;
     QString name = user->GetNick().toLower();
     if (this->users.contains(name))
         this->RemoveUser(name);
@@ -319,8 +321,8 @@ void UserFrame::RemoveUser(QString user)
     if (!this->users.contains(user))
         return;
     libircclient::User ux = this->users[user];
-    if (this->userCounts.contains(ux.CUMode))
-        this->userCounts[ux.CUMode]--;
+    if (this->userCounts.contains(ux.GetHighestCUMode()))
+        this->userCounts[ux.GetHighestCUMode()]--;
     this->users.remove(user);
     this->ui->listWidget->removeItemWidget(this->userItem[user]);
     delete this->userItem[user];
@@ -403,7 +405,7 @@ void UserFrame::ChangeMode(QString mode)
         if (mode.size() < 2)
             throw new Exception("Invalid mode", BOOST_CURRENT_FUNCTION);
         this->changeModes(mode[0].toLatin1(), mode[1].toLatin1());
-    } else
+    } else if (users.size() == 1)
     {
         this->parentFrame->TransferRaw("MODE " + channel_name + " " + mode + " " + users.at(0).GetNick());
     }

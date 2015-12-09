@@ -19,10 +19,11 @@ using namespace GrumpyIRC;
 
 void UiHooks::OnScrollbackItemHighlight(ScrollbackFrame *scrollback, ScrollbackItem *item)
 {
+    if (!scrollback->IsVisible())
+        scrollback->GetScrollback()->SetState(ScrollbackState_UnreadNotice);
     // Triggered when any item is highlighted by system
     if (!scrollback->IsVisible() || !MainWindow::Main->isActiveWindow())
     {
-        scrollback->GetScrollback()->SetState(ScrollbackState_UnreadNotice);
         if (item->GetUser().GetNick().isEmpty() == false)
             MainWindow::Main->Notify(scrollback->GetTitle(), item->GetUser().GetNick() + ": " + item->GetText());
         else
