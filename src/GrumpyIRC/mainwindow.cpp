@@ -229,7 +229,8 @@ static int SystemCommand_Act(SystemCommand *command, CommandArgs command_args)
 
 static int SystemCommand_Query(SystemCommand *command, CommandArgs command_args)
 {
-
+    (void)command;
+    return 0;
 }
 
 static int SystemCommand_UnsecureGrumpy(SystemCommand *command, CommandArgs command_args)
