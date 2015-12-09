@@ -1031,6 +1031,11 @@ void IRCSession::OnGeneric(libircclient::Parser *px)
     this->systemWindow->InsertText(px->GetRaw());
 }
 
+void IRCSession::OnServerSideUnknown(libircclient::Parser *px)
+{
+    this->systemWindow->InsertText(px->GetRaw(), ScrollbackItemType_SystemWarning);
+}
+
 void IRCSession::OnCapabilitiesNotSupported()
 {
     this->systemWindow->InsertText("This ircd doesn't support IRCv3 protocol, disabling CAP support", ScrollbackItemType_SystemWarning);
@@ -1130,6 +1135,7 @@ void IRCSession::connInternalSocketSignals()
     connect(this->network, SIGNAL(Event_UnAway(libircclient::Parser*)), this, SLOT(OnGeneric(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_CAP(libircclient::Parser*)), this, SLOT(OnGeneric(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_CAP_Timeout()), this, SLOT(OnCapabilitiesNotSupported()));
+    connect(this->network, SIGNAL(Event_NUMERIC_UNKNOWN(libircclient::Parser*)), this, SLOT(OnServerSideUnknown(libircclient::Parser*)));
 }
 
 void IRCSession::_gs_ResyncNickChange(QString new_, QString old_)
