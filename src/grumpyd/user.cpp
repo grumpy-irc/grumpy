@@ -170,6 +170,12 @@ void User::SendRawToIrcs(QString raw)
         return;
     foreach (SyncableIRCSession *session, this->sessions)
     {
+        if (!session->IsConnected())
+        {
+            // We can probably safely ignore this
+            // let's go next
+            continue;
+        }
         foreach (QString line, raw.split("\n"))
         {
             if (line.startsWith("#"))

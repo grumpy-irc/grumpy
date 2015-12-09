@@ -452,6 +452,11 @@ void IRCSession::SendAction(Scrollback *window, QString text)
 void IRCSession::SendRaw(Scrollback *window, QString raw)
 {
     Q_UNUSED(window);
+    if (!this->IsConnected())
+    {
+        this->GetSystemWindow()->InsertText("Can't send raw data to a disconnected network");
+        return;
+    }
     this->GetNetwork()->TransferRaw(raw);
 }
 
