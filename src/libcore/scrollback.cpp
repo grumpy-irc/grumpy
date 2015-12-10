@@ -268,6 +268,13 @@ bool Scrollback::IsHidden() const
     return this->_sbHidden;
 }
 
+void Scrollback::Resize(scrollback_id_t size)
+{
+    this->_maxItems = size;
+    while ((unsigned int)this->_items.size() > this->_maxItems)
+        this->_items.removeAt(0);
+}
+
 QHash<QString, QVariant> Scrollback::ToPartialHash()
 {
     QHash<QString, QVariant> hash;
@@ -345,7 +352,7 @@ ScrollbackState Scrollback::GetState()
 
 void Scrollback::insertSI(ScrollbackItem si)
 {
-    while (this->_items.size() > this->_maxItems)
+    while ((unsigned int)this->_items.size() > this->_maxItems)
     {
         this->_items.removeAt(0);
     }

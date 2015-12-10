@@ -22,6 +22,7 @@ GrumpydCfWin::GrumpydCfWin(GrumpydSession *session, QWidget *parent) : QDialog(p
     ui->setupUi(this);
     this->GrumpySession = session;
     this->ui->checkBox->setChecked(this->getBool("offline_ms_bool", true));
+    this->ui->lineEdit_6->setText(QString::number(this->getUInt("maximum_bsize", 2000)));
     this->ui->plainTextEdit->setPlainText(this->getString("session_on_conn_raw", "AWAY"));
     this->ui->plainTextEdit_2->setPlainText(this->getString("session_on_disc_raw", "AWAY :" + CONF->GetDefaultAwayReason()));
     this->ui->lineEdit->setText(this->getString("offline_ms_text", this->ui->lineEdit->text()));
@@ -40,6 +41,7 @@ void GrumpyIRC::GrumpydCfWin::on_buttonBox_accepted()
     this->set("default_ident", this->ui->lineEdit_4->text());
     this->set("session_on_conn_raw", this->ui->plainTextEdit->toPlainText());
     this->set("session_on_disc_raw", this->ui->plainTextEdit_2->toPlainText());
+    this->set("maximum_bsize", this->ui->lineEdit_6->text().toUInt());
     QHash<QString, QVariant> hash;
     hash.insert("merge", this->GrumpySession->Preferences);
     //this->set("away_msg", QVariant(this->ui->lineEdit_2->text()));
@@ -60,6 +62,13 @@ QString GrumpydCfWin::getString(QString key, QString missing)
     if (this->GrumpySession->Preferences.contains(key))
         return this->GrumpySession->Preferences[key].toString();
     return missing;
+}
+
+unsigned int GrumpyIRC::GrumpydCfWin::getUInt(QString key, unsigned int default_uint)
+{
+    if (this->GrumpySession->Preferences.contains(key))
+        return this->GrumpySession->Preferences[key].toUInt();
+    return default_uint;
 }
 
 bool GrumpydCfWin::getBool(QString key, bool default_bool)

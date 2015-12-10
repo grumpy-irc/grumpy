@@ -160,6 +160,7 @@ namespace GrumpyIRC
             virtual Scrollback *GetParentScrollback();
             virtual void FinishBulk();
             virtual bool IsHidden() const;
+            virtual void Resize(scrollback_id_t size);
             virtual void PrependItems(QList<ScrollbackItem> list);
             virtual ScrollbackItem FetchItem(scrollback_id_t id);
             virtual QList<QVariant> FetchBacklog(scrollback_id_t from, unsigned int size);

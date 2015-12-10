@@ -40,6 +40,7 @@ namespace GrumpyIRC
             template <typename T>
             void set(QString key, T value);
             QString getString(QString key, QString missing);
+            unsigned int getUInt(QString key, unsigned int default_uint);
             bool getBool(QString key, bool default_bool);
             Ui::GrumpydCfWin *ui;
     };
