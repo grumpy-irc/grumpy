@@ -172,6 +172,8 @@ void Scrollback::PrependItems(QList<ScrollbackItem> list)
         this->_items.insert(0, list.last());
         list.removeLast();
     }
+    if (this->_maxItems < (unsigned int)this->_items.size())
+        this->_maxItems = (unsigned int)this->_items.size();
     emit this->Event_Reload();
 }
 
@@ -341,6 +343,15 @@ ScrollbackState Scrollback::GetState()
     return this->scrollbackState;
 }
 
+void Scrollback::insertSI(ScrollbackItem si)
+{
+    while (this->_items.size() > this->_maxItems)
+    {
+        this->_items.removeAt(0);
+    }
+    this->_items.append(si);
+}
+
 void Scrollback::SetTarget(QString target)
 {
     this->_target = target;
@@ -390,7 +401,7 @@ void Scrollback::InsertText(ScrollbackItem item)
         throw new Exception("meep", "");
 
     item.SetID(this->_lastItemID++);
-    this->_items.append(item);
+    this->insertSI(item);
     if (!this->IgnoreState)
     {
         switch (item.GetType())

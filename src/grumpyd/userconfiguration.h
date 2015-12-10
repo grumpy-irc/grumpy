@@ -17,6 +17,11 @@
 
 #include "../libcore/configuration.h"
 
+// Some values explained:
+
+// maximum_bsize is maximum size of items in buffer of scrollback, if there are more items than maximum_bsize the oldest items are removed from it.
+//               Because the items are stored in sqlite we don't really need to keep them in buffer so this value should be rather small.
+
 namespace GrumpyIRC
 {
     class UserConf : public Configuration

@@ -202,6 +202,7 @@ namespace GrumpyIRC
         protected:
             static scrollback_id_t lastID;
 
+            virtual void insertSI(ScrollbackItem si);
             scrollback_id_t _lastItemID;
             bool _sbHidden;
             ScrollbackState scrollbackState;

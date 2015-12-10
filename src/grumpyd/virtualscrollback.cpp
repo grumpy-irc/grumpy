@@ -14,6 +14,7 @@
 #include "../libcore/ircsession.h"
 #include "../libcore/networksession.h"
 #include "../libcore/grumpydsession.h"
+#include "userconfiguration.h"
 #include "databasebackend.h"
 #include "grumpyd.h"
 #include "virtualscrollback.h"
@@ -96,6 +97,7 @@ void VirtualScrollback::SetOwner(User *user, bool restored)
 {
     this->owner = user;
     this->owner->RegisterScrollback(this, restored);
+    this->_maxItems = this->owner->GetConfiguration()->GetValueAsUInt("maximum_bsize", 2000);
 }
 
 void VirtualScrollback::ImportText(ScrollbackItem item)
@@ -117,7 +119,7 @@ void VirtualScrollback::InsertText(ScrollbackItem item)
     //! \todo Fix this crap
     //////////////////////////////////////////////////////////////////
     item.SetID(this->_lastItemID++);
-    this->_items.append(item);
+    this->insertSI(item);
     if (!this->IgnoreState)
     {
         switch (item.GetType())
