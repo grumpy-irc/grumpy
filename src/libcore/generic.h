@@ -37,7 +37,7 @@ namespace GrumpyIRC
             MessageBox_Type_Error
         };
 
-        LIBCORESHARED_EXPORT bool String2Bool(QString string);
+        LIBCORESHARED_EXPORT bool String2Bool(QString string, bool invalid = false);
         LIBCORESHARED_EXPORT QString Bool2String(bool boolean);
         LIBCORESHARED_EXPORT QStringList Trim(QStringList list);
         LIBCORESHARED_EXPORT int Bool2Int(bool value);

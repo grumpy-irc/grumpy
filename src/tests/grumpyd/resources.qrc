@@ -1,3 +1,5 @@
 <RCC>
-    <qresource prefix="/sql"/>
+    <qresource prefix="/sql">
+        <file>install.sql</file>
+    </qresource>
 </RCC>

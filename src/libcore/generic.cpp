@@ -20,11 +20,13 @@
 
 using namespace GrumpyIRC;
 
-bool Generic::String2Bool(QString string)
+bool Generic::String2Bool(QString string, bool invalid)
 {
     if (string.toLower() == "true")
         return true;
-    return false;
+    else if (string.toLower() == "false")
+        return false;
+    return invalid;
 }
 
 QString Generic::Bool2String(bool boolean)
