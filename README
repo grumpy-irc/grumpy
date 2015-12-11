@@ -19,6 +19,27 @@ Some features:
 * Supports IRCv3 protocol (http://ircv3.net/)
 * Extensible and very powerfull auto-completion mechanism
 
+How to build
+==========================
+
+You need to have CMake in order to build grumpy in most easy way. If you have it
+just use it for src folder.
+
+Grumpy requires Qt4 or Qt5. It doesn't depend on any other libraries, except for
+its own libraries and sqlite, which are all embedded within the project tree.
+
+Note: sqlite source codes are gzipped. If you enable support for sqlite you will
+      need to unzip them or download fresh version.
+
+License
+==========================
+
+The source code is licensed under GNU LGPL, but contains some other embedded
+open source libraries, such as sqlite which may have difference licenses.
+
+Please see local README's or check headers of source code files for more
+information on license for a given file.
+
 Grumpy is currently a work in progress and is unfinished. Use on your own risk.
 There is no manual yet. You can ask for help at #grumpy on network
 irc.tm-irc.org
