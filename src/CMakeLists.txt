@@ -3,6 +3,15 @@ cmake_minimum_required (VERSION 2.8.0)
 if (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 3.0)
     add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/MP>)
 endif()
+
+if(WIN32)
+    if(MINGW)
+        set(CMAKE_CXX_FLAGS "-std=c++11")
+    endif()
+else()
+        set(CMAKE_CXX_FLAGS "-std=c++11")
+endif()
+
 # Settings
 option(QT5_BUILD "Build with Qt5" false)
 option(EXTREME_DEBUG "Enable some resource expensive and slowing debug info" false)
