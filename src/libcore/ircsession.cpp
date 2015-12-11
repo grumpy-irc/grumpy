@@ -720,13 +720,14 @@ void IRCSession::OnKICK(libircclient::Parser *px, libircclient::Channel *channel
 void IRCSession::OnCTCP(libircclient::Parser *px, QString ctcp, QString pars)
 {
     QString target = px->GetParameters()[0];
-    if (target != this->GetNetwork()->GetNick())
-        return;
     if (ctcp == "ACTION")
     {
         this->processME(px, pars);
         return;
-    } else if (ctcp == "VERSION")
+    }
+    if (target != this->GetNetwork()->GetNick())
+        return;
+    if (ctcp == "VERSION")
     {
         if (!px->GetSourceUserInfo())
             return;
