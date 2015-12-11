@@ -139,6 +139,7 @@ namespace GrumpyIRC
             void RequestRemove(Scrollback *window);
             void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete);
             void RequestPart(Scrollback *window);
+            void Query(Scrollback *window, QString target, QString message);
             void RequestBL(Scrollback *window, scrollback_id_t from, unsigned int size);
             void RequestReconnect(Scrollback *window);
             void Connect();

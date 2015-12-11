@@ -208,6 +208,11 @@ void GrumpydSession::RequestPart(Scrollback *window)
     this->SendRaw(window, "PART " + window->GetTarget());
 }
 
+void GrumpydSession::Query(Scrollback *window, QString target, QString message)
+{
+
+}
+
 libircclient::Channel *GrumpydSession::GetChannel(Scrollback *window)
 {
     IRCSession *ircs = this->GetSessionFromWindow(window);

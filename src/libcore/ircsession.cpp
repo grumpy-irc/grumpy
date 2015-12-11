@@ -492,6 +492,23 @@ void IRCSession::RequestReconnect(Scrollback *window)
     this->network->Reconnect();
 }
 
+void IRCSession::Query(Scrollback *window, QString target, QString message)
+{
+    if (!this->IsConnected())
+    {
+        window->InsertText("You are not connected to any irc server", ScrollbackItemType_SystemError);
+        return;
+    }
+    Scrollback *sx = this->GetScrollbackForUser(target);
+    if (sx == NULL)
+    {
+        this->systemWindow->InsertText("No target for " + target + ": " + message);
+        return;
+    }
+    sx->InsertText(ScrollbackItem(message, ScrollbackItemType_Message, this->network->GetLocalUserInfo(), 0, true));
+    this->network->SendMessage(message, target);
+}
+
 libircclient::Channel *IRCSession::GetChannel(Scrollback *window)
 {
     if (!this->network)

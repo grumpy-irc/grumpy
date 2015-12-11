@@ -131,8 +131,10 @@ void User::RegisterScrollback(VirtualScrollback *scrollback, bool skip)
 SyncableIRCSession *User::ConnectToIRCServer(libirc::ServerAddress info)
 {
     Scrollback *system_window = CoreWrapper::GrumpyCore->NewScrollback(NULL, info.GetHost(), ScrollbackType_System);
+    if (info.GetNick().isEmpty())
+        info.SetNick(this->conf->GetValueAsString("nick", "GrumpydUser"));
     SyncableIRCSession *session = SyncableIRCSession::Open(system_window, info, this);
-    session->AutomaticallyRetrieveBanList = this->conf->GetValueAsBool("AutomaticallyRetrieveBanList", false);
+    session->AutomaticallyRetrieveBanList = this->conf->GetValueAsBool("session_AutomaticallyRetrieveBanList", true);
     this->sessions.append(session);
     return session;
 }

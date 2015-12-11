@@ -6,6 +6,7 @@ endif()
 # Settings
 option(QT5_BUILD "Build with Qt5" false)
 option(EXTREME_DEBUG "Enable some resource expensive and slowing debug info" false)
+option(UNIT_TESTS "Enable unit tests" false)
 option(SQLITE "Support sqlite backend storage" true)
 
 # Configuration
@@ -23,3 +24,9 @@ add_subdirectory (libgp)
 add_subdirectory (libcore)
 add_subdirectory (grumpyd)
 add_subdirectory (GrumpyIRC)
+
+# Unit test
+
+if (UNIT_TESTS)
+    add_subdirectory (tests)
+endif()

@@ -54,6 +54,7 @@ namespace GrumpyIRC
             virtual QString GetLocalUserModeAsString(Scrollback *window)=0;
             virtual void SendMessage(Scrollback *window, QString target, QString message)=0;
             virtual void SendNotice(Scrollback *window, QString target, QString message) = 0;
+            virtual void Query(Scrollback *window, QString target, QString message)=0;
             virtual Scrollback *GetSystemWindow()=0;
             virtual libircclient::Channel *GetChannel(Scrollback *window)=0;
             virtual void RetrieveChannelBanList(Scrollback *window, QString channel_name)=0;
