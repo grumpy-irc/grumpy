@@ -109,7 +109,7 @@ void DatabaseLite::LoadRoles()
 
 void DatabaseLite::LoadUsers()
 {
-    SqlResult *userlist = this->database->ExecuteQuery("SELECT id, name, password, role FROM users;");
+    std::shared_ptr<SqlResult> userlist = this->database->ExecuteQuery("SELECT id, name, password, role FROM users;");
     if (!userlist->Count())
     {
         CONF->Init = true;
@@ -125,12 +125,11 @@ void DatabaseLite::LoadUsers()
                 ux->SetRole(Role::Roles[row.GetField(3).toString()]);
         }
     }
-    delete userlist;
 }
 
 void DatabaseLite::LoadSessions()
 {
-    SqlResult *networks = this->database->ExecuteQuery("SELECT id, network_id, user_id, hostname, port, ssl, nick, ident, system_id, password, scrollback_list, name FROM networks;");
+    std::shared_ptr<SqlResult> networks = this->database->ExecuteQuery("SELECT id, network_id, user_id, hostname, port, ssl, nick, ident, system_id, password, scrollback_list, name FROM networks;");
 
     if (networks->InError)
         throw new Exception("Unable to load networks from db: " + this->LastError, BOOST_CURRENT_FUNCTION);
@@ -206,14 +205,12 @@ void DatabaseLite::LoadSessions()
     }
 
     SyncableIRCSession::SetLastNID(lnid);
-
-    delete networks;
 }
 
 void DatabaseLite::LoadWindows()
 {
     scrollback_id_t max_id = 0;
-    SqlResult *windows = this->database->ExecuteQuery("SELECT original_id, user_id, target, type, virtual_state, last_item, parent, id FROM scrollbacks;");
+    std::shared_ptr<SqlResult> windows = this->database->ExecuteQuery("SELECT original_id, user_id, target, type, virtual_state, last_item, parent, id FROM scrollbacks;");
     if (windows->InError)
         throw new Exception("Unable to recover scrollbacks from sql: " + this->LastError, BOOST_CURRENT_FUNCTION);
 
@@ -263,8 +260,6 @@ void DatabaseLite::LoadWindows()
         scrollbacks.insert(scrollback_id, sx);
     }
     VirtualScrollback::SetLastID(++max_id);
-
-    delete windows;
 }
 
 void DatabaseLite::LoadText()
@@ -277,7 +272,7 @@ void DatabaseLite::LoadText()
             input << QVariant(user->GetID())
                   << QVariant(scrollback->GetOriginalID());
             scrollback_id_t last_item = 0;
-            SqlResult *text = this->database->ExecuteQuery_Bind("SELECT id, item_id, user_id, scrollback_id, date, type, nick, ident, host, text, self "\
+            std::shared_ptr<SqlResult> text = this->database->ExecuteQuery_Bind("SELECT id, item_id, user_id, scrollback_id, date, type, nick, ident, host, text, self "\
                                                                  "FROM scrollback_items "\
                                                                  "WHERE user_id = ? AND scrollback_id = ? "\
                                                                  "ORDER BY item_id ASC LIMIT " + QString::number(CONF->GetMaxScrollbackSize()) + ";", input);
@@ -301,8 +296,6 @@ void DatabaseLite::LoadText()
             }
 
             scrollback->SetLastItemID(last_item);
-
-            delete text;
         }
     }
 }
@@ -312,19 +305,16 @@ QHash<QString, QVariant> DatabaseLite::GetConfiguration(user_id_t user)
     QList<QVariant> parameters;
     parameters << user;
     QString sql = "SELECT value FROM settings WHERE user_id = ?;";
-    SqlResult *result = this->database->ExecuteQuery_Bind(sql, parameters);
+    std::shared_ptr<SqlResult> result = this->database->ExecuteQuery_Bind(sql, parameters);
     if (result->InError)
     {
-        delete result;
         throw new Exception("Unable to retrieve user settings from sql: " + this->LastError, BOOST_CURRENT_FUNCTION);
     }
     if (result->Count() == 0)
     {
-        delete result;
         return QHash<QString, QVariant>();
     }
     QHash<QString, QVariant> hash = FromArray(result->GetRow(0).GetField(0).toByteArray());
-    delete result;
     return hash;
 }
 
@@ -340,25 +330,21 @@ void DatabaseLite::SetConfiguration(user_id_t user, QHash<QString, QVariant> dat
 
     // First we need to check if there is a record for this user
     QString sql = "SELECT count(1) FROM settings where user_id = ?;";
-    SqlResult *rx = this->database->ExecuteQuery_Bind(sql, parameters);
+    std::shared_ptr<SqlResult> rx = this->database->ExecuteQuery_Bind(sql, parameters);
     if (rx->InError)
     {
-        delete rx;
         throw new Exception("Unable to store user settings to sql: " + this->LastError, BOOST_CURRENT_FUNCTION);
     }
     if (!rx->Count())
     {
-        delete rx;
         throw new Exception("SELECT count(1) returned 0 items", BOOST_CURRENT_FUNCTION);
     }
     SqlRow row = rx->GetRow(0);
     int results = row.GetField(0).toInt();
     if (results > 1)
     {
-        delete rx;
         throw new Exception("User has more than 1 blob hash", BOOST_CURRENT_FUNCTION);
     }
-    delete rx;
     if (!results)
     {
         parameters << ToArray(data);
@@ -374,10 +360,8 @@ void DatabaseLite::SetConfiguration(user_id_t user, QHash<QString, QVariant> dat
     }
     if (rx->InError)
     {
-        delete rx;
         throw new Exception("Unable to store user data to sql: " + this->LastError, BOOST_CURRENT_FUNCTION);
     }
-    delete rx;
 }
 
 void DatabaseLite::StoreScrollback(User *owner, Scrollback *sx)
@@ -386,7 +370,7 @@ void DatabaseLite::StoreScrollback(User *owner, Scrollback *sx)
     Scrollback *parent = sx->GetParentScrollback();
     if (parent)
         sql = "INSERT INTO scrollbacks (original_id, user_id, target, type, virtual_state, last_item, parent) VALUES (?,?,?,?,?,?,?);";
-    SqlResult *result;
+    std::shared_ptr<SqlResult> result;
     QStringList params;
     params << QString::number(sx->GetOriginalID())
            << QString::number(owner->GetID())
@@ -399,11 +383,8 @@ void DatabaseLite::StoreScrollback(User *owner, Scrollback *sx)
     result = this->database->ExecuteQuery_Bind(sql, params);
     if (result->InError)
     {
-        delete result;
         throw new Exception("Unable to insert scrollback to db: " + this->LastError, BOOST_CURRENT_FUNCTION);
     }
-
-    delete result;
 }
 
 void DatabaseLite::StoreUser(User *item)
@@ -423,14 +404,11 @@ void DatabaseLite::StoreUser(User *item)
         SQL = "INSERT INTO users (id, name, password, is_locked) VALUES (?,?,?,0);";
     }
 
-    SqlResult *result = this->database->ExecuteQuery_Bind(SQL, Parameters);
+    std::shared_ptr<SqlResult> result = this->database->ExecuteQuery_Bind(SQL, Parameters);
     if (result->InError)
     {
-        delete result;
         throw new Exception("Unable to store user record: " + this->LastError, BOOST_CURRENT_FUNCTION);
     }
-
-    delete result;
 }
 
 void DatabaseLite::UpdateUser(User *user)
@@ -441,7 +419,7 @@ void DatabaseLite::UpdateUser(User *user)
 void DatabaseLite::ClearScrollback(User *owner, Scrollback *sx)
 {
     QString sql = "DELETE FROM scrollback_items WHERE scrollback_id = ? AND user_id = ?;";
-    SqlResult *result;
+    std::shared_ptr<SqlResult> result;
     QStringList params;
 
     params << QString::number(sx->GetOriginalID())
@@ -451,17 +429,14 @@ void DatabaseLite::ClearScrollback(User *owner, Scrollback *sx)
 
     if (result->InError)
     {
-        delete result;
         throw new Exception("Unable to remove items from db: " + this->LastError, BOOST_CURRENT_FUNCTION);
     }
-
-    delete result;
 }
 
 void DatabaseLite::ClearScrollback(unsigned int id, unsigned int user_id)
 {
     QString sql = "DELETE FROM scrollback_items WHERE scrollback_id = ? AND user_id = ?;";
-    SqlResult *result;
+    std::shared_ptr<SqlResult> result;
     QStringList params;
 
     params << QString::number(id)
@@ -471,17 +446,14 @@ void DatabaseLite::ClearScrollback(unsigned int id, unsigned int user_id)
 
     if (result->InError)
     {
-        delete result;
         throw new Exception("Unable to remove items from db: " + this->LastError, BOOST_CURRENT_FUNCTION);
     }
-
-    delete result;
 }
 
 void DatabaseLite::RemoveNetwork(IRCSession *session)
 {
     QString sql = "DELETE FROM networks WHERE user_id = ? AND network_id = ?;";
-    SqlResult *result;
+    std::shared_ptr<SqlResult> result;
     QList<QVariant> params;
 
     params << ((SyncableIRCSession*)session)->GetOwner()->GetID();
@@ -491,17 +463,14 @@ void DatabaseLite::RemoveNetwork(IRCSession *session)
 
     if (result->InError)
     {
-        delete result;
         throw new Exception("Unable to remove network using sql: " + this->LastError, BOOST_CURRENT_FUNCTION);
     }
-
-    delete result;
 }
 
 void DatabaseLite::RemoveScrollback(unsigned int id)
 {
     QString sql = "DELETE FROM scrollbacks WHERE id = ?;";
-    SqlResult *result;
+    std::shared_ptr<SqlResult> result;
     QStringList params;
 
     params << QString::number(id);
@@ -510,11 +479,8 @@ void DatabaseLite::RemoveScrollback(unsigned int id)
 
     if (result->InError)
     {
-        delete result;
         throw new Exception("Unable to remove scrollback using sql: " + this->LastError, BOOST_CURRENT_FUNCTION);
     }
-
-    delete result;
 }
 
 QList<QVariant> DatabaseLite::FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size)
@@ -541,7 +507,7 @@ QList<QVariant> DatabaseLite::FetchBacklog(VirtualScrollback *scrollback, scroll
           << QVariant(from)
           << QVariant(first);
     scrollback_id_t last_item = 0;
-    SqlResult *text = this->database->ExecuteQuery_Bind("SELECT id, item_id, user_id, scrollback_id, date, type, nick, ident, host, text, self "\
+    std::shared_ptr<SqlResult> text = this->database->ExecuteQuery_Bind("SELECT id, item_id, user_id, scrollback_id, date, type, nick, ident, host, text, self "\
                                                         "FROM scrollback_items "\
                                                         "WHERE user_id = ? AND scrollback_id = ? AND item_id < ? AND item_id >= ? "\
                                                         "ORDER BY item_id ASC;", input);
@@ -563,7 +529,6 @@ QList<QVariant> DatabaseLite::FetchBacklog(VirtualScrollback *scrollback, scroll
         ScrollbackItem tm(item_text, type, user, last_item, self);
         result.append(tm.ToHash());
     }
-    delete text;
     return result;
 }
 
@@ -576,17 +541,16 @@ void DatabaseLite::UpdateNetwork(IRCSession *session)
          << QVariant(session->GetSID())
          << QVariant((((SyncableIRCSession*)session))->GetOwner()->GetID());
 
-    SqlResult *qx = this->database->ExecuteQuery_Bind(sql, hash);
+    std::shared_ptr<SqlResult> qx = this->database->ExecuteQuery_Bind(sql, hash);
     if (qx->InError)
         throw new Exception("SQL: " + this->LastError, BOOST_CURRENT_FUNCTION);
-    delete qx;
 }
 
 void DatabaseLite::RemoveScrollback(User *owner, Scrollback *sx)
 {
     this->ClearScrollback(owner, sx);
     QString sql = "DELETE FROM scrollbacks WHERE original_id = ? AND user_id = ?;";
-    SqlResult *result;
+    std::shared_ptr<SqlResult> result;
     QStringList params;
 
     params << QString::number(sx->GetOriginalID())
@@ -596,8 +560,6 @@ void DatabaseLite::RemoveScrollback(User *owner, Scrollback *sx)
 
     if (result->InError)
         throw new Exception("Unable to remove scrollback from db: " + this->LastError, BOOST_CURRENT_FUNCTION);
-
-    delete result;
 }
 
 void DatabaseLite::UpdateRoles()
@@ -607,7 +569,7 @@ void DatabaseLite::UpdateRoles()
 
 void DatabaseLite::StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem *item)
 {
-    SqlResult *result;
+    std::shared_ptr<SqlResult> result;
     QList<QVariant> info;
 
     info << QVariant(owner->GetID())
@@ -625,13 +587,11 @@ void DatabaseLite::StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem
     result = this->database->ExecuteQuery_Bind(sql, info);
     if (result->InError)
         throw new Exception("Unable to insert data to db: " + this->LastError, BOOST_CURRENT_FUNCTION);
-
-    delete result;
 }
 
 void DatabaseLite::StoreNetwork(IRCSession *session)
 {
-    SqlResult *result;
+    std::shared_ptr<SqlResult> result;
     QList<QVariant> info;
 
     SyncableIRCSession *sx = dynamic_cast<SyncableIRCSession*>(session);
@@ -652,8 +612,6 @@ void DatabaseLite::StoreNetwork(IRCSession *session)
     result = this->database->ExecuteQuery_Bind(sql, info);
     if (result->InError)
         throw new Exception("Unable to insert data to db: " + this->LastError, BOOST_CURRENT_FUNCTION);
-
-    delete result;
 }
 
 #endif

@@ -122,7 +122,7 @@ bool SQLite::ExecuteNonQuery(QString sql)
     return true;
 }
 
-SqlResult *SQLite::ExecuteQuery(QString sql)
+std::shared_ptr<SqlResult> SQLite::ExecuteQuery(QString sql)
 {
     return this->ExecuteQuery_Bind(sql, QStringList());
 }
@@ -132,7 +132,7 @@ QString SQLite::GetPath()
     return this->datafile;
 }
 
-SqlResult *SQLite::ExecuteQuery_Bind(QString sql, QString parameter)
+std::shared_ptr<SqlResult> SQLite::ExecuteQuery_Bind(QString sql, QString parameter)
 {
     QStringList list;
     list << parameter;
@@ -145,9 +145,9 @@ static QString StringFromUnsignedChar(const unsigned char *str)
     return QString::fromUtf8(temp.c_str());
 }
 
-SqlResult *SQLite::ExecuteQuery_Bind(QString sql, QList<QVariant> parameters)
+std::shared_ptr<SqlResult> SQLite::ExecuteQuery_Bind(QString sql, QList<QVariant> parameters)
 {
-    SqlResult *result = new SqlResult();
+    std::shared_ptr<SqlResult> result = std::make_shared<SqlResult>();
     sqlite3_stmt *statement;
     int current_parameter = 1;
     this->LastStatement = sql;
@@ -240,9 +240,9 @@ on_error:
     return result;
 }
 
-SqlResult *SQLite::ExecuteQuery_Bind(QString sql, QStringList parameters)
+std::shared_ptr<SqlResult> SQLite::ExecuteQuery_Bind(QString sql, QStringList parameters)
 {
-    SqlResult *result = new SqlResult();
+    std::shared_ptr<SqlResult> result = std::make_shared<SqlResult>();
     sqlite3_stmt *statement;
     int current_parameter = 1;
     this->LastStatement = sql;

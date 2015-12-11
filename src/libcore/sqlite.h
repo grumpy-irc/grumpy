@@ -17,6 +17,7 @@
 
 #include "definitions.h"
 #include "libcore_global.h"
+#include <memory>
 #include <QHash>
 #include <QMutex>
 #include <QVariant>
@@ -60,10 +61,10 @@ namespace GrumpyIRC
             bool Evaluate(int data);
             qint64 LastRow();
             bool ExecuteNonQuery(QString sql);
-            SqlResult *ExecuteQuery(QString sql);
-            SqlResult *ExecuteQuery_Bind(QString sql, QString parameter);
-            SqlResult *ExecuteQuery_Bind(QString sql, QList<QVariant> parameters);
-            SqlResult *ExecuteQuery_Bind(QString sql, QStringList parameters);
+            std::shared_ptr<SqlResult> ExecuteQuery(QString sql);
+            std::shared_ptr<SqlResult> ExecuteQuery_Bind(QString sql, QString parameter);
+            std::shared_ptr<SqlResult> ExecuteQuery_Bind(QString sql, QList<QVariant> parameters);
+            std::shared_ptr<SqlResult> ExecuteQuery_Bind(QString sql, QStringList parameters);
             QString LastStatement;
             QString LastError;
 
