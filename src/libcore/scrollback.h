@@ -129,6 +129,8 @@ namespace GrumpyIRC
             Scrollback(QHash<QString, QVariant> hash);
             virtual ~Scrollback();
             virtual void Close();
+            //! Maximum amount of items allowed to be stored in buffer of this scrollback
+            //! if exceeded, oldest items are removed
             virtual scrollback_id_t GetMaxItemsSize();
             //! Unique ID of this scrollback for this grumpy, this is newer synced over network
             scrollback_id_t GetID();
@@ -140,8 +142,9 @@ namespace GrumpyIRC
             virtual void InsertText(QString text, ScrollbackItemType type = ScrollbackItemType_System);
             virtual void InsertText(ScrollbackItem item);
             ScrollbackItem GetFirst();
-            virtual void SetTarget(QString target);
             virtual QString GetTarget() const;
+            virtual void SetTarget(QString target);
+            virtual void SetSITotalCount(scrollback_id_t sitc);
             //! If this scrollback is associated to some session this function returns the pointer to it, in case it's not NULL is returned
             virtual NetworkSession *GetSession();
             virtual QList<ScrollbackItem> GetItems();
@@ -157,6 +160,8 @@ namespace GrumpyIRC
             virtual void Show();
             virtual void Hide();
             virtual int GetSICount();
+            //! Return (possibly unaccurate) amount of all items that were ever inserted to this scrollback
+            virtual scrollback_id_t GetSITotalCount();
             virtual Scrollback *GetParentScrollback();
             virtual void FinishBulk();
             virtual bool IsHidden() const;
@@ -214,6 +219,7 @@ namespace GrumpyIRC
             NetworkSession *session;
             ScrollbackType type;
             QList<ScrollbackItem> _items;
+            scrollback_id_t _totalItems;
             scrollback_id_t _id;
             scrollback_id_t _original_id;
             scrollback_id_t _maxItems;

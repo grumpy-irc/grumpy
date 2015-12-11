@@ -14,6 +14,7 @@
 #include "../libirc/libircclient/user.h"
 #include "../libirc/libircclient/channel.h"
 #include "core.h"
+#include "configuration.h"
 #include "eventhandler.h"
 #include "grumpydsession.h"
 #include "ircsession.h"
@@ -773,6 +774,16 @@ void GrumpydSession::processPreferences(QHash<QString, QVariant> hash)
     {
         is_missing = true;
         this->Preferences.insert("offline_ms_text", "I am current away, your message was logged and I will read it when I return");
+    }
+    if (!this->Preferences.contains("maximum_bsize"))
+    {
+        is_missing = true;
+        this->Preferences.insert("maximum_bsize", 2000);
+    }
+    if (!this->Preferences.contains("nick"))
+    {
+        is_missing = true;
+        this->Preferences.insert("nick", Core::GrumpyCore->GetConfiguration()->GetValueAsString("nick", "GrumpydUser"));
     }
     if (is_missing)
     {

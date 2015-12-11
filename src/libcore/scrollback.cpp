@@ -27,6 +27,7 @@ unsigned long long ScrollbackItem::TotalIC = 0;
 Scrollback::Scrollback(ScrollbackType Type, Scrollback *parent, bool scrollback_hidden)
 {
     this->_maxItems = 800000;
+    this->_totalItems = 0;
     this->parentSx = parent;
     ScrollbackList_Mutex.lock();
     ScrollbackList.append(this);
@@ -45,6 +46,7 @@ Scrollback::Scrollback(ScrollbackType Type, Scrollback *parent, bool scrollback_
 Scrollback::Scrollback(QHash<QString, QVariant> hash)
 {
     this->_maxItems = 0;
+    this->_totalItems = 0;
     this->parentSx = NULL;
     this->IgnoreState = false;
     ScrollbackList_Mutex.lock();
@@ -91,6 +93,11 @@ scrollback_id_t Scrollback::GetOriginalID()
 void Scrollback::SetOriginalID(scrollback_id_t sid)
 {
     this->_original_id = sid;
+}
+
+scrollback_id_t Scrollback::GetSITotalCount()
+{
+    return this->_totalItems;
 }
 
 ScrollbackType Scrollback::GetType() const
@@ -172,8 +179,9 @@ void Scrollback::PrependItems(QList<ScrollbackItem> list)
         this->_items.insert(0, list.last());
         list.removeLast();
     }
-    if (this->_maxItems < (unsigned int)this->_items.size())
-        this->_maxItems = (unsigned int)this->_items.size();
+    if (this->_maxItems <  (scrollback_id_t)this->_items.size())
+        this->_maxItems =  (scrollback_id_t)this->_items.size();
+    this->_totalItems +=   (scrollback_id_t)list.size();
     emit this->Event_Reload();
 }
 
@@ -279,6 +287,7 @@ QHash<QString, QVariant> Scrollback::ToPartialHash()
 {
     QHash<QString, QVariant> hash;
     SERIALIZE(_dead);
+    SERIALIZE(_totalItems);
     SERIALIZE(_original_id);
     SERIALIZE(_sbHidden);
     SERIALIZE(PropertyBag);
@@ -292,6 +301,7 @@ QHash<QString, QVariant> Scrollback::ToPartialHash()
 void Scrollback::LoadHash(QHash<QString, QVariant> hash)
 {
     UNSERIALIZE_HASH(PropertyBag);
+    UNSERIALIZE_UINT(_totalItems);
     UNSERIALIZE_STRING(_target);
     UNSERIALIZE_BOOL(_dead);
     UNSERIALIZE_BOOL(_sbHidden);
@@ -352,6 +362,7 @@ ScrollbackState Scrollback::GetState()
 
 void Scrollback::insertSI(ScrollbackItem si)
 {
+    this->_totalItems++;
     while ((unsigned int)this->_items.size() > this->_maxItems)
     {
         this->_items.removeAt(0);
@@ -362,6 +373,13 @@ void Scrollback::insertSI(ScrollbackItem si)
 void Scrollback::SetTarget(QString target)
 {
     this->_target = target;
+}
+
+void Scrollback::SetSITotalCount(scrollback_id_t sitc)
+{
+    if (sitc < static_cast<scrollback_id_t>(this->_items.count()))
+        sitc = static_cast<scrollback_id_t>(this->_items.count());
+    this->_totalItems = sitc;
 }
 
 NetworkSession *Scrollback::GetSession()

@@ -29,6 +29,7 @@ namespace GrumpyIRC
 {
     class ScrollbackItem;
 
+    //! \todo No unit test
     class LIBCORESHARED_EXPORT Highlighter : public libirc::SerializableItem
     {
         public:
