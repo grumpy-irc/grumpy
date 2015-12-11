@@ -958,7 +958,7 @@ void IRCSession::OnUserAwayStatusChange(libircclient::Parser *px, libircclient::
     if (!scrollback)
         return;
 
-    scrollback->UserListChange(ux->GetNick(), ux, UserListChange_Alter);
+    scrollback->UserListChange(ux->GetNick(), ux, UserListChange_Refresh);
 }
 
 void IRCSession::OnChannelMODE(libircclient::Parser *px, libircclient::Channel *channel)
