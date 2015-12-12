@@ -473,11 +473,8 @@ void MainWindow::ExecuteLine(QString line)
     if (line.isEmpty())
         return;
 
-    if (line.trimmed().startsWith("#"))
-        return;
-
     line = this->processInput(line);
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->ProcessText(line, this->GetCurrentScrollbackFrame()->GetScrollback());
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->ProcessText(line, this->GetCurrentScrollbackFrame()->GetScrollback(), true);
 }
 
 void MainWindow::OpenGrumpy(QString hostname, int port, QString username, QString password, bool ssl)

@@ -25,6 +25,7 @@ CommandProcessor::CommandProcessor()
 {
     this->SplitLong = true;
     this->LongSize = 300;
+    this->CommentChar = '#';
     this->CommandPrefix = '/';
 }
 
@@ -41,12 +42,17 @@ void CommandProcessor::RegisterCommand(SystemCommand *sc)
     this->CommandList.insert(name, sc);
 }
 
-int CommandProcessor::ProcessText(QString text, Scrollback *window)
+int CommandProcessor::ProcessText(QString text, Scrollback *window, bool comments_rm)
 {
     text.replace("\r", "");
     QStringList items = text.split("\n");
     foreach (QString line, items)
     {
+        if (comments_rm)
+        {
+            if (text.trimmed().startsWith(this->CommentChar))
+                continue;
+        }
         int return_code = this->ProcessItem(line, window);
         switch (-return_code)
         {
