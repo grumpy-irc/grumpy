@@ -275,14 +275,15 @@ void DatabaseLite::LoadText()
             std::shared_ptr<SqlResult> text = this->database->ExecuteQuery_Bind("SELECT id, item_id, user_id, scrollback_id, date, type, nick, ident, host, text, self "\
                                                                  "FROM scrollback_items "\
                                                                  "WHERE user_id = ? AND scrollback_id = ? "\
-                                                                 "ORDER BY item_id ASC LIMIT " + QString::number(CONF->GetMaxScrollbackSize()) + ";", input);
+                                                                 "ORDER BY item_id DESC LIMIT " + QString::number(CONF->GetMaxScrollbackSize()) + ";", input);
             if (text->InError)
                 throw new Exception("Unable to fetch: " + this->LastError, BOOST_CURRENT_FUNCTION);
 
-            unsigned int item = 0;
-            while (item < text->Count())
+            // this must be long because we need something bigger than int as we convert unsigned int to signed variable
+            long item = static_cast<long>(text->Count());
+            while (item >= 0)
             {
-                SqlRow row = text->GetRow(item++);
+                SqlRow row = text->GetRow((unsigned int)item--);
                 last_item = row.GetField(1).toUInt();
                 QString item_text = row.GetField(9).toString();
                 ScrollbackItemType type = static_cast<ScrollbackItemType>(row.GetField(5).toInt());
