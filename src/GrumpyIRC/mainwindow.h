@@ -62,6 +62,8 @@ namespace GrumpyIRC
             void UpdateStatus();
             void Notify(QString heading, QString text);
             void OpenUrl(QString url);
+            void Execute(QString text);
+            void ExecuteLine(QString line);
             void OpenGrumpy(QString hostname, int port, QString username, QString password, bool ssl);
             void OpenIRCNetworkLink(QString link);
             void OpenServer(libirc::ServerAddress server);
@@ -78,6 +80,7 @@ namespace GrumpyIRC
             void on_actionToggle_secret_triggered();
 
         private:
+            QString processInput(QString text);
             void closeEvent(QCloseEvent *event);
             QSystemTrayIcon tray;
             bool isFork;

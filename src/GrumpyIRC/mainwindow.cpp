@@ -324,7 +324,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     CoreWrapper::GrumpyCore->GetCommandProcessor()->SplitLong = CONF->GetSplit();
     // Welcome user
     this->ui->actionOpen_window->setVisible(false);
-    this->systemWindow->InsertText(QString("Grumpy irc version " + GCFG->GetVersion()));
     connect(&this->timer, SIGNAL(timeout()), this, SLOT(OnRefresh()));
     this->handler = new LinkHandler();
     this->timer.start(100);
@@ -332,6 +331,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->restoreGeometry(GCFG->GetValue("mainwindow_geometry").toByteArray());
     this->restoreState(GCFG->GetValue("mainwindow_state").toByteArray());
     this->userWidget->hide();
+    this->Execute(CONF->GetAutorun());
 }
 
 MainWindow::MainWindow(bool fork, MainWindow *parent)
@@ -462,6 +462,24 @@ void MainWindow::OpenUrl(QString url)
     this->handler->OpenLink(url);
 }
 
+void MainWindow::Execute(QString text)
+{
+    foreach (QString line, text.split("\n"))
+        this->ExecuteLine(line);
+}
+
+void MainWindow::ExecuteLine(QString line)
+{
+    if (line.isEmpty())
+        return;
+
+    if (line.trimmed().startsWith("#"))
+        return;
+
+    line = this->processInput(line);
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->ProcessText(line, this->GetCurrentScrollbackFrame()->GetScrollback());
+}
+
 void MainWindow::OpenGrumpy(QString hostname, int port, QString username, QString password, bool ssl)
 {
     ScrollbackFrame *system = this->GetScrollbackManager()->CreateWindow(hostname, NULL, true);
@@ -548,4 +566,11 @@ void GrumpyIRC::MainWindow::on_actionFavorites_triggered()
 void GrumpyIRC::MainWindow::on_actionToggle_secret_triggered()
 {
     this->GetCurrentScrollbackFrame()->ToggleSecure();
+}
+
+QString MainWindow::processInput(QString text)
+{
+    if (text.contains("$grumpy.version"))
+        text = text.replace("$grumpy.version", GCFG->GetVersion());
+    return text;
 }

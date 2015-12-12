@@ -122,6 +122,18 @@ QString GrumpyConf::GetDefaultAwayReason()
     return GCFG->GetValueAsString("reason_away", "I am currently not here");
 }
 
+QString GrumpyConf::GetAutorun()
+{
+    QString default_autorun = "# This is a script that is executed every time you run grumpy\n"\
+                              "/echo Welcome to GrumpyIRC v. $grumpy.version";
+    return GCFG->GetValueAsString("execute_autorun", default_autorun);
+}
+
+void GrumpyConf::SetAutorun(QString data)
+{
+    GCFG->SetValue("execute_autorun", data);
+}
+
 void GrumpyConf::SetIgnoreSSLProblems(bool set)
 {
     GCFG->SetValue("ignore_ssl", set);

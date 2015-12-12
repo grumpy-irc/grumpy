@@ -31,6 +31,7 @@ PreferencesWin::PreferencesWin(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
     this->ui->lineEdit_2->setText(CONF->GetName());
     this->ui->lineEdit_3->setText(QString::number(CONF->GetSplitMaxSize()));
     this->ui->checkBoxSplitMs->setChecked(CONF->GetSplit());
+    this->ui->plainTextEditAutorun->setPlainText(CONF->GetAutorun());
 
     QStringList heading_1;
     heading_1 << "Highlighted text" << "Is regex" << "Matching" << "Enabled";
@@ -66,6 +67,7 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
     CONF->SetName(this->ui->lineEdit_2->text());
     CONF->SetSplitMaxSize(this->ui->lineEdit_3->text().toInt());
     CONF->SetSplit(this->ui->checkBoxSplitMs->isChecked());
+    CONF->SetAutorun(this->ui->plainTextEditAutorun->toPlainText());
     CoreWrapper::GrumpyCore->GetCommandProcessor()->LongSize = CONF->GetSplitMaxSize();
     CoreWrapper::GrumpyCore->GetCommandProcessor()->SplitLong = CONF->GetSplit();
     CONF->Save();

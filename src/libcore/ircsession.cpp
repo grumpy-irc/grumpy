@@ -725,7 +725,7 @@ void IRCSession::OnCTCP(libircclient::Parser *px, QString ctcp, QString pars)
         this->processME(px, pars);
         return;
     }
-    if (target != this->GetNetwork()->GetNick())
+        if (target != this->GetNetwork()->GetNick())
         return;
     if (ctcp == "VERSION")
     {
