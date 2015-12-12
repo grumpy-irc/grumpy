@@ -31,6 +31,8 @@ its own libraries and sqlite, which are all embedded within the project tree.
 Note: sqlite source codes are gzipped. If you enable support for sqlite you will
       need to unzip them or download fresh version.
 
+There may also be information specific for your platform on our github wiki
+
 License
 ==========================
 
@@ -39,6 +41,7 @@ open source libraries, such as sqlite which may have difference licenses.
 
 Please see local README's or check headers of source code files for more
 information on license for a given file.
+
 
 Grumpy is currently a work in progress and is unfinished. Use on your own risk.
 There is no manual yet. You can ask for help at #grumpy on network

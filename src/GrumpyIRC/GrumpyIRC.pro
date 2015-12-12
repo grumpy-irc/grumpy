@@ -15,7 +15,6 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     scrollbackframe.cpp \
-    syslogwindow.cpp \
     scrollbacklist.cpp \
     corewrapper.cpp \
     inputbox.cpp \
@@ -45,7 +44,6 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
     scrollbackframe.h \
-    syslogwindow.h \
     scrollbacklist.h \
     corewrapper.h \
     inputbox.h \
@@ -75,7 +73,6 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui \
     scrollbackframe.ui \
-    syslogwindow.ui \
     scrollbacklist.ui \
     inputbox.ui \
     scrollbacksmanager.ui \

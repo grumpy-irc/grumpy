@@ -38,7 +38,6 @@ namespace GrumpyIRC
     class ScrollbackList;
     class ScrollbacksManager;
     class Skin;
-    class SyslogWindow;
 
     class MainWindow : public QMainWindow
     {
@@ -92,7 +91,6 @@ namespace GrumpyIRC
             LinkHandler *handler;
             ScrollbackList *windowList;
             UserWidget *userWidget;
-            SyslogWindow *syslogWindow;
             ScrollbacksManager *scrollbackWindow;
             Ui::MainWindow *ui;
     };

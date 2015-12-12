@@ -35,7 +35,6 @@
 #include "grumpyconf.h"
 #include "preferenceswin.h"
 #include "scrollbackframe.h"
-#include "syslogwindow.h"
 #include "scrollbacksmanager.h"
 #include "skin.h"
 
@@ -279,7 +278,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     Main = this;
     this->isFork = false;
     this->ui->setupUi(this);
-    this->syslogWindow = new SyslogWindow(this);
     this->windowList = new ScrollbackList(this);
     this->scrollbackWindow = new ScrollbacksManager(this);
     this->userWidget = new UserWidget(this);
@@ -292,14 +290,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->statusFrame->setTextInteractionFlags(Qt::TextSelectableByMouse);
     this->ui->statusBar->addPermanentWidget(this->identFrame);
     this->addDockWidget(Qt::LeftDockWidgetArea, this->windowList);
-    this->addDockWidget(Qt::BottomDockWidgetArea, this->syslogWindow);
     this->addDockWidget(Qt::RightDockWidgetArea, this->userWidget);
     this->ui->statusBar->addPermanentWidget(this->overviewFrame);
     this->ui->statusBar->addPermanentWidget(this->statusFrame);
     ScrollbacksManager::Global = this->scrollbackWindow;
     if (CONF->FirstRun())
         new Highlighter("$nick");
-    this->syslogWindow->hide();
     this->tray.setIcon(this->windowIcon());
     this->tray.show();
     this->tray.setToolTip("Grumpy IRC");
@@ -352,10 +348,8 @@ MainWindow::MainWindow(bool fork, MainWindow *parent)
     ScrollbacksManager::Global = this->scrollbackWindow;
     */
     this->ui->setupUi(this);
-    this->syslogWindow = parent->syslogWindow;
     this->windowList = parent->windowList;
     this->scrollbackWindow = parent->scrollbackWindow;
-    this->syslogWindow->hide();
     // Create a system scrollback
     this->systemWindow = parent->systemWindow;
     connect(&this->timer, SIGNAL(timeout()), this, SLOT(OnRefresh()));

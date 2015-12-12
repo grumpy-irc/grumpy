@@ -45,6 +45,8 @@ namespace GrumpyIRC
             void SetAlterNick(QString text);
             bool WriteNoticesToSystem();
             void SetName(QString text);
+            bool IsDisabledMessage(QString id);
+            void SetDisabledMessage(bool enabled, QString id);
             QString GetName();
             QString GetNick();
             QString GetLineFormat();

@@ -24,6 +24,7 @@
 #include "scrollbackframe.h"
 #include "scrollbacksmanager.h"
 #include "userframe.h"
+#include "messagebox.h"
 #include "inputbox.h"
 #include "ui_scrollbackframe.h"
 #include "../libcore/exception.h"
@@ -650,7 +651,10 @@ void ScrollbackFrame::RequestDisconnect()
 void ScrollbackFrame::RequestMore(unsigned int count)
 {
     if (!Generic::IsGrumpy(this->GetScrollback()))
+    {
+        MessageBox::Display("only-grumpy", "Error", "This function is available only for use with grumpyd.", MainWindow::Main);
         return;
+    }
     GrumpydSession *grumpy = (GrumpydSession*)this->GetSession();
     ScrollbackItem first_item = this->GetScrollback()->GetFirst();
     if (first_item.GetID() == 0)

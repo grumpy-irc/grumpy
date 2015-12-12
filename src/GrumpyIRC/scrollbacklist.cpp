@@ -21,6 +21,7 @@
 #include "../libcore/grumpydsession.h"
 #include "grumpyconf.h"
 #include "packetsnifferwin.h"
+#include "messagebox.h"
 #include "grumpydcfwin.h"
 #include "skin.h"
 #include "ui_scrollbacklist.h"
@@ -140,14 +141,14 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
 
     if (wx->IsNetwork())
     {
-        menuInsrFavorites = new QAction("Insert to favorite networks", &Menu);
+        menuInsrFavorites = new QAction(QObject::tr("Insert to favorite networks"), &Menu);
         Menu.addAction(menuInsrFavorites);
-        menuAuto = new QAction("Automatically connect", &Menu);
+        menuAuto = new QAction(QObject::tr("Automatically reconnect"), &Menu);
         menuAuto->setCheckable(true);
         if (wx->GetSession())
             menuAuto->setChecked(wx->GetSession()->IsAutoreconnect(wx->GetScrollback()));
         Menu.addAction(menuAuto);
-        menuAway_Set = new QAction("Set away", &Menu);
+        menuAway_Set = new QAction(QObject::tr("Set away"), &Menu);
         menuAway_Uns = new QAction("Unset away", &Menu);
         Menu.addAction(menuAway_Uns);
         Menu.addAction(menuAway_Set);
@@ -155,7 +156,7 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
 
     if (wx->IsGrumpy())
     {
-        menuSettings = new QAction("Settings", &Menu);
+        menuSettings = new QAction(QObject::tr("Settings"), &Menu);
         Menu.addAction(menuSettings);
         menuHide = new QAction(QObject::tr("Hide window"), &Menu);
         Menu.addAction(menuHide);
@@ -204,7 +205,10 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     } else if (selectedItem == menuSettings)
     {
         if (wx->IsDead())
+        {
+            MessageBox::Display("settings_not_connected_network", "Error", "You can't use this function on disconnected window", MainWindow::Main);
             return;
+        }
         GrumpydCfWin *window = new GrumpydCfWin((GrumpydSession*)wx->GetSession());
         window->setAttribute(Qt::WA_DeleteOnClose);
         window->show();

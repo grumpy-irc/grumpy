@@ -82,6 +82,18 @@ void GrumpyConf::SetName(QString text)
     GCFG->SetValue("name", text);
 }
 
+bool GrumpyConf::IsDisabledMessage(QString id)
+{
+    if (!GCFG->Contains("messages.disabled." + id))
+        return false;
+    return GCFG->GetValueAsBool("messages.disabled." + id);
+}
+
+void GrumpyConf::SetDisabledMessage(bool enabled, QString id)
+{
+    GCFG->SetValue("messages.disabled." + id, enabled);
+}
+
 QString GrumpyConf::GetName()
 {
     return GCFG->GetValueAsString("name", "Grumpy IRC");

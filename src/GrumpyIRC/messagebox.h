@@ -30,6 +30,7 @@ namespace GrumpyIRC
     enum MessageBoxType
     {
         MessageBoxType_Normal,
+        MessageBoxType_Error,
         MessageBoxType_Question,
         MessageBoxType_QuestionCancel
     };
@@ -47,9 +48,20 @@ namespace GrumpyIRC
             Q_OBJECT
 
         public:
+            static void Display(QString id, QString title, QString message, QWidget *parent = 0);
+
             explicit MessageBox(QString id, QString title, QString message, QWidget *parent = 0);
             MessageBoxResponse Exec(MessageBoxType type);
             ~MessageBox();
+
+        private slots:
+            void on_pushYES_clicked();
+
+            void on_pushNO_clicked();
+
+            void on_pushCancel_clicked();
+
+            void on_pushOK_clicked();
 
         private:
             MessageBoxType _type;
