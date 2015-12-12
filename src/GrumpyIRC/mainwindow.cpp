@@ -327,6 +327,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(&this->timer, SIGNAL(timeout()), this, SLOT(OnRefresh()));
     this->handler = new LinkHandler();
     this->timer.start(100);
+    this->ui->mainToolBar->hide();
     // Try to restore geometry
     this->restoreGeometry(GCFG->GetValue("mainwindow_geometry").toByteArray());
     this->restoreState(GCFG->GetValue("mainwindow_state").toByteArray());
