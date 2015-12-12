@@ -36,6 +36,7 @@ namespace GrumpyIRC
             virtual unsigned int GetValueAsUInt(QString key, unsigned int none = 0);
             virtual QString GetValueAsString(QString key, QString default_value = "");
             virtual int GetValueAsInt(QString key, int none = 0);
+            virtual float GetValueAsFloat(QString key, float none = 0);
             virtual void RemoveValue(QString key);
             virtual void SetValue(QString key, QVariant value);
             virtual void SetValue(QString key, bool value);

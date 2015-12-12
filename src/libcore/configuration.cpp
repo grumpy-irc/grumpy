@@ -131,3 +131,11 @@ unsigned int GrumpyIRC::Configuration::GetValueAsUInt(QString key, unsigned int 
 
     return this->Options[key].toUInt();
 }
+
+float GrumpyIRC::Configuration::GetValueAsFloat(QString key, float none)
+{
+    if (!this->Options.contains(key))
+        return none;
+
+    return this->Options[key].toFloat();
+}

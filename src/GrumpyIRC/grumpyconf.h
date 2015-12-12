@@ -55,6 +55,7 @@ namespace GrumpyIRC
             QString GetDefaultAwayReason();
             QString GetAutorun();
             void SetAutorun(QString data);
+            float GetTransparency();
             void SetIgnoreSSLProblems(bool set);
             bool GetIgnoreSSLProblems();
             void SetDefaultAwayReason(QString reason);

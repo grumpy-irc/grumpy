@@ -134,6 +134,11 @@ void GrumpyConf::SetAutorun(QString data)
     GCFG->SetValue("execute_autorun", data);
 }
 
+float GrumpyConf::GetTransparency()
+{
+    return GCFG->GetValueAsFloat("transparency_main", 0);
+}
+
 void GrumpyConf::SetIgnoreSSLProblems(bool set)
 {
     GCFG->SetValue("ignore_ssl", set);
