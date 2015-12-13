@@ -31,7 +31,7 @@ QList<GrumpydSession*> GrumpydSession::Sessions;
 
 GrumpydSession::GrumpydSession(Scrollback *System, QString Hostname, QString UserName, QString Pass, int Port, bool ssl)
 {
-	this->gp = NULL;
+    this->gp = NULL;
     this->systemWindow = System;
     this->AutoReconnect = true;
     this->hostname = Hostname;

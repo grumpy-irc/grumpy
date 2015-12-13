@@ -227,26 +227,26 @@ void IRCSession::Connect(libircclient::Network *Network)
 
 void GrumpyIRC::IRCSession::SendMessage(Scrollback * window, QString target, QString text)
 {
-	if (!this->IsConnected())
-	{
-		this->GetSystemWindow()->InsertText("Can't send messages to a disconnected network");
-		return;
-	}
-	this->GetNetwork()->SendMessage(text, target);
-	// Write the message to active window
-	window->InsertText(ScrollbackItem("[ >> " + target + " ]: " + text, ScrollbackItemType_Message, this->GetNetwork()->GetLocalUserInfo(), 0, true));
+    if (!this->IsConnected())
+    {
+        this->GetSystemWindow()->InsertText("Can't send messages to a disconnected network");
+        return;
+    }
+    this->GetNetwork()->SendMessage(text, target);
+    // Write the message to active window
+    window->InsertText(ScrollbackItem("[ >> " + target + " ]: " + text, ScrollbackItemType_Message, this->GetNetwork()->GetLocalUserInfo(), 0, true));
 }
 
 void GrumpyIRC::IRCSession::SendNotice(Scrollback * window, QString target, QString text)
 {
-	if (!this->IsConnected())
-	{
-		this->GetSystemWindow()->InsertText("Can't send notices to a disconnected network");
-		return;
-	}
-	this->GetNetwork()->SendNotice(text, target);
-	// Write the message to active window
-	window->InsertText(ScrollbackItem("[ >> " + target + " ]: " + text, ScrollbackItemType_Notice, this->GetNetwork()->GetLocalUserInfo(), 0, true));
+    if (!this->IsConnected())
+    {
+        this->GetSystemWindow()->InsertText("Can't send notices to a disconnected network");
+        return;
+    }
+    this->GetNetwork()->SendNotice(text, target);
+    // Write the message to active window
+    window->InsertText(ScrollbackItem("[ >> " + target + " ]: " + text, ScrollbackItemType_Notice, this->GetNetwork()->GetLocalUserInfo(), 0, true));
 }
 
 bool IRCSession::IsConnected() const
@@ -693,7 +693,7 @@ void IRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
         this->channels.insert(ln, window);
         window->SetSession(this);
     }
-	// Request some information about users in the channel
+    // Request some information about users in the channel
     if (!this->retrievingWho.contains(ln))
         this->retrievingWho.append(ln);
     this->GetNetwork()->TransferRaw("MODE " + channel->GetName(), libircclient::Priority_Low);

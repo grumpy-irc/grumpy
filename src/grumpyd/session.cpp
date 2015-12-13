@@ -245,7 +245,7 @@ void Session::processMessage(QHash<QString, QVariant> parameters)
     unsigned int nsid = parameters["network_id"].toUInt();
     scrollback_id_t sid = parameters["scrollback_id"].toUInt();
     QString target;
-	if (parameters.contains("target"))
+    if (parameters.contains("target"))
         target = parameters["target"].toString();
     // let's find the network
     SyncableIRCSession* irc = this->loggedUser->GetSIRCSession(nsid);

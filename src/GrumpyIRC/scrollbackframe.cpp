@@ -562,17 +562,17 @@ void ScrollbackFrame::RequestClose()
     {
         return;
     }
-	// We need to figure out if we are closing the system window, in that case we need to also delete the corresponding network session that it belonged to
-	// the check for system window needs to be done before we request it to be closed as that might remove the reference to it
-	NetworkSession *session = NULL;
-	if (this->GetSession())
-	{
-		if (this->GetSession()->GetSystemWindow() == this->GetScrollback())
-			session = this->GetSession();
-		this->GetSession()->RequestRemove(this->GetScrollback());
-		// Call to RequestRemove probably called delete on this very scrollback frame, so now we are within a deleted object, be carefull here not to access internal memory
-		if (session)
-			delete session;
+    // We need to figure out if we are closing the system window, in that case we need to also delete the corresponding network session that it belonged to
+    // the check for system window needs to be done before we request it to be closed as that might remove the reference to it
+    NetworkSession *session = NULL;
+    if (this->GetSession())
+    {
+        if (this->GetSession()->GetSystemWindow() == this->GetScrollback())
+            session = this->GetSession();
+        this->GetSession()->RequestRemove(this->GetScrollback());
+        // Call to RequestRemove probably called delete on this very scrollback frame, so now we are within a deleted object, be carefull here not to access internal memory
+        if (session)
+            delete session;
     }
 }
 
