@@ -28,6 +28,7 @@ Scrollback::Scrollback(ScrollbackType Type, Scrollback *parent, bool scrollback_
 {
     this->_maxItems = 800000;
     this->_totalItems = 0;
+    this->scrollbackState = ScrollbackState_Normal;
     this->parentSx = parent;
     ScrollbackList_Mutex.lock();
     ScrollbackList.append(this);
@@ -47,6 +48,7 @@ Scrollback::Scrollback(QHash<QString, QVariant> hash)
 {
     this->_maxItems = 0;
     this->_totalItems = 0;
+    this->scrollbackState = ScrollbackState_Normal;
     this->parentSx = NULL;
     this->IgnoreState = false;
     ScrollbackList_Mutex.lock();
