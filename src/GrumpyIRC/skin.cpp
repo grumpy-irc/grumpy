@@ -20,9 +20,9 @@ Skin *Skin::Default = NULL;
 
 Skin *GrumpyIRC::Skin::GetDefault()
 {
-	if (Skin::Default == NULL)
-		Skin::Default = new Skin();
-	return Skin::Default;
+    if (Skin::Default == NULL)
+        Skin::Default = new Skin();
+    return Skin::Default;
 }
 
 Skin::Skin()
