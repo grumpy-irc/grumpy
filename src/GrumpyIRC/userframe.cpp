@@ -14,6 +14,7 @@
 #include "scrollbackframe.h"
 #include "grumpyconf.h"
 #include "../libcore/exception.h"
+#include "../libcore/networksession.h"
 #include "userframe.h"
 #include "userframeitem.h"
 #include "scriptwin.h"
@@ -147,6 +148,8 @@ void UserFrame::on_listWidget_customContextMenuRequested(const QPoint &pos)
         this->ban();
     else if (selectedItem == menuKickBan)
         this->kb();
+    else if (selectedItem == menuQuery)
+        this->query();
 }
 
 QString UserFrame::generateKick()
@@ -199,6 +202,15 @@ void UserFrame::kick()
     ScriptWin *script_win = new ScriptWin(this->parentFrame);
     script_win->Set(script);
     script_win->show();
+}
+
+void UserFrame::query()
+{
+    QList<libircclient::User> ul = this->SelectedUsers();
+    foreach (libircclient::User user, ul)
+    {
+        this->parentFrame->GetSession()->Query(this->parentFrame->GetScrollback(), user.GetNick(), "");
+    }
 }
 
 void UserFrame::changeModes(char prefix, char mode)

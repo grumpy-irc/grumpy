@@ -59,6 +59,7 @@ namespace GrumpyIRC
             QString generateKick();
             QString generateBan();
             void kick();
+            void query();
             void changeModes(char prefix, char mode);
             void ban();
             void kb();

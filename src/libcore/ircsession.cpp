@@ -505,8 +505,11 @@ void IRCSession::Query(Scrollback *window, QString target, QString message)
         this->systemWindow->InsertText("No target for " + target + ": " + message);
         return;
     }
-    sx->InsertText(ScrollbackItem(message, ScrollbackItemType_Message, this->network->GetLocalUserInfo(), 0, true));
-    this->network->SendMessage(message, target);
+    if (!message.isEmpty())
+    {
+        sx->InsertText(ScrollbackItem(message, ScrollbackItemType_Message, this->network->GetLocalUserInfo(), 0, true));
+        this->network->SendMessage(message, target);
+    }
 }
 
 libircclient::Channel *IRCSession::GetChannel(Scrollback *window)
@@ -1180,7 +1183,7 @@ void IRCSession::_gs_ResyncNickChange(QString new_, QString old_)
 
 void IRCSession::rmWindow(Scrollback *window)
 {
-    if (!window->IsDead())
+    if (window->GetType() != ScrollbackType_User && !window->IsDead())
         throw new Exception("You can't delete window which is alive", BOOST_CURRENT_FUNCTION);
     QString name = window->GetTarget().toLower();
     if (this->channels.contains(name))
