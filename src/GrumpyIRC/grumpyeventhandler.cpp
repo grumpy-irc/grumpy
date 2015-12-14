@@ -32,10 +32,10 @@ void GrumpyEventHandler::OnMessage(scrollback_id_t ScrollbackID)
 
 void GrumpyEventHandler::OnDebug(QString text, unsigned int verbosity)
 {
+    qDebug() << text;
+
     if (GCFG->Verbosity < verbosity)
         return;
-
-    qDebug() << text;
 
     if (!MainWindow::Main)
         return;

@@ -25,7 +25,7 @@ QString Configuration::GetVersion()
 
 Configuration::Configuration()
 {
-    this->Verbosity = 60;
+    this->Verbosity = 0;
 }
 
 Configuration::~Configuration()

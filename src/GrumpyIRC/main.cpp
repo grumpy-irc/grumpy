@@ -24,6 +24,7 @@
 #include "grumpyeventhandler.h"
 #include "../libcore/autocompletionengine.h"
 #include "../libcore/core.h"
+#include "../libcore/terminalparser.h"
 #include "../libcore/highlighter.h"
 #include "scrollbackframe.h"
 #include "inputbox.h"
@@ -48,12 +49,29 @@ void HideConsole(int hide)
 }
 #endif
 
+int Parser_KeepCons(GrumpyIRC::TerminalParser *parser, QStringList params)
+{
+
+    return 0;
+}
+
 int main(int argc, char *argv[])
 {
     int ReturnCode = 0;
     try
     {
+        TerminalParser *tp = new TerminalParser();
+        tp->Register('k', "--cons", "Keep console on", 0, (TP_Callback)Parser_KeepCons);
+        if (!tp->Parse(argc, argv))
+        {
+            delete tp;
+            return ReturnCode;
+        }
+        delete tp;
+
         QApplication a(argc, argv);
+        a.setApplicationName("GrumpyChat");
+        a.setOrganizationName("grumpy");
 
         // Initialize core first
         CoreWrapper::GrumpyCore = new Core();
