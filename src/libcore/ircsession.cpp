@@ -953,7 +953,12 @@ void IRCSession::OnMODE(libircclient::Parser *px)
     if (!px->GetSourceUserInfo())
         return;
     if (px->GetParameters()[0] == this->GetNetwork()->GetNick())
-        this->systemWindow->InsertText(ScrollbackItem(px->GetSourceInfo() + " set your mode " + px->GetText()));
+    {
+        QString mode = px->GetText();
+        if (mode.isEmpty() && px->GetParameters().count() >= 2)
+            mode = px->GetParameters()[1];
+        this->systemWindow->InsertText(ScrollbackItem(px->GetSourceInfo() + " set your mode " + mode));
+    }
 }
 
 void IRCSession::OnUserAwayStatusChange(libircclient::Parser *px, libircclient::Channel *ch, libircclient::User *ux)

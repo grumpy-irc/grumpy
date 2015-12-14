@@ -127,3 +127,13 @@ QHash<QString, QVariant> Generic::MergeHash(QHash<QString, QVariant> x, QHash<QS
     }
     return x;
 }
+
+QList<QVariant> Generic::QStringListToQVariantList(QList<QString> list)
+{
+    QList<QVariant> results;
+
+    foreach (QString item, list)
+        results.append(QVariant(item));
+
+    return results;
+}

@@ -18,6 +18,7 @@
 #include "grumpyd.h"
 #include "session.h"
 #include "../libcore/core.h"
+#include "../libcore/generic.h"
 #include "../libcore/eventhandler.h"
 #include "../libcore/exception.h"
 #include "../libcore/grumpydsession.h"
@@ -79,9 +80,6 @@ SyncableIRCSession::SyncableIRCSession(unsigned int id, Scrollback *system, User
 void SyncableIRCSession::Connect(libircclient::Network *Network)
 {
     IRCSession::Connect(Network);
-
-    connect(this->network, SIGNAL(Event_MyInfo(libircclient::Parser*)), this, SLOT(OnInfo(libircclient::Parser*)));
-
 }
 
 void SyncableIRCSession::Connect()
@@ -260,8 +258,10 @@ void SyncableIRCSession::connInternalSocketSignals()
 {
     IRCSession::connInternalSocketSignals();
     connect(this->network, SIGNAL(Event_MyInfo(libircclient::Parser*)), this, SLOT(OnInfo(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_ISUPPORT(libircclient::Parser*)), this, SLOT(OnServer_ISUPPORT(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_CPMInserted(libircclient::Parser*,libircclient::ChannelPMode,libircclient::Channel*)), this, SLOT(OnPModeInsert(libircclient::Parser*,libircclient::ChannelPMode,libircclient::Channel*)));
     connect(this->network, SIGNAL(Event_CPMRemoved(libircclient::Parser*,libircclient::ChannelPMode,libircclient::Channel*)), this, SLOT(OnPModeRemove(libircclient::Parser*,libircclient::ChannelPMode,libircclient::Channel*)));
+    connect(this->network, SIGNAL(Event_MyInfo(libircclient::Parser*)), this, SLOT(OnInfo(libircclient::Parser*)));
 }
 
 void SyncableIRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
@@ -518,6 +518,28 @@ void SyncableIRCSession::OnUserAwayStatusChange(libircclient::Parser *px, libirc
 {
     IRCSession::OnUserAwayStatusChange(px, ch, ux);
     this->resyncUL(ch, GRUMPY_UL_UPDATE, ux);
+}
+
+static QVariant serializeList(QList<char> data)
+{
+    QList<QVariant> result;
+    foreach (char x, data)
+        result.append(QVariant(QChar(x)));
+    return QVariant(result);
+}
+
+void SyncableIRCSession::OnServer_ISUPPORT(libircclient::Parser *px)
+{
+    Q_UNUSED(px);
+    QHash<QString, QVariant> hash;
+    hash.insert("_capabilitiesSubscribed", Generic::QStringListToQVariantList(this->GetNetwork()->GetSubscribedCaps()));
+    hash.insert("_capabilitiesSupported", Generic::QStringListToQVariantList(this->GetNetwork()->GetSupportedCaps()));
+    hash.insert("CModes", serializeList(this->GetNetwork()->GetCModes()));
+    hash.insert("CCModes", serializeList(this->GetNetwork()->GetCCModes()));
+    hash.insert("CUModes", serializeList(this->GetNetwork()->GetCUModes()));
+    hash.insert("CPModes", serializeList(this->GetNetwork()->GetCPModes()));
+    hash.insert("CRModes", serializeList(this->GetNetwork()->GetCRModes()));
+    this->Resync(hash);
 }
 
 void SyncableIRCSession::rmWindow(Scrollback *window)
