@@ -13,6 +13,13 @@
 #ifndef PREFERENCESWIN_H
 #define PREFERENCESWIN_H
 
+#include "../libcore/definitions.h"
+
+#include <QHash>
+#include <QCheckBox>
+#include <QTableWidget>
+#include <QComboBox>
+#include <QList>
 #include <QDialog>
 
 namespace Ui
@@ -22,6 +29,8 @@ namespace Ui
 
 namespace GrumpyIRC
 {
+    class Highlighter;
+
     class PreferencesWin : public QDialog
     {
             Q_OBJECT
@@ -33,8 +42,20 @@ namespace GrumpyIRC
         private slots:
             void on_buttonBox_rejected();
             void on_buttonBox_accepted();
+            void on_tableWidget_cellChanged(int row, int column);
+            void on_tableWidget_2_cellChanged(int row, int column);
+            void on_tableWidget_customContextMenuRequested(const QPoint &pos);
+            void OnHLEnable(bool checked);
+            void OnHLRegex(bool checked);
 
         private:
+            void highlights_reload();
+            void highlights_append_row(int row, Highlighter *hl);
+            QList<int> selectedHLRows();
+            QHash<QTableWidgetItem*, Highlighter*> highlights_source;
+            QHash<QCheckBox*, Highlighter*> highlights_enabled;
+            QHash<QCheckBox*, Highlighter*> highlights_regex;
+            QHash<QComboBox*, Highlighter*> highlights_type;
             Ui::PreferencesWin *ui;
     };
 }

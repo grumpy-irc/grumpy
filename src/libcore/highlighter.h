@@ -43,7 +43,11 @@ namespace GrumpyIRC
             QHash<QString, QVariant> ToHash();
             void LoadHash(QHash<QString, QVariant> hash);
             bool IsMatching(ScrollbackItem *text, libircclient::Network *network);
+            void SetDefinition(QString value);
+            void MakeRegex();
+            QString GetDefinition() const;
             bool CaseSensitive;
+            bool Enabled;
             bool Messages;
             bool MatchingSelf;
             bool IsRegex;

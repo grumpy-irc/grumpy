@@ -41,6 +41,7 @@ Highlighter::Highlighter(QHash<QString, QVariant> hash)
     this->IsRegex = false;
     this->Messages = true;
     this->MatchingSelf = false;
+    this->Enabled = true;
     Highlighter_Data.append(this);
     this->LoadHash(hash);
 }
@@ -49,6 +50,7 @@ Highlighter::Highlighter(QString text)
 {
     this->CaseSensitive = false;
     this->IsRegex = false;
+    this->Enabled = true;
     this->definition = text;
     this->Messages = true;
     this->MatchingSelf = false;
@@ -66,6 +68,7 @@ QHash<QString, QVariant> Highlighter::ToHash()
     SERIALIZE(CaseSensitive);
     SERIALIZE(IsRegex);
     SERIALIZE(definition);
+    SERIALIZE(Enabled);
     SERIALIZE(Messages);
     SERIALIZE(MatchingSelf);
     return hash;
@@ -75,6 +78,7 @@ void Highlighter::LoadHash(QHash<QString, QVariant> hash)
 {
     UNSERIALIZE_BOOL(CaseSensitive);
     UNSERIALIZE_BOOL(IsRegex);
+    UNSERIALIZE_BOOL(Enabled);
     UNSERIALIZE_BOOL(Messages);
     UNSERIALIZE_BOOL(MatchingSelf);
     UNSERIALIZE_STRING(definition);
@@ -82,6 +86,9 @@ void Highlighter::LoadHash(QHash<QString, QVariant> hash)
 
 bool Highlighter::IsMatching(ScrollbackItem *text, libircclient::Network *network)
 {
+    if (!this->Enabled)
+        return false;
+
     if (text->IsSelf() && !this->MatchingSelf)
         return false;
 
@@ -108,3 +115,18 @@ bool Highlighter::IsMatching(ScrollbackItem *text, libircclient::Network *networ
     return false;
 }
 
+
+void GrumpyIRC::Highlighter::SetDefinition(QString value)
+{
+    this->definition = value;
+}
+
+void Highlighter::MakeRegex()
+{
+    this->IsRegex = true;
+}
+
+QString Highlighter::GetDefinition() const
+{
+    return this->definition;
+}
