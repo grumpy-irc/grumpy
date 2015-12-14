@@ -34,7 +34,7 @@ Configuration *GrumpyConf::GetConfiguration()
 
 QString GrumpyConf::GetQuitMessage()
 {
-    QString qm = GCFG->GetValueAsString("quit_message", "Grumpy IRC v. $version");
+    QString qm = GCFG->GetValueAsString("quit_message", "GrumpyChat v. $version. Such bouncer. WOW. Much awesome.");
     qm.replace("$version", GRUMPY_VERSION_STRING);
     return qm;
 }

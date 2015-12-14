@@ -40,8 +40,11 @@
        <pointsize>20</pointsize>
       </font>
      </property>
+     <property name="contextMenuPolicy">
+      <enum>Qt::NoContextMenu</enum>
+     </property>
      <property name="text">
-      <string>Grumpy</string>
+      <string>GrumpyChat</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>

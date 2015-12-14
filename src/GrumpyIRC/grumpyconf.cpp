@@ -39,7 +39,7 @@ QString GrumpyConf::GetQuitMessage()
 
 QString GrumpyConf::GetRawQuitMessage()
 {
-    return GCFG->GetValueAsString("quit_message", "GrumpyIRC v. $version. Such client. WOW. Much quit.");
+    return GCFG->GetValueAsString("quit_message", "GrumpyChat v. $version. Such client. WOW. Much quit.");
 }
 
 void GrumpyConf::SetQuitMessage(QString text)
@@ -96,7 +96,7 @@ void GrumpyConf::SetDisabledMessage(bool enabled, QString id)
 
 QString GrumpyConf::GetName()
 {
-    return GCFG->GetValueAsString("name", "Grumpy IRC");
+    return GCFG->GetValueAsString("name", "Grumpy Chat");
 }
 
 QString GrumpyConf::GetNick()
@@ -137,7 +137,7 @@ QString GrumpyConf::GetDefaultAwayReason()
 QString GrumpyConf::GetAutorun()
 {
     QString default_autorun = "# This is a script that is executed every time you run grumpy\n"\
-                              "/echo Welcome to GrumpyIRC v. $grumpy.version";
+                              "/echo Welcome to GrumpyChat v. $grumpy.version";
     return GCFG->GetValueAsString("execute_autorun", default_autorun);
 }
 
