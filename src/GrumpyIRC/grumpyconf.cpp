@@ -146,6 +146,36 @@ void GrumpyConf::SetAutorun(QString data)
     GCFG->SetValue("execute_autorun", data);
 }
 
+void GrumpyConf::SetLabeledH(QString text)
+{
+    GCFG->SetValue("labeled_header", text);
+}
+
+void GrumpyConf::SetStandardH(QString text)
+{
+    GCFG->SetValue("standard_header", text);
+}
+
+void GrumpyConf::SetChannelH(QString text)
+{
+    GCFG->SetValue("channel_header", text);
+}
+
+QString GrumpyConf::GetLabeledHeader() const
+{
+    return GCFG->GetValueAsString("labeled_header", "GrumpyChat: $title");
+}
+
+QString GrumpyConf::GetChannelHeader() const
+{
+    return GCFG->GetValueAsString("channel_header", "GrumpyChat - $title: $topic");
+}
+
+QString GrumpyConf::GetStandardHeader() const
+{
+    return GCFG->GetValueAsString("standard_header", "GrumpyChat");
+}
+
 float GrumpyConf::GetTransparency()
 {
     return GCFG->GetValueAsFloat("transparency_main", 0);

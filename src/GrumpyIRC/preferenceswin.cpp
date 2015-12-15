@@ -39,6 +39,9 @@ PreferencesWin::PreferencesWin(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
     this->ui->checkBox->setChecked(CONF->GetIgnoreSSLProblems());
     this->ui->checkBoxSplitMs->setChecked(CONF->GetSplit());
     this->ui->plainTextEditAutorun->setPlainText(CONF->GetAutorun());
+    this->ui->lineEdit_ChannelH->setText(CONF->GetChannelHeader());
+    this->ui->lineEdit_LabeledH->setText(CONF->GetLabeledHeader());
+    this->ui->lineEdit_StandardH->setText(CONF->GetStandardHeader());
 
     QStringList heading_1;
     heading_1 << "Highlighted text" << "Is regex" << "Matching" << "Enabled";
@@ -83,6 +86,9 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
     CONF->SetAutorun(this->ui->plainTextEditAutorun->toPlainText());
     CoreWrapper::GrumpyCore->GetCommandProcessor()->LongSize = CONF->GetSplitMaxSize();
     CoreWrapper::GrumpyCore->GetCommandProcessor()->SplitLong = CONF->GetSplit();
+    CONF->SetChannelH(this->ui->lineEdit_ChannelH->text());
+    CONF->SetLabeledH(this->ui->lineEdit_LabeledH->text());
+    CONF->SetStandardH(this->ui->lineEdit_StandardH->text());
     CONF->Save();
     this->close();
 }

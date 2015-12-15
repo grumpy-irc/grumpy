@@ -11,11 +11,14 @@
 // Copyright (c) Petr Bena 2015
 
 #include "scrollbacksmanager.h"
+#include "grumpyconf.h"
 #include "scrollbacklist.h"
 #include "scrollbackframe.h"
 #include "userframe.h"
 #include "userwidget.h"
 #include "mainwindow.h"
+#include "../libcore/networksession.h"
+#include "../libirc/libircclient/channel.h"
 #include "../libcore/exception.h"
 #include "ui_scrollbacksmanager.h"
 
@@ -136,7 +139,30 @@ void ScrollbacksManager::SwitchWindow(ScrollbackFrame *window)
     this->currentWidget->Focus();
 
     // Redraw the buffer contents if needed
-    MainWindow::Main->SetWN(window->GetTitle());
+    QString name;
+    switch (window->GetScrollback()->GetType())
+    {
+        case ScrollbackType_Channel:
+            name = CONF->GetChannelHeader();
+            break;
+        case ScrollbackType_System:
+        case ScrollbackType_User:
+            name = CONF->GetLabeledHeader();
+            break;
+    }
+    if (window->GetTitle().isEmpty())
+    {
+        name = "";
+    } else
+    {
+        name.replace("$title", window->GetTitle());
+        if (window->GetScrollback()->GetType() == ScrollbackType_Channel)
+        {
+            libircclient::Channel *channel = window->GetScrollback()->GetSession()->GetChannel(window->GetScrollback());
+            name.replace("$topic", channel->GetTopic());
+        }
+    }
+    MainWindow::Main->SetWN(name);
 
     window->EnableState(false);
     window->SetVisible(true);

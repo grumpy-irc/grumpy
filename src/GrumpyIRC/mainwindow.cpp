@@ -424,9 +424,9 @@ void MainWindow::Fork()
 void MainWindow::SetWN(QString text)
 {
     if (text.isEmpty())
-        this->setWindowTitle("GrumpyChat");
+        this->setWindowTitle(CONF->GetStandardHeader());
     else
-        this->setWindowTitle("GrumpyChat - " + text);
+        this->setWindowTitle(text);
 }
 
 void MainWindow::UpdateStatus()

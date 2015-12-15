@@ -57,6 +57,12 @@ namespace GrumpyIRC
             QString GetDefaultAwayReason();
             QString GetAutorun();
             void SetAutorun(QString data);
+            void SetLabeledH(QString text);
+            void SetStandardH(QString text);
+            void SetChannelH(QString text);
+            QString GetLabeledHeader() const;
+            QString GetChannelHeader() const;
+            QString GetStandardHeader() const;
             float GetTransparency();
             void SetIgnoreSSLProblems(bool set);
             bool GetIgnoreSSLProblems();
