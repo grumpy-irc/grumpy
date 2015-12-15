@@ -318,7 +318,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("query", (SC_Callback)SystemCommand_Query));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->LongSize = CONF->GetSplitMaxSize();
     CoreWrapper::GrumpyCore->GetCommandProcessor()->SplitLong = CONF->GetSplit();
-    // Welcome user
     this->ui->actionOpen_window->setVisible(false);
     connect(&this->timer, SIGNAL(timeout()), this, SLOT(OnRefresh()));
     this->handler = new LinkHandler();
@@ -328,7 +327,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->restoreGeometry(GCFG->GetValue("mainwindow_geometry").toByteArray());
     this->restoreState(GCFG->GetValue("mainwindow_state").toByteArray());
     this->userWidget->hide();
-    this->Execute(CONF->GetAutorun());
+    if (!CONF->SafeMode)
+        this->Execute(CONF->GetAutorun());
 }
 
 MainWindow::MainWindow(bool fork, MainWindow *parent)

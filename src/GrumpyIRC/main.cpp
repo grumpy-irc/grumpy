@@ -55,13 +55,33 @@ int Parser_KeepCons(GrumpyIRC::TerminalParser *parser, QStringList params)
     return 0;
 }
 
+int Parser_Verbosity(GrumpyIRC::TerminalParser *parser, QStringList params)
+{
+    Q_UNUSED(params);
+    Q_UNUSED(parser);
+    CONF->Verbosity++;
+    return 0;
+}
+
+int Parser_SafeMode(GrumpyIRC::TerminalParser *parser, QStringList params)
+{
+    Q_UNUSED(params);
+    (void)parser;
+
+    CONF->SafeMode = true;
+    return 0;
+}
+
 int main(int argc, char *argv[])
 {
     int ReturnCode = 0;
     try
     {
+        CONF = new GrumpyConf();
         TerminalParser *tp = new TerminalParser();
+        tp->Register('v', "--verbose", "Increase verbosity level", 0, (TP_Callback)Parser_Verbosity);
         tp->Register('k', "--cons", "Keep console on", 0, (TP_Callback)Parser_KeepCons);
+        tp->Register('m', "--safe", "Start GrumpyChat in a safe mode", 0, (TP_Callback)Parser_SafeMode);
         if (!tp->Parse(argc, argv))
         {
             delete tp;
@@ -72,7 +92,6 @@ int main(int argc, char *argv[])
         QApplication a(argc, argv);
         a.setApplicationName("GrumpyChat");
         a.setOrganizationName("grumpy");
-
         // Initialize core first
         CoreWrapper::GrumpyCore = new Core();
         CoreWrapper::GrumpyCore->InitCfg();
@@ -88,6 +107,7 @@ int main(int argc, char *argv[])
     #endif
         ReturnCode = a.exec();
         delete CoreWrapper::GrumpyCore;
+        delete CONF;
         return ReturnCode;
     } catch (GrumpyIRC::Exception *ex)
     {

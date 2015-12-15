@@ -79,6 +79,8 @@ namespace GrumpyIRC
             void SetIRCIgnoredNumerics(QList<int> list);
             void Load();
             void Save();
+            bool SafeMode = false;
+            unsigned int Verbosity = 0;
     };
 }
 
