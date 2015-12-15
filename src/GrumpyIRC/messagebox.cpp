@@ -26,6 +26,14 @@ void MessageBox::Display(QString id, QString title, QString message, QWidget *pa
     mb.Exec(MessageBoxType_Normal);
 }
 
+MessageBoxResponse MessageBox::Question(QString id, QString title, QString message, QWidget *parent)
+{
+    if (CONF->IsDisabledMessage(id))
+        return MessageBoxResponse_Yes;
+    MessageBox mb(id, title, message, parent);
+    return mb.Exec(MessageBoxType_Question);
+}
+
 MessageBox::MessageBox(QString id, QString title, QString message, QWidget *parent) : QDialog(parent), ui(new Ui::MessageBox)
 {
     this->ui->setupUi(this);
@@ -96,11 +104,13 @@ MessageBox::~MessageBox()
 
 void GrumpyIRC::MessageBox::on_pushYES_clicked()
 {
+    this->result = MessageBoxResponse_Yes;
     this->close();
 }
 
 void GrumpyIRC::MessageBox::on_pushNO_clicked()
 {
+    this->result = MessageBoxResponse_No;
     this->close();
 }
 

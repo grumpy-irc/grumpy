@@ -49,6 +49,7 @@ namespace GrumpyIRC
 
         public:
             static void Display(QString id, QString title, QString message, QWidget *parent = 0);
+            static MessageBoxResponse Question(QString id, QString title, QString message, QWidget *parent = 0);
 
             explicit MessageBox(QString id, QString title, QString message, QWidget *parent = 0);
             MessageBoxResponse Exec(MessageBoxType type);
@@ -56,11 +57,8 @@ namespace GrumpyIRC
 
         private slots:
             void on_pushYES_clicked();
-
             void on_pushNO_clicked();
-
             void on_pushCancel_clicked();
-
             void on_pushOK_clicked();
 
         private:

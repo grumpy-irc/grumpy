@@ -15,6 +15,7 @@
 #include "corewrapper.h"
 #include "../libcore/core.h"
 #include "inputbox.h"
+#include "messagebox.h"
 #include "skin.h"
 #include "keyfilter.h"
 #include "ui_inputbox.h"
@@ -45,7 +46,16 @@ InputBox::~InputBox()
 
 void InputBox::ProcessInput()
 {
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->ProcessText(this->ui->textEdit->toPlainText(), this->parent->GetScrollback());
+    // Check if the text user is about to send isn't too long
+    QString text = this->ui->textEdit->toPlainText();
+    int size = text.size();
+    if (size > 800 && !text.trimmed().startsWith(CoreWrapper::GrumpyCore->GetCommandProcessor()->CommandPrefix))
+    {
+        MessageBoxResponse response = MessageBox::Question("really-send-long-text", "Text is long", "Text you input is " + QString::number(size) + " letters long. Do you really want to send it? Please note that on some channels you may get banned for flooding.");
+        if (response != MessageBoxResponse_Yes)
+            return;
+    }
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->ProcessText(text, this->parent->GetScrollback());
     this->insertToHistory();
     this->historyPosition = this->history.count();
     this->ui->textEdit->setText("");
