@@ -28,12 +28,12 @@ ChannelWin::ChannelWin(NetworkSession *session, libircclient::Network *network, 
     this->ignore = true;
     this->_ns = session;
     this->updateTopic = false;
-    this->ui->plainTextEdit->setPlainText(channel->GetTopic());
     this->_network = network;
     this->_channel = channel;
+    this->ui->plainTextEdit->setPlainText(channel->GetTopic());
+    this->topic();
     this->setWindowTitle(channel->GetName());
     this->ignore = false;
-    this->ui->groupBox->setTitle("Topic set by " + channel->GetTopicUser() + " at " + channel->GetTopicTime().toString());
     this->ui->plainTextEdit->setPalette(Skin::GetDefault()->Palette());
 
     // Mode view
@@ -146,6 +146,7 @@ void GrumpyIRC::ChannelWin::on_plainTextEdit_textChanged()
     if (this->ignore)
         return;
     this->updateTopic = true;
+    this->topic();
 }
 
 void ChannelWin::OnMode(bool toggled)
@@ -177,4 +178,10 @@ void ChannelWin::headings()
     this->ui->tabWidget->setTabText(1, QObject::tr("Bans") + QString(" (") + QString::number(this->ui->tableWidget_2->rowCount()) + ")");
     this->ui->tabWidget->setTabText(2, QObject::tr("Exceptions") + " (" + QString::number(this->ui->tableWidget_3->rowCount()) + ")");
     this->ui->tabWidget->setTabText(3, QObject::tr("Invites") + " (" + QString::number(this->ui->tableWidget_4->rowCount()) + ")");
+}
+
+void ChannelWin::topic()
+{
+    this->ui->groupBox->setTitle("Topic set by " + this->_channel->GetTopicUser() + " at " + this->_channel->GetTopicTime().toString()
+                                   + " (" + QString::number(this->ui->plainTextEdit->toPlainText().size()) + ")");
 }

@@ -55,6 +55,7 @@ namespace GrumpyIRC
 
         private:
             void headings();
+            void topic();
             libircclient::Mode *chanmode;
             bool ignore;
             bool updateTopic;
