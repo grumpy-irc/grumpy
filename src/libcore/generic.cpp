@@ -106,3 +106,23 @@ QList<QVariant> Generic::QStringListToQVariantList(QList<QString> list)
 
     return results;
 }
+
+QList<int> Generic::QVariantListToIntList(QList<QVariant> list)
+{
+    QList<int> results;
+
+    foreach (QVariant item, list)
+        results.append(item.toInt());
+
+    return results;
+}
+
+QList<QVariant> Generic::QIntListToVariantList(QList<int> list)
+{
+    QList<QVariant> results;
+
+    foreach (int item, list)
+        results.append(QVariant(item));
+
+    return results;
+}

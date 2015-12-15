@@ -10,6 +10,9 @@
 
 // Copyright (c) Petr Bena 2015
 
+#include "../libcore/definitions.h"
+#include "../libcore/exception.h"
+#include "../libcore/generic.h"
 #include "userconfiguration.h"
 #include "grumpyd.h"
 #include "databasebackend.h"
@@ -34,6 +37,23 @@ void UserConf::Load()
 void UserConf::SetHash(QHash<QString, QVariant> hash)
 {
     this->Options = hash;
+}
+
+QList<int> UserConf::IgnoredNums()
+{
+    if (!this->Contains("ignored_nmrs"))
+    {
+        QList<int> list;
+        // These are really annoying and not very useful
+        list << 305 << 306;
+        return list;
+    }
+    return Generic::QVariantListToIntList(this->GetValue("ignored_nmrs").toList());
+}
+
+void UserConf::SetIRCIgnoredNumerics(QList<int> list)
+{
+    this->SetValue("ignored_nmrs", Generic::QIntListToVariantList(list));
 }
 
 QHash<QString, QVariant> UserConf::ToHash()

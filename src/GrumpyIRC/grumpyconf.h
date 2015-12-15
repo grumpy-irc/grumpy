@@ -74,6 +74,8 @@ namespace GrumpyIRC
             void SetSplit(bool split);
             bool GetSplit();
             bool FirstRun();
+            QList<int> IgnoredNums();
+            void SetIRCIgnoredNumerics(QList<int> list);
             void Load();
             void Save();
     };

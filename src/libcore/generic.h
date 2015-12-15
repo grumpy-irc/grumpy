@@ -51,6 +51,8 @@ namespace GrumpyIRC
         //! \todo No unit test
         LIBCORESHARED_EXPORT QVariant VariantFromByteArray(QByteArray data);
         LIBCORESHARED_EXPORT QList<QVariant> QStringListToQVariantList(QList<QString> list);
+        LIBCORESHARED_EXPORT QList<int> QVariantListToIntList(QList<QVariant> list);
+        LIBCORESHARED_EXPORT QList<QVariant> QIntListToVariantList(QList<int> list);
     }
 }
 

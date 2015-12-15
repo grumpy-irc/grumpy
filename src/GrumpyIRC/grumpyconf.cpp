@@ -11,6 +11,7 @@
 // Copyright (c) Petr Bena 2015
 
 #include "corewrapper.h"
+#include "../libcore/generic.h"
 #include "../libcore/highlighter.h"
 #include "grumpyconf.h"
 #include "../libcore/configuration.h"
@@ -229,6 +230,23 @@ bool GrumpyConf::GetSplit()
 bool GrumpyConf::FirstRun()
 {
     return GCFG->GetValueAsBool("first_run", true);
+}
+
+QList<int> GrumpyConf::IgnoredNums()
+{
+    if (!GCFG->Contains("ignored_nmrs"))
+    {
+        QList<int> list;
+        // These are really annoying and not very useful
+        list << 305 << 306;
+        return list;
+    }
+    return Generic::QVariantListToIntList(GCFG->GetValue("ignored_nmrs").toList());
+}
+
+void GrumpyConf::SetIRCIgnoredNumerics(QList<int> list)
+{
+    GCFG->SetValue("ignored_nmrs", Generic::QIntListToVariantList(list));
 }
 
 void GrumpyConf::Load()

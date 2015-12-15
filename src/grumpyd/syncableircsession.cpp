@@ -47,6 +47,7 @@ SyncableIRCSession::SyncableIRCSession(QHash<QString, QVariant> sx, User *user, 
     this->snifferEnabled = false;
     
     ((VirtualScrollback*)this->systemWindow)->SetOwner(owner);
+    this->post_init();
 }
 
 SyncableIRCSession::SyncableIRCSession(Scrollback *system, User *user, Scrollback *root) : IRCSession(system, root)
@@ -55,6 +56,7 @@ SyncableIRCSession::SyncableIRCSession(Scrollback *system, User *user, Scrollbac
     this->snifferEnabled = false;
 
     ((VirtualScrollback*)this->systemWindow)->SetOwner(owner);
+    this->post_init();
 }
 
 SyncableIRCSession::SyncableIRCSession(unsigned int id, Scrollback *system, User *user, QList<Scrollback *> sl) : IRCSession(id, system, NULL)
@@ -75,6 +77,7 @@ SyncableIRCSession::SyncableIRCSession(unsigned int id, Scrollback *system, User
             // System window? Ignoring
         }
     }
+    this->post_init();
 }
 
 void SyncableIRCSession::Connect(libircclient::Network *Network)
@@ -540,6 +543,13 @@ void SyncableIRCSession::OnServer_ISUPPORT(libircclient::Parser *px)
     hash.insert("CPModes", serializeList(this->GetNetwork()->GetCPModes()));
     hash.insert("CRModes", serializeList(this->GetNetwork()->GetCRModes()));
     this->Resync(hash);
+}
+
+void SyncableIRCSession::post_init()
+{
+    if (!this->owner)
+        throw new NullPointerException("this->owner", BOOST_CURRENT_FUNCTION);
+    this->IgnoredNums = this->owner->GetConfiguration()->IgnoredNums();
 }
 
 void SyncableIRCSession::rmWindow(Scrollback *window)

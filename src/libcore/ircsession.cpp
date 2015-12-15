@@ -1054,7 +1054,8 @@ void IRCSession::OnEndOfExcepts(libircclient::Parser *px)
 
 void IRCSession::OnGeneric(libircclient::Parser *px)
 {
-    this->systemWindow->InsertText(px->GetRaw());
+    if (!this->IgnoredNums.contains(px->GetNumeric()))
+        this->systemWindow->InsertText(px->GetRaw());
 }
 
 void IRCSession::OnServerSideUnknown(libircclient::Parser *px)

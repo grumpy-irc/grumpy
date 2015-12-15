@@ -42,6 +42,13 @@ PreferencesWin::PreferencesWin(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
     this->ui->lineEdit_ChannelH->setText(CONF->GetChannelHeader());
     this->ui->lineEdit_LabeledH->setText(CONF->GetLabeledHeader());
     this->ui->lineEdit_StandardH->setText(CONF->GetStandardHeader());
+    QString ignored;
+    foreach (int numeric, CONF->IgnoredNums())
+    {
+        ignored += QString::number(numeric) + ", ";
+    }
+    ignored = ignored.trimmed();
+    this->ui->lineEdit_4->setText(ignored);
 
     QStringList heading_1;
     heading_1 << "Highlighted text" << "Is regex" << "Matching" << "Enabled";
@@ -89,6 +96,16 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
     CONF->SetChannelH(this->ui->lineEdit_ChannelH->text());
     CONF->SetLabeledH(this->ui->lineEdit_LabeledH->text());
     CONF->SetStandardH(this->ui->lineEdit_StandardH->text());
+    QList<int> ignored_nums;
+    QList<QString> ignored = this->ui->lineEdit_4->text().split(",");
+    foreach (QString numeric, ignored)
+    {
+        numeric = numeric.trimmed();
+        if (numeric.isEmpty())
+            continue;
+        ignored_nums.append(numeric.toInt());
+    }
+    CONF->SetIRCIgnoredNumerics(ignored_nums);
     CONF->Save();
     this->close();
 }

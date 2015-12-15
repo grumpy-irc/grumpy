@@ -31,6 +31,8 @@ namespace GrumpyIRC
             void Save();
             void Load();
             void SetHash(QHash<QString, QVariant> hash);
+            QList<int> IgnoredNums();
+            void SetIRCIgnoredNumerics(QList<int> list);
             QHash<QString, QVariant> ToHash();
             user_id_t User;
     };

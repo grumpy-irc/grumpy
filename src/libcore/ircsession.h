@@ -128,6 +128,7 @@ namespace GrumpyIRC
             unsigned int GetPort() const;
             bool IsAutoreconnect(Scrollback *window);
             void SetAutoreconnect(Scrollback *window, bool reconnect);
+            QList<int> IgnoredNums;
             Scrollback *Root;
             bool AutomaticallyRetrieveBanList;
         signals:
