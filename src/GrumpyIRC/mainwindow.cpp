@@ -298,7 +298,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         new Highlighter("$nick");
     this->tray.setIcon(this->windowIcon());
     this->tray.show();
-    this->tray.setToolTip("Grumpy IRC");
+    this->tray.setToolTip("GrumpyChat");
     // Create a system scrollback
     this->systemWindow = this->scrollbackWindow->CreateWindow("System Window", NULL, true, false, NULL, true);
     // Register built-in commands

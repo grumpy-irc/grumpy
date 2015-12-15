@@ -67,6 +67,30 @@ int CommandProcessor::ProcessText(QString text, Scrollback *window, bool comment
     return 0;
 }
 
+static QList<QString> Split(int size, QString text)
+{
+    QList<QString> messages;
+    while (text.size() > size)
+    {
+        // We need to find a part of text which is divided by space
+        if (!text.mid(0, size).contains(" "))
+        {
+            messages.append(text.mid(0, size));
+            text = text.mid(size);
+        } else
+        {
+            QString shortened_text = text.mid(0, size);
+            shortened_text = shortened_text.mid(0, shortened_text.lastIndexOf(" "));
+            text = text.mid(shortened_text.length() + 1);
+            messages.append(shortened_text);
+        }
+    }
+    if (!text.isEmpty())
+        messages.append(text);
+
+    return messages;
+}
+
 QList<QString> CommandProcessor::GetCommands()
 {
     return this->CommandList.keys();
@@ -114,16 +138,9 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
     if (window->IsDead() != true && (window->GetType() == ScrollbackType_Channel || window->GetType() == ScrollbackType_User))
     {
         // This is a channel window, so we send this as a message to the channel
-        if (this->SplitLong && command.size() > (int)this->LongSize)
+        if (this->SplitLong && command.size() > static_cast<int>(this->LongSize))
         {
-            QStringList messages;
-            while (command.size() > (int)this->LongSize)
-            {
-                messages.append(command.mid(0, (int)this->LongSize));
-                command = command.mid((int)this->LongSize);
-            }
-            if (!command.isEmpty())
-                messages.append(command);
+            QList<QString> messages = Split(static_cast<int>(this->LongSize), command);
             foreach (QString text, messages)
                 window->GetSession()->SendMessage(window, text);
             return 0;
