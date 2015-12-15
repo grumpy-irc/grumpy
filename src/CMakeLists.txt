@@ -19,6 +19,9 @@ option(UNIT_TESTS "Enable unit tests" false)
 option(SQLITE "Support sqlite backend storage" true)
 
 # Configuration
+if (UNIT_TESTS)
+    SET(QT_USE_QTTEST TRUE)
+endif()
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 
 # Libraries first
