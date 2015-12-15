@@ -72,6 +72,7 @@ namespace GrumpyIRC
             void SetSplitMaxSize(int size);
             int GetSplitMaxSize();
             void SetSplit(bool split);
+            unsigned int GetBatchMaxSize();
             bool GetSplit();
             bool FirstRun();
             QList<int> IgnoredNums();

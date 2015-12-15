@@ -43,6 +43,8 @@ namespace GrumpyIRC
             QString GetNick();
             unsigned int GetMaxScrollbackSize();
 
+            QString etc = "etc";
+            QString var = "var";
             bool Init;
             bool AutoFix;
             QString PID;

@@ -55,7 +55,9 @@ namespace GrumpyIRC
 
         private:
             void headings();
+            QList<int> selected_bx();
             void topic();
+            ScrollbackFrame *parentFrame;
             libircclient::Mode *chanmode;
             bool ignore;
             bool updateTopic;

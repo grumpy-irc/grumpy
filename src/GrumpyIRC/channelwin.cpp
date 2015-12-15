@@ -10,9 +10,13 @@
 
 // Copyright (c) Petr Bena 2015
 
+#include <QMenu>
+
 #include "skin.h"
 #include "../libcore/networksession.h"
+#include "grumpyconf.h"
 #include "scrollbackframe.h"
+#include "scriptwin.h"
 #include "../libirc/libircclient/mode.h"
 #include "../libirc/libircclient/network.h"
 #include "../libirc/libircclient/channel.h"
@@ -33,6 +37,7 @@ ChannelWin::ChannelWin(NetworkSession *session, libircclient::Network *network, 
     this->ui->plainTextEdit->setPlainText(channel->GetTopic());
     this->topic();
     this->setWindowTitle(channel->GetName());
+    this->parentFrame = parent;
     this->ignore = false;
     this->ui->plainTextEdit->setPalette(Skin::GetDefault()->Palette());
 
@@ -160,7 +165,49 @@ void ChannelWin::OnMode(bool toggled)
 
 void GrumpyIRC::ChannelWin::on_tableWidget_2_customContextMenuRequested(const QPoint &pos)
 {
+    QPoint globalPos = this->ui->tableWidget_2->viewport()->mapToGlobal(pos);
+    QMenu Menu;
+    // Items
+    QAction *menuRemove = new QAction("Remove", &Menu);
+    Menu.addAction(menuRemove);
 
+    QAction* selectedItem = Menu.exec(globalPos);
+    if (!selectedItem)
+        return;
+    if (selectedItem == menuRemove)
+    {
+        QList<QString> lx;
+        foreach (int line, this->selected_bx())
+            lx << this->ui->tableWidget_2->item(line, 0)->text();
+
+        // Construct the script
+        QString script_code;
+        if (!CONF->Batches())
+        {
+            foreach (QString ban, lx)
+                script_code += "MODE " + this->_channel->GetName() + " -b " + ban + " \n";
+        } else
+        {
+            while (!lx.isEmpty())
+            {
+                unsigned int current_batch_size = CONF->GetBatchMaxSize();
+                if (lx.count() < static_cast<int>(current_batch_size))
+                    current_batch_size = lx.count();
+                QString mode = "-";
+                QString parameters;
+                while(current_batch_size-- > 0)
+                {
+                    mode += "b";
+                    parameters += lx.at(0) + " ";
+                    lx.removeAt(0);
+                }
+                script_code += "MODE " + this->_channel->GetName() + " " + mode + " " + parameters.trimmed() + "\n";
+            }
+        }
+        ScriptWin *script_window = new ScriptWin(this->parentFrame);
+        script_window->Set(script_code);
+        script_window->show();
+    }
 }
 
 void GrumpyIRC::ChannelWin::on_tableWidget_3_customContextMenuRequested(const QPoint &pos)
@@ -178,6 +225,19 @@ void ChannelWin::headings()
     this->ui->tabWidget->setTabText(1, QObject::tr("Bans") + QString(" (") + QString::number(this->ui->tableWidget_2->rowCount()) + ")");
     this->ui->tabWidget->setTabText(2, QObject::tr("Exceptions") + " (" + QString::number(this->ui->tableWidget_3->rowCount()) + ")");
     this->ui->tabWidget->setTabText(3, QObject::tr("Invites") + " (" + QString::number(this->ui->tableWidget_4->rowCount()) + ")");
+}
+
+QList<int> ChannelWin::selected_bx()
+{
+    QList<int> results;
+    QList<QTableWidgetItem*> items = this->ui->tableWidget_2->selectedItems();
+    foreach (QTableWidgetItem *xx, items)
+    {
+        if (!results.contains(xx->row()))
+            results.append(xx->row());
+    }
+
+    return results;
 }
 
 void ChannelWin::topic()

@@ -82,7 +82,7 @@ static QHash<QString, QVariant> FromArray(QByteArray data)
 
 DatabaseLite::DatabaseLite()
 {
-    QString datafile = Grumpyd::GetCFPath() + "sqlite.dat";
+    QString datafile = Grumpyd::GetDFPath() + "sqlite.dat";
     bool install = !QFile().exists(datafile);
     this->database = new SQLite(datafile);
     this->last_user_id = 0;

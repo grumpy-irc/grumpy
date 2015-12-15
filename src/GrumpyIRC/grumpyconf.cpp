@@ -222,6 +222,11 @@ void GrumpyConf::SetSplit(bool split)
     GCFG->SetValue("split", split);
 }
 
+unsigned int GrumpyConf::GetBatchMaxSize()
+{
+    return GCFG->GetValueAsUInt("maximum_irc_batch_size", 4);
+}
+
 bool GrumpyConf::GetSplit()
 {
     return GCFG->GetValueAsBool("split", true);
