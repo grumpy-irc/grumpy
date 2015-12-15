@@ -12,6 +12,7 @@
 
 #include "commandprocessor.h"
 #include "core.h"
+#include "exception.h"
 #include "scrollback.h"
 #include "grumpydsession.h"
 #include "ircsession.h"
@@ -96,6 +97,23 @@ QList<QString> CommandProcessor::GetCommands()
     return this->CommandList.keys();
 }
 
+QList<QString> GrumpyIRC::CommandProcessor::GetAList()
+{
+    return this->aliasList.keys();
+}
+
+bool GrumpyIRC::CommandProcessor::Exists(QString name) const
+{
+    return this->CommandList.contains(name) || this->aliasList.contains(name);
+}
+
+void GrumpyIRC::CommandProcessor::RegisterAlias(QString name, QString target)
+{
+    if (this->aliasList.contains(name))
+        return;
+    this->aliasList.insert(name, target);
+}
+
 int CommandProcessor::ProcessItem(QString command, Scrollback *window)
 {
     command = command.trimmed();
@@ -115,6 +133,13 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
             parameters.ParameterLine = param;
             parameters.Parameters = param.split(" ");
             command_name = command.mid(0, command.indexOf(" ")).toLower();
+        }
+        int recursion_cnt = 0;
+        while (!this->CommandList.contains(command_name) && this->aliasList.contains(command_name))
+        {
+            if (recursion_cnt++ > 20)
+                throw new Exception("Too many redirects", BOOST_CURRENT_FUNCTION);
+            command_name = this->aliasList[command_name];
         }
         if (!this->CommandList.contains(command_name))
         {

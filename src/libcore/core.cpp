@@ -29,6 +29,7 @@ GrumpyIRC::Core::Core()
 
 GrumpyIRC::Core::~Core()
 {
+    delete this->config;
     delete this->factory;
     delete this->commandProcessor;
     delete this->eventHandler;

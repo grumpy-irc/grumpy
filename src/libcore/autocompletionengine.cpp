@@ -47,6 +47,9 @@ AutocompletionInformation AutocompletionEngine::Execute(AutocompletionInformatio
         // this will also append space to full command name if user hit enter while having cursor on word, so
         // "/server|" is expanded to "/server |" (pipe stands for cursor)
         QList<QString> commands;
+        // Fetch aliases here
+        foreach(QString alias, Core::GrumpyCore->GetCommandProcessor()->GetAList())
+            commands << alias + " ";
         foreach (QString cm, Core::GrumpyCore->GetCommandProcessor()->GetCommands())
             commands << cm + " ";
         foreach (QString cm, extra_commands)

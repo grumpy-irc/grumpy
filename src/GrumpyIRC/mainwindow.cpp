@@ -61,6 +61,25 @@ static int SystemCommand_Exit(SystemCommand *command, CommandArgs args)
     return 0;
 }
 
+static int SystemCommand_alias(SystemCommand *command, CommandArgs args)
+{
+    Q_UNUSED(command);
+    if (args.Parameters.count() != 2)
+    {
+        GRUMPY_ERROR(QObject::tr("You need to provide 2 names"));
+        return 1;
+    }
+
+    if (CoreWrapper::GrumpyCore->GetCommandProcessor()->Exists(args.Parameters[0]))
+    {
+        GRUMPY_ERROR("This name is already used by some other");
+        return 1;
+    }
+
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterAlias(args.Parameters[0], args.Parameters[1]);
+    return 0;
+}
+
 static int SystemCommand_echo(SystemCommand *command, CommandArgs args)
 {
     Q_UNUSED(command);
@@ -314,7 +333,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpyd", (SC_Callback)SystemCommand_Grumpy));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("quote", (SC_Callback)SystemCommand_RAW));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("raw", (SC_Callback)SystemCommand_RAW));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("echo", (SC_Callback)SystemCommand_echo));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.echo", (SC_Callback)SystemCommand_echo));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.alias", (SC_Callback)SystemCommand_alias));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("query", (SC_Callback)SystemCommand_Query));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->LongSize = CONF->GetSplitMaxSize();
     CoreWrapper::GrumpyCore->GetCommandProcessor()->SplitLong = CONF->GetSplit();

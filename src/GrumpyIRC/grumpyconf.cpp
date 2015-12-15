@@ -138,6 +138,7 @@ QString GrumpyConf::GetDefaultAwayReason()
 QString GrumpyConf::GetAutorun()
 {
     QString default_autorun = "# This is a script that is executed every time you run grumpy\n"\
+                              "/grumpy.alias echo grumpy.echo\n"\
                               "/echo Welcome to GrumpyChat v. $grumpy.version";
     return GCFG->GetValueAsString("execute_autorun", default_autorun);
 }
