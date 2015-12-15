@@ -46,7 +46,6 @@ namespace GrumpyIRC
         LIBCORESHARED_EXPORT bool IsGrumpy(Scrollback *window);
         //! \todo No unit test
         LIBCORESHARED_EXPORT QHash<QString, QVariant> MergeHash(QHash<QString, QVariant> x, QHash<QString, QVariant> y);
-        LIBCORESHARED_EXPORT int MessageBox(QString title, QString message, MessageBox_Type type, QObject *parent = 0);
         //! \todo No unit test
         LIBCORESHARED_EXPORT QByteArray VariantToByteArray(QVariant data);
         //! \todo No unit test

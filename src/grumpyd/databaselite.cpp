@@ -210,7 +210,7 @@ void DatabaseLite::LoadSessions()
 void DatabaseLite::LoadWindows()
 {
     scrollback_id_t max_id = 0;
-    std::shared_ptr<SqlResult> windows = this->database->ExecuteQuery("SELECT original_id, user_id, target, type, virtual_state, last_item, parent, id FROM scrollbacks;");
+    std::shared_ptr<SqlResult> windows = this->database->ExecuteQuery("SELECT original_id, user_id, target, type, virtual_state, last_item, parent, id, is_hidden FROM scrollbacks;");
     if (windows->InError)
         throw new Exception("Unable to recover scrollbacks from sql: " + this->LastError, BOOST_CURRENT_FUNCTION);
 
@@ -250,6 +250,8 @@ void DatabaseLite::LoadWindows()
             max_id = scrollback_id + 1;
         ScrollbackType st = static_cast<ScrollbackType>(row.GetField(3).toInt());
         VirtualScrollback *sx = (VirtualScrollback*)Core::GrumpyCore->NewScrollback(parent_ptr, target, st);
+        if (Generic::Int2Bool(row.GetField(8).toInt()))
+            sx->Hide();
         sx->SetOriginalID(scrollback_id);
         sx->SetLastItemID(row.GetField(5).toInt());
         sx->SetOwner(user, true);
@@ -367,18 +369,19 @@ void DatabaseLite::SetConfiguration(user_id_t user, QHash<QString, QVariant> dat
 
 void DatabaseLite::StoreScrollback(User *owner, Scrollback *sx)
 {
-    QString sql = "INSERT INTO scrollbacks (original_id, user_id, target, type, virtual_state, last_item) VALUES (?,?,?,?,?,?);";
+    QString sql = "INSERT INTO scrollbacks (original_id, user_id, target, type, virtual_state, last_item, is_hidden) VALUES (?,?,?,?,?,?,?);";
     Scrollback *parent = sx->GetParentScrollback();
     if (parent)
-        sql = "INSERT INTO scrollbacks (original_id, user_id, target, type, virtual_state, last_item, parent) VALUES (?,?,?,?,?,?,?);";
+        sql = "INSERT INTO scrollbacks (original_id, user_id, target, type, virtual_state, last_item, parent, is_hidden) VALUES (?,?,?,?,?,?,?,?);";
     std::shared_ptr<SqlResult> result;
-    QStringList params;
-    params << QString::number(sx->GetOriginalID())
-           << QString::number(owner->GetID())
+    QList<QVariant> params;
+    params << sx->GetOriginalID()
+           << owner->GetID()
            << sx->GetTarget()
-           << QString::number(static_cast<int>(sx->GetType()))
-           << QString::number(static_cast<int>(sx->GetState()))
-           << QString::number(sx->GetLastID());
+           << static_cast<int>(sx->GetType())
+           << static_cast<int>(sx->GetState())
+           << sx->GetLastID()
+           << Generic::Bool2Int(sx->IsHidden());
     if (parent)
         params << QString::number(parent->GetOriginalID());
     result = this->database->ExecuteQuery_Bind(sql, params);

@@ -38,7 +38,8 @@ CREATE TABLE scrollbacks
     "virtual_state" INTEGER NOT NULL,
     /* Number of total items that are owned by this scrollback, should be identical to:
        SELECT count(1) FROM scrollback_items WHERE user_id = scrollback.user_id AND scrollback_id = scrollback.original_id */
-    "item_count" INTEGER
+    "item_count" INTEGER,
+    "is_hidden" INTEGER NOT NULL
 );
 
 CREATE INDEX idx_scrollback_user_id ON scrollbacks(user_id);

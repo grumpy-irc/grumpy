@@ -254,7 +254,7 @@ static int SystemCommand_Server(SystemCommand *command, CommandArgs command_args
         GRUMPY_ERROR(QObject::tr("This command requires a parameter"));
         return 0;
     }
-    // This command is much more tricky that you think
+    // This command is much more tricky than you think
     // we need to first check if we are going to open
     // new server within Grumpy itself, or in grumpyd
     Scrollback *sx = MainWindow::Main->GetCurrentScrollbackFrame()->GetScrollback();

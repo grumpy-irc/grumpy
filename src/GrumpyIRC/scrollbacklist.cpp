@@ -281,7 +281,7 @@ void ScrollbackList::sniffer(ScrollbackFrame *window)
     }
     else
     {
-        Generic::MessageBox("Unsupported", "This protocol doesn't support this feature", Generic::MessageBox_Type_Error);
+        MessageBox::Display("sniffer-grumpy", "Unsupported", "This protocol doesn't support this feature", MainWindow::Main);
     }
 }
 

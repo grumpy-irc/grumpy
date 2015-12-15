@@ -69,37 +69,6 @@ int GrumpyIRC::Generic::Bool2Int(bool value)
         return 0;
 }
 
-int Generic::MessageBox(QString title, QString message, GrumpyIRC::Generic::MessageBox_Type type, QObject *parent)
-{
-#ifdef QT_GUI_LIB
-    QMessageBox *mb = new QMessageBox((QWidget*)parent);
-    mb->setAttribute(Qt::WA_DeleteOnClose);
-    mb->setText(message);
-    mb->setWindowTitle(title);
-
-    switch (type)
-    {
-        case MessageBox_Type_Error:
-            mb->setIcon(QMessageBox::Critical);
-            break;
-        case MessageBox_Type_Normal:
-            mb->setIcon(QMessageBox::Information);
-            break;
-        case MessageBox_Type_Question:
-            mb->setIcon(QMessageBox::Question);
-            break;
-        case MessageBox_Type_Warning:
-            mb->setIcon(QMessageBox::Warning);
-            break;
-    }
-
-    mb->show();
-#else
-    // print to cout
-#endif
-    return 0;
-}
-
 QByteArray Generic::VariantToByteArray(QVariant data)
 {
     QByteArray result;

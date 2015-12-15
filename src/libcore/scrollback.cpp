@@ -138,6 +138,9 @@ void Scrollback::Show()
 
 void Scrollback::Hide()
 {
+    if (!this->_hidable)
+        throw new Exception("Scrollback can't be hidden", BOOST_CURRENT_FUNCTION);
+
     this->_sbHidden = true;
     emit this->Event_Hide();
 }
@@ -297,7 +300,13 @@ QHash<QString, QVariant> Scrollback::ToPartialHash()
     hash.insert("scrollbackState", static_cast<int>(this->scrollbackState));
     SERIALIZE(_lastItemID);
     SERIALIZE(_target);
+    SERIALIZE(_hidable);
     return hash;
+}
+
+bool Scrollback::IsHidable()
+{
+    return this->_hidable;
 }
 
 void Scrollback::LoadHash(QHash<QString, QVariant> hash)
@@ -323,6 +332,7 @@ void Scrollback::LoadHash(QHash<QString, QVariant> hash)
             _items.append(item.toHash());
         emit this->Event_Reload();
     }
+    UNSERIALIZE_BOOL(_hidable);
 }
 
 void Scrollback::Resync(Scrollback *target)
@@ -341,6 +351,11 @@ void Scrollback::Resync(Scrollback *target)
         }
     }
     emit this->Event_Resync();
+}
+
+void Scrollback::SetHidable(bool is)
+{
+    this->_hidable = is;
 }
 
 void Scrollback::SetState(ScrollbackState state, bool enforce)

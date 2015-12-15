@@ -171,11 +171,13 @@ namespace GrumpyIRC
             virtual QList<QVariant> FetchBacklog(scrollback_id_t from, unsigned int size);
             QHash<QString, QVariant> ToHash(int max = 200);
             QHash<QString, QVariant> ToPartialHash();
+            virtual bool IsHidable();
             void LoadHash(QHash<QString, QVariant> hash);
             //! Used to resync most of attributes with target
             void Resync(Scrollback *target);
-            void SetState(ScrollbackState state, bool enforced = false);
-            ScrollbackState GetState();
+            virtual void SetHidable(bool is);
+            virtual void SetState(ScrollbackState state, bool enforced = false);
+            virtual ScrollbackState GetState();
             //! You can set this to true in order to suppress state updates
             bool IgnoreState;
             QHash<QString, QVariant> PropertyBag;
@@ -217,6 +219,7 @@ namespace GrumpyIRC
             bool _dead;
             QString _target;
             NetworkSession *session;
+            bool _hidable = true;
             ScrollbackType type;
             QList<ScrollbackItem> _items;
             scrollback_id_t _totalItems;
