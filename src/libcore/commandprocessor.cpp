@@ -146,7 +146,6 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
             if (recursion_cnt++ > 20)
                 throw new Exception("Too many redirects", BOOST_CURRENT_FUNCTION);
             command_name = this->aliasList[command_name];
-            temp1.clear();
             if (command_name.contains(" "))
             {
                 // This is an alias which contains also parameter, we store it as a temporary string which is
