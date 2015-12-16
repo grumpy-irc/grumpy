@@ -245,6 +245,18 @@ static int SystemCommand_Act(SystemCommand *command, CommandArgs command_args)
     return 0;
 }
 
+static int SystemCommand_GrumpyLink(SystemCommand *command, CommandArgs command_args)
+{
+    if (command_args.ParameterLine.isEmpty())
+    {
+        GRUMPY_ERROR("No parameters");
+        return 0;
+    }
+
+    MainWindow::Main->OpenUrl(command_args.ParameterLine);
+    return 0;
+}
+
 static int SystemCommand_Query(SystemCommand *command, CommandArgs command_args)
 {
     (void)command;
@@ -321,20 +333,22 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // Create a system scrollback
     this->systemWindow = this->scrollbackWindow->CreateWindow("System Window", NULL, true, false, NULL, true);
     // Register built-in commands
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.netstat", (SC_Callback)SystemCommand_Netstat));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.next_session_nick", (SC_Callback)SystemCommand_NextSessionNick));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.echo", (SC_Callback)SystemCommand_echo));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.alias", (SC_Callback)SystemCommand_alias));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.link", (SC_Callback)SystemCommand_GrumpyLink));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("unsecuregrumpyd", (SC_Callback)SystemCommand_UnsecureGrumpy));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpyd", (SC_Callback)SystemCommand_Grumpy));
+
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("quit", (SC_Callback)SystemCommand_Exit));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("server", (SC_Callback)SystemCommand_Server));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("nick", (SC_Callback)SystemCommand_Nick));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("msg", (SC_Callback)SystemCommand_SendMessage));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("me", (SC_Callback)SystemCommand_Act));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("notice", (SC_Callback)SystemCommand_Notice));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.netstat", (SC_Callback)SystemCommand_Netstat));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.next_session_nick", (SC_Callback)SystemCommand_NextSessionNick));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("unsecuregrumpyd", (SC_Callback)SystemCommand_UnsecureGrumpy));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpyd", (SC_Callback)SystemCommand_Grumpy));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("quote", (SC_Callback)SystemCommand_RAW));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("raw", (SC_Callback)SystemCommand_RAW));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.echo", (SC_Callback)SystemCommand_echo));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.alias", (SC_Callback)SystemCommand_alias));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("query", (SC_Callback)SystemCommand_Query));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->LongSize = CONF->GetSplitMaxSize();
     CoreWrapper::GrumpyCore->GetCommandProcessor()->SplitLong = CONF->GetSplit();
@@ -474,7 +488,10 @@ void MainWindow::UpdateStatus()
 
 void MainWindow::OpenUrl(QString url)
 {
-    this->handler->OpenLink(url);
+    if (url.startsWith("http://") || url.startsWith("https://"))
+        this->handler->OpenLink(url);
+    else if (url.startsWith("ircs://") || url.startsWith("irc://"))
+        this->OpenIRCNetworkLink(url);
 }
 
 void MainWindow::Execute(QString text)
