@@ -1,0 +1,12 @@
+# This is a script that is executed every time you run grumpy
+# Licensed under LGPL
+
+# Set up some basic aliases, these are most likely not present on any IRCD but if they were
+# you can remove them by commenting them out
+/grumpy.alias alias grumpy.alias
+/grumpy.alias echo grumpy.echo
+/grumpy.alias quit grumpy.quit
+
+
+# This message can be safely removed
+/echo Welcome to GrumpyChat v. $grumpy.version

@@ -14,4 +14,7 @@
         <file>img/system.png</file>
         <file>img/grumpy_logo.png</file>
     </qresource>
+    <qresource prefix="/text">
+        <file>scripts/_autoexec</file>
+    </qresource>
 </RCC>

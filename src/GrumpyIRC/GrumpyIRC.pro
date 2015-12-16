@@ -104,4 +104,7 @@ INCLUDEPATH += $$PWD/../libcore
 DEPENDPATH += $$PWD/../build-libcore-Desktop_Qt_5_4_2_MinGW_32bit-Debug/debug
 
 RESOURCES += \
-    icons.qrc
+    embedded.qrc
+
+DISTFILES += \
+    scripts/_autoexec

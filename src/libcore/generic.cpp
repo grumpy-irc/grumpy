@@ -10,7 +10,10 @@
 
 // Copyright (c) Petr Bena 2015
 
+#include "definitions.h"
+
 #include <QDataStream>
+#include <QFile>
 #include "generic.h"
 #include "exception.h"
 #include "networksession.h"
@@ -158,4 +161,13 @@ int Generic::LongestString(QList<QString> list)
             longest = item.size();
     }
     return longest;
+}
+
+QString Generic::GetResource(QString name)
+{
+    QFile file(name);
+    if (!file.open(QIODevice::ReadOnly))
+        throw new Exception("Unable to open internal resource: " + name, BOOST_CURRENT_FUNCTION);
+
+    return QString(file.readAll());
 }

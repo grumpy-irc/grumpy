@@ -52,6 +52,7 @@ namespace GrumpyIRC
         LIBCORESHARED_EXPORT QVariant VariantFromByteArray(QByteArray data);
         LIBCORESHARED_EXPORT QList<QVariant> QStringListToQVariantList(QList<QString> list);
         LIBCORESHARED_EXPORT QList<int> QVariantListToIntList(QList<QVariant> list);
+        LIBCORESHARED_EXPORT QString GetResource(QString name);
         LIBCORESHARED_EXPORT QList<QVariant> QIntListToVariantList(QList<int> list);
         LIBCORESHARED_EXPORT QString ExpandedString(QString string, unsigned int minimum_size, unsigned int maximum_size = 0);
         LIBCORESHARED_EXPORT int LongestString(QList<QString> list);
