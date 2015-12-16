@@ -97,6 +97,11 @@ QList<QString> CommandProcessor::GetCommands()
     return this->CommandList.keys();
 }
 
+QHash<QString, QString> CommandProcessor::GetAliasRdTable()
+{
+    return this->aliasList;
+}
+
 QList<QString> GrumpyIRC::CommandProcessor::GetAList()
 {
     return this->aliasList.keys();
@@ -135,11 +140,36 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
             command_name = command.mid(0, command.indexOf(" ")).toLower();
         }
         int recursion_cnt = 0;
+        QString temp1;
         while (!this->CommandList.contains(command_name) && this->aliasList.contains(command_name))
         {
             if (recursion_cnt++ > 20)
                 throw new Exception("Too many redirects", BOOST_CURRENT_FUNCTION);
             command_name = this->aliasList[command_name];
+            temp1.clear();
+            if (command_name.contains(" "))
+            {
+                // This is an alias which contains also parameter, we store it as a temporary string which is
+                // used in case this is a final cmd name
+                // otherwise we continue searching others
+                if (temp1.isEmpty())
+                    temp1 = command_name.mid(command_name.indexOf(" ") + 1);
+                else
+                    temp1 = command_name.mid(command_name.indexOf(" ") + 1) + " " + temp1;
+                command_name = command_name.mid(0, command_name.indexOf(" "));
+            }
+        }
+        if (!temp1.isEmpty())
+        {
+            // we need to prepend this parameters to current parameters, there should be space in some cases to separate them
+            QString space = "";
+            if (!parameters.ParameterLine.isEmpty())
+                space = " ";
+            parameters.ParameterLine = temp1 + space + parameters.ParameterLine;
+            // now insert the extra parameters
+            QStringList temp2 = temp1.split(" ");
+            temp2.append(parameters.Parameters);
+            parameters.Parameters = temp2;
         }
         if (!this->CommandList.contains(command_name))
         {

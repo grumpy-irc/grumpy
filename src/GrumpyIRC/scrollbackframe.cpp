@@ -326,7 +326,7 @@ void ScrollbackFrame::OnLink(QString url)
     if (scheme == "irc_join")
     {
         this->TransferRaw("JOIN " + url.mid(url.indexOf("://") + 3));
-    } else if (scheme == "https" || scheme == "http")
+    } else
     {
         MainWindow::Main->OpenUrl(url);
     }

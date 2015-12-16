@@ -10,11 +10,9 @@
 
 // Copyright (c) Petr Bena 2015
 
-#ifdef QT_GUI_LIB
-#include <QMessageBox>
-#endif
 #include <QDataStream>
 #include "generic.h"
+#include "exception.h"
 #include "networksession.h"
 #include "scrollback.h"
 
@@ -125,4 +123,39 @@ QList<QVariant> Generic::QIntListToVariantList(QList<int> list)
         results.append(QVariant(item));
 
     return results;
+}
+
+QString Generic::ExpandedString(QString string, unsigned int minimum_size, unsigned int maximum_size)
+{
+    if (maximum_size != 0 && minimum_size > maximum_size)
+        throw new Exception("Maximum size smaller than minimum size", BOOST_CURRENT_FUNCTION);
+
+    if (maximum_size > 0 && static_cast<unsigned int>(string.size()) > maximum_size)
+    {
+        if (maximum_size < 4)
+        {
+            string = string.mid(0, maximum_size);
+        } else
+        {
+            string = string.mid(0, maximum_size - 3);
+            string += "...";
+        }
+        return string;
+    }
+
+    while (static_cast<unsigned int>(string.size()) < minimum_size)
+        string += " ";
+
+    return string;
+}
+
+int Generic::LongestString(QList<QString> list)
+{
+    int longest = 0;
+    foreach (QString item, list)
+    {
+        if (item.size() > longest)
+            longest = item.size();
+    }
+    return longest;
 }

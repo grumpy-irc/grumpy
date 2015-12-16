@@ -64,9 +64,18 @@ static int SystemCommand_Exit(SystemCommand *command, CommandArgs args)
 static int SystemCommand_alias(SystemCommand *command, CommandArgs args)
 {
     Q_UNUSED(command);
-    if (args.Parameters.count() != 2)
+    if (!args.Parameters.count())
     {
-        GRUMPY_ERROR(QObject::tr("You need to provide 2 names"));
+        QHash<QString, QString> hash = CoreWrapper::GrumpyCore->GetCommandProcessor()->GetAliasRdTable();
+        unsigned int size = static_cast<unsigned int>(Generic::LongestString(hash.keys()));
+        foreach (QString item, hash.keys())
+            MainWindow::Main->WriteToCurrentWindow(Generic::ExpandedString(item, size, size) + " -> " + hash[item]);
+        return 0;
+    }
+
+    if (args.Parameters.count() == 1)
+    {
+        GRUMPY_ERROR("This need to provide 2 or more parameters for this to work");
         return 1;
     }
 
@@ -76,7 +85,8 @@ static int SystemCommand_alias(SystemCommand *command, CommandArgs args)
         return 1;
     }
 
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterAlias(args.Parameters[0], args.Parameters[1]);
+    QString value = args.ParameterLine.mid(args.Parameters[0].size() + 1);
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterAlias(args.Parameters[0], value);
     return 0;
 }
 
@@ -340,8 +350,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.link", (SC_Callback)SystemCommand_GrumpyLink));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("unsecuregrumpyd", (SC_Callback)SystemCommand_UnsecureGrumpy));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpyd", (SC_Callback)SystemCommand_Grumpy));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.quit", (SC_Callback)SystemCommand_Exit));
 
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("quit", (SC_Callback)SystemCommand_Exit));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("server", (SC_Callback)SystemCommand_Server));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("nick", (SC_Callback)SystemCommand_Nick));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("msg", (SC_Callback)SystemCommand_SendMessage));

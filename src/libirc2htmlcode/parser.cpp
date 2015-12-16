@@ -92,6 +92,7 @@ QString Parser::EncodeHtml(QString text)
 {
     text.replace("<", "&lt;");
     text.replace(">", "&gt;");
+    text.replace("  ", "&nbsp;&nbsp;");
 
     return text;
 }
