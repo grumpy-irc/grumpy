@@ -63,6 +63,9 @@ int CommandProcessor::ProcessText(QString text, Scrollback *window, bool comment
             case COMMANDPROCESSOR_ENOTCONNECTED:
                 GRUMPY_ERROR("Not connected");
                 break;
+            case COMMANDPROCESSOR_ETOOMANYREDS:
+                GRUMPY_ERROR("Too many redirects in hash table");
+                break;
         }
     }
     return 0;
@@ -144,7 +147,7 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
         while (!this->CommandList.contains(command_name) && this->aliasList.contains(command_name))
         {
             if (recursion_cnt++ > 20)
-                throw new Exception("Too many redirects", BOOST_CURRENT_FUNCTION);
+                return -COMMANDPROCESSOR_ETOOMANYREDS;
             command_name = this->aliasList[command_name];
             if (command_name.contains(" "))
             {

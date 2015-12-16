@@ -20,6 +20,7 @@
 #define COMMANDPROCESSOR_ENOTEXIST        1
 #define COMMANDPROCESSOR_ENOTCONNECTED    2
 #define COMMANDPROCESSOR_EEMPTY           3
+#define COMMANDPROCESSOR_ETOOMANYREDS     20
 
 namespace GrumpyIRC
 {
@@ -54,6 +55,8 @@ namespace GrumpyIRC
             CommandProcessor();
             ~CommandProcessor();
             void RegisterCommand(SystemCommand *sc);
+            //! Handles a single item - can process only 1 line of text
+            int ProcessItem(QString command, Scrollback *window);
             //! Simple idiot proof processor for text that is input by a user
             int ProcessText(QString text, Scrollback *window, bool comments_rm = false);
             QList<QString> GetCommands();
@@ -66,10 +69,8 @@ namespace GrumpyIRC
             char CommandPrefix;
             char CommentChar;
         private:
-            int ProcessItem(QString command, Scrollback *window);
             QHash<QString, QString> aliasList;
             QHash<QString, SystemCommand*> CommandList;
-
     };
 }
 
