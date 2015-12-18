@@ -314,6 +314,89 @@ static int SystemCommand_Server(SystemCommand *command, CommandArgs command_args
     return 0;
 }
 
+static int SystemCommand_JOIN(SystemCommand *command, CommandArgs command_args)
+{
+    (void)command;
+
+    if (command_args.ParameterLine.isEmpty())
+    {
+        GRUMPY_ERROR("You need to provide some channel names to join, they can be even separated by comma or space");
+        return 0;
+    }
+
+    Scrollback *sx = MainWindow::Main->GetCurrentScrollbackFrame()->GetScrollback();
+    if (!sx->GetSession())
+    {
+        GRUMPY_ERROR("You can only use this command in a connected server window");
+        return 0;
+    }
+
+    QList<QString> channel_list_t, channel_list_d;
+    if (command_args.ParameterLine.contains(" "))
+        channel_list_t = command_args.ParameterLine.split(' ');
+    if (command_args.ParameterLine.contains(","))
+        channel_list_t = command_args.ParameterLine.split(',');
+
+    foreach (QString c, channel_list_t)
+    {
+        c = c.replace(" ", "").replace(",", "");
+        channel_list_d.append(c);
+    }
+
+    foreach (QString channel, channel_list_d)
+        sx->GetSession()->SendRaw(sx, "JOIN " + channel);
+    return 0;
+}
+
+static int SystemCommand_KICK(SystemCommand *command, CommandArgs command_args)
+{
+    (void)command;
+    if (command_args.ParameterLine.isEmpty())
+    {
+        GRUMPY_ERROR("You need to provide some channel names to join, they can be even separated by comma or space");
+        return 0;
+    }
+
+    Scrollback *sx = MainWindow::Main->GetCurrentScrollbackFrame()->GetScrollback();
+    if (!sx->GetSession())
+    {
+        GRUMPY_ERROR("You can only use this command in a connected server window");
+        return 0;
+    }
+    if (!command_args.Parameters[0].startsWith('#') && sx->GetType() != ScrollbackType_Channel)
+    {
+        GRUMPY_ERROR("This is not a channel window!!");
+        return 0;
+    }
+    QString channel_name;
+    if (command_args.Parameters[0].startsWith('#'))
+    {
+        channel_name = command_args.Parameters[0];
+        command_args.Parameters.removeAt(0);
+    } else
+    {
+        channel_name = sx->GetTarget();
+    }
+    if (command_args.Parameters.size() == 0)
+    {
+        GRUMPY_ERROR("No target");
+        return 0;
+    }
+    QString target, reason;
+    if (command_args.Parameters.size() == 1)
+    {
+        target = command_args.Parameters[0];
+        reason = CONF->GetDefaultKickReason();
+    }
+    if (command_args.Parameters.size() > 1)
+    {
+        target = command_args.Parameters[0];
+        reason = command_args.ParameterLine.mid(command_args.ParameterLine.indexOf(target) + target.size() + 1);
+    }
+    sx->GetSession()->SendRaw(sx, "KICK " + channel_name + " " + target + " :" + reason);
+    return 0;
+}
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     Main = this;
@@ -351,6 +434,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("unsecuregrumpyd", (SC_Callback)SystemCommand_UnsecureGrumpy));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpyd", (SC_Callback)SystemCommand_Grumpy));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.quit", (SC_Callback)SystemCommand_Exit));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.join", (SC_Callback)SystemCommand_JOIN));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.kick", (SC_Callback)SystemCommand_KICK));
 
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("server", (SC_Callback)SystemCommand_Server));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("nick", (SC_Callback)SystemCommand_Nick));
