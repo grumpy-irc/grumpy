@@ -338,6 +338,14 @@ static int SystemCommand_JOIN(SystemCommand *command, CommandArgs command_args)
     if (command_args.ParameterLine.contains(","))
         channel_list_t = command_args.ParameterLine.split(',');
 
+    if (channel_list_t.isEmpty())
+    {
+        // Requested join for 1 item only
+        sx->GetSession()->SendRaw(sx, "JOIN " + command_args.ParameterLine);
+        // There is nothing else to do
+        return 0;
+    }
+
     foreach (QString c, channel_list_t)
     {
         c = c.replace(" ", "").replace(",", "");
