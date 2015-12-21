@@ -21,6 +21,7 @@
 #include "hooks.h"
 #include "scrollbacklist_node.h"
 #include "skin.h"
+#include "scrollbacklist.h"
 #include "scrollbackframe.h"
 #include "scrollbacksmanager.h"
 #include "userframe.h"
@@ -549,6 +550,48 @@ bool ScrollbackFrame::IsGrumpy()
     if (!this->scrollback)
         return false;
     return Generic::IsGrumpy(this->scrollback);
+}
+
+bool GrumpyIRC::ScrollbackFrame::IsHidden()
+{
+    return this->scrollback->IsHidden();
+}
+
+void ScrollbackFrame::ToggleHide()
+{
+    if (!this->scrollback->IsHidable())
+        return;
+
+    if (Generic::IsGrumpy(this->scrollback))
+    {
+
+        return;
+    }
+
+    if (!this->scrollback->IsHidden())
+    {
+        // Remove from tree list
+        if (!ScrollbackList::GetScrollbackList()->ShowHidden && this->TreeNode)
+        {
+            ScrollbackList_Node *parent = NULL;
+            if (this->GetParent())
+                parent = this->GetParent()->TreeNode;
+            ScrollbackList::GetScrollbackList()->UnregisterWindow(this->TreeNode, parent);
+            this->TreeNode = NULL;
+        }
+        this->scrollback->Hide();
+    }
+    else
+    {
+        if (!ScrollbackList::GetScrollbackList()->ShowHidden)
+        {
+            ScrollbackList_Node *parent_tree = NULL;
+            if (this->GetParent())
+                parent_tree = this->GetParent()->TreeNode;
+            ScrollbackList::GetScrollbackList()->RegisterWindow(this, parent_tree);
+        }
+        this->scrollback->Show();
+    }
 }
 
 bool ScrollbackFrame::IsDead()

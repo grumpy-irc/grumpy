@@ -21,6 +21,7 @@ typedef unsigned int scrollback_id_t;
 #define GRUMPY_VERSION_STRING "1.0.0"
 #define CONFIGURATION_FILE "grumpy.ini"
 #define CONFIGURATION_PATH "grumpyirc"
+#define PYTHON_ENGINE
 #define PRODUCTION_BUILD
 
 #if defined _WIN64 || defined _WIN32

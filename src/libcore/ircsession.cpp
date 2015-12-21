@@ -60,27 +60,25 @@ IRCSession *IRCSession::Open(Scrollback *system_window, libirc::ServerAddress &s
 
 IRCSession::IRCSession(QHash<QString, QVariant> sx, Scrollback *root)
 {
-    this->init(false);
     this->systemWindow = NULL;
+    this->init(false);
     this->Root = root;
     this->LoadHash(sx);
 }
 
 IRCSession::IRCSession(Scrollback *system, Scrollback *root)
 {
+    this->systemWindow = system;
     this->init(false);
     this->Root = root;
-    this->systemWindow = system;
-    this->systemWindow->SetSession(this);
 }
 
 IRCSession::IRCSession(unsigned int id, Scrollback *system, Scrollback *root)
 {
+    this->systemWindow = system;
     this->init(true);
     this->SID = id;
     this->Root = root;
-    this->systemWindow = system;
-    this->systemWindow->SetSession(this);
 }
 
 IRCSession::~IRCSession()
@@ -349,6 +347,13 @@ void IRCSession::init(bool preindexed)
 {
     this->_autoReconnect = false;
     this->AutomaticallyRetrieveBanList = true;
+    if (this->systemWindow)
+    {
+        // We don't want to let users hide this window
+        // it's not safe
+        this->systemWindow->SetHidable(false);
+        this->systemWindow->SetSession(this);
+    }
     this->_ssl = false;
     this->snifferEnabled = true;
     this->highlightCollector = NULL;

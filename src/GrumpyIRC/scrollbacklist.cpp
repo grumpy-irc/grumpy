@@ -32,8 +32,21 @@
 
 using namespace GrumpyIRC;
 
+ScrollbackList * ScrollbackList::scrollbackList = NULL;
+
+ScrollbackList * ScrollbackList::GetScrollbackList()
+{
+    if (!scrollbackList)
+        throw new NullPointerException("ScrollbackList * ScrollbackList::scrollbackList", BOOST_CURRENT_FUNCTION);
+    return scrollbackList;
+}
+
 ScrollbackList::ScrollbackList(QWidget *parent) : QDockWidget(parent), ui(new Ui::ScrollbackList)
 {
+    if (scrollbackList)
+        throw new Exception("You can't create multiple instances of this class in same moment", BOOST_CURRENT_FUNCTION);
+
+    scrollbackList = this;
     this->timer = new QTimer();
     connect (this->timer, SIGNAL(timeout()), this, SLOT(OnUpdate()));
     this->ui->setupUi(this);
@@ -52,6 +65,22 @@ ScrollbackList::~ScrollbackList()
 {
     delete this->timer;
     delete this->ui;
+    scrollbackList = NULL;
+}
+
+void GrumpyIRC::ScrollbackList::RegisterHidden()
+{
+    foreach (ScrollbackFrame *scrollback, ScrollbackFrame::ScrollbackFrames)
+    {
+        if (scrollback->IsHidden())
+        {
+            ScrollbackList_Node *parent = NULL;
+            if (scrollback->GetParent())
+                parent = scrollback->GetParent()->TreeNode;
+
+            this->RegisterWindow(scrollback, parent);
+        }
+    }
 }
 
 void ScrollbackList::RegisterWindow(ScrollbackFrame *scrollback, ScrollbackList_Node *parent_node)
@@ -73,6 +102,21 @@ void ScrollbackList::RegisterWindow(ScrollbackFrame *scrollback, ScrollbackList_
 QStandardItem *ScrollbackList::GetRootTreeItem()
 {
     return this->root;
+}
+
+void GrumpyIRC::ScrollbackList::UnregisterHidden()
+{
+    foreach(ScrollbackFrame *scrollback, ScrollbackFrame::ScrollbackFrames)
+    {
+        if (scrollback->IsHidden())
+        {
+            ScrollbackList_Node *parent = NULL;
+            if (scrollback->GetParent())
+                parent = scrollback->GetParent()->TreeNode;
+            this->UnregisterWindow(scrollback->TreeNode, parent);
+            scrollback->TreeNode = NULL;
+        }
+    }
 }
 
 void ScrollbackList::UnregisterWindow(ScrollbackList_Node *node, ScrollbackList_Node *parent_n)
@@ -114,15 +158,11 @@ void GrumpyIRC::ScrollbackList::on_treeView_activated(const QModelIndex &index)
 void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPoint &pos)
 {
     ScrollbackFrame *wx = this->selectedWindow();
-    if (!wx)
-        return;
-
     // We have some window selected so let's display a menu
     QPoint globalPos = this->ui->treeView->viewport()->mapToGlobal(pos);
     QMenu Menu;
     // Items
-    QAction *menuClose = new QAction(QObject::tr("Close"), &Menu);
-    Menu.addAction(menuClose);
+    QAction *menuClose = NULL;
     QAction *menuInsrFavorites = NULL;
     QAction *menuAuto = NULL;
     QAction *menuAway_Set = NULL;
@@ -136,62 +176,76 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     QAction *menuSniffer = NULL;
     QAction *menuJoinAll = NULL;
 
-    if (!wx->IsDeletable || (!wx->IsDead() && wx->GetScrollback()->GetType() != ScrollbackType_User))
-        menuClose->setEnabled(false);
-
-    if (wx->IsNetwork())
+    if (wx)
     {
-        menuInsrFavorites = new QAction(QObject::tr("Insert to favorite networks"), &Menu);
-        Menu.addAction(menuInsrFavorites);
-        menuAuto = new QAction(QObject::tr("Automatically reconnect"), &Menu);
-        menuAuto->setCheckable(true);
-        if (wx->GetSession())
-            menuAuto->setChecked(wx->GetSession()->IsAutoreconnect(wx->GetScrollback()));
-        Menu.addAction(menuAuto);
-        menuAway_Set = new QAction(QObject::tr("Set away"), &Menu);
-        menuAway_Uns = new QAction("Unset away", &Menu);
-        Menu.addAction(menuAway_Uns);
-        Menu.addAction(menuAway_Set);
-    }
-
-    if (wx->IsGrumpy())
-    {
-        menuSettings = new QAction(QObject::tr("Settings"), &Menu);
-        Menu.addAction(menuSettings);
+        menuClose = new QAction(QObject::tr("Close"), &Menu);
+        Menu.addAction(menuClose);
         menuHide = new QAction(QObject::tr("Hide window"), &Menu);
+        menuHide->setEnabled(wx->GetScrollback()->IsHidable());
+        menuHide->setCheckable(true);
+        menuHide->setChecked(wx->IsHidden());
         Menu.addAction(menuHide);
-    }
 
-    if (wx->IsChannel())
-    {
-        Menu.addSeparator();
-        if (wx->IsDead())
+        if (!wx->IsDeletable || (!wx->IsDead() && wx->GetScrollback()->GetType() != ScrollbackType_User))
+            menuClose->setEnabled(false);
+
+        if (wx->IsNetwork())
         {
-            menuJoin = new QAction(QObject::tr("Join"), &Menu);
-            Menu.addAction(menuJoin);
+            menuInsrFavorites = new QAction(QObject::tr("Insert to favorite networks"), &Menu);
+            Menu.addAction(menuInsrFavorites);
+            menuAuto = new QAction(QObject::tr("Automatically reconnect"), &Menu);
+            menuAuto->setCheckable(true);
+            if (wx->GetSession())
+                menuAuto->setChecked(wx->GetSession()->IsAutoreconnect(wx->GetScrollback()));
+            Menu.addAction(menuAuto);
+            menuAway_Set = new QAction(QObject::tr("Set away"), &Menu);
+            menuAway_Uns = new QAction("Unset away", &Menu);
+            Menu.addAction(menuAway_Uns);
+            Menu.addAction(menuAway_Set);
         }
-        menuPart = new QAction(QObject::tr("Part"), &Menu);
-        // Check if we can part the chan
-        if (wx->IsDead())
-            menuPart->setEnabled(false);
-        Menu.addAction(menuPart);
-        menuJoinAll = new QAction(QObject::tr("Rejoin all dead channels on this network"), &Menu);
-        Menu.addAction(menuJoinAll);
-    }
-    if (wx->IsNetwork())
-    {
-        Menu.addSeparator();
-        if (wx->IsDead())
+
+        if (wx->IsGrumpy())
         {
-            menuReconnect = new QAction(QObject::tr("Reconnect"), &Menu);
-            Menu.addAction(menuReconnect);
+            menuSettings = new QAction(QObject::tr("Settings"), &Menu);
+            Menu.addAction(menuSettings);
         }
-        menuDisconnect = new QAction(QObject::tr("Disconnect"), &Menu);
-        Menu.addAction(menuDisconnect);
-        menuDisconnect->setEnabled(!wx->IsDead());
-        menuSniffer = new QAction(QObject::tr("Network sniffer"), &Menu);
-        Menu.addAction(menuSniffer);
+
+        if (wx->IsChannel())
+        {
+            Menu.addSeparator();
+            if (wx->IsDead())
+            {
+                menuJoin = new QAction(QObject::tr("Join"), &Menu);
+                Menu.addAction(menuJoin);
+            }
+            menuPart = new QAction(QObject::tr("Part"), &Menu);
+            // Check if we can part the chan
+            if (wx->IsDead())
+                menuPart->setEnabled(false);
+            Menu.addAction(menuPart);
+            menuJoinAll = new QAction(QObject::tr("Rejoin all dead channels on this network"), &Menu);
+            Menu.addAction(menuJoinAll);
+        }
+        if (wx->IsNetwork())
+        {
+            Menu.addSeparator();
+            if (wx->IsDead())
+            {
+                menuReconnect = new QAction(QObject::tr("Reconnect"), &Menu);
+                Menu.addAction(menuReconnect);
+            }
+            menuDisconnect = new QAction(QObject::tr("Disconnect"), &Menu);
+            Menu.addAction(menuDisconnect);
+            menuDisconnect->setEnabled(!wx->IsDead());
+            menuSniffer = new QAction(QObject::tr("Network sniffer"), &Menu);
+            Menu.addAction(menuSniffer);
+        }
+        Menu.addSeparator();
     }
+    QAction *showHidden = new QAction(QObject::tr("Show hidden windows"), &Menu);
+    showHidden->setCheckable(true);
+    Menu.addAction(showHidden);
+    showHidden->setChecked(this->ShowHidden);
 
     QAction* selectedItem = Menu.exec(globalPos);
     if (!selectedItem)
@@ -232,6 +286,9 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     {
         if (wx->GetSession())
             wx->GetSession()->SendRaw(wx->GetScrollback(), "AWAY");
+    } else if (selectedItem == menuHide)
+    {
+        wx->ToggleHide();
     } else if (selectedItem == menuJoinAll)
     {
         IRCSession *irc_session = NULL;
@@ -254,6 +311,13 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     {
         if (wx->GetSession())
             wx->GetSession()->SetAutoreconnect(wx->GetScrollback(), menuAuto->isChecked());
+    } else if (selectedItem == showHidden)
+    {
+        this->ShowHidden = showHidden->isChecked();
+        if (this->ShowHidden)
+            RegisterHidden();
+        else
+            UnregisterHidden();
     }
 }
 

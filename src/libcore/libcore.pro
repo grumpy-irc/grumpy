@@ -33,7 +33,8 @@ SOURCES += core.cpp \
     cppextension.cpp \
     hooks.cpp \
     highlighter.cpp \
-    sqlite.cpp
+    sqlite.cpp \
+    pythonengine.cpp
 
 HEADERS += core.h\
         libcore_global.h \
@@ -57,7 +58,8 @@ HEADERS += core.h\
     cppextension.h \
     hooks.h \
     highlighter.h \
-    sqlite.h
+    sqlite.h \
+    pythonengine.h
 
 unix {
     target.path = /usr/lib

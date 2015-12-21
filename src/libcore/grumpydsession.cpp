@@ -36,6 +36,7 @@ GrumpydSession::GrumpydSession(Scrollback *System, QString Hostname, QString Use
     this->AutoReconnect = true;
     this->hostname = Hostname;
     this->systemWindow->SetSession(this);
+    this->systemWindow->SetHidable(false);
     this->port = Port;
     this->syncInit = QDateTime::currentDateTime();
     this->username = UserName;

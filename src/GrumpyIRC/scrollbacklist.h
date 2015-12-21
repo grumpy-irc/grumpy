@@ -31,11 +31,16 @@ namespace GrumpyIRC
     {
             Q_OBJECT
         public:
+            static ScrollbackList *GetScrollbackList();
+
             explicit ScrollbackList(QWidget *parent = 0);
             ~ScrollbackList();
+            void RegisterHidden();
             void RegisterWindow(ScrollbackFrame *scrollback, ScrollbackList_Node *parent_node = NULL);
             QStandardItem *GetRootTreeItem();
+            void UnregisterHidden();
             void UnregisterWindow(ScrollbackList_Node *node, ScrollbackList_Node *parent_n);
+            bool ShowHidden = false;
 
         private slots:
             void OnUpdate();
@@ -44,11 +49,13 @@ namespace GrumpyIRC
             void on_treeView_clicked(const QModelIndex &index);
 
         private:
+            static ScrollbackList *scrollbackList;
+
             void switchWindow(const QModelIndex &index);
             void sniffer(ScrollbackFrame *window);
             void closeWindow();
             ScrollbackFrame *selectedWindow();
-			QStandardItem *root;
+            QStandardItem *root;
             QTimer *timer;
             QStandardItemModel *model;
             Ui::ScrollbackList *ui;

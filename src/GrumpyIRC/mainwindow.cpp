@@ -48,6 +48,7 @@ static void Exit()
     IRCSession::Exit(CONF->GetQuitMessage());
     GCFG->SetValue("mainwindow_state", QVariant(MainWindow::Main->saveState()));
     GCFG->SetValue("mainwindow_geometry", QVariant(MainWindow::Main->saveGeometry()));
+    GCFG->SetValue("systemwx_hide", MainWindow::Main->GetSystem()->IsHidden());
     CONF->Save();
     QApplication::exit(0);
 }
@@ -456,6 +457,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->restoreGeometry(GCFG->GetValue("mainwindow_geometry").toByteArray());
     this->restoreState(GCFG->GetValue("mainwindow_state").toByteArray());
     this->userWidget->hide();
+    if (GCFG->GetValueAsBool("systemwx_hide", false))
+        this->systemWindow->ToggleHide();
     if (!CONF->SafeMode)
         this->Execute(CONF->GetAutorun());
 }

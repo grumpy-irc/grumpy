@@ -89,7 +89,8 @@ void ScrollbacksManager::DestroyWindow(ScrollbackFrame *window)
         ScrollbackList_Node *parent = NULL;
         if (window->GetParent())
             parent = window->GetParent()->TreeNode;
-        MainWindow::Main->GetScrollbackList()->UnregisterWindow(window->TreeNode, parent);
+        ScrollbackList::GetScrollbackList()->UnregisterWindow(window->TreeNode, parent);
+        window->TreeNode = NULL;
     }
     this->Scrollbacks.removeOne(window);
     delete window;

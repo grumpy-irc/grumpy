@@ -85,9 +85,11 @@ namespace GrumpyIRC
             bool IsChannel();
             bool IsNetwork();
             bool IsGrumpy();
+            bool IsHidden();
+            void ToggleHide();
             bool IsVisible();
             bool IsDead();
-			ScrollbackFrame *GetParent();
+            ScrollbackFrame *GetParent();
             scrollback_id_t GetID();
             NetworkSession *GetSession();
             Scrollback *GetScrollback();
@@ -158,7 +160,6 @@ namespace GrumpyIRC
             STextBox *textEdit;
             bool needsRefresh;
             Scrollback *scrollback;
-			//QStandardItem *treeNode;
             QString buffer;
             UserFrame *userFrame;
             QString _name;
