@@ -24,8 +24,8 @@ PacketSnifferWin::PacketSnifferWin(QWidget *parent) : QDialog(parent), ui(new Ui
     this->ui->setupUi(this);
     this->ui->plainTextEdit->clear();
     this->ui->plainTextEdit->setReadOnly(true);
-    this->ui->plainTextEdit->setPalette(Skin::GetDefault()->Palette());
-    this->ui->plainTextEdit->setFont(Skin::GetDefault()->TextFont);
+    this->ui->plainTextEdit->setPalette(Skin::GetCurrent()->Palette());
+    this->ui->plainTextEdit->setFont(Skin::GetCurrent()->TextFont);
 }
 
 PacketSnifferWin::~PacketSnifferWin()

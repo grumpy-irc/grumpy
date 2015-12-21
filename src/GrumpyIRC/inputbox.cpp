@@ -31,9 +31,9 @@ InputBox::InputBox(ScrollbackFrame *parent) : QFrame(parent), ui(new Ui::InputBo
     this->ui->lineEdit->setVisible(false);
     this->ui->textEdit->installEventFilter(new KeyFilter(this));
     this->historySize = 800;
-    this->ui->textEdit->setFont(Skin::GetDefault()->TextFont);
-    this->ui->textEdit->setPalette(Skin::GetDefault()->Palette());
-    this->ui->lineEdit->setPalette(Skin::GetDefault()->Palette());
+    this->ui->textEdit->setFont(Skin::GetCurrent()->TextFont);
+    this->ui->textEdit->setPalette(Skin::GetCurrent()->Palette());
+    this->ui->lineEdit->setPalette(Skin::GetCurrent()->Palette());
     this->historyPosition = 0;
     this->isPassword = false;
     this->parent = parent;

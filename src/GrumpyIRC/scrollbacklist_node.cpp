@@ -49,10 +49,10 @@ void ScrollbackList_Node::RebuildCache()
     this->standardBrush = this->foreground();
     this->highlighterBrush = this->foreground();
     this->systemBrush = this->foreground();
-    this->unreadBrush.setColor(Skin::GetDefault()->Unread);
-    this->standardBrush.setColor(Skin::GetDefault()->TextColor);
-    this->highlighterBrush.setColor(Skin::GetDefault()->HighligtedColor);
-    this->systemBrush.setColor(Skin::GetDefault()->SystemColor);
+    this->unreadBrush.setColor(Skin::GetCurrent()->Unread);
+    this->standardBrush.setColor(Skin::GetCurrent()->TextColor);
+    this->highlighterBrush.setColor(Skin::GetCurrent()->HighligtedColor);
+    this->systemBrush.setColor(Skin::GetCurrent()->SystemColor);
 }
 
 void ScrollbackList_Node::UpdateIcon()

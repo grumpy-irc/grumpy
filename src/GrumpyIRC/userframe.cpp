@@ -32,9 +32,9 @@ UserFrame::UserFrame(ScrollbackFrame *parent) : QFrame(parent), ui(new Ui::UserF
     this->network = NULL;
     this->IsVisible = false;
     this->NeedsUpdate = false;
-    this->ui->label->setPalette(Skin::GetDefault()->Palette());
+    this->ui->label->setPalette(Skin::GetCurrent()->Palette());
     this->ui->label->setText("");
-    this->ui->listWidget->setPalette(Skin::GetDefault()->Palette());
+    this->ui->listWidget->setPalette(Skin::GetCurrent()->Palette());
 }
 
 UserFrame::~UserFrame()
@@ -277,14 +277,14 @@ QString UserFrame::GenerateTip(libircclient::User *ux)
 static QColor getColor(libircclient::User *ux)
 {
     if (ux->IsAway)
-        return Skin::GetDefault()->UserListAwayColor;
+        return Skin::GetCurrent()->UserListAwayColor;
 
     char cumode = ux->GetHighestCUMode();
 
-    if (cumode == 0 || !Skin::GetDefault()->ModeColors.contains(cumode))
-        return Skin::GetDefault()->TextColor;
+    if (cumode == 0 || !Skin::GetCurrent()->ModeColors.contains(cumode))
+        return Skin::GetCurrent()->TextColor;
     
-    return Skin::GetDefault()->ModeColors[cumode];
+    return Skin::GetCurrent()->ModeColors[cumode];
 }
 
 void UserFrame::InsertUser(libircclient::User *user, bool bulk)

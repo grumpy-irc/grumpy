@@ -73,9 +73,9 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     this->inputBox = new InputBox(this);
     this->ui->splitter->addWidget(this->textEdit);
     this->ui->splitter->addWidget(this->inputBox);
-    this->textEdit->setFont(Skin::GetDefault()->TextFont);
+    this->textEdit->setFont(Skin::GetCurrent()->TextFont);
     this->LastMenuTooltipUpdate = QDateTime::currentDateTime().addSecs(-50);
-    this->textEdit->setPalette(Skin::GetDefault()->Palette());
+    this->textEdit->setPalette(Skin::GetCurrent()->Palette());
     this->_parent = parentWindow;
     this->TreeNode = NULL;
     this->needsRefresh = false;
@@ -162,7 +162,7 @@ static QString ItemToString(ScrollbackItem item, bool highlighted)
     QString text = item.GetText();
     QString user = item.GetUser().GetNick();
     bool system = false;
-    QColor color = Skin::GetDefault()->TextColor;
+    QColor color = Skin::GetCurrent()->TextColor;
     switch (item.GetType())
     {
         case ScrollbackItemType_Act:
@@ -217,10 +217,10 @@ static QString ItemToString(ScrollbackItem item, bool highlighted)
             //result = item.GetText();
             break;
         case ScrollbackItemType_SystemError:
-            color = Skin::GetDefault()->Error;
+            color = Skin::GetCurrent()->Error;
             break;
         case ScrollbackItemType_SystemWarning:
-            color = Skin::GetDefault()->Warning;
+            color = Skin::GetCurrent()->Warning;
             break;
         case ScrollbackItemType_Topic:
             system = true;
@@ -230,11 +230,11 @@ static QString ItemToString(ScrollbackItem item, bool highlighted)
     }
     //format_string.replace("$string", result);
     if (highlighted)
-        color = Skin::GetDefault()->HighligtedColor;
+        color = Skin::GetCurrent()->HighligtedColor;
     else if (item.GetType() == ScrollbackItemType_System)
-        color = Skin::GetDefault()->SystemColor;
+        color = Skin::GetCurrent()->SystemColor;
     else if (system)
-        color = Skin::GetDefault()->SystemInfo;
+        color = Skin::GetCurrent()->SystemInfo;
     irc2htmlcode::FormattedItem results = ScrollbackFrame::parser.Process(format_string, item.GetTime(), user, text, color.name());
     return results.source;
 }

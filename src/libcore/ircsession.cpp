@@ -346,6 +346,7 @@ bool IRCSession::isRetrievingWhoInfo(QString channel)
 void IRCSession::init(bool preindexed)
 {
     this->_autoReconnect = false;
+    this->network = NULL;
     this->AutomaticallyRetrieveBanList = true;
     if (this->systemWindow)
     {
@@ -360,7 +361,6 @@ void IRCSession::init(bool preindexed)
     this->ulistUpdateTime = 20 * 60000;
     connect(&this->timerUL, SIGNAL(timeout()), this, SLOT(OnUpdateUserList()));
     this->maxSnifferBufferSize = 2000;
-    this->network = NULL;
     if (!preindexed)
     {
         IRCSession::Sessions_Lock.lock();

@@ -11,6 +11,7 @@
 // Copyright (c) Petr Bena 2015
 
 #include "corewrapper.h"
+#include "skin.h"
 #include "../libcore/generic.h"
 #include "../libcore/highlighter.h"
 #include "grumpyconf.h"
@@ -265,6 +266,23 @@ void GrumpyConf::Load()
             new Highlighter(item.toHash());
         }
     }
+    if (GCFG->Contains("skins"))
+    {
+        Skin::Clear();
+        QList<QVariant> list = GCFG->GetValue("skins").toList();
+        foreach (QVariant item, list)
+        {
+            new Skin(item.toHash());
+        }
+    }
+    if (GCFG->Contains("skin"))
+    {
+        int skin = GCFG->GetValueAsInt("skin");
+        if (skin < 0 || skin >= Skin::SkinList.count())
+            return;
+
+        Skin::Current = Skin::SkinList[skin];
+    }
 }
 
 void GrumpyConf::Save()
@@ -275,7 +293,17 @@ void GrumpyConf::Save()
     {
         ql.append(item->ToHash());
     }
-    GCFG->SetValue("highlights", QVariant(ql));
+    QList<QVariant> sl;
+    foreach (Skin *sx, Skin::SkinList)
+    {
+        if (sx->IsDefault())
+            continue;
+        sl.append(sx->ToHash());
+    }
+    GCFG->SetValue("highlights", ql);
+    if (!sl.isEmpty())
+        GCFG->SetValue("skins", sl);
+    GCFG->SetValue("skin", Skin::SkinList.indexOf(Skin::GetCurrent()));
     GCFG->Save();
 }
 

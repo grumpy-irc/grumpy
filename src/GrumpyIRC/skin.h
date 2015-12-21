@@ -16,19 +16,32 @@
 #include "../libcore/definitions.h"
 
 #include <QHash>
+#include <QList>
 #include <QFont>
 #include <QPalette>
+#include "../libirc/libirc/serializableitem.h"
 
 namespace GrumpyIRC
 {
-    class Skin
+    class Skin : public libirc::SerializableItem
     {
         public:
-            static Skin *Default;
 			static Skin *GetDefault();
+            static void Clear();
+            static Skin *GetCurrent();
+            static QList<Skin*> SkinList;
+            static Skin *Default;
+            static Skin *Current;
 
+            Skin(QHash<QString, QVariant> skin);
             Skin();
+            Skin(Skin *forked);
+            ~Skin();
             QPalette Palette();
+            void LoadHash(QHash<QString, QVariant> hash);
+            QHash<QString, QVariant> ToHash();
+            bool IsDefault();
+            QString Name;
             QFont TextFont;
             QColor TextColor;
             QColor UserListAwayColor;
@@ -40,6 +53,8 @@ namespace GrumpyIRC
             QColor Unread;
             QColor BackgroundColor;
             QHash<char, QColor> ModeColors;
+        private:
+            void setDefaults();
     };
 }
 

@@ -13,6 +13,7 @@
 #include "../libcore/definitions.h"
 
 #include <QMenu>
+#include <QColorDialog>
 #include "../libcore/autocompletionengine.h"
 #include "../libcore/commandprocessor.h"
 #include "../libcore/exception.h"
@@ -21,6 +22,7 @@
 #include "../libcore/highlighter.h"
 #include "../libcore/generic.h"
 #include "preferenceswin.h"
+#include "skin.h"
 #include "ui_preferenceswin.h"
 #include "corewrapper.h"
 #include "grumpyconf.h"
@@ -68,6 +70,7 @@ PreferencesWin::PreferencesWin(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
     this->ui->tableWidget->resizeColumnsToContents();
     this->ui->tableWidget->resizeRowsToContents();
     this->ui->tableWidget_2->resizeColumnsToContents();
+    this->updateSkin();
 }
 
 PreferencesWin::~PreferencesWin()
@@ -105,6 +108,7 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
             continue;
         ignored_nums.append(numeric.toInt());
     }
+    Skin::Current = this->highlighted_skin;
     CONF->SetIRCIgnoredNumerics(ignored_nums);
     CONF->Save();
     this->close();
@@ -163,6 +167,30 @@ QList<int> PreferencesWin::selectedHLRows()
     }
 
     return results;
+}
+
+void PreferencesWin::updateSkin()
+{
+    int selectedSkin = 0;
+    if (this->ui->comboBox->count() > 0)
+        selectedSkin = this->ui->comboBox->currentIndex();
+    this->ui->comboBox->clear();
+    foreach (Skin *skin, Skin::SkinList)
+    {
+        this->ui->comboBox->addItem(skin->Name);
+    }
+    while (selectedSkin >= this->ui->comboBox->count())
+        selectedSkin -= 1;
+    this->ui->comboBox->setCurrentIndex(selectedSkin);
+}
+
+void PreferencesWin::refreshSkin(bool enabled)
+{
+    this->ui->pushButton_4->setEnabled(enabled);
+    this->ui->lineEdit_SkinFont->setEnabled(enabled);
+    this->ui->lineEdit_SkinName->setEnabled(enabled);
+    this->ui->pushButton_5->setEnabled(enabled);
+    this->ui->lineEdit_SkinSz->setEnabled(enabled);
 }
 
 void PreferencesWin::on_tableWidget_cellChanged(int row, int column)
@@ -236,4 +264,72 @@ void PreferencesWin::OnHLRegex(bool checked)
         throw new Exception("Checkbox not found", BOOST_CURRENT_FUNCTION);
 
     this->highlights_regex[source]->IsRegex = checked;
+}
+
+void GrumpyIRC::PreferencesWin::on_comboBox_currentIndexChanged(int index)
+{
+    if (index < 0)
+        return;
+
+    if (index >= Skin::SkinList.count())
+        throw new Exception("Invalid skin_ptr", BOOST_CURRENT_FUNCTION);
+
+    this->highlighted_skin = Skin::SkinList[index];
+    this->ui->lineEdit_SkinFont->setText(this->highlighted_skin->TextFont.toString());
+    this->ui->lineEdit_SkinSz->setText(QString::number(this->highlighted_skin->TextFont.pixelSize()));
+    this->ui->lineEdit_SkinName->setText(this->highlighted_skin->Name);
+    this->refreshSkin(!this->highlighted_skin->IsDefault());
+    //this->ui->lineEdit_SkinBk->setText(skin->BackgroundColor);
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_clicked()
+{
+    if (this->highlighted_skin->IsDefault())
+        return;
+
+    this->highlighted_skin->Name = this->ui->lineEdit_SkinName->text();
+    this->highlighted_skin->TextFont = QFont(this->ui->lineEdit_SkinFont->text());
+    this->highlighted_skin->TextFont.setPixelSize(this->ui->lineEdit_SkinSz->text().toInt());
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_3_clicked()
+{
+    if (this->highlighted_skin->IsDefault())
+        return;
+
+    delete this->highlighted_skin;
+    this->highlighted_skin = NULL;
+    this->updateSkin();
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_2_clicked()
+{
+    new Skin(this->highlighted_skin);
+    this->updateSkin();
+
+    // Now that we created a new skin we can switch it
+    this->ui->comboBox->setCurrentIndex(this->ui->comboBox->count() - 1);
+}
+
+static QColor GetColorUsingPicker(QColor color)
+{
+    QColorDialog *picker = new QColorDialog(color, NULL);
+    picker->exec();
+    color = picker->selectedColor();
+    delete picker;
+    return color;
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_4_clicked()
+{
+    if (!this->highlighted_skin)
+        return;
+    this->highlighted_skin->BackgroundColor = GetColorUsingPicker(this->highlighted_skin->BackgroundColor);
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_5_clicked()
+{
+    if (!this->highlighted_skin)
+        return;
+    this->highlighted_skin->TextColor = GetColorUsingPicker(this->highlighted_skin->TextColor);
 }

@@ -57,7 +57,7 @@ ScrollbackList::ScrollbackList(QWidget *parent) : QDockWidget(parent), ui(new Ui
     this->ui->treeView->setColumnHidden(1, true);
     this->ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     this->ui->treeView->setHeaderHidden(true);
-    this->ui->treeView->setPalette(Skin::GetDefault()->Palette());
+    this->ui->treeView->setPalette(Skin::GetCurrent()->Palette());
     this->timer->start(2000);
 }
 

@@ -39,7 +39,7 @@ ChannelWin::ChannelWin(NetworkSession *session, libircclient::Network *network, 
     this->setWindowTitle(channel->GetName());
     this->parentFrame = parent;
     this->ignore = false;
-    this->ui->plainTextEdit->setPalette(Skin::GetDefault()->Palette());
+    this->ui->plainTextEdit->setPalette(Skin::GetCurrent()->Palette());
 
     // Mode view
     this->ui->tableWidget->verticalHeader()->setVisible(false);

@@ -27,8 +27,8 @@ ScriptWin::ScriptWin(ScrollbackFrame *parent) : QDialog(parent), ui(new Ui::Scri
     this->setAttribute(Qt::WA_DeleteOnClose);
     this->ui->setupUi(this);
     this->parentFrame = parent;
-    this->ui->plainTextEdit->setFont(Skin::GetDefault()->TextFont);
-    this->ui->plainTextEdit->setPalette(Skin::GetDefault()->Palette());
+    this->ui->plainTextEdit->setFont(Skin::GetCurrent()->TextFont);
+    this->ui->plainTextEdit->setPalette(Skin::GetCurrent()->Palette());
 }
 
 ScriptWin::~ScriptWin()
