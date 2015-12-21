@@ -266,6 +266,10 @@ void GrumpyConf::Load()
             new Highlighter(item.toHash());
         }
     }
+
+    // This will actually load the default skin in case it wasn't already, we need that to ensure that it's first in list
+    Skin::GetDefault();
+
     if (GCFG->Contains("skins"))
     {
         Skin::Clear();

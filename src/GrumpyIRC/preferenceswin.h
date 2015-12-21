@@ -55,6 +55,8 @@ namespace GrumpyIRC
             void on_pushButton_4_clicked();
             void on_pushButton_5_clicked();
 
+            void on_pushButton_SC_clicked();
+
         private:
             void highlights_reload();
             void highlights_append_row(int row, Highlighter *hl);

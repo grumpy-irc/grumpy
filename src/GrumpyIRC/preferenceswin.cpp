@@ -171,7 +171,7 @@ QList<int> PreferencesWin::selectedHLRows()
 
 void PreferencesWin::updateSkin()
 {
-    int selectedSkin = 0;
+    int selectedSkin = Skin::SkinList.indexOf(Skin::GetCurrent());
     if (this->ui->comboBox->count() > 0)
         selectedSkin = this->ui->comboBox->currentIndex();
     this->ui->comboBox->clear();
@@ -257,6 +257,18 @@ void PreferencesWin::OnHLEnable(bool checked)
     this->highlights_enabled[source]->Enabled = checked;
 }
 
+static void UpdateButton(QPushButton *push, QColor color)
+{
+    QPalette temp = push->palette();
+    QColor inverted;
+    inverted.setBlue(255 - color.blue());
+    inverted.setRed(255 - color.red());
+    inverted.setGreen(255 - color.green());
+    temp.setColor(QPalette::ButtonText, inverted);
+    push->setStyleSheet("background-color: " + color.name() + ";");
+    push->setPalette(temp);
+}
+
 void PreferencesWin::OnHLRegex(bool checked)
 {
     QCheckBox *source = (QCheckBox*)QObject::sender();
@@ -278,6 +290,9 @@ void GrumpyIRC::PreferencesWin::on_comboBox_currentIndexChanged(int index)
     this->ui->lineEdit_SkinFont->setText(this->highlighted_skin->TextFont.toString());
     this->ui->lineEdit_SkinSz->setText(QString::number(this->highlighted_skin->TextFont.pixelSize()));
     this->ui->lineEdit_SkinName->setText(this->highlighted_skin->Name);
+    UpdateButton(this->ui->pushButton_4, this->highlighted_skin->BackgroundColor);
+    UpdateButton(this->ui->pushButton_5, this->highlighted_skin->TextColor);
+    UpdateButton(this->ui->pushButton_SC, this->highlighted_skin->SystemColor);
     this->refreshSkin(!this->highlighted_skin->IsDefault());
     //this->ui->lineEdit_SkinBk->setText(skin->BackgroundColor);
 }
@@ -313,10 +328,13 @@ void GrumpyIRC::PreferencesWin::on_pushButton_2_clicked()
 
 static QColor GetColorUsingPicker(QColor color)
 {
+    QColor original = color;
     QColorDialog *picker = new QColorDialog(color, NULL);
     picker->exec();
     color = picker->selectedColor();
     delete picker;
+    if (!color.isValid())
+        return original;
     return color;
 }
 
@@ -324,12 +342,25 @@ void GrumpyIRC::PreferencesWin::on_pushButton_4_clicked()
 {
     if (!this->highlighted_skin)
         return;
+
     this->highlighted_skin->BackgroundColor = GetColorUsingPicker(this->highlighted_skin->BackgroundColor);
+    UpdateButton(this->ui->pushButton_4, this->highlighted_skin->BackgroundColor);
 }
 
 void GrumpyIRC::PreferencesWin::on_pushButton_5_clicked()
 {
     if (!this->highlighted_skin)
         return;
+
     this->highlighted_skin->TextColor = GetColorUsingPicker(this->highlighted_skin->TextColor);
+    UpdateButton(this->ui->pushButton_5, this->highlighted_skin->TextColor);
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_SC_clicked()
+{
+    if (!this->highlighted_skin)
+        return;
+
+    this->highlighted_skin->SystemColor = GetColorUsingPicker(this->highlighted_skin->SystemColor);
+    UpdateButton(this->ui->pushButton_SC, this->highlighted_skin->SystemColor);
 }
