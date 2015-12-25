@@ -54,15 +54,41 @@ namespace GrumpyIRC
             void on_pushButton_2_clicked();
             void on_pushButton_4_clicked();
             void on_pushButton_5_clicked();
-
             void on_pushButton_SC_clicked();
-
+            void on_pushButton_WC_clicked();
+            void on_pushButton_EC_clicked();
+            void on_pushButton_IC_clicked();
+            void on_pushButton_AC_clicked();
+            void on_pushButton_CQ_clicked();
+            void on_pushButton_CA_clicked();
+            void on_pushButton_CO_clicked();
+            void on_pushButton_CH_clicked();
+            void on_pushButton_CV_clicked();
+            void on_pushButton_UC_clicked();
+            void on_pushButton_HC_clicked();
+            void on_pushButton_C1_clicked();
+            void on_pushButton_C2_clicked();
+            void on_pushButton_C3_clicked();
+            void on_pushButton_C4_clicked();
+            void on_pushButton_C5_clicked();
+            void on_pushButton_C6_clicked();
+            void on_pushButton_C7_clicked();
+            void on_pushButton_C8_clicked();
+            void on_pushButton_C9_clicked();
+            void on_pushButton_C10_clicked();
+            void on_pushButton_C11_clicked();
+            void on_pushButton_C12_clicked();
+            void on_pushButton_C13_clicked();
+            void on_pushButton_C14_clicked();
+            void on_pushButton_C15_clicked();
         private:
             void highlights_reload();
+            void updateColor();
             void highlights_append_row(int row, Highlighter *hl);
             QList<int> selectedHLRows();
             void updateSkin();
             void refreshSkin(bool enabled);
+            QHash<QPushButton*,QColor*> skin_ht;
             QHash<QTableWidgetItem*, Highlighter*> highlights_source;
             QHash<QCheckBox*, Highlighter*> highlights_enabled;
             QHash<QCheckBox*, Highlighter*> highlights_regex;

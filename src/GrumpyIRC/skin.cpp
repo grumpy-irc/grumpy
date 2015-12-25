@@ -124,6 +124,22 @@ void Skin::setDefaults()
     this->ModeColors.insert('o', QColor(92, 247, 14));
     this->ModeColors.insert('a', QColor(255, 156, 190));
     this->ModeColors.insert('q', QColor(255, 206, 156));
+    this->Colors.insert(0,    QColor("#000000")); // White
+    this->Colors.insert(1,    QColor("#FFFFFF")); // Black
+    this->Colors.insert(2,    QColor("#97ADF7")); // Blue
+    this->Colors.insert(3,    QColor("#A1F797")); // Green
+    this->Colors.insert(4,    QColor("#FFC4CE")); // Light red
+    this->Colors.insert(5,    QColor("#CCB472")); // Brown
+    this->Colors.insert(6,    QColor("#F03CD5")); // Purple
+    this->Colors.insert(7,    QColor("#F0B754")); // Orange
+    this->Colors.insert(8,    QColor("#FCFA6A")); // Yellow
+    this->Colors.insert(9,    QColor("#C3FAC5")); // Light green
+    this->Colors.insert(10,   QColor("#C8FAF7")); // Cyan
+    this->Colors.insert(11,   QColor("#DEFAF8")); // Light cyan
+    this->Colors.insert(12,   QColor("#D2D3FA")); // Light blue
+    this->Colors.insert(13,   QColor("#F7C3F1")); // Pink
+    this->Colors.insert(14,   QColor("#C4C4C4")); // Grey
+    this->Colors.insert(15,   QColor("#DADADA")); // Light grey
 }
 
 Skin::Skin(Skin *forked)

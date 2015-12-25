@@ -45,6 +45,18 @@ QMutex ScrollbackFrame::ScrollbackFrames_m;
 ScrollbackFrame_WorkerThread *ScrollbackFrame::WorkerThread = NULL;
 irc2htmlcode::Parser ScrollbackFrame::parser;
 
+void ScrollbackFrame::UpdateSkins()
+{
+    QHash<unsigned int, QColor> colors = Skin::GetCurrent()->Colors;
+    parser.TextColors.clear();
+
+    foreach (unsigned int color_n, colors.keys())
+        parser.TextColors.insert(color_n, colors[color_n].name());
+
+    foreach (ScrollbackFrame *frame, ScrollbackFrame::ScrollbackFrames)
+        frame->UpdateSkin();
+}
+
 void ScrollbackFrame::ExitThread()
 {
     WorkerThread->IsRunning = false;
@@ -75,17 +87,11 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     this->ui->splitter->addWidget(this->inputBox);
     this->textEdit->setFont(Skin::GetCurrent()->TextFont);
     this->LastMenuTooltipUpdate = QDateTime::currentDateTime().addSecs(-50);
-    this->textEdit->setPalette(Skin::GetCurrent()->Palette());
     this->_parent = parentWindow;
     this->TreeNode = NULL;
     this->needsRefresh = false;
     this->isClean = true;
     connect(this->textEdit, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(Menu(QPoint)));
-    this->maxItems = 200;
-    this->userFrame = new UserFrame(this);
-    this->Highlighting = true;
-    this->precachedNetwork = NULL;
-    this->isVisible = false;
     if (_scrollback == NULL)
         this->scrollback = new Scrollback();
     else
@@ -103,9 +109,15 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     connect(this->scrollback, SIGNAL(Event_Resync()), this, SLOT(OnDead()));
     connect(this->scrollback, SIGNAL(Event_StateModified()), this, SLOT(OnState()));
     connect(this->textEdit, SIGNAL(Event_Link(QString)), this, SLOT(OnLink(QString)));
-    this->textEdit->SetStyleSheet(ScrollbackFrame::parser.GetStyle());
-    this->currentScrollbar = 0;
     connect(&this->scroller, SIGNAL(timeout()), this, SLOT(OnScroll()));
+    this->UpdateSkin();
+    this->maxItems = 200;
+    this->userFrame = new UserFrame(this);
+    this->Highlighting = true;
+    this->precachedNetwork = NULL;
+    this->isVisible = false;
+    this->currentScrollbar = 0;
+
     //this->scroller.start(200);
 }
 
@@ -795,6 +807,12 @@ QString ScrollbackFrame::GetLocalUserMode()
 
     // Return a self identity information for the current network
     return this->GetSession()->GetLocalUserModeAsString(this->GetScrollback());
+}
+
+void ScrollbackFrame::UpdateSkin()
+{
+    this->textEdit->setPalette(Skin::GetCurrent()->Palette());
+    this->textEdit->SetStyleSheet(ScrollbackFrame::parser.GetStyle());
 }
 
 int ScrollbackFrame::GetSynced()

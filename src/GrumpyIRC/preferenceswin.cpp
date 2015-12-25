@@ -24,6 +24,7 @@
 #include "preferenceswin.h"
 #include "skin.h"
 #include "ui_preferenceswin.h"
+#include "scrollbackframe.h"
 #include "corewrapper.h"
 #include "grumpyconf.h"
 
@@ -71,6 +72,11 @@ PreferencesWin::PreferencesWin(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
     this->ui->tableWidget->resizeRowsToContents();
     this->ui->tableWidget_2->resizeColumnsToContents();
     this->updateSkin();
+
+    this->ui->lineEdit_FormatActn->setText(CONF->GetActionFormat());
+    this->ui->lineEdit_FormatMsg->setText(CONF->GetMessageFormat());
+    this->ui->lineEdit_FormatNt->setText(CONF->GetNoticeFormat());
+    this->ui->lineEdit_FormatText->setText(CONF->GetLineFormat());
 }
 
 PreferencesWin::~PreferencesWin()
@@ -110,6 +116,8 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
     }
     Skin::Current = this->highlighted_skin;
     CONF->SetIRCIgnoredNumerics(ignored_nums);
+    //CONF->setl
+    ScrollbackFrame::UpdateSkins();
     CONF->Save();
     this->close();
 }
@@ -290,9 +298,25 @@ void GrumpyIRC::PreferencesWin::on_comboBox_currentIndexChanged(int index)
     this->ui->lineEdit_SkinFont->setText(this->highlighted_skin->TextFont.toString());
     this->ui->lineEdit_SkinSz->setText(QString::number(this->highlighted_skin->TextFont.pixelSize()));
     this->ui->lineEdit_SkinName->setText(this->highlighted_skin->Name);
-    UpdateButton(this->ui->pushButton_4, this->highlighted_skin->BackgroundColor);
-    UpdateButton(this->ui->pushButton_5, this->highlighted_skin->TextColor);
-    UpdateButton(this->ui->pushButton_SC, this->highlighted_skin->SystemColor);
+
+    // This is to save us some coding, it's a little bit slower but scales much better:
+    // We put a pointer to every button and color of current skin into a hash table
+    // then we let the functions pair them
+    this->skin_ht.clear();
+    this->skin_ht.insert(this->ui->pushButton_4, &this->highlighted_skin->BackgroundColor);
+    this->skin_ht.insert(this->ui->pushButton_5, &this->highlighted_skin->TextColor);
+    this->skin_ht.insert(this->ui->pushButton_SC, &this->highlighted_skin->SystemColor);
+    this->skin_ht.insert(this->ui->pushButton_AC, &this->highlighted_skin->UserListAwayColor);
+    this->skin_ht.insert(this->ui->pushButton_EC, &this->highlighted_skin->Error);
+    this->skin_ht.insert(this->ui->pushButton_HC, &this->highlighted_skin->HighligtedColor);
+    this->skin_ht.insert(this->ui->pushButton_IC, &this->highlighted_skin->SystemInfo);
+    this->skin_ht.insert(this->ui->pushButton_UC, &this->highlighted_skin->Unread);
+    this->skin_ht.insert(this->ui->pushButton_WC, &this->highlighted_skin->Warning);
+    //this->skin_ht.insert(this->ui->pushButton_CA, &this->highlighted_skin->)
+
+    foreach (QPushButton *button, this->skin_ht.keys())
+        UpdateButton(button, *this->skin_ht[button]);
+
     this->refreshSkin(!this->highlighted_skin->IsDefault());
     //this->ui->lineEdit_SkinBk->setText(skin->BackgroundColor);
 }
@@ -338,29 +362,159 @@ static QColor GetColorUsingPicker(QColor color)
     return color;
 }
 
-void GrumpyIRC::PreferencesWin::on_pushButton_4_clicked()
+void PreferencesWin::updateColor()
 {
     if (!this->highlighted_skin)
         return;
 
-    this->highlighted_skin->BackgroundColor = GetColorUsingPicker(this->highlighted_skin->BackgroundColor);
-    UpdateButton(this->ui->pushButton_4, this->highlighted_skin->BackgroundColor);
+    if (!this->skin_ht.contains((QPushButton*)QObject::sender()))
+        throw new Exception("Button not found", BOOST_CURRENT_FUNCTION);
+
+    *this->skin_ht[(QPushButton*)QObject::sender()] = GetColorUsingPicker(this->highlighted_skin->BackgroundColor);
+    UpdateButton((QPushButton*)QObject::sender(), *this->skin_ht[(QPushButton*)QObject::sender()]);
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_4_clicked()
+{
+    this->updateColor();
 }
 
 void GrumpyIRC::PreferencesWin::on_pushButton_5_clicked()
 {
-    if (!this->highlighted_skin)
-        return;
-
-    this->highlighted_skin->TextColor = GetColorUsingPicker(this->highlighted_skin->TextColor);
-    UpdateButton(this->ui->pushButton_5, this->highlighted_skin->TextColor);
+    this->updateColor();
 }
 
 void GrumpyIRC::PreferencesWin::on_pushButton_SC_clicked()
 {
-    if (!this->highlighted_skin)
-        return;
+    this->updateColor();
+}
 
-    this->highlighted_skin->SystemColor = GetColorUsingPicker(this->highlighted_skin->SystemColor);
-    UpdateButton(this->ui->pushButton_SC, this->highlighted_skin->SystemColor);
+void GrumpyIRC::PreferencesWin::on_pushButton_WC_clicked()
+{
+    this->updateColor();
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_EC_clicked()
+{
+    this->updateColor();
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_IC_clicked()
+{
+    this->updateColor();
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_AC_clicked()
+{
+    this->updateColor();
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_CQ_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_CA_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_CO_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_CH_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_CV_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_UC_clicked()
+{
+    this->updateColor();
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_HC_clicked()
+{
+    this->updateColor();
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_C1_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_C2_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_C3_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_C4_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_C5_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_C6_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_C7_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_C8_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_C9_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_C10_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_C11_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_C12_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_C13_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_C14_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_C15_clicked()
+{
+
 }

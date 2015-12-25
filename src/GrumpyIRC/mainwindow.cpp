@@ -465,6 +465,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->restoreGeometry(GCFG->GetValue("mainwindow_geometry").toByteArray());
     this->restoreState(GCFG->GetValue("mainwindow_state").toByteArray());
     this->userWidget->hide();
+    ScrollbackFrame::UpdateSkins();
     if (GCFG->GetValueAsBool("systemwx_hide", false))
         this->systemWindow->ToggleHide();
     if (!CONF->SafeMode)

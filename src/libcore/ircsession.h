@@ -177,6 +177,8 @@ namespace GrumpyIRC
             virtual void OnGeneric(libircclient::Parser *px);
             virtual void OnServerSideUnknown(libircclient::Parser *px);
             virtual void OnCapabilitiesNotSupported();
+            virtual void OnINVITE(libircclient::Parser *px);
+
         protected:
             static unsigned int lastID;
 

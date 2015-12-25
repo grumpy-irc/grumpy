@@ -69,6 +69,7 @@ namespace GrumpyIRC
             Q_OBJECT
 
         public:
+            static void UpdateSkins();
             static void ExitThread();
             static void InitializeThread();
             static QList<ScrollbackFrame*> ScrollbackFrames;
@@ -117,6 +118,7 @@ namespace GrumpyIRC
             QList<QString> GetUsers();
             QList<QString> GetChannels();
             QString GetLocalUserMode();
+            void UpdateSkin();
             int GetSynced();
             //void SetParent(ScrollbackFrame* parentWindow);
             bool IsDeletable;

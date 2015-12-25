@@ -41,6 +41,7 @@ namespace GrumpyIRC
             void LoadHash(QHash<QString, QVariant> hash);
             QHash<QString, QVariant> ToHash();
             bool IsDefault();
+            QHash<unsigned int, QColor> Colors;
             QString Name;
             QFont TextFont;
             QColor TextColor;

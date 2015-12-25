@@ -34,7 +34,8 @@ SOURCES += core.cpp \
     hooks.cpp \
     highlighter.cpp \
     sqlite.cpp \
-    pythonengine.cpp
+    pythonengine.cpp \
+    grumpyscript.cpp
 
 HEADERS += core.h\
         libcore_global.h \
@@ -59,7 +60,8 @@ HEADERS += core.h\
     hooks.h \
     highlighter.h \
     sqlite.h \
-    pythonengine.h
+    pythonengine.h \
+    grumpyscript.h
 
 unix {
     target.path = /usr/lib
