@@ -201,6 +201,29 @@ void GrumpydSession::RequestDisconnect(Scrollback *window, QString reason, bool 
     }
 }
 
+void GrumpyIRC::GrumpydSession::ResyncPB(Scrollback *window)
+{
+    QHash<QString, QVariant> parameters;
+    parameters.insert("scrollback_id", window->GetOriginalID());
+    parameters.insert("property_bag", window->PropertyBag);
+    this->gp->SendProtocolCommand(GP_CMD_RESYNC_SCROLLBACK_PB, parameters);
+}
+
+void GrumpyIRC::GrumpydSession::ResyncSingleItemPB(Scrollback * window, QString name)
+{
+    QHash<QString, QVariant> single_item_pb;
+
+    if (!window->PropertyBag.contains(name))
+        return;
+
+    single_item_pb.insert(name, window->PropertyBag[name]);
+
+    QHash<QString, QVariant> parameters;
+    parameters.insert("scrollback_id", window->GetOriginalID());
+    parameters.insert("property_bag", single_item_pb);
+    this->gp->SendProtocolCommand(GP_CMD_RESYNC_SCROLLBACK_PB, parameters);
+}
+
 void GrumpydSession::RequestPart(Scrollback *window)
 {
     if (window->GetType() != ScrollbackType_Channel)
@@ -599,7 +622,10 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVarian
     } else if (text == GP_CMD_OPTIONS)
     {
         this->processPreferences(parameters);
-    }else
+    } else if (text == GP_CMD_RESYNC_SCROLLBACK_PB)
+    {
+        this->processPBResync(parameters);
+    } else
     {
         QHash<QString, QVariant> params;
         params.insert("source", text);
@@ -923,6 +949,25 @@ void GrumpydSession::processSResync(QHash<QString, QVariant> parameters)
         // get a list of users in this channel and fill them up to scrollback info
         foreach (libircclient::User *user, channel->GetUsers())
             result->UserListChange(user->GetNick(), user, UserListChange_Insert);
+    }
+}
+
+void GrumpydSession::processPBResync(QHash<QString, QVariant> parameters)
+{
+    if (!parameters.contains("scrollback_id"))
+        return;
+    Scrollback *scrollback = this->GetScrollback(parameters["scrollback_id"].toUInt());
+    if (!scrollback)
+        return;
+    if (!parameters.contains("property_bag"))
+        return;
+    QHash<QString, QVariant> pb = parameters["property_bag"].toHash();
+    foreach(QString key, pb.keys())
+    {
+        if (scrollback->PropertyBag.contains(key))
+            scrollback->PropertyBag[key] = pb[key];
+        else
+            scrollback->PropertyBag.insert(key, pb[key]);
     }
 }
 

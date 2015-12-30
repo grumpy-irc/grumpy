@@ -21,6 +21,9 @@
 #include <QPalette>
 #include "../libirc/libirc/serializableitem.h"
 
+#define SERIALIZE_COLOR(color)   hash.insert(#color, color.name())
+#define UNSERIALIZE_COLOR(variable_name)       if (hash.contains(#variable_name)) { variable_name = QColor(hash[#variable_name].toString()); }
+
 namespace GrumpyIRC
 {
     class Skin : public libirc::SerializableItem

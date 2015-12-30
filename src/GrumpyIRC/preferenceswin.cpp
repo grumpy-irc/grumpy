@@ -105,6 +105,8 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
     CONF->SetChannelH(this->ui->lineEdit_ChannelH->text());
     CONF->SetLabeledH(this->ui->lineEdit_LabeledH->text());
     CONF->SetStandardH(this->ui->lineEdit_StandardH->text());
+    CONF->SetMessageFormat(this->ui->lineEdit_FormatMsg->text());
+    CONF->SetLineFormat(this->ui->lineEdit_FormatText->text());
     QList<int> ignored_nums;
     QList<QString> ignored = this->ui->lineEdit_4->text().split(",");
     foreach (QString numeric, ignored)
@@ -370,7 +372,7 @@ void PreferencesWin::updateColor()
     if (!this->skin_ht.contains((QPushButton*)QObject::sender()))
         throw new Exception("Button not found", BOOST_CURRENT_FUNCTION);
 
-    *this->skin_ht[(QPushButton*)QObject::sender()] = GetColorUsingPicker(this->highlighted_skin->BackgroundColor);
+    *this->skin_ht[(QPushButton*)QObject::sender()] = GetColorUsingPicker(*this->skin_ht[(QPushButton*)QObject::sender()]);
     UpdateButton((QPushButton*)QObject::sender(), *this->skin_ht[(QPushButton*)QObject::sender()]);
 }
 

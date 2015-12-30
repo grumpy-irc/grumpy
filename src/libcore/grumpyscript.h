@@ -14,12 +14,15 @@
 #define GRUMPYSCRIPT_H
 
 #include "definitions.h"
+#include <QHash>
 
 namespace GrumpyIRC
 {
     class GrumpyScript
     {
         public:
+            static QString ReplaceVars(QString source, QHash<QString, QString> vars, char prefix = '$', char escape = '\\');
+
             GrumpyScript();
             //virtual ~GrumpyScript()
             void Exec();

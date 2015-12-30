@@ -14,6 +14,38 @@
 
 using namespace GrumpyIRC;
 
+QString GrumpyScript::ReplaceVars(QString source, QHash<QString, QString> vars, char prefix, char escape)
+{
+    int current_pos = 0;
+    QList<QChar> separators;
+    separators << ' ';
+    QString replaced = source;
+    while (current_pos < replaced.size())
+    {
+        char symbol = replaced[current_pos].toLatin1();
+        char previous = '\0';
+        if (current_pos > 0)
+            previous = replaced[current_pos - 1].toLatin1();
+        if (symbol == prefix && previous != escape)
+        {
+            // This looks like a variable
+            QString variable;
+            int variable_start = current_pos;
+            int variable_end = current_pos;
+            // find its end
+            while (variable_end < replaced.size() && !separators.contains(replaced[variable_end]))
+                variable_end++;
+            variable = replaced.mid(variable_start, variable_end - variable_start);
+            if (!variable.isEmpty() && vars.contains(variable.mid(1)))
+            {
+                // this is a known 
+            }
+        }
+        current_pos++;
+    }
+    return replaced;
+}
+
 GrumpyScript::GrumpyScript()
 {
 

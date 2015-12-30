@@ -377,6 +377,35 @@ ScrollbackState Scrollback::GetState()
     return this->scrollbackState;
 }
 
+void Scrollback::SetProperty(QString name, QVariant value)
+{
+    if (this->PropertyBag.contains(name))
+        this->PropertyBag[name] = value;
+    else
+        this->PropertyBag.insert(name, value);
+}
+
+int Scrollback::GetPropertyAsInt(QString name, int default_val)
+{
+    if (!this->PropertyBag.contains(name))
+        return default_val;
+    return this->PropertyBag[name].toInt();
+}
+
+QString Scrollback::GetPropertyAsString(QString name, QString default_val)
+{
+    if (!this->PropertyBag.contains(name))
+        return default_val;
+    return this->PropertyBag[name].toString();
+}
+
+bool Scrollback::GetPropertyAsBool(QString name, bool default_val)
+{
+    if (!this->PropertyBag.contains(name))
+        return default_val;
+    return this->PropertyBag[name].toBool();
+}
+
 void Scrollback::insertSI(ScrollbackItem si)
 {
     this->_totalItems++;

@@ -175,6 +175,8 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     QAction *menuDisconnect = NULL;
     QAction *menuSniffer = NULL;
     QAction *menuJoinAll = NULL;
+    QAction *menuSound = NULL;
+    QAction *menuNotify = NULL;
 
     if (wx)
     {
@@ -247,6 +249,11 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     Menu.addAction(showHidden);
     showHidden->setChecked(this->ShowHidden);
 
+    menuNotify = new QAction(QObject::tr("Notify on message"), &Menu);
+    menuNotify->setCheckable(true);
+    menuNotify->setChecked(wx->GetScrollback()->GetPropertyAsBool("notify"));
+    Menu.addAction(menuNotify);
+
     QAction* selectedItem = Menu.exec(globalPos);
     if (!selectedItem)
         return;
@@ -318,6 +325,9 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
             RegisterHidden();
         else
             UnregisterHidden();
+    } else if (selectedItem == menuNotify)
+    {
+        wx->SetProperty("notify", menuNotify->isChecked());
     }
 }
 

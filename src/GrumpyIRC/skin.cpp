@@ -76,19 +76,25 @@ QPalette GrumpyIRC::Skin::Palette()
 void Skin::LoadHash(QHash<QString, QVariant> hash)
 {
     UNSERIALIZE_STRING(Name);
+    UNSERIALIZE_COLOR(BackgroundColor);
+    UNSERIALIZE_COLOR(Error);
+    UNSERIALIZE_COLOR(HighligtedColor);
+    UNSERIALIZE_COLOR(SystemColor);
+    UNSERIALIZE_COLOR(SystemInfo);
+    UNSERIALIZE_COLOR(TextColor);
 }
 
 QHash<QString, QVariant> Skin::ToHash()
 {
     QHash<QString, QVariant> hash;
     SERIALIZE(Name);
-    SERIALIZE(BackgroundColor);
-    SERIALIZE(Error);
-    SERIALIZE(HighligtedColor);
+    SERIALIZE_COLOR(BackgroundColor);
+    SERIALIZE_COLOR(Error);
+    SERIALIZE_COLOR(HighligtedColor);
     //SERIALIZE(ModeColors);
-    SERIALIZE(SystemColor);
-    SERIALIZE(SystemInfo);
-    SERIALIZE(TextColor);
+    SERIALIZE_COLOR(SystemColor);
+    SERIALIZE_COLOR(SystemInfo);
+    SERIALIZE_COLOR(TextColor);
     SERIALIZE(TextFont);
     return hash;
 }

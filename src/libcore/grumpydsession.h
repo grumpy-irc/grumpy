@@ -77,6 +77,8 @@
 #define GP_CMD_REMOVE                      26
 #define GP_CMD_REQUEST_INFO                27
 #define GP_CMD_RESYNC_MODE                 28
+#define GP_CMD_RESYNC_SCROLLBACK_PB        29 // Used to resync the scrollback's property bag - only change or append new items, doesn't clear existing ones
+#define GP_CMD_OVERRIDE_SCROLLBACK_PB      30 // Replaces the property bag with another hash
 
 #define GP_MODETYPE_UMODE 1
 #define GP_MODETYPE_PMODE 2
@@ -138,6 +140,8 @@ namespace GrumpyIRC
             void RetrieveChannelBanList(Scrollback *window, QString channel_name);
             void RequestRemove(Scrollback *window);
             void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete);
+            void ResyncPB(Scrollback *window);
+            void ResyncSingleItemPB(Scrollback *window, QString name);
             void RequestPart(Scrollback *window);
             void Query(Scrollback *window, QString target, QString message);
             void RequestBL(Scrollback *window, scrollback_id_t from, unsigned int size);
@@ -180,6 +184,7 @@ namespace GrumpyIRC
             void processRequest(QHash<QString, QVariant> hash);
             void processChannelResync(QHash<QString, QVariant> hash);
             void processSResync(QHash<QString, QVariant> parameters);
+            void processPBResync(QHash<QString, QVariant> parameters);
             void processPSResync(QHash<QString, QVariant> parameters);
             void processRemove(QHash<QString, QVariant> parameters);
             void freememory();

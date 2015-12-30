@@ -178,6 +178,10 @@ namespace GrumpyIRC
             virtual void SetHidable(bool is);
             virtual void SetState(ScrollbackState state, bool enforced = false);
             virtual ScrollbackState GetState();
+            virtual void SetProperty(QString name, QVariant value);
+            virtual int GetPropertyAsInt(QString name, int default_val = 0);
+            virtual QString GetPropertyAsString(QString name, QString default_val = "");
+            virtual bool GetPropertyAsBool(QString name, bool default_val = false);
             //! You can set this to true in order to suppress state updates
             bool IgnoreState;
             QHash<QString, QVariant> PropertyBag;

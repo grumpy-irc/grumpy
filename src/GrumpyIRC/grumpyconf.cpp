@@ -111,6 +111,21 @@ QString GrumpyConf::GetLineFormat()
     return GCFG->GetValueAsString("line_format", "($time) $string");
 }
 
+void GrumpyConf::SetLineFormat(QString format)
+{
+    GCFG->SetValue("line_format", format);
+}
+
+void GrumpyConf::SetNoticeFormat(QString format)
+{
+    GCFG->SetValue("notice_format", format);
+}
+
+void GrumpyConf::SetMessageFormat(QString format)
+{
+    GCFG->SetValue("message_format", format);
+}
+
 QString GrumpyConf::GetNoticeFormat()
 {
     return GCFG->GetValueAsString("notice_format", "[$nick] $string");
@@ -175,6 +190,11 @@ QString GrumpyConf::GetChannelHeader() const
 QString GrumpyConf::GetStandardHeader() const
 {
     return GCFG->GetValueAsString("standard_header", "GrumpyChat");
+}
+
+void GrumpyConf::SetActionFormat(QString format)
+{
+    GCFG->SetValue("action_format", format);
 }
 
 float GrumpyConf::GetTransparency()

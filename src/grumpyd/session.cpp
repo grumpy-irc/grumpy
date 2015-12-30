@@ -439,6 +439,9 @@ void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
     } else if (text == GP_CMD_OPTIONS)
     {
         this->processOptions(parameters);
+    } else if (text == GP_CMD_RESYNC_SCROLLBACK_PB)
+    {
+        this->processPBResync(parameters);
     } else
     {
         // We received some unknown packet, send it back to client so that it at least knows we don't support this
@@ -678,4 +681,33 @@ void Session::processRemove(QHash<QString, QVariant> parameters)
         }
         irc->RequestRemove(scrollback);
     }
+}
+
+void Session::processPBResync(QHash<QString, QVariant> parameters)
+{
+    if (!this->IsAuthorized(PRIVILEGE_USE_IRC))
+    {
+        this->PermissionDeny(GP_CMD_RESYNC_SCROLLBACK_PB);
+        return;
+    }
+
+    if (!parameters.contains("scrollback_id"))
+        return;
+    Scrollback *scrollback = this->GetScrollback(parameters["scrollback_id"].toUInt());
+    if (!scrollback)
+        return;
+    if (!parameters.contains("property_bag"))
+        return;
+    QHash<QString, QVariant> pb = parameters["property_bag"].toHash();
+
+    foreach(QString key, pb.keys())
+    {
+        if (scrollback->PropertyBag.contains(key))
+            scrollback->PropertyBag[key] = pb[key];
+        else
+            scrollback->PropertyBag.insert(key, pb[key]);
+    }
+
+    // Now we need to notify all clients about this change as well
+    this->SendToOtherSessions(GP_CMD_RESYNC_SCROLLBACK_PB, parameters);
 }

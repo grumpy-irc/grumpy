@@ -50,6 +50,9 @@ namespace GrumpyIRC
             QString GetName();
             QString GetNick();
             QString GetLineFormat();
+            void SetLineFormat(QString format);
+            void SetNoticeFormat(QString format);
+            void SetMessageFormat(QString format);
             QString GetNoticeFormat();
             QString GetMessageFormat();
             QString GetActionFormat();
@@ -63,6 +66,7 @@ namespace GrumpyIRC
             QString GetLabeledHeader() const;
             QString GetChannelHeader() const;
             QString GetStandardHeader() const;
+            void SetActionFormat(QString format);
             float GetTransparency();
             void SetIgnoreSSLProblems(bool set);
             bool GetIgnoreSSLProblems();

@@ -251,6 +251,21 @@ static QString ItemToString(ScrollbackItem item, bool highlighted)
     return results.source;
 }
 
+static QString ItemToPlainText(ScrollbackItem item)
+{
+    QString result;
+    switch (item.GetType())
+    {
+        case ScrollbackItemType_Act:
+            result = "* " + item.GetUser().GetNick() + " " + item.GetText();
+            break;
+        case ScrollbackItemType_Message:
+            result = item.GetUser().GetNick() + ": " + item.GetText();
+            break;
+    }
+    return result;
+}
+
 void ScrollbackFrame::_insertText_(ScrollbackItem item)
 {
     if (!this->ShowJQP)
@@ -275,6 +290,8 @@ void ScrollbackFrame::_insertText_(ScrollbackItem item)
     }
     if (!this->IsVisible())
     {
+        if ((item.GetType() == ScrollbackItemType_Act || item.GetType() == ScrollbackItemType_Message) && this->scrollback->GetPropertyAsBool("notify"))
+            MainWindow::Main->Notify(this->GetTitle(), ItemToPlainText(item));
         this->unwritten_m.lock();
         while (this->unwritten.size() > this->maxItems)
         {
@@ -752,6 +769,18 @@ void ScrollbackFrame::RefreshHtmlIfNeeded()
 {
     if (this->needsRefresh)
         this->RefreshHtml();
+}
+
+void ScrollbackFrame::SetProperty(QString name, QVariant value)
+{
+    this->scrollback->SetProperty(name, value);
+    // now, if this is grumpy scrollback we need to share this option with others
+
+    if (!Generic::IsGrumpy(this->scrollback))
+        return;
+
+    GrumpydSession *session = (GrumpydSession*)this->GetSession();
+    session->ResyncSingleItemPB(this->scrollback, name);
 }
 
 libircclient::Network *ScrollbackFrame::GetNetwork()

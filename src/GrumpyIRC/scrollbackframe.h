@@ -111,6 +111,7 @@ namespace GrumpyIRC
             void RefreshHtml();
             void SendCtcp(QString target, QString ctcp, QString text);
             void RefreshHtmlIfNeeded();
+            void SetProperty(QString name, QVariant value);
             libircclient::Network *GetNetwork();
             void TransferRaw(QString data);
             libircclient::User *GetIdentity();
