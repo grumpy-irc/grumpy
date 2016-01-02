@@ -84,6 +84,13 @@ void GrumpyConf::SetName(QString text)
     GCFG->SetValue("name", text);
 }
 
+QList<char> GrumpyConf::GetSeparators()
+{
+    QList<char> results;
+    results << '(' << ')' << ' ' << '.' << ',' << ';' << '!';
+    return results;
+}
+
 bool GrumpyConf::IsDisabledMessage(QString id)
 {
     if (!GCFG->Contains("messages.disabled." + id))

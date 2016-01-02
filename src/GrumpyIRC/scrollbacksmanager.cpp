@@ -160,7 +160,10 @@ void ScrollbacksManager::SwitchWindow(ScrollbackFrame *window)
         if (window->GetScrollback()->GetType() == ScrollbackType_Channel)
         {
             libircclient::Channel *channel = window->GetScrollback()->GetSession()->GetChannel(window->GetScrollback());
-            name.replace("$topic", channel->GetTopic());
+            if (channel != nullptr)
+                name.replace("$topic", channel->GetTopic());
+            else
+                name.replace("$topic", " (dead)");
         }
     }
     MainWindow::Main->SetWN(name);
