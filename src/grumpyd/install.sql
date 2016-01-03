@@ -39,7 +39,9 @@ CREATE TABLE scrollbacks
     /* Number of total items that are owned by this scrollback, should be identical to:
        SELECT count(1) FROM scrollback_items WHERE user_id = scrollback.user_id AND scrollback_id = scrollback.original_id */
     "item_count" INTEGER,
-    "is_hidden" INTEGER NOT NULL
+    "is_hidden" INTEGER NOT NULL,
+    /* PB hash */
+    "property" BLOB
 );
 
 CREATE INDEX idx_scrollback_user_id ON scrollbacks(user_id);
@@ -100,5 +102,5 @@ CREATE TABLE meta
 );
 
 /* This is just to track the version information for updates */
-INSERT INTO meta (key, value) VALUES ('version', '1');
+INSERT INTO meta (key, value) VALUES ('version', '2');
 

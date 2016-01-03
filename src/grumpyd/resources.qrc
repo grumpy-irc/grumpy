@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/sql">
         <file>install.sql</file>
+        <file>patch_sql_2.sql</file>
     </qresource>
 </RCC>

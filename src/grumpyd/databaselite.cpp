@@ -93,6 +93,24 @@ DatabaseLite::DatabaseLite()
 
         // Let's set grumpy to init mode
         CONF->Init = true;
+    } else
+    {
+        // Check if datafile is OK
+        std::shared_ptr<SqlResult> version_info = this->database->ExecuteQuery("SELECT value FROM meta WHERE key = 'version';");
+        if (version_info->InError || version_info->Count() < 1)
+            throw new Exception("The database file is corrupted, no version info in meta table", BOOST_CURRENT_FUNCTION);
+
+        unsigned int version = version_info->GetRow(0).GetField(0).toString().toUInt();
+        if (version < GRUMPYD_SCHEMA_VERSION)
+        {
+            GRUMPY_LOG("Database is outdated (version " + QString::number(version) + ") updating to " + QString::number(GRUMPYD_SCHEMA_VERSION));
+            while (version++ < GRUMPYD_SCHEMA_VERSION)
+                this->UpdateDB(version);
+
+        } else if (version > GRUMPYD_SCHEMA_VERSION)
+        {
+            GRUMPY_LOG("Database seems to belong to grumpyd that is newer than this version, it may not work");
+        }
     }
 }
 
@@ -320,6 +338,13 @@ QHash<QString, QVariant> DatabaseLite::GetConfiguration(user_id_t user)
     }
     QHash<QString, QVariant> hash = FromArray(result->GetRow(0).GetField(0).toByteArray());
     return hash;
+}
+
+void DatabaseLite::UpdateDB(unsigned int patch)
+{
+    GRUMPY_DEBUG("Updating schema to version " + QString::number(patch), 1);
+    if (!this->database->ExecuteNonQuery(GetSource("patch_sql_" + QString::number(patch) + ".sql")))
+        throw new Exception("Failed to upgrade DB to version " + QString::number(patch) + ", error: " + this->LastError, BOOST_CURRENT_FUNCTION);
 }
 
 int DatabaseLite::GetLastUserID()

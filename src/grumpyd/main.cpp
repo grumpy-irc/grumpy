@@ -43,6 +43,8 @@
 //////////////////////////////////////////////////////////////////
 // Terminal parameters
 
+int verbosity = 0;
+
 int daemonize()
 {
     if (!CONF->Daemon)
@@ -94,6 +96,16 @@ int dummy(GrumpyIRC::TerminalParser *parser, QStringList params)
     Q_UNUSED(parser);
     CONF->StorageDummy = true;
 
+    return TP_RESULT_OK;
+}
+
+int verbosity_plus(GrumpyIRC::TerminalParser *parser, QStringList params)
+{
+    Q_UNUSED(params);
+    Q_UNUSED(parser);
+
+    // Increase the verbosity of whole grumpy
+    verbosity++;
     return TP_RESULT_OK;
 }
 
@@ -165,6 +177,7 @@ int main(int argc, char *argv[])
         tp->Register(0, "dummy", "Use dummy as a storage backend, useful for debugging.", 0, (GrumpyIRC::TP_Callback)dummy);
         tp->Register(0, "cleanup", "Remove invalid objects from the database permanently.", 0, (GrumpyIRC::TP_Callback)dbcl);
         tp->Register(0, "upgrade-db", "Upgrade the database schemas. Required only if grumpyd asks for it.", 0, (GrumpyIRC::TP_Callback)upgrade_store);
+        tp->Register('v', "verbosity", "Increases the verbose level", 0, (GrumpyIRC::TP_Callback)verbosity_plus);
         if (!tp->Parse(argc, argv))
         {
             // We processed some argument which requires the application to exit
@@ -201,12 +214,14 @@ int main(int argc, char *argv[])
         GrumpyIRC::CoreWrapper::GrumpyCore->SetSystemEventHandler(new GrumpyIRC::GDEventHandler());
         GrumpyIRC::CoreWrapper::GrumpyCore->InstallFactory(new GrumpyIRC::ScrollbackFactory());
         GrumpyIRC::CoreWrapper::GrumpyCore->InitCfg();
+        GrumpyIRC::Core::GrumpyCore->GetConfiguration()->Verbosity = verbosity;
         // Save the configuration immediately so that we have the configuration file
         CONF->SetStorage(CONF->GetStorage());
         GrumpyIRC::CoreWrapper::GrumpyCore->GetConfiguration()->Save();
         GRUMPY_LOG("Grumpyd starting...");
         GrumpyIRC::Grumpyd *daemon = new GrumpyIRC::Grumpyd();
         QTimer::singleShot(0, daemon, SLOT(Main()));
+        GRUMPY_DEBUG("Verbosity level: " + QString::number(verbosity), 1);
         return a.exec();
     } catch (GrumpyIRC::Exception *exception)
     {
