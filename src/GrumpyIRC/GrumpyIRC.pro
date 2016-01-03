@@ -40,7 +40,8 @@ SOURCES += main.cpp\
     linkhandler.cpp \
     initializewin.cpp \
     hooks.cpp \
-    messagebox.cpp
+    messagebox.cpp \
+    sessionwindow.cpp
 
 HEADERS  += mainwindow.h \
     scrollbackframe.h \
@@ -69,7 +70,8 @@ HEADERS  += mainwindow.h \
     linkhandler.h \
     initializewin.h \
     hooks.h \
-    messagebox.h
+    messagebox.h \
+    sessionwindow.h
 
 FORMS    += mainwindow.ui \
     scrollbackframe.ui \
@@ -87,7 +89,8 @@ FORMS    += mainwindow.ui \
     favoriteswin.ui \
     grumpydcfwin.ui \
     initializewin.ui \
-    messagebox.ui
+    messagebox.ui \
+    sessionwindow.ui
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../libirc/libirc/build-libirc-Desktop_Qt_5_4_2_MinGW_32bit-Debug/release/ -llibirc
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../libirc/libirc/build-libirc-Desktop_Qt_5_4_2_MinGW_32bit-Debug/debug/ -llibirc

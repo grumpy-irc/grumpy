@@ -67,6 +67,17 @@ int daemonize()
     return DAEMONIZE_SUCCESS;
 }
 
+int upgrade_store(GrumpyIRC::TerminalParser *parser, QStringList params)
+{
+    Q_UNUSED(params);
+    Q_UNUSED(parser);
+    
+    // Flag the db upgrades for later
+    CONF->Upgrade = true;
+
+    return TP_RESULT_OK;
+}
+
 int service(GrumpyIRC::TerminalParser *parser, QStringList params)
 {
     Q_UNUSED(parser);
@@ -153,6 +164,7 @@ int main(int argc, char *argv[])
         tp->Register('k', "config", "Specify a path to configuration file", 1, (GrumpyIRC::TP_Callback)config);
         tp->Register(0, "dummy", "Use dummy as a storage backend, useful for debugging.", 0, (GrumpyIRC::TP_Callback)dummy);
         tp->Register(0, "cleanup", "Remove invalid objects from the database permanently.", 0, (GrumpyIRC::TP_Callback)dbcl);
+        tp->Register(0, "upgrade-db", "Upgrade the database schemas. Required only if grumpyd asks for it.", 0, (GrumpyIRC::TP_Callback)upgrade_store);
         if (!tp->Parse(argc, argv))
         {
             // We processed some argument which requires the application to exit

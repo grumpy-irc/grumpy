@@ -18,6 +18,8 @@
 
 #ifdef GRUMPY_SQLITE
 
+#define GRUMPYD_SCHEMA_VERSION 1
+
 #include <QMutex>
 
 struct sqlite3;

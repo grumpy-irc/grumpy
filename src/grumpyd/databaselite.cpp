@@ -109,6 +109,7 @@ void DatabaseLite::LoadRoles()
 
 void DatabaseLite::LoadUsers()
 {
+    Q_ASSERT(User::UserInfo.size() == 0);
     std::shared_ptr<SqlResult> userlist = this->database->ExecuteQuery("SELECT id, name, password, role FROM users;");
     if (!userlist->Count())
     {
@@ -148,7 +149,7 @@ void DatabaseLite::LoadSessions()
                 GRUMPY_ERROR("Missing owner for a network, skipping initialization of scrollback, please run grumpyd with --cleanup parameter to fix this issue permanently");
             } else
             {
-                GRUMPY_LOG("Removing network with no owner");
+                GRUMPY_LOG("Removing network with no owner: " + QString::number(row.GetField(0).toInt()));
                 this->database->ExecuteNonQuery("DELETE FROM networks WHERE id = " + QString::number(row.GetField(0).toInt()) + ";");
             }
             continue;
@@ -161,7 +162,7 @@ void DatabaseLite::LoadSessions()
                 GRUMPY_ERROR("Missing system window for a network, skipping initialization, please run grumpyd with --cleanup parameter to fix this issue permanently");
             } else
             {
-                GRUMPY_LOG("Removing network with no owner");
+                GRUMPY_LOG("Removing network with no system window: " + QString::number(row.GetField(0).toInt()));
                 this->database->ExecuteNonQuery("DELETE FROM networks WHERE id = " + QString::number(row.GetField(0).toInt()) + ";");
             }
             continue;
@@ -180,7 +181,7 @@ void DatabaseLite::LoadSessions()
                     GRUMPY_ERROR("Missing window for a network, skipping initialization, please run grumpyd with --cleanup parameter to fix this issue permanently");
                 } else
                 {
-                    GRUMPY_LOG("Removing network with no window");
+                    GRUMPY_LOG("Removing network with no window: " + QString::number(row.GetField(0).toInt()));
                     this->database->ExecuteNonQuery("DELETE FROM networks WHERE id = " + QString::number(row.GetField(0).toInt()) + ";");
                 }
                 goto next;
@@ -237,7 +238,7 @@ void DatabaseLite::LoadWindows()
                 GRUMPY_ERROR("Missing owner for a scrollback, skipping initialization of scrollback, please run grumpyd with --cleanup parameter to fix this issue permanently");
             } else
             {
-                GRUMPY_LOG("Removing scrollback with no owner");
+                GRUMPY_LOG("Removing scrollback with no owner: " + QString::number(scrollback_id));
                 this->ClearScrollback(scrollback_id, row.GetField(1).toUInt());
                 this->RemoveScrollback(row.GetField(7).toUInt());
             }
@@ -275,9 +276,9 @@ void DatabaseLite::LoadText()
                   << QVariant(scrollback->GetOriginalID());
             scrollback_id_t last_item = 0;
             std::shared_ptr<SqlResult> text = this->database->ExecuteQuery_Bind("SELECT id, item_id, user_id, scrollback_id, date, type, nick, ident, host, text, self "\
-                                                                 "FROM scrollback_items "\
-                                                                 "WHERE user_id = ? AND scrollback_id = ? "\
-                                                                 "ORDER BY item_id DESC LIMIT " + QString::number(CONF->GetMaxScrollbackSize()) + ";", input);
+                                                                        "FROM scrollback_items "\
+                                                                        "WHERE user_id = ? AND scrollback_id = ? "\
+                                                                        "ORDER BY item_id DESC LIMIT " + QString::number(CONF->GetMaxScrollbackSize()) + ";", input);
             if (text->InError)
                 throw new Exception("Unable to fetch: " + this->LastError, BOOST_CURRENT_FUNCTION);
 

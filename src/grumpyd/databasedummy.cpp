@@ -29,6 +29,7 @@ void DatabaseDummy::LoadRoles()
 
 void DatabaseDummy::LoadUsers()
 {
+    Q_ASSERT(User::UserInfo.size() == 0);
     User::UserInfo.clear();
     User *test = new User("user", "pw", 0);
     test->SetRole(Role::Roles["root"]);

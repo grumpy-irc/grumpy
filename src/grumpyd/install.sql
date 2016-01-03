@@ -100,5 +100,5 @@ CREATE TABLE meta
 );
 
 /* This is just to track the version information for updates */
-INSERT INTO meta (key, value) VALUES ('version', '1.0.0.0');
+INSERT INTO meta (key, value) VALUES ('version', '1');
 

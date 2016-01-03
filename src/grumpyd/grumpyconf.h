@@ -45,6 +45,7 @@ namespace GrumpyIRC
 
             QString etc = "etc";
             QString var = "var";
+            bool Upgrade = false;
             bool Init;
             bool AutoFix;
             QString PID;
