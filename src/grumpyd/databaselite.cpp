@@ -302,6 +302,8 @@ void DatabaseLite::LoadText()
 
             // this must be long because we need something bigger than int as we convert unsigned int to signed variable
             long item = static_cast<long>(text->Count());
+            if (item > 0)
+                item--;
             while (item >= 0)
             {
                 SqlRow row = text->GetRow((unsigned int)item--);

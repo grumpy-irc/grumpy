@@ -39,7 +39,7 @@ int SqlResult::GetColumns()
 SqlRow SqlResult::GetRow(unsigned int rowid)
 {
     if (rowid >= (unsigned int)this->Rows.count())
-        throw new Exception("Too large", BOOST_CURRENT_FUNCTION);
+        throw new Exception("Invalid rowid", BOOST_CURRENT_FUNCTION);
     return this->Rows.at(rowid);
 }
 

@@ -56,7 +56,7 @@ QString GrumpyConf::GetNick()
 
 unsigned int GrumpyConf::GetMaxScrollbackSize()
 {
-    return GCFG->GetValueAsUInt("max_scrollback_size", 8000);
+    return GCFG->GetValueAsUInt("max_scrollback_size", 2000);
 }
 
 QString GrumpyConf::GetStorage()
