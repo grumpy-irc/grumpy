@@ -127,6 +127,7 @@ namespace GrumpyIRC
             bool Highlighting;
             void SetVisible(bool is_visible);
             ScrollbackList_Node *TreeNode;
+            bool Refreshing = false;
             QDateTime LastMenuTooltipUpdate;
             bool IsSystem;
         protected:

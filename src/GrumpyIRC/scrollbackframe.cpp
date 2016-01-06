@@ -283,14 +283,18 @@ void ScrollbackFrame::_insertText_(ScrollbackItem item)
         }
     }
     int highlighted = GRUMPY_H_NOT;
+    bool is_opening = this->Refreshing;
+    if (!is_opening && Generic::IsGrumpy(this->scrollback))
+        is_opening = ((GrumpydSession*)this->scrollback->GetSession())->IsOpening;
     if (Highlighter::IsMatch(&item, this->GetNetwork()))
     {
-        UiHooks::OnScrollbackItemHighlight(this, &item);
+        if (!is_opening)
+            UiHooks::OnScrollbackItemHighlight(this, &item);
         highlighted = GRUMPY_H_YES;
     }
     if (!this->IsVisible())
     {
-        if ((item.GetType() == ScrollbackItemType_Act || item.GetType() == ScrollbackItemType_Message) && this->scrollback->GetPropertyAsBool("notify"))
+        if (!is_opening && (item.GetType() == ScrollbackItemType_Act || item.GetType() == ScrollbackItemType_Message) && this->scrollback->GetPropertyAsBool("notify"))
             MainWindow::Main->Notify(this->GetTitle(), ItemToPlainText(item));
         this->unwritten_m.lock();
         while (this->unwritten.size() > this->maxItems)
@@ -382,8 +386,10 @@ void ScrollbackFrame::Refresh()
 {
     this->textEdit->Clear();
     this->buffer.clear();
+    this->Refreshing = true;
     foreach (ScrollbackItem item, this->scrollback->GetItems())
         this->_insertText_(item);
+    this->Refreshing = false;
     this->UpdateIcon();
     this->UpdateColor();
     //if (this->currentScrollbar <= this->textEdit->verticalScrollBar()->maximum())

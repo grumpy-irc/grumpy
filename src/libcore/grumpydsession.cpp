@@ -672,6 +672,7 @@ void GrumpydSession::processNetwork(QHash<QString, QVariant> hash)
     if (!hash.contains("sessions"))
         return;
 
+    this->IsOpening = true;
     // Deserialize all irc sessions
     QList<QVariant> session_list = hash["sessions"].toList();
     foreach (QVariant session_hash, session_list)
@@ -688,6 +689,7 @@ void GrumpydSession::processNetwork(QHash<QString, QVariant> hash)
                                        " seconds.");
         this->syncing = false;
     }
+    this->IsOpening = false;
 }
 
 void GrumpydSession::processULSync(QHash<QString, QVariant> hash)
@@ -847,11 +849,13 @@ void GrumpydSession::processRequest(QHash<QString, QVariant> hash)
     if (!scrollback)
         return;
 
+    this->IsOpening = true;
     QList<QVariant> lx = hash["data"].toList();
     QList<ScrollbackItem> data;
     foreach (QVariant item, lx)
         data.append(ScrollbackItem(item.toHash()));
     scrollback->PrependItems(data);
+    this->IsOpening = false;
 }
 
 void GrumpydSession::processChannelResync(QHash<QString, QVariant> hash)

@@ -157,6 +157,7 @@ namespace GrumpyIRC
             unsigned long long GetPacketsSent();
             unsigned long long GetPacketsRcvd();
             QString Version;
+            bool IsOpening = false;
             QHash<QString, QVariant> Preferences;
 
         signals:
