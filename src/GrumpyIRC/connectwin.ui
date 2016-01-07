@@ -52,6 +52,12 @@
      </item>
      <item row="0" column="1">
       <widget class="QComboBox" name="comboBox">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="editable">
         <bool>false</bool>
        </property>
@@ -59,6 +65,12 @@
      </item>
      <item row="1" column="1">
       <widget class="QComboBox" name="comboBox_2">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="editable">
         <bool>true</bool>
        </property>

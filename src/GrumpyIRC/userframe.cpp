@@ -452,7 +452,7 @@ void UserFrame::UpdateInfo()
         int count = this->userCounts[mode];
         if (!count)
             continue;
-        QString info = QChar(mode) + ": ";
+        QString info = QString(QChar(mode)) + ": ";
         // now count all users with this mode
         info += QString::number(count) + " ";
         extras_found = true;
