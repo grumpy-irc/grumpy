@@ -79,9 +79,9 @@ int main(int argc, char *argv[])
     {
         CONF = new GrumpyConf();
         TerminalParser *tp = new TerminalParser();
-        tp->Register('v', "--verbose", "Increase verbosity level", 0, (TP_Callback)Parser_Verbosity);
-        tp->Register('k', "--cons", "Keep console on", 0, (TP_Callback)Parser_KeepCons);
-        tp->Register('m', "--safe", "Start GrumpyChat in a safe mode", 0, (TP_Callback)Parser_SafeMode);
+        tp->Register('v', "verbose", "Increase verbosity level", 0, (TP_Callback)Parser_Verbosity);
+        tp->Register('k', "cons", "Keep console on", 0, (TP_Callback)Parser_KeepCons);
+        tp->Register('m', "safe", "Start GrumpyChat in a safe mode", 0, (TP_Callback)Parser_SafeMode);
         if (!tp->Parse(argc, argv))
         {
             delete tp;

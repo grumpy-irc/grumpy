@@ -45,6 +45,6 @@ bool UserFrameItem::lowerThan(const QListWidgetItem &other) const
         return network->PositionOfUCPrefix(username1[0].toLatin1()) < network->PositionOfUCPrefix(username2[0].toLatin1());
     }
     // They differ by a string name
-    return QString::localeAwareCompare(username1, username2) < 0;
+    return QString::localeAwareCompare(username1.toLower(), username2.toLower()) < 0;
 }
 
