@@ -404,14 +404,14 @@ void DatabaseLite::StoreScrollback(User *owner, Scrollback *sx)
     std::shared_ptr<SqlResult> result;
     QList<QVariant> params;
     params << sx->GetOriginalID()
-           << owner->GetID()
-           << sx->GetTarget()
-           << static_cast<int>(sx->GetType())
-           << static_cast<int>(sx->GetState())
-           << sx->GetLastID()
-           << Generic::Bool2Int(sx->IsHidden());
+        << owner->GetID()
+        << sx->GetTarget()
+        << static_cast<int>(sx->GetType())
+        << static_cast<int>(sx->GetState())
+        << sx->GetLastID();
     if (parent)
         params << QString::number(parent->GetOriginalID());
+    params << Generic::Bool2Int(sx->IsHidden());
     result = this->database->ExecuteQuery_Bind(sql, params);
     if (result->InError)
     {
