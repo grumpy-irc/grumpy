@@ -33,6 +33,19 @@ Note: sqlite source codes are gzipped. If you enable support for sqlite you will
 
 There may also be information specific for your platform on our github wiki
 
+Minimal guide for linux:
+
+    git clone http://github.com/grumpy-irc/grumpy
+    cd grumpy
+    git submodule init
+    git submodule update
+    mkdir release
+    cd release
+    cmake ../src -DSQLITE=n
+    make
+
+This will build everything but grumpyd will not have support for sqlite.
+
 License
 ==========================
 
