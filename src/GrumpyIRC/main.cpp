@@ -78,6 +78,9 @@ int main(int argc, char *argv[])
     try
     {
         CONF = new GrumpyConf();
+        QApplication a(argc, argv);
+        a.setApplicationName("GrumpyChat");
+        a.setOrganizationName("grumpy");
         TerminalParser *tp = new TerminalParser();
         tp->Register('v', "verbose", "Increase verbosity level", 0, (TP_Callback)Parser_Verbosity);
         tp->Register('k', "cons", "Keep console on", 0, (TP_Callback)Parser_KeepCons);
@@ -89,9 +92,6 @@ int main(int argc, char *argv[])
         }
         delete tp;
 
-        QApplication a(argc, argv);
-        a.setApplicationName("GrumpyChat");
-        a.setOrganizationName("grumpy");
         // Initialize core first
         CoreWrapper::GrumpyCore = new Core();
         CoreWrapper::GrumpyCore->InitCfg();

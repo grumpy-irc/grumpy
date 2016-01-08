@@ -12,6 +12,7 @@
 
 #include <QCoreApplication>
 #include <iostream>
+#include "generic.h"
 #include "terminalparser.h"
 
 using namespace GrumpyIRC;
@@ -27,7 +28,7 @@ static int PrintHelp(TerminalParser *parser, QStringList params)
     {
         QString parameters = i.GetLong();
         if (!parameters.isEmpty())
-            parameters = "--" + parameters;
+            parameters = Generic::ExpandedString("--" + parameters, 10, 60);
         QString parameters_short;
         if (i.GetShort() != 0)
             parameters_short = "-" + QString(QChar(i.GetShort()));
@@ -42,7 +43,7 @@ static int PrintHelp(TerminalParser *parser, QStringList params)
             else
                 parameters += " <" + QString::number(i.GetParameters()) + " required parameters>";
         }
-        std::cout << "  " << parameters.toStdString() << ": " << i.GetHelp().toStdString() << std::endl;
+        std::cout << "  " << Generic::ExpandedString(parameters, 20, 80).toStdString() << ": " << i.GetHelp().toStdString() << std::endl;
     }
 
     std::cout << std::endl;
