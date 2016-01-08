@@ -76,6 +76,7 @@ namespace GrumpyIRC
             ScrollbackItem(QString text, scrollback_id_t id=0, bool self = false);
             ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User *user = NULL, scrollback_id_t id=0, bool self = false);
             ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User user, scrollback_id_t id=0, bool self = false);
+            ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User user, QDateTime date, scrollback_id_t id=0, bool self = false);
             virtual ~ScrollbackItem();
             virtual void SetID(scrollback_id_t id);
             virtual QString GetText() const;

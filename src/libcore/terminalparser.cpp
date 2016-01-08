@@ -24,11 +24,24 @@ static int PrintHelp(TerminalParser *parser, QStringList params)
     std::cout << QCoreApplication::applicationName().toStdString() << " version " << GRUMPY_VERSION_STRING << std::endl << std::endl
               << "Following options can be used:" << std::endl << std::endl;
 
+    // first we analyse the list of options and get the size of longest one
+    int longest = 10;
+
+    foreach (TerminalItem i, parser->GetItems())
+    {
+        int is = i.GetLong().size() + 4;
+        if (is > longest)
+            longest = is;
+    }
+
+    int longest_line = 20;
+    QStringList lines_param, lines_help;
+
     foreach (TerminalItem i, parser->GetItems())
     {
         QString parameters = i.GetLong();
         if (!parameters.isEmpty())
-            parameters = Generic::ExpandedString("--" + parameters, 10, 60);
+            parameters = Generic::ExpandedString("--" + parameters, longest, longest + 10);
         QString parameters_short;
         if (i.GetShort() != 0)
             parameters_short = "-" + QString(QChar(i.GetShort()));
@@ -43,7 +56,22 @@ static int PrintHelp(TerminalParser *parser, QStringList params)
             else
                 parameters += " <" + QString::number(i.GetParameters()) + " required parameters>";
         }
-        std::cout << "  " << Generic::ExpandedString(parameters, 20, 80).toStdString() << ": " << i.GetHelp().toStdString() << std::endl;
+        lines_help << i.GetHelp();
+        lines_param << parameters;
+
+        int size = parameters.size() + 2;
+        if (size > longest_line)
+            longest_line = size;
+
+        //std::cout << "  " << Generic::ExpandedString(parameters, 20, 80).toStdString() << ": " << i.GetHelp().toStdString() << std::endl;
+    }
+
+    int item = 0;
+    while (item < lines_param.size())
+    {
+        std::cout << "  " << Generic::ExpandedString(lines_param[item], longest_line, longest_line + 10).toStdString() << ": " << lines_help[item].toStdString() << std::endl;
+        // let's go next
+        item++;
     }
 
     std::cout << std::endl;

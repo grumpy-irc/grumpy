@@ -555,6 +555,19 @@ ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclie
     this->_user = user;
 }
 
+ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User user, QDateTime date, scrollback_id_t id, bool self)
+{
+#ifdef GRUMPY_EXTREME
+    ScrollbackItem::TotalIC++;
+#endif
+    this->_type = type;
+    this->_id = id;
+    this->_self = self;
+    this->_text = text;
+    this->_datetime = date;
+    this->_user = user;
+}
+
 void ScrollbackItem::SetID(scrollback_id_t id)
 {
     this->_id = id;
