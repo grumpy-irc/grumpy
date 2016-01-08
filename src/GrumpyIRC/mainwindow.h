@@ -87,6 +87,7 @@ namespace GrumpyIRC
             QTimer timer;
             QLabel *statusFrame;
             QLabel *identFrame;
+            QLabel *windowCount;
             QLabel *overviewFrame;
             ScrollbackFrame *systemWindow;
             LinkHandler *handler;

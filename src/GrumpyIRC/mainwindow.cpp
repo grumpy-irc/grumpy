@@ -65,9 +65,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->statusFrame = new QLabel(this);
     this->identFrame = new QLabel(this);
     this->overviewFrame = new QLabel(this);
+    this->windowCount = new QLabel(this);
     this->overviewFrame->setTextInteractionFlags(Qt::TextSelectableByMouse);
     this->identFrame->setTextInteractionFlags(Qt::TextSelectableByMouse);
     this->statusFrame->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    this->ui->statusBar->addPermanentWidget(this->windowCount, 1);
+    this->windowCount->setAlignment(Qt::AlignLeft);
     this->ui->statusBar->addPermanentWidget(this->identFrame);
     this->addDockWidget(Qt::LeftDockWidgetArea, this->windowList);
     this->addDockWidget(Qt::RightDockWidgetArea, this->userWidget);
@@ -82,25 +85,25 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // Create a system scrollback
     this->systemWindow = this->scrollbackWindow->CreateWindow("System Window", NULL, true, false, NULL, true);
     // Register built-in commands
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.netstat", (SC_Callback)SystemCmds::Netstat));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.next_session_nick", (SC_Callback)SystemCmds::NextSessionNick));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.echo", (SC_Callback)SystemCmds::Echo));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.alias", (SC_Callback)SystemCmds::Alias));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.link", (SC_Callback)SystemCmds::GrumpyLink));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("unsecuregrumpyd", (SC_Callback)SystemCmds::UnsecureGrumpy));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpyd", (SC_Callback)SystemCmds::Grumpy));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.quit", (SC_Callback)SystemCmds::Exit));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.join", (SC_Callback)SystemCmds::JOIN));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.kick", (SC_Callback)SystemCmds::KICK));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.netstat",             (SC_Callback)SystemCmds::Netstat));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.next_session_nick",   (SC_Callback)SystemCmds::NextSessionNick));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.echo",                (SC_Callback)SystemCmds::Echo));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.alias",               (SC_Callback)SystemCmds::Alias));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.link",                (SC_Callback)SystemCmds::GrumpyLink));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("unsecuregrumpyd",            (SC_Callback)SystemCmds::UnsecureGrumpy));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpyd",                    (SC_Callback)SystemCmds::Grumpy));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.quit",                (SC_Callback)SystemCmds::Exit));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.join",                (SC_Callback)SystemCmds::JOIN));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.kick",                (SC_Callback)SystemCmds::KICK));
 
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("server", (SC_Callback)SystemCmds::Server));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("nick", (SC_Callback)SystemCmds::Nick));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("msg", (SC_Callback)SystemCmds::SendMessage));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("me", (SC_Callback)SystemCmds::Act));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("notice", (SC_Callback)SystemCmds::Notice));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("quote", (SC_Callback)SystemCmds::RAW));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("raw", (SC_Callback)SystemCmds::RAW));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("query", (SC_Callback)SystemCmds::Query));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("server",                     (SC_Callback)SystemCmds::Server));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("nick",                       (SC_Callback)SystemCmds::Nick));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("msg",                        (SC_Callback)SystemCmds::SendMessage));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("me",                         (SC_Callback)SystemCmds::Act));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("notice",                     (SC_Callback)SystemCmds::Notice));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("quote",                      (SC_Callback)SystemCmds::RAW));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("raw",                        (SC_Callback)SystemCmds::RAW));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("query",                      (SC_Callback)SystemCmds::Query));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->LongSize = CONF->GetSplitMaxSize();
     CoreWrapper::GrumpyCore->GetCommandProcessor()->SplitLong = CONF->GetSplit();
     this->ui->actionOpen_window->setVisible(false);
@@ -219,6 +222,7 @@ void MainWindow::SetWN(QString text)
 
 void MainWindow::UpdateStatus()
 {
+    this->windowCount->setText(QString::number(Scrollback::ScrollbackList.count()) + " scrollbacks");
     int synced = this->GetScrollbackManager()->GetCurrentScrollback()->GetSynced();
     int total = this->GetScrollbackManager()->GetCurrentScrollback()->GetItems();
     this->statusFrame->setText("Items (synced/total): " + QString::number(synced) + " / " + QString::number(total));
