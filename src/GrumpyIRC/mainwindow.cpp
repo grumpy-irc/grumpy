@@ -547,7 +547,7 @@ ScrollbackFrame *MainWindow::GetCurrentScrollbackFrame()
 
 void MainWindow::Notify(QString heading, QString text)
 {
-    this->tray.showMessage(heading, text);
+    this->tray.showMessage(heading, Generic::StripSpecial(text));
 }
 
 UserWidget *MainWindow::GetUsers()

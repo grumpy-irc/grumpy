@@ -171,3 +171,39 @@ QString Generic::GetResource(QString name)
 
     return QString(file.readAll());
 }
+
+
+QString Generic::StripSpecial(QString text)
+{
+    text = text.replace((char)1, "").replace((char)2, "").replace((char)16, "");
+    // now find a remove color codes
+    while (text.contains((char)3))
+    {
+        int pos = text.indexOf((char)3);
+        if (pos + 1 == text.size())
+        {
+            text.remove(pos, 1);
+        } else if (pos + 2 == text.size())
+        {
+            // let's check if the characted after is a number
+            QChar last = text.at(pos + 1);
+            if (last.isNumber())
+                text.remove(pos, 2);
+            else
+                text.remove(pos, 1);
+        } else
+        {
+            int remove = 1;
+            QChar first = text.at(pos + 1);
+            if (first.isNumber())
+            {
+                remove++;
+                QChar second = text.at(pos + 2);
+                if (second.isNumber())
+                    remove++;
+            }
+            text.remove(pos, remove);
+        }
+    }
+    return text;
+}

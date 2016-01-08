@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>640</width>
-    <height>473</height>
+    <width>752</width>
+    <height>482</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -136,7 +136,7 @@
          <item row="8" column="1">
           <widget class="QLabel" name="label_9">
            <property name="text">
-            <string>Send this RAW on first session</string>
+            <string>Send this RAW when first session connects to grumpyd</string>
            </property>
           </widget>
          </item>
@@ -157,7 +157,7 @@
          <item row="10" column="1">
           <widget class="QLabel" name="label_12">
            <property name="text">
-            <string>Send this RAW on last session</string>
+            <string>Send this RAW when last session disconnects from this grumpyd user</string>
            </property>
           </widget>
          </item>
