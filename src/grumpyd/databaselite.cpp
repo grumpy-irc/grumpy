@@ -308,6 +308,7 @@ void DatabaseLite::LoadText()
             {
                 SqlRow row = text->GetRow((unsigned int)item--);
                 last_item = row.GetField(1).toUInt();
+                QDateTime date = QDateTime::fromMSecsSinceEpoch(row.GetField(4).toLongLong());
                 QString item_text = row.GetField(9).toString();
                 ScrollbackItemType type = static_cast<ScrollbackItemType>(row.GetField(5).toInt());
                 bool self = Generic::Int2Bool(row.GetField(10).toInt());
@@ -315,7 +316,7 @@ void DatabaseLite::LoadText()
                 user.SetNick(row.GetField(6).toString());
                 user.SetIdent(row.GetField(7).toString());
                 user.SetHost(row.GetField(8).toString());
-                ScrollbackItem tm(item_text, type, user, last_item, self);
+                ScrollbackItem tm(item_text, type, user, date, last_item, self);
                 scrollback->ImportText(tm);
             }
 

@@ -201,6 +201,34 @@ void PreferencesWin::refreshSkin(bool enabled)
     this->ui->lineEdit_SkinName->setEnabled(enabled);
     this->ui->pushButton_5->setEnabled(enabled);
     this->ui->lineEdit_SkinSz->setEnabled(enabled);
+    this->ui->pushButton_AC->setEnabled(enabled);
+    this->ui->pushButton_C1->setEnabled(enabled);
+    this->ui->pushButton_C2->setEnabled(enabled);
+    this->ui->pushButton_C3->setEnabled(enabled);
+    this->ui->pushButton_C4->setEnabled(enabled);
+    this->ui->pushButton_C5->setEnabled(enabled);
+    this->ui->pushButton_C6->setEnabled(enabled);
+    this->ui->pushButton_C7->setEnabled(enabled);
+    this->ui->pushButton_C8->setEnabled(enabled);
+    this->ui->pushButton_C9->setEnabled(enabled);
+    this->ui->pushButton_C10->setEnabled(enabled);
+    this->ui->pushButton_C11->setEnabled(enabled);
+    this->ui->pushButton_C12->setEnabled(enabled);
+    this->ui->pushButton_C13->setEnabled(enabled);
+    this->ui->pushButton_C14->setEnabled(enabled);
+    this->ui->pushButton_C15->setEnabled(enabled);
+
+    this->ui->pushButton_CA->setEnabled(enabled);
+    this->ui->pushButton_CH->setEnabled(enabled);
+    this->ui->pushButton_CO->setEnabled(enabled);
+    this->ui->pushButton_CQ->setEnabled(enabled);
+    this->ui->pushButton_CV->setEnabled(enabled);
+    this->ui->pushButton_EC->setEnabled(enabled);
+    this->ui->pushButton_HC->setEnabled(enabled);
+    this->ui->pushButton_IC->setEnabled(enabled);
+    this->ui->pushButton_WC->setEnabled(enabled);
+    this->ui->pushButton_SC->setEnabled(enabled);
+    this->ui->pushButton_UC->setEnabled(enabled);
 }
 
 void PreferencesWin::on_tableWidget_cellChanged(int row, int column)
