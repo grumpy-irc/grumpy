@@ -73,8 +73,19 @@ QPalette GrumpyIRC::Skin::Palette()
     return px;
 }
 
+void Skin::SetSize(int font_size)
+{
+    // Update the size
+    this->TextSize = font_size;
+    this->TextFont.setPixelSize(this->TextSize);
+}
+
 void Skin::LoadHash(QHash<QString, QVariant> hash)
 {
+    UNSERIALIZE_STRING(FontFamily);
+    UNSERIALIZE_INT(TextSize);
+    this->TextFont = QFont(this->FontFamily);
+    this->TextFont.setPixelSize(this->TextSize);
     UNSERIALIZE_STRING(Name);
     UNSERIALIZE_COLOR(BackgroundColor);
     UNSERIALIZE_COLOR(Error);
@@ -88,6 +99,8 @@ QHash<QString, QVariant> Skin::ToHash()
 {
     QHash<QString, QVariant> hash;
     SERIALIZE(Name);
+    SERIALIZE(TextSize);
+    SERIALIZE(FontFamily);
     SERIALIZE_COLOR(BackgroundColor);
     SERIALIZE_COLOR(Error);
     SERIALIZE_COLOR(HighligtedColor);
@@ -95,7 +108,6 @@ QHash<QString, QVariant> Skin::ToHash()
     SERIALIZE_COLOR(SystemColor);
     SERIALIZE_COLOR(SystemInfo);
     SERIALIZE_COLOR(TextColor);
-    SERIALIZE(TextFont);
     return hash;
 }
 
@@ -114,15 +126,17 @@ void Skin::setDefaults()
     this->SystemColor = QColor(71, 245, 92);
     this->UserListAwayColor = QColor(180, 180, 180);
     this->TextColor = QColor(255, 255, 255);
+    this->TextSize = 12;
 #ifdef GRUMPY_WIN
     if (QFontDatabase().families().contains("Consolas"))
-        this->TextFont = QFont("Consolas");
+        this->FontFamily = "Consolas"l
     else
-        this->TextFont = QFont("Courier New");
+        this->FontFamily = "Courier New";
 #else
-    this->TextFont = QFont("Monospace");
+    this->FontFamily = "Monospace";
 #endif
-    this->TextFont.setPixelSize(13);
+    this->TextFont = QFont(this->FontFamily);
+    this->TextFont.setPixelSize(this->TextSize);
     this->SystemInfo = QColor(240, 250, 102);
     this->Unread = QColor(240, 250, 102);
     this->ModeColors.insert('v', QColor(244, 254, 10));

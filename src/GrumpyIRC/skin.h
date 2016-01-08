@@ -41,11 +41,14 @@ namespace GrumpyIRC
             Skin(Skin *forked);
             ~Skin();
             QPalette Palette();
+            void SetSize(int font_size);
             void LoadHash(QHash<QString, QVariant> hash);
             QHash<QString, QVariant> ToHash();
             bool IsDefault();
             QHash<unsigned int, QColor> Colors;
             QString Name;
+            int TextSize;
+            QString FontFamily;
             QFont TextFont;
             QColor TextColor;
             QColor UserListAwayColor;

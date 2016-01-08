@@ -325,8 +325,8 @@ void GrumpyIRC::PreferencesWin::on_comboBox_currentIndexChanged(int index)
         throw new Exception("Invalid skin_ptr", BOOST_CURRENT_FUNCTION);
 
     this->highlighted_skin = Skin::SkinList[index];
-    this->ui->lineEdit_SkinFont->setText(this->highlighted_skin->TextFont.toString());
-    this->ui->lineEdit_SkinSz->setText(QString::number(this->highlighted_skin->TextFont.pixelSize()));
+    this->ui->lineEdit_SkinFont->setText(this->highlighted_skin->FontFamily);
+    this->ui->lineEdit_SkinSz->setText(QString::number(this->highlighted_skin->TextSize));
     this->ui->lineEdit_SkinName->setText(this->highlighted_skin->Name);
 
     // This is to save us some coding, it's a little bit slower but scales much better:
@@ -357,8 +357,8 @@ void GrumpyIRC::PreferencesWin::on_pushButton_clicked()
         return;
 
     this->highlighted_skin->Name = this->ui->lineEdit_SkinName->text();
-    this->highlighted_skin->TextFont = QFont(this->ui->lineEdit_SkinFont->text());
-    this->highlighted_skin->TextFont.setPixelSize(this->ui->lineEdit_SkinSz->text().toInt());
+    this->highlighted_skin->TextSize = this->ui->lineEdit_SkinSz->text().toInt();
+    this->highlighted_skin->FontFamily = this->ui->lineEdit_SkinFont->text();
 }
 
 void GrumpyIRC::PreferencesWin::on_pushButton_3_clicked()
