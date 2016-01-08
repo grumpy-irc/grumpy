@@ -43,6 +43,7 @@ namespace GrumpyIRC
     {
             Q_OBJECT
         public:
+            static void Exit();
             static MainWindow *Main;
 
             explicit MainWindow(QWidget *parent = 0);

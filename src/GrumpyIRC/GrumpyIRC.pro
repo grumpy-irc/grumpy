@@ -4,7 +4,9 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
+
+QMAKE_CXXFLAGS += -std=c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -41,7 +43,8 @@ SOURCES += main.cpp\
     initializewin.cpp \
     hooks.cpp \
     messagebox.cpp \
-    sessionwindow.cpp
+    sessionwindow.cpp \
+    systemcmds.cpp
 
 HEADERS  += mainwindow.h \
     scrollbackframe.h \
@@ -71,7 +74,8 @@ HEADERS  += mainwindow.h \
     initializewin.h \
     hooks.h \
     messagebox.h \
-    sessionwindow.h
+    sessionwindow.h \
+    systemcmds.h
 
 FORMS    += mainwindow.ui \
     scrollbackframe.ui \
@@ -91,20 +95,6 @@ FORMS    += mainwindow.ui \
     initializewin.ui \
     messagebox.ui \
     sessionwindow.ui
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../libirc/libirc/build-libirc-Desktop_Qt_5_4_2_MinGW_32bit-Debug/release/ -llibirc
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../libirc/libirc/build-libirc-Desktop_Qt_5_4_2_MinGW_32bit-Debug/debug/ -llibirc
-else:unix: LIBS += -L$$PWD/../../../libirc/libirc/build-libirc-Desktop_Qt_5_4_2_MinGW_32bit-Debug/ -llibirc
-
-INCLUDEPATH += $$PWD/../../../libirc/libirc/libirc/
-DEPENDPATH += $$PWD/../../../libirc/libirc/build-libirc-Desktop_Qt_5_4_2_MinGW_32bit-Debug/debug
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../build-libcore-Desktop_Qt_5_4_2_MinGW_32bit-Debug/release/ -llibcore
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../build-libcore-Desktop_Qt_5_4_2_MinGW_32bit-Debug/debug/ -llibcore
-else:unix: LIBS += -L$$PWD/../build-libcore-Desktop_Qt_5_4_2_MinGW_32bit-Debug/ -llibcore
-
-INCLUDEPATH += $$PWD/../libcore
-DEPENDPATH += $$PWD/../build-libcore-Desktop_Qt_5_4_2_MinGW_32bit-Debug/debug
 
 RESOURCES += \
     embedded.qrc
