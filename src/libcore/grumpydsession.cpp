@@ -661,7 +661,7 @@ void GrumpydSession::processNewScrollbackItem(QHash<QString, QVariant> hash)
     Scrollback *window = this->GetScrollback(id);
     if (!window)
     {
-        this->systemWindow->InsertText("Received scrollback item for scrollback which couldn't be found, name: " + hash["scrollback_name"].toString(), ScrollbackItemType_SystemWarning);
+        GRUMPY_DEBUG("Received scrollback item for scrollback which couldn't be found, name: " + hash["scrollback_name"].toString(), 3);
         return;
     }
     window->InsertText(ScrollbackItem(hash["item"].toHash()));

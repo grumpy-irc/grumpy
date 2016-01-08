@@ -189,6 +189,7 @@ QString Parser::replaceSpecials(QString source)
     char bold = 2;
     char italic = 16;
     char color = 3;
+    char terminated = 15;
     int current_pos = 0;
     bool close_b = false;
     bool close_i = false;
@@ -197,7 +198,22 @@ QString Parser::replaceSpecials(QString source)
     while (current_pos < source.size())
     {
         char current_symbol = source[current_pos].toLatin1();
-        if (current_symbol == bold)
+        if (current_symbol == terminated)
+        {
+            source = source.remove(current_pos, 1);
+            if (close_b)
+                source.insert(current_pos, "</b>");
+            if (close_u)
+                source.insert(current_pos, "</u>");
+            if (close_k)
+                source.insert(current_pos, "</font>");
+            if (close_i)
+                source.insert(current_pos, "</i>");
+            close_b = false;
+            close_u = false;
+            close_k = false;
+            close_i = false;
+        } else if (current_symbol == bold)
         {
             // replace
             source = source.remove(current_pos, 1);

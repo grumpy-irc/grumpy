@@ -17,6 +17,16 @@
 #include "formatteditem.h"
 #include <QHash>
 
+// Codes
+// 1 (0x01):  Underline (mirc)
+// 2 (0x02):  Bold
+// 3 (0x03):  Color
+// 4 (0x04):  Unknown
+// 15 (0x0F): Terminate all previous
+// 16 (0x10): Italics (mirc)
+// 29 (0x1D): Italics (textual)
+// 31 (0x1F): Underline (textual)
+
 namespace irc2htmlcode
 {
     class LIBIRC2HTMLCODESHARED_EXPORT Parser

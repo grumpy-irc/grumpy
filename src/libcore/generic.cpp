@@ -175,7 +175,7 @@ QString Generic::GetResource(QString name)
 
 QString Generic::StripSpecial(QString text)
 {
-    text = text.replace((char)1, "").replace((char)2, "").replace((char)16, "");
+    text = text.replace((char)1, "").replace((char)2, "").replace((char)4, "").replace((char)15, "").replace((char)16, "").replace((char)29, "");
     // now find a remove color codes
     while (text.contains((char)3))
     {
