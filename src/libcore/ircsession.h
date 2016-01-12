@@ -105,7 +105,7 @@ namespace GrumpyIRC
             QHash<QString, QVariant> ToHash(int max_items = 2000);
             void LoadHash(QHash<QString, QVariant> hash);
             void SendAction(Scrollback *window, QString text);
-            void SendRaw(Scrollback *window, QString raw);
+            void SendRaw(Scrollback *window, QString raw, libircclient::Priority pr = libircclient::Priority_Normal);
             void RequestRemove(Scrollback *window);
             void RequestReconnect(Scrollback *window);
             void Query(Scrollback *window, QString target, QString message);

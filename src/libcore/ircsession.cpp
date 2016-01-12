@@ -454,7 +454,7 @@ void IRCSession::SendAction(Scrollback *window, QString text)
     window->InsertText(ScrollbackItem(text, ScrollbackItemType_Act, this->GetNetwork()->GetLocalUserInfo()));
 }
 
-void IRCSession::SendRaw(Scrollback *window, QString raw)
+void IRCSession::SendRaw(Scrollback *window, QString raw, libircclient::Priority pr)
 {
     Q_UNUSED(window);
     if (!this->IsConnected())
@@ -462,7 +462,7 @@ void IRCSession::SendRaw(Scrollback *window, QString raw)
         this->GetSystemWindow()->InsertText("Can't send raw data to a disconnected network");
         return;
     }
-    this->GetNetwork()->TransferRaw(raw);
+    this->GetNetwork()->TransferRaw(raw, pr);
 }
 
 void IRCSession::RequestRemove(Scrollback *window)

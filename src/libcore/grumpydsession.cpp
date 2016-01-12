@@ -100,7 +100,7 @@ libircclient::Network *GrumpydSession::GetNetwork(Scrollback *window)
     return ircs->GetNetwork();
 }
 
-void GrumpydSession::SendRaw(Scrollback *window, QString raw)
+void GrumpydSession::SendRaw(Scrollback *window, QString raw, libircclient::Priority pr)
 {
     IRCSession *ircs = this->GetSessionFromWindow(window);
     if (!ircs)
@@ -108,6 +108,7 @@ void GrumpydSession::SendRaw(Scrollback *window, QString raw)
 
     QHash<QString, QVariant> parameters;
     parameters.insert("network_id", QVariant(ircs->GetSID()));
+    parameters.insert("priority", QVariant(static_cast<int>(pr)));
     parameters.insert("command", QVariant(raw));
     this->gp->SendProtocolCommand(GP_CMD_RAW, parameters);
 }

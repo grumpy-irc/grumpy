@@ -67,3 +67,13 @@ unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+
+unix:!macx: LIBS += -L$$PWD/../libirc/build-libirc-Desktop-Debug/ -llibirc
+
+INCLUDEPATH += $$PWD/../libirc/build-libirc-Desktop-Debug
+DEPENDPATH += $$PWD/../libirc/build-libirc-Desktop-Debug
+
+unix:!macx: LIBS += -L$$PWD/../libirc/build-libircclient-Desktop-Debug/ -llibircclient
+
+INCLUDEPATH += $$PWD/../libirc/build-libircclient-Desktop-Debug
+DEPENDPATH += $$PWD/../libirc/build-libircclient-Desktop-Debug

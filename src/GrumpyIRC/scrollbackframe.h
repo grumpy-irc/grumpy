@@ -18,6 +18,7 @@
 #include <QThread>
 #include <QMutex>
 #include <QTimer>
+#include "../libirc/libircclient/priority.h"
 #include "stextbox.h"
 #include "../libirc2htmlcode/parser.h"
 #include "../libcore/scrollback.h"
@@ -113,7 +114,7 @@ namespace GrumpyIRC
             void RefreshHtmlIfNeeded();
             void SetProperty(QString name, QVariant value);
             libircclient::Network *GetNetwork();
-            void TransferRaw(QString data);
+            void TransferRaw(QString data, libircclient::Priority priority = libircclient::Priority_Normal);
             libircclient::User *GetIdentity();
             scrollback_id_t GetItems();
             QList<QString> GetUsers();

@@ -128,7 +128,7 @@ namespace GrumpyIRC
             virtual void Open(libirc::ServerAddress server);
             bool IsConnected() const;
             void SendMessage(Scrollback *window, QString text);
-            void SendRaw(Scrollback *window, QString raw);
+            void SendRaw(Scrollback *window, QString raw, libircclient::Priority pr = libircclient::Priority_Normal);
             void SendAction(Scrollback *window, QString text);
             void SendNotice(Scrollback *window, QString text);
             void SendMessage(Scrollback *window, QString target, QString message);

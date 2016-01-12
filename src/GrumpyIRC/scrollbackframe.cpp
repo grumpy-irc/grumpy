@@ -800,13 +800,13 @@ libircclient::Network *ScrollbackFrame::GetNetwork()
     return this->precachedNetwork;
 }
 
-void ScrollbackFrame::TransferRaw(QString data)
+void ScrollbackFrame::TransferRaw(QString data, libircclient::Priority priority)
 {
     if (!this->GetSession())
         return;
 
     // Delegate the raw command
-    this->GetSession()->SendRaw(this->GetScrollback(), data);
+    this->GetSession()->SendRaw(this->GetScrollback(), data, priority);
 }
 
 libircclient::User *ScrollbackFrame::GetIdentity()

@@ -104,7 +104,7 @@ QStandardItem *ScrollbackList::GetRootTreeItem()
     return this->root;
 }
 
-void GrumpyIRC::ScrollbackList::UnregisterHidden()
+void ScrollbackList::UnregisterHidden()
 {
     foreach(ScrollbackFrame *scrollback, ScrollbackFrame::ScrollbackFrames)
     {
@@ -315,7 +315,7 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
         foreach (Scrollback *channel, irc_session->GetChannelScrollbacks())
         {
             if (channel->IsDead())
-                wx->TransferRaw("JOIN " + channel->GetTarget());
+                wx->TransferRaw("JOIN " + channel->GetTarget(), libircclient::Priority_Low);
         }
     } else if (selectedItem == menuAuto)
     {

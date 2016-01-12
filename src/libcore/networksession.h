@@ -14,6 +14,7 @@
 #define NETWORKSESSION_H
 
 #include <QString>
+#include "../libirc/libircclient/priority.h"
 #include <QObject>
 
 namespace libircclient
@@ -46,7 +47,7 @@ namespace GrumpyIRC
             virtual libircclient::Network *GetNetwork(Scrollback *window = 0)=0;
             virtual void SendAction(Scrollback *window, QString text)=0;
             virtual void SendMessage(Scrollback *window, QString text)=0;
-            virtual void SendRaw(Scrollback *window, QString raw)=0;
+            virtual void SendRaw(Scrollback *window, QString raw, libircclient::Priority pr = libircclient::Priority_Normal)=0;
             virtual void SendCTCP(Scrollback *window, QString target, QString ctcp, QString param)=0;
             virtual void SendNotice(Scrollback *window, QString text)=0;
             virtual QList<QString> GetChannels(Scrollback *window)=0;
