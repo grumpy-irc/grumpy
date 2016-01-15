@@ -80,6 +80,10 @@
 #define GP_CMD_RESYNC_SCROLLBACK_PB        29 // Used to resync the scrollback's property bag - only change or append new items, doesn't clear existing ones
 #define GP_CMD_OVERRIDE_SCROLLBACK_PB      30 // Replaces the property bag with another hash
 
+// PACKET VERIFICATION
+// This system is used to verify if packet was delivered or not
+#define GP_CMD_ACK                         200
+
 #define GP_MODETYPE_UMODE 1
 #define GP_MODETYPE_PMODE 2
 #define GP_MODETYPE_CMODE 3
@@ -186,12 +190,15 @@ namespace GrumpyIRC
             void processChannelResync(QHash<QString, QVariant> hash);
             void processSResync(QHash<QString, QVariant> parameters);
             void processPBResync(QHash<QString, QVariant> parameters);
+            void processAck(QHash<QString, QVariant> parameters);
             void processPSResync(QHash<QString, QVariant> parameters);
             void processRemove(QHash<QString, QVariant> parameters);
             void freememory();
             void closeError(QString error);
             bool AutoReconnect;
             QDateTime syncInit;
+            QList<unsigned int> processedMessages;
+            unsigned int lastProcessedMessage = 1;
             bool syncing;
             libgp::GP *gp;
             //! Irc sessions associated with their ROOT window so that we can figure out the network just from parent window

@@ -976,6 +976,16 @@ void GrumpydSession::processPBResync(QHash<QString, QVariant> parameters)
     }
 }
 
+void GrumpydSession::processAck(QHash<QString, QVariant> parameters)
+{
+    if (parameters.contains("s"))
+    {
+        unsigned int id = parameters["s"].toString().toUInt();
+        if (this->processedMessages.contains(id))
+            this->processedMessages.removeOne(id);
+    }
+}
+
 void GrumpydSession::processPSResync(QHash<QString, QVariant> parameters)
 {
     //Scrollback scrollback(parameters["scrollback"].toHash());

@@ -127,17 +127,6 @@ MainWindow::MainWindow(bool fork, MainWindow *parent)
     Q_UNUSED(fork);
     this->ui = new Ui::MainWindow();
     this->isFork = true;
-    /*this->userWidget = new UserWidget(this);
-    this->setCentralWidget(this->scrollbackWindow);
-    this->statusFrame = new QLabel(this);
-    this->identFrame = new QLabel(this);
-    this->ui->statusBar->addPermanentWidget(this->identFrame);
-    this->addDockWidget(Qt::LeftDockWidgetArea, this->windowList);
-    this->addDockWidget(Qt::BottomDockWidgetArea, this->syslogWindow);
-    this->addDockWidget(Qt::RightDockWidgetArea, this->userWidget);
-    this->ui->statusBar->addPermanentWidget(this->statusFrame);
-    ScrollbacksManager::Global = this->scrollbackWindow;
-    */
     this->ui->setupUi(this);
     this->windowList = parent->windowList;
     this->scrollbackWindow = parent->scrollbackWindow;

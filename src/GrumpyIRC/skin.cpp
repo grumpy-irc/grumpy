@@ -129,7 +129,7 @@ void Skin::setDefaults()
     this->TextSize = 12;
 #ifdef GRUMPY_WIN
     if (QFontDatabase().families().contains("Consolas"))
-        this->FontFamily = "Consolas"l
+        this->FontFamily = "Consolas";
     else
         this->FontFamily = "Courier New";
 #else
