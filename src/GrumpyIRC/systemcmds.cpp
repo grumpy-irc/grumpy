@@ -156,6 +156,31 @@ int SystemCmds::Nick(SystemCommand *command, CommandArgs args)
     }
 }
 
+static QString human_read(unsigned long long input)
+{
+    if (input < 1025)
+        return "";
+    int level = 0;
+    double value = static_cast<double>(input);
+    QString units;
+    while (level < 2 || value > 1024)
+    {
+        level++;
+        switch (level)
+        {
+            case 1:
+                units = "KB";
+                break;
+            case 2:
+                units = "MB";
+                break;
+        }
+        value = value / 1024;
+    }
+    value = static_cast<double>(qRound64(value * 100)) / 100;
+    return " (" + QString::number(value) + " " + units +  QString(")");
+}
+
 int SystemCmds::Netstat(SystemCommand *command, CommandArgs command_args)
 {
     Q_UNUSED(command_args);
@@ -171,10 +196,10 @@ int SystemCmds::Netstat(SystemCommand *command, CommandArgs command_args)
     us = session->GetBytesSent();
     sx->InsertText("Network stats for this grumpy session:");
     sx->InsertText("-----------------------------------------------------");
-    sx->InsertText("Compressed bytes rcvd: " + QString::number(cr));
-    sx->InsertText("Compressed bytes sent: " + QString::number(cs));
-    sx->InsertText("Bytes rcvd: " + QString::number(ur));
-    sx->InsertText("Bytes sent: " + QString::number(us));
+    sx->InsertText("Compressed bytes rcvd: " + QString::number(cr) + human_read(cr));
+    sx->InsertText("Compressed bytes sent: " + QString::number(cs) + human_read(cs));
+    sx->InsertText("Bytes rcvd: " + QString::number(ur) + human_read(ur));
+    sx->InsertText("Bytes sent: " + QString::number(us) + human_read(us));
     sx->InsertText("-----------------------------------------------------");
     if (cs > 0 && cr > 0)
     {
