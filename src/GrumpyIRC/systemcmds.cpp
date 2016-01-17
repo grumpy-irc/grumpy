@@ -163,7 +163,7 @@ static QString human_read(unsigned long long input)
     int level = 0;
     double value = static_cast<double>(input);
     QString units;
-    while (level < 2 || value > 1024)
+    while (level < 2 && value > 1024)
     {
         level++;
         switch (level)
