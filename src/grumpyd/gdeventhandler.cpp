@@ -11,6 +11,7 @@
 // Copyright (c) Petr Bena 2015
 
 #include "gdeventhandler.h"
+#include <iostream>
 #include "grumpyconf.h"
 #include "corewrapper.h"
 #include "../libcore/core.h"
@@ -30,25 +31,41 @@ void GDEventHandler::OnDebug(QString text, unsigned int verbosity)
 {
     if (GCFG->Verbosity >= verbosity)
     {
-    openlog ("grumpyd", LOG_PID | LOG_DAEMON, 0);
-    syslog (LOG_DEBUG, "%s", text.toStdString().c_str());
-    closelog ();
+        if (CONF->Stdout)
+        {
+            std::cout << "DEBUG: " << text.toStdString() << std::endl;
+            return;
+        }
+        openlog ("grumpyd", LOG_PID | LOG_DAEMON, 0);
+        syslog (LOG_DEBUG, "%s", text.toStdString().c_str());
+        closelog ();
     }
 }
 
 void GDEventHandler::OnError(QString text)
 {
-    openlog ("grumpyd", LOG_PID | LOG_DAEMON, 0);
-    syslog (LOG_ERR, "%s", text.toStdString().c_str());
-    closelog ();
+    if (!CONF->Stdout)
+    {
+        openlog ("grumpyd", LOG_PID | LOG_DAEMON, 0);
+        syslog (LOG_ERR, "%s", text.toStdString().c_str());
+        closelog ();
+    } else
+    {
+        std::cerr << "ERROR: " << text.toStdString() << std::endl;
+        return;
+    }
 }
 
 void GDEventHandler::OnSystemLog(QString text)
 {
-    openlog ("grumpyd", LOG_PID | LOG_DAEMON, 0);
-
-    syslog (LOG_INFO, "%s", text.toStdString().c_str());
-
-    closelog ();
+    if (CONF->Stdout)
+    {
+        std::cout << text.toStdString() << std::endl;
+    } else
+    {
+        openlog ("grumpyd", LOG_PID | LOG_DAEMON, 0);
+        syslog (LOG_INFO, "%s", text.toStdString().c_str());
+        closelog ();
+    }
 }
 #endif
