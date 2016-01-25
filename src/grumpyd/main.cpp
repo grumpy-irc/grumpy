@@ -121,6 +121,17 @@ int config(GrumpyIRC::TerminalParser *parser, QStringList params)
     return TP_RESULT_OK;
 }
 
+int log_stdout(GrumpyIRC::TerminalParser *parser, QStringList params)
+{
+    (void)parser;
+
+    // Flag here that we want to use
+    // stdout for logs
+    CONF->Stdout = true;
+
+    return TP_RESULT_OK;
+}
+
 int pid(GrumpyIRC::TerminalParser *parser, QStringList params)
 {
     (void)parser;
@@ -178,6 +189,7 @@ int main(int argc, char *argv[])
         tp->Register(0, "cleanup", "Remove invalid objects from the database permanently.", 0, (GrumpyIRC::TP_Callback)dbcl);
         tp->Register(0, "upgrade-db", "Upgrade the database schemas. Required only if grumpyd asks for it.", 0, (GrumpyIRC::TP_Callback)upgrade_store);
         tp->Register('v', "verbosity", "Increases the verbose level", 0, (GrumpyIRC::TP_Callback)verbosity_plus);
+        tp->Register('s', "log-stdout", "Use current tty for logging instead of syslog", 0, (GrumpyIRC::TP_Callback)log_stdout);
         if (!tp->Parse(argc, argv))
         {
             // We processed some argument which requires the application to exit
