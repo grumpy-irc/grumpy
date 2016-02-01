@@ -191,6 +191,8 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
         }
         return this->CommandList[command_name]->Run(parameters);
     }
+    if (command.startsWith(this->CommandPrefix) && (command.length() > 2 && command[1] == this->CommandPrefix))
+        command = command.mid(1);
     // It's not a command, let's do something with this
     if (window->IsDead() != true && (window->GetType() == ScrollbackType_Channel || window->GetType() == ScrollbackType_User))
     {
