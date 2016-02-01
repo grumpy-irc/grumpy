@@ -128,7 +128,7 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
     if (command.isEmpty())
         return 0;
     // Check if command starts with prefix, but make sure it doesn't start with double prefix, which means ignore the prefix symbol
-    if (command.startsWith(this->CommandPrefix) && !(command.length() > 2 && command[1] == this->CommandPrefix))
+    if (command.startsWith(this->CommandPrefix) && !(command.length() > 1 && command[1] == this->CommandPrefix))
     {
         // This is a system command
         command = command.mid(1);
@@ -191,7 +191,7 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
         }
         return this->CommandList[command_name]->Run(parameters);
     }
-    if (command.startsWith(this->CommandPrefix) && (command.length() > 2 && command[1] == this->CommandPrefix))
+    if (command.startsWith(this->CommandPrefix) && (command.length() > 1 && command[1] == this->CommandPrefix))
         command = command.mid(1);
     // It's not a command, let's do something with this
     if (window->IsDead() != true && (window->GetType() == ScrollbackType_Channel || window->GetType() == ScrollbackType_User))
