@@ -20,10 +20,10 @@
 
 namespace GrumpyIRC
 {
-	class ScrollbackFrame;
-	class ScrollbackList_Node : public QStandardItem
-	{
-		public:
+    class ScrollbackFrame;
+    class ScrollbackList_Node : public QStandardItem
+    {
+        public:
             static QList<ScrollbackList_Node*> NodesList;
 
 			ScrollbackList_Node(ScrollbackFrame *sb);
@@ -42,7 +42,7 @@ namespace GrumpyIRC
             QBrush highlighterBrush;
             QBrush unreadBrush;
             QBrush systemBrush;
-			ScrollbackFrame *scrollback;
+            ScrollbackFrame *scrollback;
 
 	};
 }

@@ -132,6 +132,9 @@ void ScrollbackList::OnUpdate()
 {
     foreach (ScrollbackList_Node *node, ScrollbackList_Node::NodesList)
     {
+        // yes this is retarded bug in Qt and freaky fix
+        if ((uintptr_t)node->GetScrollback() == 0xdddddddddddddddd)
+            continue;
         if ((node->GetScrollback()->LastMenuTooltipUpdate.secsTo(QDateTime::currentDateTime())) > 20)
         {
             Scrollback *scrollback = node->GetScrollback()->GetScrollback();
