@@ -35,3 +35,7 @@ if (QT5_BUILD)
 endif()
 
 TARGET_LINK_LIBRARIES(irc2htmlcode ${QT_LIBRARIES})
+
+if (NOT WIN32)
+  INSTALL(TARGETS irc2htmlcode LIBRARY DESTINATION lib)
+endif()
