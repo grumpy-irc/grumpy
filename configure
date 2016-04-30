@@ -211,10 +211,19 @@ if [ -d "../.git" ];then
     git submodule update
 fi
 
+if [ ! -f "src/sqlite/sqlite3.h" ];then
+    echo "The sqlite files are missing! Fixing by using a backup file..."
+    cd "src/sqlite" || exit 1
+    unzip sqlite-amalgamation-3090200.zip || exit 1
+    mv sqlite-amalgamation-3090200/* . || exit 1
+    rm -rf sqlite-amalgamation-3090200 || exit 1
+    cd - || exit 1
+fi
+
 if [ ! -d "src/libirc/libirc" ];then
     echo "The libirc directories are missing! Fixing by using a backup file..."
-    cd ".src/libirc" || exit 1
-    #unzip libirc.zip || exit 1
+    cd "src/libirc" || exit 1
+    unzip libirc.zip || exit 1
     cd - || exit 1
 fi
 
@@ -248,6 +257,7 @@ fi
 #	exit 1
 #fi
 #ok
+
 if [ x"$QTPATH" != "x" ];then
     CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_PREFIX_PATH=$QTPATH"
 fi
