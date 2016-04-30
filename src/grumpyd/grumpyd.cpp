@@ -49,12 +49,12 @@ QString Grumpyd::GetDFPath()
 QString Grumpyd::GetPathSSLCert()
 {
     //! TODO load this from config
-    return GetCFPath() + "cert.crt";
+    return GetCFPath() + "server.crt";
 }
 
 QString Grumpyd::GetPathSSLKey()
 {
-    return GetCFPath() + "privkey.pem";
+    return GetCFPath() + "server.key";
 }
 
 bool Grumpyd::SSLIsAvailable()
