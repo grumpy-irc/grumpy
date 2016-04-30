@@ -31,6 +31,8 @@
 
 namespace GrumpyIRC
 {
+    class GrumpydSession;
+
     class LIBCORESHARED_EXPORT EventHandler : libircclient::IRCEventHandler
     {
         public:
@@ -40,7 +42,8 @@ namespace GrumpyIRC
             virtual void OnDebug(QString text, unsigned int verbosity = 1);
             virtual void OnError(QString text);
             virtual void OnSystemLog(QString text);
-
+            virtual void OnGrumpydCtorCall(GrumpydSession *session);
+            virtual void OnGrumpydDtorCall(GrumpydSession *session);
     };
 }
 

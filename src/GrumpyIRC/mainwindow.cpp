@@ -36,6 +36,7 @@
 #include "preferenceswin.h"
 #include "scrollbackframe.h"
 #include "scrollbacksmanager.h"
+#include <QProgressBar>
 #include "skin.h"
 
 using namespace GrumpyIRC;
@@ -76,6 +77,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->addDockWidget(Qt::RightDockWidgetArea, this->userWidget);
     this->ui->statusBar->addPermanentWidget(this->overviewFrame);
     this->ui->statusBar->addPermanentWidget(this->statusFrame);
+    this->progressBar = new QProgressBar(this->ui->statusBar);
+    this->ui->statusBar->addPermanentWidget(this->progressBar);
     ScrollbacksManager::Global = this->scrollbackWindow;
     if (CONF->FirstRun())
         new Highlighter("$nick");
@@ -120,6 +123,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         this->systemWindow->ToggleHide();
     if (!CONF->SafeMode)
         this->Execute(CONF->GetAutorun());
+    this->HideProgress();
 }
 
 MainWindow::MainWindow(bool fork, MainWindow *parent)
@@ -209,6 +213,7 @@ void MainWindow::SetWN(QString text)
         this->setWindowTitle(text);
 }
 
+int lastPacketSize = 0;
 void MainWindow::UpdateStatus()
 {
     this->windowCount->setText(QString::number(Scrollback::ScrollbackList.count()) + " scrollbacks");
@@ -231,6 +236,31 @@ void MainWindow::UpdateStatus()
             extra += QString(" <b>(") + channel->GetMode().ToString() + QString(")</b>");
     }
     this->overviewFrame->setText(extra);
+
+    // Check if there isn't some grumpyd session transfering large amount of packets
+    GrumpydSession::Sessions_Lock.lock();
+    bool progress_needed = false;
+    foreach (GrumpydSession *session, GrumpydSession::Sessions)
+    {
+        if (session->IsConnected() && session->IsReceivingLargePacket())
+        {
+            if (lastPacketSize != session->GetReceivingPacketSize())
+            {
+                this->SetMaxProgressValue(session->GetReceivingPacketSize());
+                lastPacketSize = session->GetReceivingPacketSize();
+            }
+            progress_needed = true;
+            this->SetProgress(session->GetProgress());
+            if (!this->progressBar->isVisible())
+                this->ShowProgress();
+            this->statusFrame->setText("Syncing " + QString::number(session->GetProgress() / 1024) + "kb / " +
+                                            QString::number(session->GetReceivingPacketSize() / 1024) + "kb");
+            break;
+        }
+    }
+    GrumpydSession::Sessions_Lock.unlock();
+    if (!progress_needed)
+        this->HideProgress();
 }
 
 void MainWindow::OpenUrl(QString url)
@@ -245,6 +275,26 @@ void MainWindow::Execute(QString text)
 {
     foreach (QString line, text.split("\n"))
         this->ExecuteLine(line);
+}
+
+void MainWindow::HideProgress()
+{
+    this->progressBar->setVisible(false);
+}
+
+void MainWindow::ShowProgress()
+{
+    this->progressBar->setVisible(true);
+}
+
+void MainWindow::SetMaxProgressValue(int max)
+{
+    this->progressBar->setMaximum(max);
+}
+
+void MainWindow::SetProgress(int progress)
+{
+    this->progressBar->setValue(progress);
 }
 
 void MainWindow::ExecuteLine(QString line)

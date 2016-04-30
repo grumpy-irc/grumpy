@@ -1,4 +1,4 @@
-//This program is free software: you can redistribute it and/or modify
+    //This program is free software: you can redistribute it and/or modify
 //it under the terms of the GNU Lesser General Public License as published by
 //the Free Software Foundation, either version 3 of the License, or
 //(at your option) any later version.
@@ -46,10 +46,12 @@ GrumpydSession::GrumpydSession(Scrollback *System, QString Hostname, QString Use
     GrumpydSession::Sessions_Lock.lock();
     GrumpydSession::Sessions.append(this);
     GrumpydSession::Sessions_Lock.unlock();
+    Core::GrumpyCore->GetCurrentEventHandler()->OnGrumpydCtorCall(this);
 }
 
 GrumpydSession::~GrumpydSession()
 {
+    Core::GrumpyCore->GetCurrentEventHandler()->OnGrumpydDtorCall(this);
     this->systemWindow->Close();
     GrumpydSession::Sessions_Lock.lock();
     GrumpydSession::Sessions.removeAll(this);
@@ -482,6 +484,21 @@ unsigned long long GrumpydSession::GetPacketsSent()
 unsigned long long GrumpydSession::GetPacketsRcvd()
 {
     return this->gp->GetPacketsRecv();
+}
+
+bool GrumpydSession::IsReceivingLargePacket()
+{
+    return this->gp->IsReceiving() && (this->gp->GetIncomingPacketSize() > 2000);
+}
+
+qint64 GrumpydSession::GetReceivingPacketSize()
+{
+    return this->gp->GetIncomingPacketSize();
+}
+
+qint64 GrumpydSession::GetProgress()
+{
+    return this->gp->GetIncomingPacketRecv();
 }
 
 void GrumpydSession::OnSslHandshakeFailure(QList<QSslError> errors, bool *ok)

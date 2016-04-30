@@ -160,6 +160,9 @@ namespace GrumpyIRC
             unsigned long long GetBytesSent();
             unsigned long long GetPacketsSent();
             unsigned long long GetPacketsRcvd();
+            bool IsReceivingLargePacket();
+            qint64 GetReceivingPacketSize();
+            qint64 GetProgress();
             QString Version;
             bool IsOpening = false;
             QHash<QString, QVariant> Preferences;

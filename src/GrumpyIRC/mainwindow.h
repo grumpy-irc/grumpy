@@ -29,6 +29,8 @@ namespace libirc
     class ServerAddress;
 }
 
+class QProgressBar;
+
 namespace GrumpyIRC
 {
     class InputBox;
@@ -63,6 +65,10 @@ namespace GrumpyIRC
             void Notify(QString heading, QString text);
             void OpenUrl(QString url);
             void Execute(QString text);
+            void HideProgress();
+            void ShowProgress();
+            void SetMaxProgressValue(int max);
+            void SetProgress(int progress);
             void ExecuteLine(QString line);
             void OpenGrumpy(QString hostname, int port, QString username, QString password, bool ssl);
             void OpenIRCNetworkLink(QString link);
@@ -89,6 +95,7 @@ namespace GrumpyIRC
             QLabel *identFrame;
             QLabel *windowCount;
             QLabel *overviewFrame;
+            QProgressBar *progressBar;
             ScrollbackFrame *systemWindow;
             LinkHandler *handler;
             ScrollbackList *windowList;

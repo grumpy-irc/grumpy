@@ -43,3 +43,13 @@ void GrumpyIRC::EventHandler::OnSystemLog(QString text)
     qDebug() << "INFO:  " + text;
 }
 
+void GrumpyIRC::EventHandler::OnGrumpydCtorCall(GrumpyIRC::GrumpydSession *session)
+{
+
+}
+
+void GrumpyIRC::EventHandler::OnGrumpydDtorCall(GrumpyIRC::GrumpydSession *session)
+{
+
+}
+
