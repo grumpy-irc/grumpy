@@ -207,3 +207,64 @@ QString Generic::StripSpecial(QString text)
     }
     return text;
 }
+
+
+Generic::HostInfo Generic::GetHostPortInfo(QString target, int default_port)
+{
+    target = target.trimmed();
+    Generic::HostInfo info;
+    info.Port = default_port;
+    info.Host = target;
+
+    if (!target.contains(":"))
+    {
+        return info;
+    }
+
+    int p;
+    bool success = true;
+
+    // Detect IPv6: [::1]:50
+    if (target.startsWith("["))
+    {
+        // This could be IPv6
+        QString ip = target.mid(1);
+        if (!ip.contains("]"))
+        {
+            info.Invalid = true;
+            return info;
+        }
+
+        // Let's extract IPv6
+        ip = ip.mid(0, ip.indexOf("]"));
+        info.Host = ip;
+
+        // Now get port if there is any
+        QString port = target.mid(target.indexOf("]") + 1);
+        if (port.isEmpty())
+        {
+            // there is no port
+            return info;
+        }
+
+        p = port.toInt(&success);
+        if (!success)
+        {
+            info.Invalid = true;
+            return info;
+        }
+        info.Port = p;
+        return info;
+    }
+
+    // This is either IPv4 or string
+    info.Host = target.mid(0, target.indexOf(":"));
+    p = target.mid(target.indexOf(":") + 1).toInt(&success);
+    if (!success)
+    {
+        info.Invalid = true;
+        return info;
+    }
+    info.Port = p;
+    return info;
+}

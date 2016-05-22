@@ -29,6 +29,14 @@ namespace GrumpyIRC
 
     namespace Generic
     {
+        class HostInfo
+        {
+            public:
+                QString Host;
+                int Port = 0;
+                bool Invalid = false;
+        };
+
         enum MessageBox_Type
         {
             MessageBox_Type_Normal,
@@ -57,6 +65,7 @@ namespace GrumpyIRC
         LIBCORESHARED_EXPORT QList<QVariant> QIntListToVariantList(QList<int> list);
         LIBCORESHARED_EXPORT QString ExpandedString(QString string, unsigned int minimum_size, unsigned int maximum_size = 0);
         LIBCORESHARED_EXPORT int LongestString(QList<QString> list);
+        LIBCORESHARED_EXPORT HostInfo GetHostPortInfo(QString target, int default_port);
     }
 }
 

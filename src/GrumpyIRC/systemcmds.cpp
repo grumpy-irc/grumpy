@@ -236,7 +236,13 @@ int SystemCmds::Grumpy(SystemCommand *command, CommandArgs command_args)
         GRUMPY_ERROR(QObject::tr("This command requires exactly 3 parameters"));
         return 0;
     }
-    MainWindow::Main->OpenGrumpy(command_args.Parameters[0], GP_DEFAULT_SSL_PORT, command_args.Parameters[1], command_args.Parameters[2], true);
+    Generic::HostInfo h = Generic::GetHostPortInfo(command_args.Parameters[0], GP_DEFAULT_SSL_PORT);
+    if (h.Invalid)
+    {
+        GRUMPY_ERROR("Invalid host: " + command_args.Parameters[0]);
+        return 1;
+    }
+    MainWindow::Main->OpenGrumpy(h.Host, h.Port, command_args.Parameters[1], command_args.Parameters[2], true);
     return 0;
 }
 
@@ -285,7 +291,13 @@ int SystemCmds::UnsecureGrumpy(SystemCommand *command, CommandArgs command_args)
         GRUMPY_ERROR(QObject::tr("This command requires exactly 3 parameters"));
         return 0;
     }
-    MainWindow::Main->OpenGrumpy(command_args.Parameters[0], GP_DEFAULT_PORT, command_args.Parameters[1], command_args.Parameters[2], false);
+    Generic::HostInfo hn = Generic::GetHostPortInfo(command_args.Parameters[0], GP_DEFAULT_PORT);
+    if (hn.Invalid)
+    {
+        GRUMPY_ERROR("Invalid host: " + command_args.Parameters[0]);
+        return 1;
+    }
+    MainWindow::Main->OpenGrumpy(hn.Host, hn.Port, command_args.Parameters[1], command_args.Parameters[2], false);
     return 0;
 }
 
