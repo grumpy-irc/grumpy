@@ -146,6 +146,15 @@ bool ScrollbackList_Node::lowerThan(const QStandardItem &other) const
     if (node->IsSystem != this->IsSystem)
         return this->IsSystem;
 
+    bool other_ic = other.text().startsWith('#');
+    bool this_ic = this->text().startsWith('#');
+
+    // Channels go first
+    if (other_ic && !this_ic)
+        return false;
+    else if (!other_ic && this_ic)
+        return true;
+
     return QString::localeAwareCompare(other.text(), this->text()) > 0;
 }
 
