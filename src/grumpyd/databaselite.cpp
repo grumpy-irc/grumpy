@@ -518,6 +518,7 @@ void DatabaseLite::RemoveScrollback(unsigned int id)
 
 QList<QVariant> DatabaseLite::FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size)
 {
+    QDateTime t = QDateTime::currentDateTime();
     QList<QVariant> result;
 
     if (from > scrollback->GetLastID())
@@ -562,6 +563,9 @@ QList<QVariant> DatabaseLite::FetchBacklog(VirtualScrollback *scrollback, scroll
         ScrollbackItem tm(item_text, type, user, last_item, self);
         result.append(tm.ToHash());
     }
+
+    GRUMPY_DEBUG("Execution of FetchBacklog took " + QString::number(t.secsTo(QDateTime::currentDateTime())) + " seconds.", 1);
+
     return result;
 }
 

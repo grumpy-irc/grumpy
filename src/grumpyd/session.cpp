@@ -42,6 +42,7 @@ QList<Session *> Session::Sessions()
 Session::Session(qintptr socket_ptr, bool ssl)
 {
     this->usingSsl = ssl;
+    this->protocol = NULL;
     if (ssl)
     {
         QSslSocket *ssl_socket = new QSslSocket();
@@ -89,7 +90,6 @@ Session::Session(qintptr socket_ptr, bool ssl)
 
     failure:
         this->SessionState = State_Offline;
-        this->protocol = NULL;
         this->socket->close();
 }
 
