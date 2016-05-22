@@ -418,7 +418,7 @@ void GrumpydSession::Connect()
     connect(this->gp, SIGNAL(Event_SslHandshakeFailure(QList<QSslError>, bool*)), this, SLOT(OnSslHandshakeFailure(QList<QSslError>, bool*)));
     this->gp->SetCompression(6);
     this->systemWindow->SetDead(false);
-    this->systemWindow->InsertText("Connecting to " + this->hostname);
+    this->systemWindow->InsertText("Connecting to " + this->hostname + " using port " + QString::number(this->port) + " SSL: " + Generic::Bool2String(this->SSL));
     // Connect grumpy
     this->gp->Connect(this->hostname, this->port, this->SSL);
 }
