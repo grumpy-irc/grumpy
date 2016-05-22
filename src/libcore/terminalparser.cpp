@@ -153,7 +153,7 @@ bool TerminalParser::Parse(int argc, char **argv)
                     return false;
                 }
                 expected_parameters = item->GetParameters();
-                if (expected_parameters && symbol_px < parameter.size())
+                if (expected_parameters && (symbol_px+1) < parameter.size())
                 {
                     std::cerr << "ERROR: not enough parameters provided for -" << sx << std::endl;
                     delete item;

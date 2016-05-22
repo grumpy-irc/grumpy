@@ -117,23 +117,23 @@ void Grumpyd::Main()
     this->databaseBackend->LoadSessions();
     this->databaseBackend->LoadText();
     GRUMPY_LOG("Starting listeners");
-    if (!this->listener->listen(QHostAddress::Any, GP_DEFAULT_PORT))
+    if (!this->listener->listen(QHostAddress::Any, CONF->DefaultPort))
     {
-        GRUMPY_ERROR("Unable to open listener on port " + QString::number(GP_DEFAULT_PORT));
+        GRUMPY_ERROR("Unable to open listener on port " + QString::number(CONF->DefaultPort));
     }
     else
     {
-        GRUMPY_LOG("Listener open on port " + QString::number(GP_DEFAULT_PORT));
+        GRUMPY_LOG("Listener open on port " + QString::number(CONF->DefaultPort));
     }
     if (SSLIsAvailable())
     {
-        if (!this->listenerSSL->listen(QHostAddress::Any, GP_DEFAULT_SSL_PORT))
+        if (!this->listenerSSL->listen(QHostAddress::Any, CONF->SecuredPort))
         {
-            GRUMPY_ERROR("Unable to open listener (SSL) on port " + QString::number(GP_DEFAULT_SSL_PORT));
+            GRUMPY_ERROR("Unable to open listener (SSL) on port " + QString::number(CONF->SecuredPort));
         }
         else
         {
-            GRUMPY_LOG("Listener (SSL) open on port " + QString::number(GP_DEFAULT_SSL_PORT));
+            GRUMPY_LOG("Listener (SSL) open on port " + QString::number(CONF->SecuredPort));
         }
     }
 }

@@ -14,7 +14,7 @@
 #include <QFile>
 #include <QProcess>
 #include <csignal>
-//#include <iostream>
+#include <iostream>
 #include "corewrapper.h"
 #include "scrollbackfactory.h"
 #include "gdeventhandler.h"
@@ -45,6 +45,11 @@
 
 int verbosity = 0;
 
+int err(QString text)
+{
+    std::cerr << "ERROR: " << text.toStdString() << std::endl;
+}
+
 int daemonize()
 {
     if (!CONF->Daemon)
@@ -56,7 +61,7 @@ int daemonize()
 
     if (pid < 0)
     {
-        GRUMPY_ERROR("Failed to daemonize itself, call to fork() failed with error code: " + QString::number(errno));
+        err("Failed to daemonize itself, call to fork() failed with error code: " + QString::number(errno));
         return DAEMONIZE_FAILED;
     }
 
@@ -113,7 +118,10 @@ int config(GrumpyIRC::TerminalParser *parser, QStringList params)
 {
     Q_UNUSED(parser);
     if (params.isEmpty())
-        GRUMPY_ERROR("Invalid file");
+    {
+        err("Invalid file");
+        return TP_RESULT_SHUT;
+    }
 
     CONF->GetConfiguration()->SetAlternativeConfigFile(params[0]);
     CONF->GetConfiguration()->Load();
@@ -136,7 +144,10 @@ int pid(GrumpyIRC::TerminalParser *parser, QStringList params)
 {
     (void)parser;
     if (params.isEmpty())
-        GRUMPY_ERROR("Invalid pid file");
+    {
+        err("Invalid pid file");
+        return TP_RESULT_SHUT;
+    }
     CONF->PID = params[0];
     return TP_RESULT_OK;
 }
@@ -146,6 +157,44 @@ int dbcl(GrumpyIRC::TerminalParser *parser, QStringList params)
     (void)params;
     (void)parser;
     CONF->AutoFix = true;
+    return TP_RESULT_OK;
+}
+
+int default_port(GrumpyIRC::TerminalParser *parser, QStringList params)
+{
+    (void)parser;
+    if (params.isEmpty())
+    {
+        err("Missing port number");
+        return TP_RESULT_SHUT;
+    }
+    bool processed = true;
+    int port = params[0].toInt(&processed);
+    if (!processed || port < 0)
+    {
+        err("Invalid port number");
+        return TP_RESULT_SHUT;
+    }
+    CONF->DefaultPort = port;
+    return TP_RESULT_OK;
+}
+
+int secured_port(GrumpyIRC::TerminalParser *parser, QStringList params)
+{
+    (void)parser;
+    if (params.isEmpty())
+    {
+        err("Missing port number");
+        return TP_RESULT_SHUT;
+    }
+    bool processed = true;
+    int port = params[0].toInt(&processed);
+    if (!processed || port < 0)
+    {
+        err("Invalid port number");
+        return TP_RESULT_SHUT;
+    }
+    CONF->SecuredPort = port;
     return TP_RESULT_OK;
 }
 
@@ -180,16 +229,20 @@ int main(int argc, char *argv[])
         QCoreApplication::setApplicationName("grumpyd");
         // This is just a wrapper around libcore configuration system so that we can easily access some global config options
         CONF = new GrumpyIRC::GrumpyConf();
+
         // First of all we need to process the arguments and then do other stuff
         GrumpyIRC::TerminalParser *tp = new GrumpyIRC::TerminalParser();
         tp->Register('x', "pid", "Write process ID to a file", 1, (GrumpyIRC::TP_Callback)pid);
         tp->Register('d', "daemonize", "Will start grumpyd as system service", 0, (GrumpyIRC::TP_Callback)service);
-        tp->Register('k', "config", "Specify a path to configuration file", 1, (GrumpyIRC::TP_Callback)config);
+        tp->Register('c', "config", "Specify a path to configuration file", 1, (GrumpyIRC::TP_Callback)config);
         tp->Register(0, "dummy", "Use dummy as a storage backend, useful for debugging.", 0, (GrumpyIRC::TP_Callback)dummy);
         tp->Register(0, "cleanup", "Remove invalid objects from the database permanently.", 0, (GrumpyIRC::TP_Callback)dbcl);
         tp->Register(0, "upgrade-db", "Upgrade the database schemas. Required only if grumpyd asks for it.", 0, (GrumpyIRC::TP_Callback)upgrade_store);
         tp->Register('v', "verbosity", "Increases the verbose level", 0, (GrumpyIRC::TP_Callback)verbosity_plus);
         tp->Register('s', "log-stdout", "Use current tty for logging instead of syslog", 0, (GrumpyIRC::TP_Callback)log_stdout);
+        tp->Register('p', "port", "Change the listener port", 1, (GrumpyIRC::TP_Callback)default_port);
+        tp->Register('w', "secured-port", "Change the SSL port", 1, (GrumpyIRC::TP_Callback)secured_port);
+
         if (!tp->Parse(argc, argv))
         {
             // We processed some argument which requires the application to exit
@@ -211,7 +264,7 @@ int main(int argc, char *argv[])
             QFile pf(CONF->PID);
             if (!pf.open(QIODevice::WriteOnly))
             {
-                GRUMPY_ERROR("Unable to write to pid file: " + CONF->PID);
+                err("Unable to write to pid file: " + CONF->PID);
                 return EPIDMKER;
             }
             pf.write(QString::number(QCoreApplication::applicationPid()).toLatin1());

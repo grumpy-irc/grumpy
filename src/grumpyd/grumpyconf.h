@@ -18,6 +18,7 @@
 #endif
 
 #include "../libcore/definitions.h"
+#include "../libgp/gp.h"
 #include <QVariant>
 
 #ifdef CONF
@@ -49,6 +50,8 @@ namespace GrumpyIRC
             bool Init;
             bool Stdout = false;
             bool AutoFix;
+            int DefaultPort = GP_DEFAULT_PORT;
+            int SecuredPort = GP_DEFAULT_SSL_PORT;
             QString PID;
             bool Daemon;
             bool StorageDummy;
