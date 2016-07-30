@@ -101,3 +101,5 @@ RESOURCES += \
 
 DISTFILES += \
     scripts/_autoexec
+
+unix:!macx: LIBS += -llibirc -llibircclient -llibirc2htmlcode -llibcore -lgp

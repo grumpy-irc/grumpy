@@ -745,7 +745,6 @@ void ScrollbackFrame::RefreshHtml()
 {
     this->needsRefresh = false;
     QString string = "";
-    bool is_first = true;
     this->unwritten_m.lock();
     if (!this->unwrittenBlock.isEmpty())
     {
