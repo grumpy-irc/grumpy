@@ -418,6 +418,7 @@ void Scrollback::insertSI(ScrollbackItem si)
 
 void Scrollback::SetTarget(QString target)
 {
+    this->_ltarget.clear();
     this->_target = target;
 }
 
@@ -440,6 +441,15 @@ ScrollbackItem Scrollback::GetFirst()
         return ScrollbackItem("");
 
     return this->_items.first();
+}
+
+QString Scrollback::GetLTarget()
+{
+    if (!this->_ltarget.isEmpty())
+        return this->_ltarget;
+
+    this->_ltarget = this->_target.toLower();
+    return this->_ltarget;
 }
 
 QList<ScrollbackItem> Scrollback::GetItems()

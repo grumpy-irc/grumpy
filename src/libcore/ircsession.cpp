@@ -110,17 +110,13 @@ Scrollback *IRCSession::GetScrollback(QString name)
     if (this->systemWindow->GetTarget() == name)
         return this->systemWindow;
 
-    foreach (Scrollback *scrollback, this->users.values())
-    {
-        if (scrollback->GetTarget() == name)
-            return scrollback;
-    }
+    name = name.toLower();
 
-    foreach (Scrollback *scrollback, this->channels.values())
-    {
-        if (scrollback->GetTarget() == name)
-            return scrollback;
-    }
+    if (this->users.contains(name))
+        return this->users[name];
+
+    if (this->channels.contains(name))
+        return this->channels[name];
 
     return NULL;
 }

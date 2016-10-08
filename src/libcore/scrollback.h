@@ -143,6 +143,7 @@ namespace GrumpyIRC
             virtual void InsertText(QString text, ScrollbackItemType type = ScrollbackItemType_System);
             virtual void InsertText(ScrollbackItem item);
             ScrollbackItem GetFirst();
+            QString GetLTarget();
             virtual QString GetTarget() const;
             virtual void SetTarget(QString target);
             virtual void SetSITotalCount(scrollback_id_t sitc);
@@ -223,6 +224,7 @@ namespace GrumpyIRC
             Scrollback *parentSx;
             bool _dead;
             QString _target;
+            QString _ltarget;
             NetworkSession *session;
             bool _hidable = true;
             ScrollbackType type;
