@@ -45,7 +45,7 @@
 
 int verbosity = 0;
 
-int err(QString text)
+void err(QString text)
 {
     std::cerr << "ERROR: " << text.toStdString() << std::endl;
 }
