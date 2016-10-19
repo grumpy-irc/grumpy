@@ -281,6 +281,37 @@ void GrumpyConf::SetIRCIgnoredNumerics(QList<int> list)
     GCFG->SetValue("ignored_nmrs", Generic::QIntListToVariantList(list));
 }
 
+void GrumpyConf::SetProxy(int proxy)
+{
+    GCFG->SetValue("proxy", proxy);
+}
+
+void GrumpyConf::SetProxy(QNetworkProxy proxy)
+{
+    GCFG->SetValue("proxy_hostname", proxy.hostName());
+    GCFG->SetValue("proxy_user", proxy.user());
+    GCFG->SetValue("proxy_password", proxy.password());
+}
+
+bool GrumpyConf::UsingProxy()
+{
+    return GCFG->GetValueAsInt("proxy") != 0;
+}
+
+int GrumpyConf::ProxyType()
+{
+    return GCFG->GetValueAsInt("proxy");
+}
+
+QNetworkProxy GrumpyConf::GetProxy()
+{
+    QNetworkProxy p;
+    p.setHostName(GCFG->GetValueAsString("proxy_hostname", "127.0.0.1"));
+    p.setPassword(GCFG->GetValueAsString("proxy_password"));
+    p.setUser(GCFG->GetValueAsString("proxy_user"));
+    return p;
+}
+
 void GrumpyConf::Load()
 {
     GCFG->Load();

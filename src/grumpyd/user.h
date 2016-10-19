@@ -44,6 +44,7 @@ namespace GrumpyIRC
 
             User(QString Name, QString Password, user_id_t User_ID);
             ~User();
+            int GetSessionCount();
             void InsertSession(Session *sx);
             QString GetName() const;
             void RemoveSession(Session *sx);

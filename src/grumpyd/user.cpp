@@ -75,6 +75,11 @@ User::~User()
     delete this->conf;
 }
 
+int User::GetSessionCount()
+{
+    return this->sessions_gp.count();
+}
+
 void User::InsertSession(Session *sx)
 {
     if (this->sessions_gp.isEmpty())

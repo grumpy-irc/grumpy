@@ -472,7 +472,9 @@ void Session::processLogin(QHash<QString, QVariant> parameters)
             this->PermissionDeny(GP_CMD_LOGIN);
             return;
         }
-        this->protocol->SendProtocolCommand(GP_CMD_LOGIN_OK);
+        QHash<QString, QVariant> param;
+        param.insert("logged", this->loggedUser->GetSessionCount());
+        this->protocol->SendProtocolCommand(GP_CMD_LOGIN_OK, param);
         GRUMPY_LOG("SID " + QString::number(this->SID) + " identified to " + this->loggedUser->GetName());
         this->loggedUser->InsertSession(this);
     } else

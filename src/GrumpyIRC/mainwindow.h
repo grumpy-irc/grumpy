@@ -85,7 +85,9 @@ namespace GrumpyIRC
             void on_actionFavorites_triggered();
             void on_actionToggle_secret_triggered();
 
-        private:
+            void on_actionProxy_triggered();
+
+    private:
             QString processInput(QString text);
             void closeEvent(QCloseEvent *event);
             QSystemTrayIcon tray;

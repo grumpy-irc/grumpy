@@ -14,7 +14,7 @@
    <string>Grumpy IRC</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="icons.qrc">
+   <iconset resource="embedded.qrc">
     <normaloff>:/icons/img/grumpy_logo.png</normaloff>:/icons/img/grumpy_logo.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget"/>
@@ -24,15 +24,16 @@
      <x>0</x>
      <y>0</y>
      <width>848</width>
-     <height>21</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>Fi&amp;le</string>
     </property>
     <addaction name="actionOpen_window"/>
     <addaction name="actionPreferences"/>
+    <addaction name="actionProxy"/>
     <addaction name="separator"/>
     <addaction name="actionConnect"/>
     <addaction name="actionFavorites"/>
@@ -47,7 +48,7 @@
    </widget>
    <widget class="QMenu" name="menuScrollback">
     <property name="title">
-     <string>Scrollback</string>
+     <string>Scrollbac&amp;k</string>
     </property>
     <addaction name="actionLoad_more_items_from_remote"/>
     <addaction name="actionToggle_secret"/>
@@ -71,7 +72,7 @@
   </widget>
   <action name="actionConnect">
    <property name="text">
-    <string>Connect</string>
+    <string>&amp;Connect</string>
    </property>
    <property name="shortcut">
     <string>Alt+C</string>
@@ -79,12 +80,12 @@
   </action>
   <action name="actionExit">
    <property name="text">
-    <string>Exit</string>
+    <string>&amp;Exit</string>
    </property>
   </action>
   <action name="actionPreferences">
    <property name="text">
-    <string>Preferences</string>
+    <string>&amp;Preferences</string>
    </property>
   </action>
   <action name="action">
@@ -94,7 +95,7 @@
   </action>
   <action name="actionAbout">
    <property name="text">
-    <string>About</string>
+    <string>&amp;About</string>
    </property>
   </action>
   <action name="actionResync">
@@ -104,12 +105,12 @@
   </action>
   <action name="actionLoad_more_items_from_remote">
    <property name="text">
-    <string>Load more items from remote</string>
+    <string>&amp;Load more items from remote</string>
    </property>
   </action>
   <action name="actionOpen_window">
    <property name="text">
-    <string>Open new grumpy window</string>
+    <string>&amp;Open new grumpy window</string>
    </property>
    <property name="shortcut">
     <string>Alt+N</string>
@@ -117,21 +118,26 @@
   </action>
   <action name="actionFavorites">
    <property name="text">
-    <string>Favorites</string>
+    <string>&amp;Favorites</string>
    </property>
   </action>
   <action name="actionToggle_secret">
    <property name="text">
-    <string>Secured input</string>
+    <string>&amp;Secured input</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Alt+S</string>
    </property>
   </action>
+  <action name="actionProxy">
+   <property name="text">
+    <string>Proxy</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="icons.qrc"/>
+  <include location="embedded.qrc"/>
  </resources>
  <connections/>
 </ui>

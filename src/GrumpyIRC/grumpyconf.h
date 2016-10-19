@@ -25,6 +25,7 @@
 #define CONF GrumpyIRC::GrumpyConf::Conf
 
 #include <QVariant>
+#include <QNetworkProxy>
 
 namespace GrumpyIRC
 {
@@ -82,6 +83,17 @@ namespace GrumpyIRC
             bool FirstRun();
             QList<int> IgnoredNums();
             void SetIRCIgnoredNumerics(QList<int> list);
+
+            /////////////////////////////////////////////////////////////////////////
+            // Proxy
+            void SetProxy(int proxy);
+            void SetProxy(QNetworkProxy proxy);
+            bool UsingProxy();
+            int ProxyType();
+            QNetworkProxy GetProxy();
+
+            /////////////////////////////////////////////////////////////////////////
+
             void Load();
             void Save();
             bool SafeMode = false;

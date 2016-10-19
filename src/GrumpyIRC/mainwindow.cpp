@@ -31,6 +31,7 @@
 #include "ui_mainwindow.h"
 #include "userwidget.h"
 #include "linkhandler.h"
+#include "proxy.h"
 #include "systemcmds.h"
 #include "grumpyconf.h"
 #include "preferenceswin.h"
@@ -400,4 +401,10 @@ QString MainWindow::processInput(QString text)
     if (text.contains("$grumpy.version"))
         text = text.replace("$grumpy.version", GCFG->GetVersion());
     return text;
+}
+
+void GrumpyIRC::MainWindow::on_actionProxy_triggered()
+{
+    Proxy p;
+    p.exec();
 }
