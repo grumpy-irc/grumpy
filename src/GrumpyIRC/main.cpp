@@ -27,6 +27,7 @@
 #include "../libcore/terminalparser.h"
 #include "../libcore/highlighter.h"
 #include "scrollbackframe.h"
+#include "proxy.h"
 #include "inputbox.h"
 #include "widgetfactory.h"
 #include <QApplication>
@@ -96,6 +97,7 @@ int main(int argc, char *argv[])
         CoreWrapper::GrumpyCore = new Core();
         CoreWrapper::GrumpyCore->InitCfg();
         GrumpyConf::Conf->Load();
+        Proxy::Init();
         CoreWrapper::GrumpyCore->SetSystemEventHandler(new GrumpyEventHandler());
         CoreWrapper::GrumpyCore->InstallFactory(new WidgetFactory());
         ScrollbackFrame::InitializeThread();

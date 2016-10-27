@@ -47,6 +47,15 @@ static QNetworkProxy SetProxy(int type, QString host, unsigned int port, QString
     return proxy;
 }
 
+void Proxy::Init()
+{
+    if (CONF->UsingProxy())
+    {
+        QNetworkProxy ps = CONF->GetProxy();
+        SetProxy(CONF->ProxyType(), ps.hostName(), ps.port(), ps.user(), ps.password());
+    }
+}
+
 Proxy::Proxy(QWidget *parent) : QDialog(parent), ui(new Ui::Proxy)
 {
     this->ui->setupUi(this);

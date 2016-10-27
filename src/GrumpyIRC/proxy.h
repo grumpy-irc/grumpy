@@ -25,6 +25,7 @@ namespace GrumpyIRC
     {
             Q_OBJECT
         public:
+            static void Init();
             explicit Proxy(QWidget *parent = nullptr);
             ~Proxy();
 

@@ -291,6 +291,7 @@ void GrumpyConf::SetProxy(QNetworkProxy proxy)
     GCFG->SetValue("proxy_hostname", proxy.hostName());
     GCFG->SetValue("proxy_user", proxy.user());
     GCFG->SetValue("proxy_password", proxy.password());
+    GCFG->SetValue("proxy_port", proxy.port());
 }
 
 bool GrumpyConf::UsingProxy()
@@ -309,6 +310,7 @@ QNetworkProxy GrumpyConf::GetProxy()
     p.setHostName(GCFG->GetValueAsString("proxy_hostname", "127.0.0.1"));
     p.setPassword(GCFG->GetValueAsString("proxy_password"));
     p.setUser(GCFG->GetValueAsString("proxy_user"));
+    p.setPort(GCFG->GetValueAsInt("proxy_port", 0));
     return p;
 }
 
