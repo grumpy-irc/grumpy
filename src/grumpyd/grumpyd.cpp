@@ -111,6 +111,13 @@ void Grumpyd::Main()
 {
     GRUMPY_LOG("Loading storage: " + CONF->GetStorage());
     this->databaseBackend = InstantiateStorage(CONF->GetStorage());
+    if (CONF->DBMaint)
+    {
+        GRUMPY_LOG("Performing database maintenance");
+        this->databaseBackend->Maintenance();
+        QCoreApplication::exit(0);
+        return;
+    }
     this->databaseBackend->LoadRoles();
     this->databaseBackend->LoadUsers();
     this->databaseBackend->LoadWindows();

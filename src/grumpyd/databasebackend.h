@@ -36,6 +36,7 @@ namespace GrumpyIRC
             virtual void LoadSessions()=0;
             virtual void LoadWindows()=0;
             virtual void LoadText()=0;
+            virtual void Maintenance()=0;
             virtual void StoreUser(User *item)=0;
             virtual void StoreNetwork(IRCSession *session)=0;
             virtual QList<QVariant> FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size)=0;

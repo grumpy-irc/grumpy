@@ -226,6 +226,27 @@ void DatabaseLite::LoadSessions()
     SyncableIRCSession::SetLastNID(lnid);
 }
 
+void DatabaseLite::Maintenance()
+{
+    if (CONF->DBTrim)
+    {
+        GRUMPY_LOG("Removing items from table scrollback_items that are older than 10 days");
+        // Calculate ts
+        QDateTime ts = QDateTime::currentDateTime().addDays(-10);
+        if (!this->database->ExecuteNonQuery("DELETE FROM scrollback_items WHERE date < " + QString::number(ts.toMSecsSinceEpoch()) + ";"))
+        {
+            GRUMPY_ERROR("Failed to delete items: " + this->database->LastError);
+            return;
+        }
+        GRUMPY_LOG("Performing database optimization");
+        if (!this->database->ExecuteNonQuery("VACUUM;"))
+        {
+            GRUMPY_ERROR("Failed to vacuum: " + this->database->LastError);
+            return;
+        }
+    }
+}
+
 void DatabaseLite::LoadWindows()
 {
     scrollback_id_t max_id = 0;

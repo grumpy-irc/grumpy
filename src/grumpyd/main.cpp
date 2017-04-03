@@ -160,6 +160,14 @@ int dbcl(GrumpyIRC::TerminalParser *parser, QStringList params)
     return TP_RESULT_OK;
 }
 
+int trim(GrumpyIRC::TerminalParser *parser, QStringList params)
+{
+    (void)parser;
+    CONF->DBTrim = true;
+    CONF->DBMaint = true;
+    return TP_RESULT_OK;
+}
+
 int default_port(GrumpyIRC::TerminalParser *parser, QStringList params)
 {
     (void)parser;
@@ -238,6 +246,7 @@ int main(int argc, char *argv[])
         tp->Register(0, "dummy", "Use dummy as a storage backend, useful for debugging.", 0, (GrumpyIRC::TP_Callback)dummy);
         tp->Register(0, "cleanup", "Remove invalid objects from the database permanently.", 0, (GrumpyIRC::TP_Callback)dbcl);
         tp->Register(0, "upgrade-db", "Upgrade the database schemas. Required only if grumpyd asks for it.", 0, (GrumpyIRC::TP_Callback)upgrade_store);
+        tp->Register(0, "trim-db", "Removes items older than 10 days from scrollback buffers", 0, (GrumpyIRC::TP_Callback)trim);
         tp->Register('v', "verbosity", "Increases the verbose level", 0, (GrumpyIRC::TP_Callback)verbosity_plus);
         tp->Register('s', "log-stdout", "Use current tty for logging instead of syslog", 0, (GrumpyIRC::TP_Callback)log_stdout);
         tp->Register('p', "port", "Change the listener port", 1, (GrumpyIRC::TP_Callback)default_port);

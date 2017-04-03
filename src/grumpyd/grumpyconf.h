@@ -47,6 +47,8 @@ namespace GrumpyIRC
             QString etc = "etc";
             QString var = "var";
             bool Upgrade = false;
+            bool DBMaint = false;
+            bool DBTrim = false;
             bool Init;
             bool Stdout = false;
             bool AutoFix;
