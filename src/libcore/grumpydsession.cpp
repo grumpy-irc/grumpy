@@ -238,7 +238,7 @@ void GrumpydSession::RequestPart(Scrollback *window)
 
 void GrumpydSession::Query(Scrollback *window, QString target, QString message)
 {
-
+    window->InsertText("This feature is not yet supported over grumpyd", ScrollbackItemType_SystemError);
 }
 
 libircclient::Channel *GrumpydSession::GetChannel(Scrollback *window)
