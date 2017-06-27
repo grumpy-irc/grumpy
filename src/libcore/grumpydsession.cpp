@@ -824,7 +824,7 @@ void GrumpydSession::processPreferences(QHash<QString, QVariant> hash)
     if (!this->Preferences.contains("offline_ms_text"))
     {
         is_missing = true;
-        this->Preferences.insert("offline_ms_text", "I am current away, your message was logged and I will read it when I return");
+        this->Preferences.insert("offline_ms_text", "I am currently away, your message was logged and I will read it when I return");
     }
     if (!this->Preferences.contains("maximum_bsize"))
     {
