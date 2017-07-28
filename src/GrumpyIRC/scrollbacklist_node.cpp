@@ -95,7 +95,7 @@ void ScrollbackList_Node::UpdateIcon()
 
 void ScrollbackList_Node::UpdateToolTip()
 {
-    QString tool_tip = "<b>" + this->text() + "</b>";
+    QString tool_tip = "<b>" + this->scrollback->GetTitle() + "</b>";
     if (this->scrollback->IsChannel() && this->scrollback->GetSession())
     {
         libircclient::Channel *channel = this->scrollback->GetSession()->GetChannel(this->scrollback->GetScrollback());
@@ -118,7 +118,8 @@ void ScrollbackList_Node::UpdateToolTip()
     }
     /*if (this->scrollback->IsDead())
         tool_tip += "<br>Window is dead";*/
-    this->setToolTip(tool_tip);
+    if (!tool_tip.isEmpty())
+        this->setToolTip(tool_tip);
 }
 
 void ScrollbackList_Node::UpdateColor()

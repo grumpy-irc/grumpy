@@ -138,6 +138,8 @@ void ScrollbackList::OnUpdate()
         if ((node->GetScrollback()->LastMenuTooltipUpdate.secsTo(QDateTime::currentDateTime())) > 20)
         {
             Scrollback *scrollback = node->GetScrollback()->GetScrollback();
+            if (!scrollback)
+                return;
             node->GetScrollback()->LastMenuTooltipUpdate = QDateTime::currentDateTime();
             node->UpdateToolTip();
             if (scrollback->IsDead() && scrollback->GetType() == ScrollbackType_System)
