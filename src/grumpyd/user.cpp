@@ -20,6 +20,7 @@
 #include "userconfiguration.h"
 #include "virtualscrollback.h"
 #include "../libcore/core.h"
+#include "../libcore/eventhandler.h"
 #include "syncableircsession.h"
 
 using namespace GrumpyIRC;
@@ -138,6 +139,7 @@ SyncableIRCSession *User::ConnectToIRCServer(libirc::ServerAddress info)
     Scrollback *system_window = CoreWrapper::GrumpyCore->NewScrollback(NULL, info.GetHost(), ScrollbackType_System);
     if (info.GetNick().isEmpty())
         info.SetNick(this->conf->GetValueAsString("nick", "GrumpydUser"));
+    GRUMPY_DEBUG("User " + this->username + " is connecting to network " + info.GetHost() + " as " + info.GetNick(), 1);
     SyncableIRCSession *session = SyncableIRCSession::Open(system_window, info, this);
     session->AutomaticallyRetrieveBanList = this->conf->GetValueAsBool("session_AutomaticallyRetrieveBanList", true);
     this->sessions.append(session);
