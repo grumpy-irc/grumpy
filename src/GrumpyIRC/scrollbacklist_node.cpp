@@ -95,7 +95,7 @@ void ScrollbackList_Node::UpdateIcon()
 
 void ScrollbackList_Node::UpdateToolTip()
 {
-    QString tool_tip = "<b>" + this->scrollback->GetTitle() + "</b>";
+    QString tool_tip = "<b>" + this->text() + "</b>";
     if (this->scrollback->IsChannel() && this->scrollback->GetSession())
     {
         libircclient::Channel *channel = this->scrollback->GetSession()->GetChannel(this->scrollback->GetScrollback());
