@@ -34,6 +34,7 @@
     <addaction name="actionOpen_window"/>
     <addaction name="actionPreferences"/>
     <addaction name="actionProxy"/>
+    <addaction name="actionEnable_proxy"/>
     <addaction name="separator"/>
     <addaction name="actionConnect"/>
     <addaction name="actionFavorites"/>
@@ -132,6 +133,14 @@
   <action name="actionProxy">
    <property name="text">
     <string>Proxy</string>
+   </property>
+  </action>
+  <action name="actionEnable_proxy">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Enable proxy</string>
    </property>
   </action>
  </widget>

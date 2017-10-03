@@ -125,6 +125,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     if (!CONF->SafeMode)
         this->Execute(CONF->GetAutorun());
     this->HideProgress();
+    this->ui->actionEnable_proxy->setChecked(CONF->UsingProxy());
 }
 
 MainWindow::MainWindow(bool fork, MainWindow *parent)
@@ -407,4 +408,10 @@ void GrumpyIRC::MainWindow::on_actionProxy_triggered()
 {
     Proxy p;
     p.exec();
+}
+
+void GrumpyIRC::MainWindow::on_actionEnable_proxy_toggled(bool arg1)
+{
+    Proxy p;
+    p.Enable(arg1);
 }

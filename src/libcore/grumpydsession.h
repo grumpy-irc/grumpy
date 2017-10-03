@@ -58,7 +58,7 @@
 #define GP_CMD_ERROR                       12 //"ERROR"
 #define GP_CMD_IRC_QUIT                    13 //"IRC_QUIT"
 //! This command is delivered when a new channel is joined by user
-#define GP_CMD_CHANNEL_JOIN                14 //"CHANNEL_JOIN"`
+#define GP_CMD_CHANNEL_JOIN                14 //"CHANNEL_JOIN"
 #define GP_CMD_CHANNEL_RESYNC              15 //"CHANNEL_RESYNC"
 //! On resync of a whole network, this only involves internal network parameters
 //! not channel lists and other lists of structures that have pointers

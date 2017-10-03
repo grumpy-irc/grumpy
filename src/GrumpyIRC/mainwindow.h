@@ -84,8 +84,8 @@ namespace GrumpyIRC
             void on_actionOpen_window_triggered();
             void on_actionFavorites_triggered();
             void on_actionToggle_secret_triggered();
-
             void on_actionProxy_triggered();
+            void on_actionEnable_proxy_toggled(bool arg1);
 
     private:
             QString processInput(QString text);

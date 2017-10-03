@@ -76,6 +76,17 @@ Proxy::Proxy(QWidget *parent) : QDialog(parent), ui(new Ui::Proxy)
     }
 }
 
+void Proxy::Enable(bool b)
+{
+    if (!b)
+    {
+        QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
+    } else
+    {
+        QNetworkProxy::setApplicationProxy(CONF->GetProxy());
+    }
+}
+
 Proxy::~Proxy()
 {
     delete this->ui;

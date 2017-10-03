@@ -27,6 +27,7 @@ namespace GrumpyIRC
         public:
             static void Init();
             explicit Proxy(QWidget *parent = nullptr);
+            void Enable(bool b);
             ~Proxy();
 
         private slots:
