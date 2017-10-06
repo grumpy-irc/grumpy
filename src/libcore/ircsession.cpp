@@ -776,6 +776,11 @@ void IRCSession::OnSelf_KICK(libircclient::Parser *px, libircclient::Channel *ch
     sc->SetDead(true);
 }
 
+void IRCSession::OnTimeout()
+{
+    this->systemWindow->InsertText("Connection timed out");
+}
+
 void IRCSession::OnTOPIC(libircclient::Parser *px, libircclient::Channel *channel, QString previous_one)
 {
     if (!this->channels.contains(channel->GetName().toLower()))
