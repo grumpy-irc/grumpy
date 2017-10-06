@@ -202,10 +202,10 @@ unsigned int IRCSession::GetSID()
 
 void IRCSession::Connect(libircclient::Network *Network)
 {
-    this->free();
     if (this->IsConnected())
         throw new Exception("You can't connect to ircsession that is active, disconnect first", BOOST_CURRENT_FUNCTION);
 
+    this->free();
     this->systemWindow->InsertText("Connecting to " + Network->GetServerAddress() + ":" + QString::number(Network->GetPort()));
     this->_hostname = Network->GetServerAddress();
     this->_name = _hostname;
