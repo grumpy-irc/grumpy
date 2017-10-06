@@ -102,6 +102,9 @@ void SyncableIRCSession::Connect()
         // let's hope it's not gonna spam hard
         ((VirtualScrollback*)s)->PartialSync();
     }
+    QString nick = this->owner->GetConfiguration()->GetValueAsString("nick", "GrumpydUser");
+    this->SetNick(nick);
+    this->network->SetDefaultNick(nick);
     this->network->Connect();
     (((VirtualScrollback*)this->systemWindow)->PartialSync());
     this->timerUL.start(this->ulistUpdateTime);
