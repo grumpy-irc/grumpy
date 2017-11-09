@@ -11,8 +11,7 @@ if(WIN32)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
     endif()
 else()
-    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++11")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++11")
 endif()
 
 # Settings
@@ -45,3 +44,12 @@ add_subdirectory (GrumpyIRC)
 if (UNIT_TESTS)
     add_subdirectory (tests)
 endif()
+
+# Packaging code
+SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Petr Bena")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "GrumpyChat IRC client")
+SET(CPACK_PACKAGE_VENDOR "Petr Bena")
+SET(CPACK_PACKAGE_VERSION_MAJOR "1")
+SET(CPACK_PACKAGE_VERSION_MINOR "0")
+SET(CPACK_PACKAGE_VERSION_PATCH "0")
+INCLUDE(CPack)
