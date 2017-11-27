@@ -166,6 +166,7 @@ void ScrollbacksManager::SwitchWindow(ScrollbackFrame *window)
                 name.replace("$topic", " (dead)");
         }
     }
+    MainWindow::Main->EnableGrumpydContext(window->IsGrumpy());
     MainWindow::Main->SetWN(name);
 
     window->EnableState(false);

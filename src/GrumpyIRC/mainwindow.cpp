@@ -80,6 +80,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->ui->statusBar->addPermanentWidget(this->statusFrame);
     this->progressBar = new QProgressBar(this->ui->statusBar);
     this->ui->statusBar->addPermanentWidget(this->progressBar);
+    this->EnableGrumpydContext(false);
     ScrollbacksManager::Global = this->scrollbackWindow;
     if (CONF->FirstRun())
         new Highlighter("$nick");
@@ -337,6 +338,11 @@ void MainWindow::OpenServer(libirc::ServerAddress server)
     ScrollbackFrame *system = this->GetScrollbackManager()->CreateWindow(network_name, NULL, true);
     IRCSession *sx = IRCSession::Open(system->GetScrollback(), server, network_name);
     sx->IgnoredNums = CONF->IgnoredNums();
+}
+
+void MainWindow::EnableGrumpydContext(bool enable)
+{
+    this->ui->actionLoad_more_items_from_remote->setVisible(enable);
 }
 
 void MainWindow::OnRefresh()
