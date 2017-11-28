@@ -308,5 +308,10 @@ on_error:
     return result;
 }
 
+int SQLite::ChangedRows()
+{
+    return sqlite3_changes(this->database);
+}
+
 #endif
 

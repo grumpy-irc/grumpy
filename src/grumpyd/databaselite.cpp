@@ -230,13 +230,59 @@ void DatabaseLite::Maintenance()
 {
     if (CONF->DBTrim)
     {
-        GRUMPY_LOG("Removing items from table scrollback_items that are older than 10 days");
         // Calculate ts
         QDateTime ts = QDateTime::currentDateTime().addDays(-10);
-        if (!this->database->ExecuteNonQuery("DELETE FROM scrollback_items WHERE date < " + QString::number(ts.toMSecsSinceEpoch()) + ";"))
+        int min_rows = 200;
+        GRUMPY_LOG("Removing items from table scrollback_items that are older than 10 days, if there is more than " + QString::number(min_rows) + " items in window");
+        // Now, fetch all scrollbacks that have at least 200 items
+        this->LoadUsers();
+        this->LoadWindows();
+        foreach (Scrollback *scrollback, Scrollback::ScrollbackList)
         {
-            GRUMPY_ERROR("Failed to delete items: " + this->database->LastError);
-            return;
+            QDateTime start_time = QDateTime::currentDateTime();
+            // Figure out how many items we have there
+            std::shared_ptr<SqlResult> sql_c = this->database->ExecuteQuery_Bind("SELECT count(1) FROM scrollback_items WHERE scrollback_id = ?;", QString::number(scrollback->GetOriginalID()));
+            if (sql_c->InError)
+            {
+                GRUMPY_ERROR("Unable to fetch count of scrollback " + QString::number(scrollback->GetOriginalID()) + " <" + scrollback->GetTarget() + ">: " + this->database->LastError);
+                return;
+            }
+            int count = sql_c->GetRow(0).GetField(0).toInt();
+            if (count > min_rows)
+            {
+                // Get id of item last_item - min_rows so that we know what we don't want to delete
+                std::shared_ptr<SqlResult> scrollback_last_item = this->database->ExecuteQuery_Bind("SELECT id FROM scrollback_items WHERE scrollback_id = ? ORDER BY id DESC LIMIT " +
+                                                                                                    QString::number(min_rows), QString::number(scrollback->GetOriginalID()));
+
+                if (scrollback_last_item->InError)
+                {
+                    GRUMPY_ERROR("Unable to fetch last item id of scrollback " + QString::number(scrollback->GetOriginalID()) + " <" + scrollback->GetTarget() + ">: " + this->database->LastError);
+                    return;
+                }
+
+                if (scrollback_last_item->Count() < min_rows)
+                {
+                    GRUMPY_ERROR("Unable to fetch last item id of scrollback " + QString::number(scrollback->GetOriginalID()) + " <" + scrollback->GetTarget() + ">: too few rows");
+                    return;
+                }
+
+                int last_id = scrollback_last_item->GetRow(min_rows - 1).GetField(0).toInt();
+
+                GRUMPY_LOG("Trimming items of " + QString::number(scrollback->GetOriginalID()) + " <" + scrollback->GetTarget() + "> which has " + QString::number(count) +
+                           " items (last id: " + QString::number(last_id) + ")");
+                if (!this->database->ExecuteNonQuery("DELETE FROM scrollback_items WHERE scrollback_id = " + QString::number(scrollback->GetOriginalID()) + " AND id < " + QString::number(last_id)
+                                                     + " AND date < " + QString::number(ts.toMSecsSinceEpoch()) + ";"))
+                {
+                    GRUMPY_ERROR("Failed to delete items: " + this->database->LastError);
+                    return;
+                }
+                int changed = this->database->ChangedRows();
+                GRUMPY_LOG("OK: removed " + QString::number(changed) + " records in " + QString::number(start_time.secsTo(QDateTime::currentDateTime())) + "s" +
+                           " remaining item count: " + QString::number(count - changed));
+            } else
+            {
+                GRUMPY_LOG("Skipping cleanup of scrollback " + QString::number(scrollback->GetOriginalID()) + " <" + scrollback->GetTarget() + "> because it has only " + QString::number(count) + " items");
+            }
         }
         GRUMPY_LOG("Performing database optimization");
         if (!this->database->ExecuteNonQuery("VACUUM;"))

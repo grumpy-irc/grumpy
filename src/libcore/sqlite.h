@@ -65,6 +65,7 @@ namespace GrumpyIRC
             std::shared_ptr<SqlResult> ExecuteQuery_Bind(QString sql, QString parameter);
             std::shared_ptr<SqlResult> ExecuteQuery_Bind(QString sql, QList<QVariant> parameters);
             std::shared_ptr<SqlResult> ExecuteQuery_Bind(QString sql, QStringList parameters);
+            int ChangedRows();
             QString LastStatement;
             QString LastError;
 
