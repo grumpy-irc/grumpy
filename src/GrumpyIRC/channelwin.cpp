@@ -20,6 +20,7 @@
 #include "../libirc/libircclient/mode.h"
 #include "../libirc/libircclient/network.h"
 #include "../libirc/libircclient/channel.h"
+#include "../libirc/libircclient/networkmodehelp.h"
 #include "channelwin.h"
 #include "ui_channelwin.h"
 
@@ -49,6 +50,7 @@ ChannelWin::ChannelWin(NetworkSession *session, libircclient::Network *network, 
     this->ui->tableWidget->setColumnWidth(0, 60);
     this->ui->tableWidget->setColumnWidth(1, 500);
     //this->ui->tableWidget->setVerticalScrollMode(Q);
+    QHash<char, QString> mode_help = libircclient::NetworkModeHelp::GetChannelModeHelp(this->_network->GetServerVersion());
 
     int row = 0;
     foreach (char mode, network->GetCModes())
@@ -61,7 +63,10 @@ ChannelWin::ChannelWin(NetworkSession *session, libircclient::Network *network, 
         if (channel->GetMode().Includes(mode))
             modeBox->setChecked(true);
         this->ui->tableWidget->setCellWidget(row, 0, modeBox);
-        this->ui->tableWidget->setItem(row, 1, new QTableWidgetItem(network->GetHelpForMode(mode, "Unknown mode, refer IRC manual (/raw help)")));
+        if (mode_help.contains(mode))
+            this->ui->tableWidget->setItem(row, 1, new QTableWidgetItem(mode_help[mode]));
+        else
+            this->ui->tableWidget->setItem(row, 1, new QTableWidgetItem("Unknown mode, refer IRC manual (/raw help)"));
         row++;
     }
     this->ui->tableWidget->resizeRowsToContents();
