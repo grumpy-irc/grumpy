@@ -196,7 +196,7 @@ std::shared_ptr<SqlResult> SQLite::ExecuteQuery_Bind(QString sql, QList<QVariant
             switch (t)
             {
                 case SQLITE_INTEGER:
-                    row.append(QVariant(sqlite3_column_int(statement, value)));
+                    row.append(QVariant(sqlite3_column_int64(statement, value)));
                     break;
                 case SQLITE_FLOAT:
                     row.append(QVariant(sqlite3_column_double(statement, value)));
@@ -268,7 +268,7 @@ std::shared_ptr<SqlResult> SQLite::ExecuteQuery_Bind(QString sql, QStringList pa
             switch (t)
             {
                 case SQLITE_INTEGER:
-                    row.append(QVariant(sqlite3_column_int(statement, value)));
+                    row.append(QVariant(sqlite3_column_int64(statement, value)));
                     break;
                 case SQLITE_FLOAT:
                     row.append(QVariant(sqlite3_column_double(statement, value)));
