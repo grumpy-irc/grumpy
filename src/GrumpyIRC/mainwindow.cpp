@@ -146,6 +146,7 @@ MainWindow::MainWindow(bool fork, MainWindow *parent)
     // Try to restore geometry
     this->restoreGeometry(GCFG->GetValue("mainwindow_geometry").toByteArray());
     this->restoreState(GCFG->GetValue("mainwindow_state").toByteArray());
+    this->ui->actionFavorites->setVisible(false);
 }
 
 MainWindow::~MainWindow()

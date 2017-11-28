@@ -729,8 +729,22 @@ void IRCSession::OnCTCP(libircclient::Parser *px, QString ctcp, QString pars)
         this->processME(px, pars);
         return;
     }
-        if (target != this->GetNetwork()->GetNick())
+    QString final_text = ctcp;
+    if (!pars.isEmpty())
+        final_text += " " + pars;
+    if (target != this->GetNetwork()->GetNick())
+    {
+        // this is most likely a channel CTCP
+        Scrollback *sc = this->GetScrollbackForChannel(target);
+        if (!sc)
+        {
+            this->systemWindow->InsertText("Incoming CTCP for unknown target (" + target +  ") from " + px->GetSourceInfo() + ": " + final_text);
+        } else
+        {
+            sc->InsertText(ScrollbackItem(final_text, ScrollbackItemType_Notice, libircclient::User(px->GetSourceUserInfo())));
+        }
         return;
+    }
     if (ctcp == "VERSION")
     {
         if (!px->GetSourceUserInfo())
@@ -742,10 +756,7 @@ void IRCSession::OnCTCP(libircclient::Parser *px, QString ctcp, QString pars)
             return;
         this->GetNetwork()->SendNotice("TIME " + QDateTime::currentDateTime().toString(), px->GetSourceUserInfo()->GetNick());
     }
-    if (pars.isEmpty())
-        this->systemWindow->InsertText("Incoming CTCP from " + px->GetSourceInfo() + ": " + ctcp);
-    else
-        this->systemWindow->InsertText("Incoming CTCP from " + px->GetSourceInfo() + ": " + ctcp + " " + pars);
+    this->systemWindow->InsertText("Incoming CTCP from " + px->GetSourceInfo() + ": " + final_text);
 }
 
 void IRCSession::OnMOTD(libircclient::Parser *px)
