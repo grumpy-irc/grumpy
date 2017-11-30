@@ -741,7 +741,8 @@ void IRCSession::OnCTCP(libircclient::Parser *px, QString ctcp, QString pars)
             this->systemWindow->InsertText("Incoming CTCP for unknown target (" + target +  ") from " + px->GetSourceInfo() + ": " + final_text);
         } else
         {
-            sc->InsertText(ScrollbackItem(final_text, ScrollbackItemType_Notice, libircclient::User(px->GetSourceUserInfo())));
+            // Process as standard message
+            sc->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Message, libircclient::User(px->GetSourceUserInfo())));
         }
         return;
     }
