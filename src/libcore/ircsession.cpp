@@ -1245,6 +1245,7 @@ void IRCSession::OnConnectionFail(QAbstractSocket::SocketError er)
 
 void IRCSession::OnDisconnect()
 {
+    this->systemWindow->InsertText("Disconnected: socket closed", ScrollbackItemType_System);
     this->SetDisconnected();
 }
 
