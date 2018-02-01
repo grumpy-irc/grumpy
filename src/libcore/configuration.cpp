@@ -26,6 +26,7 @@ QString Configuration::GetVersion()
 Configuration::Configuration()
 {
     this->Verbosity = 0;
+    this->startupDateTime = QDateTime::currentDateTime();
 }
 
 Configuration::~Configuration()
@@ -93,6 +94,11 @@ void Configuration::SetValue(QString key, QVariant value)
     // Now if the value exists we just update it
     // some autosave might do here
     this->Options[key] = value;
+}
+
+QDateTime Configuration::GetStartupDateTime()
+{
+    return this->startupDateTime;
 }
 
 void Configuration::Load()

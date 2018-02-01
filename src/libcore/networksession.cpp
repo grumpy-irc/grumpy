@@ -16,11 +16,22 @@ using namespace GrumpyIRC;
 
 NetworkSession::NetworkSession()
 {
-
+    this->createdOn = QDateTime::currentDateTime();
+    this->connectedOn = QDateTime::currentDateTime();
 }
 
 NetworkSession::~NetworkSession()
 {
     emit this->Event_Deleted();
+}
+
+QDateTime NetworkSession::GetCreationDateTime()
+{
+    return this->createdOn;
+}
+
+QDateTime NetworkSession::GetConnectionDateTime()
+{
+    return this->connectedOn;
 }
 

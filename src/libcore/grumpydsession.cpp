@@ -411,6 +411,7 @@ void GrumpydSession::Connect()
 {
     if (this->IsConnected())
         return;
+    this->connectedOn = QDateTime::currentDateTime();
     this->gp = new libgp::GP();
     connect(this->gp, SIGNAL(Event_Connected()), this, SLOT(OnConnected()));
     connect(this->gp, SIGNAL(Event_IncomingCommand(gp_command_t, QHash<QString, QVariant>)), this, SLOT(OnIncomingCommand(gp_command_t, QHash<QString, QVariant>)));

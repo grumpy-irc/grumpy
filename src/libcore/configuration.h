@@ -18,6 +18,7 @@
 
 #include <QString>
 #include <QVariant>
+#include <QDateTime>
 #include <QHash>
 
 namespace GrumpyIRC
@@ -42,6 +43,7 @@ namespace GrumpyIRC
             virtual void SetValue(QString key, bool value);
             virtual void SetValue(QString key, int value);
             virtual void SetValue(QString key, QString value);
+            virtual QDateTime GetStartupDateTime();
             virtual void Load();
             virtual void Save();
 			unsigned int Verbosity;
@@ -49,6 +51,7 @@ namespace GrumpyIRC
         protected:
             QString configuration_path;
             QHash<QString, QVariant> Options;
+            QDateTime startupDateTime;
     };
 
     inline void Configuration::SetValue(QString key, bool value) { this->SetValue(key, QVariant(value)); }

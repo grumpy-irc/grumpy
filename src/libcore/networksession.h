@@ -14,6 +14,7 @@
 #define NETWORKSESSION_H
 
 #include <QString>
+#include <QDateTime>
 #include "../libirc/libircclient/priority.h"
 #include <QObject>
 
@@ -67,6 +68,11 @@ namespace GrumpyIRC
             virtual void RequestRemove(Scrollback *window)=0;
             virtual void RequestPart(Scrollback *window)=0;
             virtual SessionType GetType()=0;
+            virtual QDateTime GetCreationDateTime();
+            virtual QDateTime GetConnectionDateTime();
+        protected:
+            QDateTime createdOn;
+            QDateTime connectedOn;
         signals:
             void Event_Deleted();
 

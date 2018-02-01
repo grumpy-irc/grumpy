@@ -419,3 +419,12 @@ int SystemCmds::KICK(SystemCommand *command, CommandArgs command_args)
     sx->GetSession()->SendRaw(sx, "KICK " + channel_name + " " + target + " :" + reason);
     return 0;
 }
+
+int SystemCmds::Uptime(SystemCommand *command, CommandArgs command_args)
+{
+    Q_UNUSED(command_args);
+    Q_UNUSED(command);
+    Scrollback *sx = MainWindow::Main->GetCurrentScrollbackFrame()->GetScrollback();
+    QDateTime uptime = CONF->GetConfiguration()->GetStartupDateTime();
+    sx->InsertText("Uptime since " + uptime.toString() + ": " + QString::number(uptime.secsTo(QDateTime::currentDateTime()) / 60) + " min");
+}

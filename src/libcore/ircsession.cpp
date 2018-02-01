@@ -206,6 +206,7 @@ void IRCSession::Connect(libircclient::Network *Network)
         throw new Exception("You can't connect to ircsession that is active, disconnect first", BOOST_CURRENT_FUNCTION);
 
     this->free();
+    this->connectedOn = QDateTime::currentDateTime();
     this->systemWindow->InsertText("Connecting to " + Network->GetServerAddress() + ":" + QString::number(Network->GetPort()));
     this->_hostname = Network->GetServerAddress();
     this->_name = _hostname;
@@ -393,6 +394,8 @@ QHash<QString, QVariant> IRCSession::ToHash(int max_items)
     SERIALIZE(_autoReconnect);
     SERIALIZE(_port);
     SERIALIZE(_ssl);
+    SERIALIZE(createdOn);
+    SERIALIZE(connectedOn);
     if (this->network)
         hash.insert("network", QVariant(this->network->ToHash()));
     QHash<QString, QVariant> channels_hash;
@@ -417,6 +420,8 @@ void IRCSession::LoadHash(QHash<QString, QVariant> hash)
     UNSERIALIZE_UINT(_port);
     UNSERIALIZE_STRING(_password);
     UNSERIALIZE_STRING(_hostname);
+    UNSERIALIZE_DATETIME(createdOn);
+    UNSERIALIZE_DATETIME(connectedOn);
     if (hash.contains("network"))
         this->network = new libircclient::Network(hash["network"].toHash());
 
