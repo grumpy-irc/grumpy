@@ -123,10 +123,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ScrollbackFrame::UpdateSkins();
     if (GCFG->GetValueAsBool("systemwx_hide", false))
         this->systemWindow->ToggleHide();
-    if (!CONF->SafeMode)
-        this->Execute(CONF->GetAutorun());
+    if (!QSslSocket::supportsSsl())
+        GRUMPY_ERROR("SSL support is not available, you won't be able to connect using SSL (probably missing OpenSSL libraries?)");
     this->HideProgress();
     this->ui->actionEnable_proxy->setChecked(CONF->UsingProxy());
+    if (!CONF->SafeMode)
+        this->Execute(CONF->GetAutorun());
 }
 
 MainWindow::MainWindow(bool fork, MainWindow *parent)
@@ -312,6 +314,11 @@ void MainWindow::ExecuteLine(QString line)
 
 void MainWindow::OpenGrumpy(QString hostname, int port, QString username, QString password, bool ssl)
 {
+    if (ssl && !QSslSocket::supportsSsl())
+    {
+        GRUMPY_ERROR("SSL is not available, can't connect.");
+        return;
+    }
     ScrollbackFrame *system = this->GetScrollbackManager()->CreateWindow(hostname, NULL, true);
     GrumpydSession *session = new GrumpydSession(system->GetScrollback(), hostname, username, password, port, ssl);
     session->Connect();
@@ -324,6 +331,11 @@ void MainWindow::OpenIRCNetworkLink(QString link)
 
 void MainWindow::OpenServer(libirc::ServerAddress server)
 {
+    if (server.UsingSSL() && !QSslSocket::supportsSsl())
+    {
+        GRUMPY_ERROR("SSL is not available, can't connect.");
+        return;
+    }
     if (server.GetNick().isEmpty())
     {
         QString nick = CONF->GetNick();
