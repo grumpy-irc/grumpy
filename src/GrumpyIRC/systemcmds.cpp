@@ -427,4 +427,5 @@ int SystemCmds::Uptime(SystemCommand *command, CommandArgs command_args)
     Scrollback *sx = MainWindow::Main->GetCurrentScrollbackFrame()->GetScrollback();
     QDateTime uptime = CONF->GetConfiguration()->GetStartupDateTime();
     sx->InsertText("Uptime since " + uptime.toString() + ": " + QString::number(uptime.secsTo(QDateTime::currentDateTime()) / 60) + " min");
+    return 0;
 }

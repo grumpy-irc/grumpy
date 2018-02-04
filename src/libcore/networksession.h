@@ -55,21 +55,27 @@ namespace GrumpyIRC
             virtual libircclient::User *GetSelfNetworkID(Scrollback *window)=0;
             virtual QString GetLocalUserModeAsString(Scrollback *window)=0;
             virtual void SendMessage(Scrollback *window, QString target, QString message)=0;
-            virtual void SendNotice(Scrollback *window, QString target, QString message) = 0;
+            virtual void SendNotice(Scrollback *window, QString target, QString message)=0;
             virtual void Query(Scrollback *window, QString target, QString message)=0;
             virtual Scrollback *GetSystemWindow()=0;
             virtual libircclient::Channel *GetChannel(Scrollback *window)=0;
             virtual void RetrieveChannelBanList(Scrollback *window, QString channel_name)=0;
             virtual void RequestReconnect(Scrollback *window)=0;
-            virtual void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete) = 0;
+            virtual void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete)=0;
             //! Request the selected window to be removed from window tree
             //! the windows are never directly removed because there might be complex structures depending on them
             //! you always need to ASK the window to delete itself
             virtual void RequestRemove(Scrollback *window)=0;
             virtual void RequestPart(Scrollback *window)=0;
             virtual SessionType GetType()=0;
+            // Workaround for really weird MSVC bug in their compiler
+#ifdef _MSC_VER
+            QDateTime GetCreationDateTime();
+            QDateTime GetConnectionDateTime();
+#else
             virtual QDateTime GetCreationDateTime();
             virtual QDateTime GetConnectionDateTime();
+#endif
         protected:
             QDateTime createdOn;
             QDateTime connectedOn;
