@@ -548,6 +548,33 @@ void SyncableIRCSession::OnServer_ISUPPORT(libircclient::Parser *px)
     this->Resync(hash);
 }
 
+void SyncableIRCSession::OnMessage(libircclient::Parser *px)
+{
+    IRCSession::OnMessage(px);
+
+    if (this->owner->IsOnline())
+        return;
+
+    // In case we have this feature available and current user is offline, we send AFK message
+    QString target = px->GetParameters()[0];
+
+    // Check if this isn't a channel message, we don't respond to these
+    if (target.toLower() == this->network->GetLocalUserInfo()->GetNick().toLower())
+    {
+        if (this->owner->GetConfiguration()->GetValueAsBool("offline_ms_bool"))
+        {
+            Scrollback *scrollback = this->GetScrollbackForUser(px->GetSourceUserInfo()->GetNick());
+            if (!scrollback)
+            {
+                GRUMPY_DEBUG("Not sending AFK message to nonexistent window: " + px->GetSourceUserInfo()->GetNick(), 2);
+                return;
+            }
+            // Message
+            this->SendMessage(scrollback, this->owner->GetConfiguration()->GetValueAsString("offline_ms_text"));
+        }
+    }
+}
+
 void SyncableIRCSession::post_init()
 {
     if (!this->owner)
