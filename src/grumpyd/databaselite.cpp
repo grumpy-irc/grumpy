@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #ifdef GRUMPY_SQLITE
 
@@ -580,6 +580,27 @@ void DatabaseLite::RemoveScrollback(unsigned int id)
     if (result->InError)
     {
         throw new Exception("Unable to remove scrollback using sql: " + this->LastError, BOOST_CURRENT_FUNCTION);
+    }
+}
+
+void DatabaseLite::RemoveUser(User *user)
+{
+    user_id_t id = user->GetID();
+    QString sql = "BEGIN; "\
+                  "DELETE FROM scrollback_items WHERE user_id = ?1; "\
+                  "DELETE FROM networks WHERE user_id = ?1; "\
+                  "DELETE FROM settings WHERE user_id = ?1; "\
+                  "DELETE FROM users WHERE id = ?1;"\
+                  "DELETE FROM scrollbacks WHERE user_id = ?1;"\
+                  "COMMIT;";
+    std::shared_ptr<SqlResult> result;
+    QList<QVariant> params;
+    params << id;
+    result = this->database->ExecuteQuery_Bind(sql, params);
+
+    if (result->InError)
+    {
+        throw new Exception("Unable to remove user using sql: " + this->LastError, BOOST_CURRENT_FUNCTION);
     }
 }
 

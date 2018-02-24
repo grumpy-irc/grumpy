@@ -14,7 +14,7 @@
 
 using namespace GrumpyIRC;
 
-QString Role::DefaultRole;
+Role* Role::DefaultRole;
 QHash<QString, Role*> Role::Roles;
 
 void Role::Defaults()
@@ -37,7 +37,7 @@ void Role::Defaults()
     Role::Roles["admin"]->Grant(PRIVILEGE_UNLOCK_USER);
     Role::Roles["user"]->Grant(PRIVILEGE_LOGIN);
     Role::Roles["user"]->Grant(PRIVILEGE_USE_IRC);
-    Role::DefaultRole = "user";
+    Role::DefaultRole = Role::Roles["user"];
 }
 
 void Role::CreateRole(QString name)

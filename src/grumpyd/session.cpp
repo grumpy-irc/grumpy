@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #include <QHostAddress>
 #include <QHash>
@@ -188,6 +188,19 @@ void Session::PermissionDeny(gp_command_t source)
     QHash<QString, QVariant> params;
     params.insert("source", QVariant(source));
     this->protocol->SendProtocolCommand(GP_CMD_PERMDENY, params);
+}
+
+void Session::Kick()
+{
+    this->TransferError(0, "You were kicked from grumpyd", 0);
+    this->Disconnect();
+}
+
+void Session::Disconnect()
+{
+    this->SessionState = State_Killing;
+    this->IsRunning = false;
+    this->protocol->Disconnect();
 }
 
 void Session::OnDisconnected()
@@ -418,6 +431,162 @@ void Session::processUserList(QHash<QString, QVariant> parameters)
     this->protocol->SendProtocolCommand(GP_CMD_SYS_LIST_USER, response);
 }
 
+void Session::processLockUser(QHash<QString, QVariant> parameters)
+{
+    if (!this->IsAuthorized(PRIVILEGE_LOCK_USER))
+    {
+        this->PermissionDeny(GP_CMD_SYS_LOCK_USER);
+        return;
+    }
+
+    if (!parameters.contains("id"))
+    {
+        this->TransferError(GP_CMD_SYS_LOCK_USER, "No user provided", GP_ENOUSER);
+        return;
+    }
+
+    User *target = User::GetUser(parameters["id"].toUInt());
+    if (!target)
+    {
+        this->TransferError(GP_CMD_SYS_LOCK_USER, "User was not found", GP_EWRONGUSER);
+        return;
+    }
+
+    if (target == this->loggedUser)
+    {
+        this->TransferError(GP_CMD_SYS_LOCK_USER, "Can't modify self", GP_ESELFTARGET);
+        return;
+    }
+
+    target->Lock();
+
+    // Confirm success
+    this->protocol->SendProtocolCommand(GP_CMD_SYS_LOCK_USER, parameters);
+}
+
+void Session::processUnlockUser(QHash<QString, QVariant> parameters)
+{
+    if (!this->IsAuthorized(PRIVILEGE_UNLOCK_USER))
+    {
+        this->PermissionDeny(GP_CMD_SYS_UNLOCK_USER);
+        return;
+    }
+
+    if (!parameters.contains("id"))
+    {
+        this->TransferError(GP_CMD_SYS_UNLOCK_USER, "No user provided", GP_ENOUSER);
+        return;
+    }
+
+    User *target = User::GetUser(parameters["id"].toUInt());
+    if (!target)
+    {
+        this->TransferError(GP_CMD_SYS_UNLOCK_USER, "User was not found", GP_EWRONGUSER);
+        return;
+    }
+
+    if (target == this->loggedUser)
+    {
+        this->TransferError(GP_CMD_SYS_UNLOCK_USER, "Can't modify self", GP_ESELFTARGET);
+        return;
+    }
+
+    target->Unlock();
+
+    // Confirm success
+    this->protocol->SendProtocolCommand(GP_CMD_SYS_UNLOCK_USER, parameters);
+}
+
+void Session::processCreateUser(QHash<QString, QVariant> parameters)
+{
+    if (!this->IsAuthorized(PRIVILEGE_CREATE_USER))
+    {
+        this->PermissionDeny(GP_CMD_SYS_CREATE_USER);
+        return;
+    }
+
+    if (!parameters.contains("username") || !parameters.contains("password"))
+    {
+        this->TransferError(GP_CMD_SYS_CREATE_USER, "Missing user info", GP_EWRONGUSER);
+        return;
+    }
+
+    QString user_name = parameters["username"].toString().toLower();
+    foreach (User *user, User::UserInfo)
+    {
+        if (user->GetName().toLower() == user_name)
+        {
+            this->TransferError(GP_CMD_SYS_CREATE_USER, "User already exists", GP_EWRONGUSER);
+            return;
+        }
+    }
+
+    Role *role = Role::DefaultRole;
+    if (parameters.contains("role"))
+    {
+        if (!this->IsAuthorized(PRIVILEGE_GRANT_ANY_ROLE))
+        {
+            this->PermissionDeny(GP_CMD_SYS_CREATE_USER);
+            return;
+        }
+        if (!Role::Roles.contains(parameters["role"].toString()))
+        {
+            this->TransferError(GP_CMD_SYS_CREATE_USER, "No such role", 0);
+            return;
+        }
+
+        role = Role::roles[parameters["role"].toString()];
+    }
+
+    // Register a new user account
+    User *new_user = User::CreateUser(parameters["username"].toString(), User::EncryptPw(parameters["password"].toString()));
+    new_user->SetRole(role);
+
+    QHash<QString, QVariant> result;
+    result.insert("done", QVariant(true));
+    result.insert("id", new_user->GetID());
+    this->protocol->SendProtocolCommand(GP_CMD_SYS_CREATE_USER, result);
+}
+
+void Session::processRemoveUser(QHash<QString, QVariant> parameters)
+{
+    if (!this->IsAuthorized(PRIVILEGE_REMOVE_USER))
+    {
+        this->PermissionDeny(GP_CMD_SYS_REMOVE_USER);
+        return;
+    }
+
+    if (!parameters.contains("id"))
+    {
+        this->TransferError(GP_CMD_SYS_REMOVE_USER, "No user provided", GP_ENOUSER);
+        return;
+    }
+
+    User *target = User::GetUser(parameters["id"].toUInt());
+    if (!target)
+    {
+        this->TransferError(GP_CMD_SYS_REMOVE_USER, "User was not found", GP_EWRONGUSER);
+        return;
+    }
+
+    if (target == this->loggedUser)
+    {
+        this->TransferError(GP_CMD_SYS_REMOVE_USER, "Can't remove self", GP_ESELFTARGET);
+        return;
+    }
+
+    // Kick & lock user to ensure no active sessions for this user exist
+    target->Lock();
+
+    if (User::RemoveUser(target->GetID()))
+    {
+        this->protocol->SendProtocolCommand(GP_CMD_SYS_REMOVE_USER, parameters);
+    } else
+    {
+        this->TransferError(GP_CMD_SYS_REMOVE_USER, "Unable to remove user", 0);
+    }
+}
+
 void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
 {
     if (text == GP_CMD_HELLO)
@@ -482,6 +651,18 @@ void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
     } else if (text == GP_CMD_RESYNC_SCROLLBACK_PB)
     {
         this->processPBResync(parameters);
+    } else if (text == GP_CMD_SYS_LOCK_USER)
+    {
+        this->processLockUser(parameters);
+    } else if (text == GP_CMD_SYS_UNLOCK_USER)
+    {
+        this->processUnlockUser(parameters);
+    } else if (text == GP_CMD_SYS_CREATE_USER)
+    {
+        this->processCreateUser(parameters);
+    } else if (text == GP_CMD_SYS_REMOVE_USER)
+    {
+        this->processRemoveUser(parameters);
     } else
     {
         // We received some unknown packet, send it back to client so that it at least knows we don't support this

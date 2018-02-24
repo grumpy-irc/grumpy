@@ -42,6 +42,9 @@
 #define GP_ESCROLLBACKNOTFOUND   -5
 #define GP_ESSLHANDSHAKEFAILED   -20
 #define GP_EIRCNOTCONN           -21
+#define GP_ENOUSER               -40
+#define GP_EWRONGUSER            -41
+#define GP_ESELFTARGET           -42
 
 #define GP_CMD_HELLO                        1 //"HELLO"
 #define GP_CMD_SERVER                       2 //"SERVER"

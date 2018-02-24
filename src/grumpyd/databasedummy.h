@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #ifndef DATABASEDUMMY_H
 #define DATABASEDUMMY_H
@@ -34,6 +34,7 @@ namespace GrumpyIRC
             void StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem *item);
             void LoadSessions();
             void UpdateNetwork(IRCSession *session);
+            void RemoveUser(User *user);
             void LoadWindows();
             void LoadText();
             void StoreScrollback(User *owner, Scrollback *sx);

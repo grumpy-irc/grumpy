@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #ifndef SESSION_H
 #define SESSION_H
@@ -54,6 +54,8 @@ namespace GrumpyIRC
             Scrollback *GetScrollback(scrollback_id_t scrollback_id);
             void TransferError(gp_command_t source, QString description, int id);
             void PermissionDeny(gp_command_t source);
+            void Kick();
+            void Disconnect();
             bool IsRunning;
             int MaxScrollbackSyncItems;
             State SessionState;
@@ -87,6 +89,10 @@ namespace GrumpyIRC
             void processInfo(QHash<QString, QVariant> parameters);
             //! Called when admin wants to list users of grumpyd
             void processUserList(QHash<QString, QVariant> parameters);
+            void processLockUser(QHash<QString, QVariant> parameters);
+            void processUnlockUser(QHash<QString, QVariant> parameters);
+            void processCreateUser(QHash<QString, QVariant> parameters);
+            void processRemoveUser(QHash<QString, QVariant> parameters);
 
             QTcpSocket *socket;
             QString peer;

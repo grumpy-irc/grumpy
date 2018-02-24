@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #ifndef DATABASELITE_H
 #define DATABASELITE_H
@@ -53,6 +53,7 @@ namespace GrumpyIRC
             void ClearScrollback(unsigned int id, unsigned int user_id);
             void RemoveNetwork(IRCSession *session);
             void RemoveScrollback(unsigned int id);
+            void RemoveUser(User *user);
             QList<QVariant> FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size);
             void UpdateNetwork(IRCSession *session);
             void RemoveScrollback(User *owner, Scrollback *sx);

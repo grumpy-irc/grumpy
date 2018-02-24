@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #ifndef DATABASEBACKEND_H
 #define DATABASEBACKEND_H
@@ -42,6 +42,7 @@ namespace GrumpyIRC
             virtual QList<QVariant> FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size)=0;
             virtual void UpdateUser(User *user)=0;
             virtual void RemoveNetwork(IRCSession *session)=0;
+            virtual void RemoveUser(User *user)=0;
             virtual void RemoveScrollback(User *owner, Scrollback *sx)=0;
             virtual void StoreScrollback(User *owner, Scrollback *sx)=0;
             virtual void UpdateNetwork(IRCSession *session)=0;

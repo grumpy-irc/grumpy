@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #include <QCryptographicHash>
 #include <QStringList>
@@ -17,6 +17,7 @@
 #include "security.h"
 #include "databasebackend.h"
 #include "grumpyd.h"
+#include "session.h"
 #include "userconfiguration.h"
 #include "virtualscrollback.h"
 #include "../libcore/core.h"
@@ -25,6 +26,7 @@
 
 using namespace GrumpyIRC;
 
+user_id_t User::LastID = 0;
 QList<User*> User::UserInfo;
 
 QString User::EncryptPw(QString Password)
@@ -60,6 +62,27 @@ User *User::GetUser(user_id_t uid)
     return NULL;
 }
 
+User *User::CreateUser(QString name, QString pass)
+{
+    user_id_t id = ++User::LastID;
+    User *user = new User(name, pass, id);
+    User::UserInfo.append(user);
+    Grumpyd::GetBackend()->StoreUser(user);
+    return user;
+}
+
+bool User::RemoveUser(user_id_t id)
+{
+    User *user = User::GetUser(id);
+    if (!user)
+        return false;
+
+    User::UserInfo.removeAll(user);
+    Grumpyd::GetBackend()->RemoveUser(user);
+    delete user;
+    return true;
+}
+
 User::User(QString Name, QString Password, user_id_t User_ID)
 {
     this->username = Name;
@@ -69,6 +92,8 @@ User::User(QString Name, QString Password, user_id_t User_ID)
     this->conf = new UserConf(User_ID);
     this->conf->Load();
     this->password = Password;
+    if (LastID > User::LastID)
+        User::LastID = this->id;
 }
 
 User::~User()
@@ -151,11 +176,20 @@ bool User::IsLocked()
 void User::Lock()
 {
     this->locked = true;
+    this->Kick();
 }
 
 void User::Unlock()
 {
     this->locked = false;
+}
+
+void User::Kick()
+{
+    foreach (Session *session, this->sessions_gp)
+    {
+        session->Kick();
+    }
 }
 
 SyncableIRCSession *User::ConnectToIRCServer(libirc::ServerAddress info)

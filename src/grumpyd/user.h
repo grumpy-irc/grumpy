@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #ifndef GDUSER_H
 #define GDUSER_H
@@ -41,6 +41,8 @@ namespace GrumpyIRC
              */
             static User *Login(QString user, QString pw);
             static User *GetUser(user_id_t uid);
+            static User *CreateUser(QString name, QString pass);
+            static bool RemoveUser(user_id_t id);
 
             User(QString Name, QString Password, user_id_t User_ID);
             ~User();
@@ -74,9 +76,11 @@ namespace GrumpyIRC
             bool IsLocked();
             void Lock();
             void Unlock();
+            void Kick();
             QString DefaultNick;
 
         private:
+            static user_id_t LastID;
             QHash<scrollback_id_t, VirtualScrollback*> scrollbacks;
             user_id_t id;
             Role *role;
