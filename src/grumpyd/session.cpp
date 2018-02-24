@@ -535,7 +535,7 @@ void Session::processCreateUser(QHash<QString, QVariant> parameters)
             return;
         }
 
-        role = Role::roles[parameters["role"].toString()];
+        role = Role::Roles[parameters["role"].toString()];
     }
 
     // Register a new user account
