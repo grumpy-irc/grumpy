@@ -8,12 +8,14 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #ifndef GRUMPYDCFWIN_H
 #define GRUMPYDCFWIN_H
 
 #include <QDialog>
+#include <QTimer>
+#include <QDateTime>
 
 namespace Ui
 {
@@ -35,6 +37,8 @@ namespace GrumpyIRC
 
         private slots:
             void on_buttonBox_accepted();
+            void on_tabWidget_currentChanged(int index);
+            void OnRefresh();
 
         private:
             template <typename T>
@@ -42,7 +46,14 @@ namespace GrumpyIRC
             QString getString(QString key, QString missing);
             unsigned int getUInt(QString key, unsigned int default_uint);
             bool getBool(QString key, bool default_bool);
+            void ClearUserList();
+            void RefreshUserList();
             Ui::GrumpydCfWin *ui;
+            //! Remember if we loaded user window, so that we don't need to load userlist everytime this form is open
+            //! we only load it when user switch the tab there and when this variable is false
+            bool userLoaded = false;
+            QDateTime lastKnownRefresh;
+            QTimer *timer;
     };
 }
 

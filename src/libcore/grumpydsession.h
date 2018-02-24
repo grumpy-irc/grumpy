@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #ifndef GRUMPYDSESSION_H
 #define GRUMPYDSESSION_H
@@ -79,6 +79,14 @@
 #define GP_CMD_RESYNC_MODE                 28
 #define GP_CMD_RESYNC_SCROLLBACK_PB        29 // Used to resync the scrollback's property bag - only change or append new items, doesn't clear existing ones
 #define GP_CMD_OVERRIDE_SCROLLBACK_PB      30 // Replaces the property bag with another hash
+#define GP_CMD_SYS_LIST_USER               40 // List grumpyd users
+#define GP_CMD_SYS_CREATE_USER             41 // Create a new user
+#define GP_CMD_SYS_REMOVE_USER             42 // Removes a user
+#define GP_CMD_SYS_LOCK_USER               43
+#define GP_CMD_SYS_UNLOCK_USER             44
+#define GP_CMD_SYS_GRANT_ROLE              45
+#define GP_CMD_SYS_REVOKE_ROLE             46
+#define GP_CMD_SYS_ALTER_USER              47
 
 // PACKET VERIFICATION
 // This system is used to verify if packet was delivered or not
@@ -138,6 +146,7 @@ namespace GrumpyIRC
             void SendMessage(Scrollback *window, QString target, QString message);
             void SendCTCP(Scrollback *window, QString target, QString ctcp, QString param);
             void SendNotice(Scrollback *window, QString target, QString message);
+            void SendProtocolCommand(unsigned int command);
             void SendProtocolCommand(unsigned int command, QHash<QString, QVariant> parameters);
             IRCSession *GetSession(unsigned int nsid);
             QString GetLocalUserModeAsString(Scrollback *window);
@@ -163,6 +172,10 @@ namespace GrumpyIRC
             bool IsReceivingLargePacket();
             qint64 GetReceivingPacketSize();
             qint64 GetProgress();
+            //! Return last time when user list was updated
+            QDateTime GetLastUpdateOfUserList();
+            //! Return user list from cache
+            QList<QVariant> GetUserList();
             QString Version;
             bool IsOpening = false;
             QHash<QString, QVariant> Preferences;
@@ -196,6 +209,7 @@ namespace GrumpyIRC
             void processAck(QHash<QString, QVariant> parameters);
             void processPSResync(QHash<QString, QVariant> parameters);
             void processRemove(QHash<QString, QVariant> parameters);
+            void processUserList(QHash<QString, QVariant> parameters);
             void freememory();
             void closeError(QString error);
             bool AutoReconnect;
@@ -215,6 +229,10 @@ namespace GrumpyIRC
             QString username;
             QString password;
             int port;
+            // Buffer only
+            QList<QVariant> userList;
+            // Used for comparisons
+            QDateTime lastUserListUpdate;
     };
 }
 

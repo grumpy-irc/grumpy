@@ -189,7 +189,11 @@
       <attribute name="title">
        <string>Users</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3"/>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QTableWidget" name="tableUser"/>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>

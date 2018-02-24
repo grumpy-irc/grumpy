@@ -45,6 +45,7 @@ namespace GrumpyIRC
             User(QString Name, QString Password, user_id_t User_ID);
             ~User();
             int GetSessionCount();
+            int GetIRCSessionCount();
             void InsertSession(Session *sx);
             QString GetName() const;
             void RemoveSession(Session *sx);
@@ -52,6 +53,10 @@ namespace GrumpyIRC
             SyncableIRCSession *ConnectToIRCServer(libirc::ServerAddress info);
             void RegisterSession(SyncableIRCSession *session);
             bool IsAuthorized(QString perm);
+            //! Return true if this user is currently connected to grumpyd
+            bool IsOnline();
+            //! Return true if user is connected at least to 1 IRC server
+            bool IsConnectedToIRC();
             QList<Session*> GetGPSessions() const;
             Session *GetAnyGPSession();
             QList<VirtualScrollback*> GetScrollbacks();
@@ -66,6 +71,9 @@ namespace GrumpyIRC
             user_id_t GetID();
             void SetRole(Role *rx);
             void RegisterScrollback(VirtualScrollback *scrollback, bool skip = false);
+            bool IsLocked();
+            void Lock();
+            void Unlock();
             QString DefaultNick;
 
         private:
@@ -77,6 +85,7 @@ namespace GrumpyIRC
             QList<SyncableIRCSession*> sessions;
             QString username;
             QString password;
+            bool locked = false;
     };
 }
 

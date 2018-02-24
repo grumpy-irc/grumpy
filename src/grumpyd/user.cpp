@@ -81,6 +81,11 @@ int User::GetSessionCount()
     return this->sessions_gp.count();
 }
 
+int User::GetIRCSessionCount()
+{
+    return this->sessions.count();
+}
+
 void User::InsertSession(Session *sx)
 {
     if (this->sessions_gp.isEmpty())
@@ -138,6 +143,21 @@ void User::RegisterScrollback(VirtualScrollback *scrollback, bool skip)
     this->scrollbacks.insert(scrollback->GetOriginalID(), scrollback);
 }
 
+bool User::IsLocked()
+{
+    return this->IsLocked();
+}
+
+void User::Lock()
+{
+    this->locked = true;
+}
+
+void User::Unlock()
+{
+    this->locked = false;
+}
+
 SyncableIRCSession *User::ConnectToIRCServer(libirc::ServerAddress info)
 {
     Scrollback *system_window = CoreWrapper::GrumpyCore->NewScrollback(NULL, info.GetHost(), ScrollbackType_System);
@@ -157,9 +177,27 @@ void User::RegisterSession(SyncableIRCSession *session)
 
 bool User::IsAuthorized(QString perm)
 {
+    if (this->locked)
+        return false;
     if (!this->role)
         return false;
+
     return this->role->IsAuthorized(perm);
+}
+
+bool User::IsOnline()
+{
+    return this->sessions_gp.count() > 0;
+}
+
+bool User::IsConnectedToIRC()
+{
+    foreach (SyncableIRCSession *session, this->sessions)
+    {
+        if (session->IsConnected())
+            return true;
+    }
+    return false;
 }
 
 QList<Session*> User::GetGPSessions() const

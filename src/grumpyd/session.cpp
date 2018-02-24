@@ -18,6 +18,7 @@
 #include "../libcore/core.h"
 #include "../libcore/grumpydsession.h"
 #include "../libcore/eventhandler.h"
+#include "../libcore/generic.h"
 #include "databasebackend.h"
 #include "grumpyconf.h"
 #include "corewrapper.h"
@@ -381,6 +382,35 @@ void Session::processInfo(QHash<QString, QVariant> parameters)
         irc->RetrieveChannelExceptionList(NULL, parameters["channel_name"].toString());
 }
 
+void Session::processUserList(QHash<QString, QVariant> parameters)
+{
+    Q_UNUSED(parameters);
+    if (!this->IsAuthorized(PRIVILEGE_LIST_USERS))
+    {
+        this->PermissionDeny(GP_CMD_SYS_LIST_USER);
+        return;
+    }
+
+    // Create user list
+    QList<QVariant> user_list;
+    foreach (User *user, User::UserInfo)
+    {
+        QHash<QString, QVariant> user_data;
+        user_data.insert("name", user->GetName());
+        user_data.insert("id", user->GetID());
+        user_data.insert("role", user->GetRole()->GetName());
+        user_data.insert("online", user->IsOnline());
+        user_data.insert("irc_session_count", user->GetIRCSessionCount());
+        user_data.insert("gp_session_count", user->GetSessionCount());
+        user_data.insert("locked", user->IsLocked());
+        user_list.append(QVariant(user_data));
+    }
+
+    QHash<QString, QVariant> response;
+    response.insert("list", QVariant(user_list));
+    this->protocol->SendProtocolCommand(GP_CMD_SYS_LIST_USER, response);
+}
+
 void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
 {
     if (text == GP_CMD_HELLO)
@@ -439,6 +469,9 @@ void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
     } else if (text == GP_CMD_OPTIONS)
     {
         this->processOptions(parameters);
+    } else if (text == GP_CMD_SYS_LIST_USER)
+    {
+        this->processUserList(parameters);
     } else if (text == GP_CMD_RESYNC_SCROLLBACK_PB)
     {
         this->processPBResync(parameters);

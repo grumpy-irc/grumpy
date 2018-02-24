@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #include "../libirc/libircclient/network.h"
 #include "../libirc/libircclient/user.h"
@@ -43,6 +43,7 @@ GrumpydSession::GrumpydSession(Scrollback *System, QString Hostname, QString Use
     this->syncing = false;
     this->password = Pass;
     this->SSL = ssl;
+    this->lastUserListUpdate = QDateTime::currentDateTime();
     GrumpydSession::Sessions_Lock.lock();
     GrumpydSession::Sessions.append(this);
     GrumpydSession::Sessions_Lock.unlock();
@@ -322,6 +323,11 @@ void GrumpyIRC::GrumpydSession::SendNotice(Scrollback * window, QString target, 
     this->gp->SendProtocolCommand(GP_CMD_MESSAGE, parameters);
 }
 
+void GrumpydSession::SendProtocolCommand(unsigned int command)
+{
+    this->SendProtocolCommand(command, QHash<QString, QVariant>());
+}
+
 void GrumpydSession::SendProtocolCommand(unsigned int command, QHash<QString, QVariant> parameters)
 {
     if (!this->gp)
@@ -502,6 +508,16 @@ qint64 GrumpydSession::GetProgress()
     return this->gp->GetIncomingPacketRecv();
 }
 
+QDateTime GrumpydSession::GetLastUpdateOfUserList()
+{
+    return this->lastUserListUpdate;
+}
+
+QList<QVariant> GrumpydSession::GetUserList()
+{
+    return this->userList;
+}
+
 void GrumpydSession::OnSslHandshakeFailure(QList<QSslError> errors, bool *ok)
 {
     foreach(QSslError x, errors)
@@ -648,6 +664,9 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVarian
     } else if (text == GP_CMD_RESYNC_SCROLLBACK_PB)
     {
         this->processPBResync(parameters);
+    } else if (text == GP_CMD_SYS_LIST_USER)
+    {
+        this->processUserList(parameters);
     } else
     {
         QHash<QString, QVariant> params;
@@ -1058,6 +1077,15 @@ void GrumpydSession::processRemove(QHash<QString, QVariant> parameters)
         return;
     }
     session->RequestRemove(scrollback);
+}
+
+void GrumpydSession::processUserList(QHash<QString, QVariant> parameters)
+{
+    if (parameters.contains("list"))
+    {
+        this->userList = parameters["list"].toList();
+        this->lastUserListUpdate = QDateTime::currentDateTime();
+    }
 }
 
 void GrumpydSession::freememory()

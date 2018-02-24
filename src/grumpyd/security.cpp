@@ -8,23 +8,36 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #include "security.h"
 
 using namespace GrumpyIRC;
 
+QString Role::DefaultRole;
 QHash<QString, Role*> Role::Roles;
 
 void Role::Defaults()
 {
     Role::CreateRole("root");
     Role::CreateRole("system");
+    Role::CreateRole("admin");
     Role::CreateRole("user");
     Role::Roles["root"]->GrantRole(Role::Roles["system"]);
     Role::Roles["root"]->GrantRole(Role::Roles["user"]);
+    Role::Roles["root"]->GrantRole(Role::Roles["admin"]);
+    Role::Roles["system"]->Grant(PRIVILEGE_MANAGE_SYSTEM);
+    Role::Roles["admin"]->Grant(PRIVILEGE_CREATE_USER);
+    Role::Roles["admin"]->Grant(PRIVILEGE_REMOVE_USER);
+    Role::Roles["admin"]->Grant(PRIVILEGE_ALTER_USER);
+    Role::Roles["admin"]->Grant(PRIVILEGE_GRANT_ANY_ROLE);
+    Role::Roles["admin"]->Grant(PRIVILEGE_REVOKE_ANY_ROLE);
+    Role::Roles["admin"]->Grant(PRIVILEGE_LIST_USERS);
+    Role::Roles["admin"]->Grant(PRIVILEGE_LOCK_USER);
+    Role::Roles["admin"]->Grant(PRIVILEGE_UNLOCK_USER);
     Role::Roles["user"]->Grant(PRIVILEGE_LOGIN);
     Role::Roles["user"]->Grant(PRIVILEGE_USE_IRC);
+    Role::DefaultRole = "user";
 }
 
 void Role::CreateRole(QString name)
