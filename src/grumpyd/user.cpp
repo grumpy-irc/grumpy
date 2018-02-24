@@ -62,10 +62,11 @@ User *User::GetUser(user_id_t uid)
     return NULL;
 }
 
-User *User::CreateUser(QString name, QString pass)
+User *User::CreateUser(QString name, QString pass, Role *role)
 {
     user_id_t id = ++User::LastID;
     User *user = new User(name, pass, id);
+    user->SetRole(role);
     User::UserInfo.append(user);
     Grumpyd::GetBackend()->StoreUser(user);
     GRUMPY_LOG("Created new user: " + name);

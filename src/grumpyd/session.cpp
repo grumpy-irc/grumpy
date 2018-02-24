@@ -411,7 +411,8 @@ void Session::processUserList(QHash<QString, QVariant> parameters)
         QHash<QString, QVariant> user_data;
         user_data.insert("name", user->GetName());
         user_data.insert("id", user->GetID());
-        user_data.insert("role", user->GetRole()->GetName());
+        if (user->GetRole() != NULL)
+            user_data.insert("role", user->GetRole()->GetName());
         user_data.insert("online", user->IsOnline());
         user_data.insert("irc_session_count", user->GetIRCSessionCount());
         user_data.insert("gp_session_count", user->GetSessionCount());
@@ -545,8 +546,7 @@ void Session::processCreateUser(QHash<QString, QVariant> parameters)
     }
 
     // Register a new user account
-    User *new_user = User::CreateUser(parameters["username"].toString(), User::EncryptPw(parameters["password"].toString()));
-    new_user->SetRole(role);
+    User *new_user = User::CreateUser(parameters["username"].toString(), User::EncryptPw(parameters["password"].toString()), role);
 
     QHash<QString, QVariant> result;
     result.insert("done", QVariant(true));

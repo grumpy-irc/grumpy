@@ -41,7 +41,7 @@ namespace GrumpyIRC
              */
             static User *Login(QString user, QString pw);
             static User *GetUser(user_id_t uid);
-            static User *CreateUser(QString name, QString pass);
+            static User *CreateUser(QString name, QString pass, Role *role);
             static bool RemoveUser(user_id_t id);
             static bool IsValid(QString user);
 
