@@ -459,6 +459,12 @@ void Session::processLockUser(QHash<QString, QVariant> parameters)
         return;
     }
 
+    if (target->IsLocked())
+    {
+        this->TransferError(GP_CMD_SYS_LOCK_USER, "Already locked", GP_ENOCHANGE);
+        return;
+    }
+
     target->Lock();
 
     if (!parameters.contains("username"))
@@ -492,6 +498,12 @@ void Session::processUnlockUser(QHash<QString, QVariant> parameters)
     if (target == this->loggedUser)
     {
         this->TransferError(GP_CMD_SYS_UNLOCK_USER, "Can't modify self", GP_ESELFTARGET);
+        return;
+    }
+
+    if (!target->IsLocked())
+    {
+        this->TransferError(GP_CMD_SYS_LOCK_USER, "Already unlocked", GP_ENOCHANGE);
         return;
     }
 

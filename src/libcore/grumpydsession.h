@@ -45,6 +45,7 @@
 #define GP_ENOUSER               -40
 #define GP_EWRONGUSER            -41
 #define GP_ESELFTARGET           -42
+#define GP_ENOCHANGE             -43
 
 #define GP_CMD_HELLO                        1 //"HELLO"
 #define GP_CMD_SERVER                       2 //"SERVER"

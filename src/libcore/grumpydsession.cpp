@@ -684,6 +684,18 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVarian
         {
             this->systemWindow->InsertText("Removed user: " + parameters["username"].toString());
         }
+    } else if (text == GP_CMD_SYS_LOCK_USER)
+    {
+        if (parameters.contains("username"))
+        {
+            this->systemWindow->InsertText("Successfuly locked user: " + parameters["username"].toString());
+        }
+    } else if (text == GP_CMD_SYS_UNLOCK_USER)
+    {
+        if (parameters.contains("username"))
+        {
+            this->systemWindow->InsertText("Successfuly unlocked user: " + parameters["username"].toString());
+        }
     } else
     {
         QHash<QString, QVariant> params;

@@ -160,6 +160,12 @@ void GrumpyIRC::GrumpydCfWin::on_tableUser_customContextMenuRequested(const QPoi
     QPoint p = this->ui->tableUser->viewport()->mapToGlobal(position);
     QAction *menuAdd = new QAction(QObject::tr("Create user"), &Menu);
     Menu.addAction(menuAdd);
+    Menu.addSeparator();
+    QAction *menuLock = new QAction("Lock", &Menu);
+    Menu.addAction(menuLock);
+    QAction *menuUnlock = new QAction("Unlock", &Menu);
+    Menu.addAction(menuUnlock);
+    Menu.addSeparator();
     QAction *menuRemove = new QAction(QObject::tr("Remove"), &Menu);
     Menu.addAction(menuRemove);
 
@@ -183,6 +189,29 @@ void GrumpyIRC::GrumpydCfWin::on_tableUser_customContextMenuRequested(const QPoi
         QHash<QString, QVariant> user;
         user.insert("id", user_id);
         this->GrumpySession->SendProtocolCommand(GP_CMD_SYS_REMOVE_USER, user);
+        this->GrumpySession->SendProtocolCommand(GP_CMD_SYS_LIST_USER);
+    } else if (selectedItem == menuLock)
+    {
+        int selected_row = this->ui->tableUser->currentRow();
+        QString user_name = this->ui->tableUser->item(selected_row, 0)->text();
+        user_id_t user_id = this->uid[user_name];
+        MessageBox *question = new MessageBox("grumpyd-lock-user", "Lock user", "Do you really want to lock user " + user_name + "? This will also disconnect them from all their grumpy sessions. "\
+                                                                                "IRC sessions will remain active, but user will not be able to control them.", this);
+        MessageBoxResponse response = question->Exec(MessageBoxType_Question);
+        if (response != MessageBoxResponse_Yes)
+            return;
+        QHash<QString, QVariant> user;
+        user.insert("id", user_id);
+        this->GrumpySession->SendProtocolCommand(GP_CMD_SYS_LOCK_USER, user);
+        this->GrumpySession->SendProtocolCommand(GP_CMD_SYS_LIST_USER);
+    } else if (selectedItem == menuUnlock)
+    {
+        int selected_row = this->ui->tableUser->currentRow();
+        QString user_name = this->ui->tableUser->item(selected_row, 0)->text();
+        user_id_t user_id = this->uid[user_name];
+        QHash<QString, QVariant> user;
+        user.insert("id", user_id);
+        this->GrumpySession->SendProtocolCommand(GP_CMD_SYS_UNLOCK_USER, user);
         this->GrumpySession->SendProtocolCommand(GP_CMD_SYS_LIST_USER);
     }
 }
