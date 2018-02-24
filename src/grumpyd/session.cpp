@@ -408,6 +408,13 @@ void Session::processUserList(QHash<QString, QVariant> parameters)
 
     QHash<QString, QVariant> response;
     response.insert("list", QVariant(user_list));
+
+    // Roles as well
+    QList<QVariant> role_list;
+    foreach (Role *role, Role::Roles)
+            role_list.append(role->GetName());
+    response.insert("roles", QVariant(role_list));
+
     this->protocol->SendProtocolCommand(GP_CMD_SYS_LIST_USER, response);
 }
 

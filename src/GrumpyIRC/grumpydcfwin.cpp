@@ -93,8 +93,10 @@ void GrumpydCfWin::ClearUserList()
     heading << "User" << "Is locked" << "Is online" << "IRC sessions" << "Role";
     this->ui->tableUser->verticalHeader()->setVisible(false);
     this->ui->tableUser->setColumnCount(heading.size());
-    this->ui->tableUser->setShowGrid(false);
     this->ui->tableUser->setHorizontalHeaderLabels(heading);
+    this->ui->tableUser->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    this->ui->tableUser->setShowGrid(false);
+    this->ui->tableUser->horizontalHeader()->setSelectionBehavior(QAbstractItemView::SelectRows);
     while (this->ui->tableUser->rowCount() > 0)
         this->ui->tableUser->removeRow(0);
 }
@@ -138,4 +140,7 @@ void GrumpydCfWin::OnRefresh()
         if (info.contains("role"))
             this->ui->tableUser->setItem(row, 4, new QTableWidgetItem(info["role"].toString()));
     }
+
+    // Make rows a bit smaller for easier reading
+    this->ui->tableUser->resizeRowsToContents();
 }

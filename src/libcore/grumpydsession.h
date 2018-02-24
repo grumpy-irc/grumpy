@@ -231,6 +231,7 @@ namespace GrumpyIRC
             int port;
             // Buffer only
             QList<QVariant> userList;
+            QList<QString> roles;
             // Used for comparisons
             QDateTime lastUserListUpdate;
     };

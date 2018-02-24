@@ -1081,10 +1081,17 @@ void GrumpydSession::processRemove(QHash<QString, QVariant> parameters)
 
 void GrumpydSession::processUserList(QHash<QString, QVariant> parameters)
 {
+    this->lastUserListUpdate = QDateTime::currentDateTime();
+    if (parameters.contains("roles"))
+    {
+        QList<QVariant> roles = parameters["roles"].toList();
+        this->roles.clear();
+        foreach (QVariant role, roles)
+            this->roles.append(role.toString());
+    }
     if (parameters.contains("list"))
     {
         this->userList = parameters["list"].toList();
-        this->lastUserListUpdate = QDateTime::currentDateTime();
     }
 }
 
