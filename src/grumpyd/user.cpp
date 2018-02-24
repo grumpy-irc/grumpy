@@ -87,8 +87,10 @@ void User::InsertSession(Session *sx)
     {
         this->sessions_gp.append(sx);
         // This is a first session to connect, let's check if there is a hook
+        GRUMPY_DEBUG("First session connected for " + this->GetName(), 1);
         if (this->conf->Contains("session_on_conn_raw"))
         {
+            GRUMPY_DEBUG("Sending RAW data for session_on_conn_raw for user: " + this->GetName(), 1);
             this->SendRawToIrcs(this->conf->GetValueAsString("session_on_conn_raw"));
         }
         return;
@@ -106,8 +108,10 @@ void User::RemoveSession(Session *sx)
     this->sessions_gp.removeAll(sx);
     if (this->sessions_gp.isEmpty())
     {
+        GRUMPY_DEBUG("Last session disconnected for " + this->GetName(), 1);
         if (this->conf->Contains("session_on_disc_raw"))
         {
+            GRUMPY_DEBUG("Sending RAW data for session_on_disc_raw for user: " + this->GetName(), 1);
             this->SendRawToIrcs(this->conf->GetValueAsString("session_on_disc_raw"));
         }
     }
