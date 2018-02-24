@@ -68,6 +68,7 @@ User *User::CreateUser(QString name, QString pass)
     User *user = new User(name, pass, id);
     User::UserInfo.append(user);
     Grumpyd::GetBackend()->StoreUser(user);
+    GRUMPY_LOG("Created new user: " + name);
     return user;
 }
 
@@ -79,7 +80,26 @@ bool User::RemoveUser(user_id_t id)
 
     User::UserInfo.removeAll(user);
     Grumpyd::GetBackend()->RemoveUser(user);
+    GRUMPY_LOG("Deleted user: " + user->GetName());
     delete user;
+    return true;
+}
+
+bool User::IsValid(QString user)
+{
+    if (user.isEmpty())
+        return false;
+    if (user.length() > 128)
+        return false;
+    if (user.contains(" "))
+        return false;
+    if (user.contains("\n"))
+        return false;
+    if (user.contains("\t"))
+        return false;
+    if (user.contains("*"))
+        return false;
+
     return true;
 }
 

@@ -521,6 +521,12 @@ void Session::processCreateUser(QHash<QString, QVariant> parameters)
         }
     }
 
+    if (!User::IsValid(user_name))
+    {
+        this->TransferError(GP_CMD_SYS_CREATE_USER, "Invalid user name", GP_EWRONGUSER);
+        return;
+    }
+
     Role *role = Role::DefaultRole;
     if (parameters.contains("role"))
     {
@@ -544,6 +550,7 @@ void Session::processCreateUser(QHash<QString, QVariant> parameters)
 
     QHash<QString, QVariant> result;
     result.insert("done", QVariant(true));
+    result.insert("username", new_user->GetName());
     result.insert("id", new_user->GetID());
     this->protocol->SendProtocolCommand(GP_CMD_SYS_CREATE_USER, result);
 }

@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #include "connectwin.h"
 #include "grumpyconf.h"
@@ -27,6 +27,7 @@ ConnectWin::ConnectWin(QWidget *parent) : QDialog(parent), ui(new Ui::ConnectWin
     this->ui->comboBox->addItem("Grumpyd");
     this->ui->comboBox->setCurrentIndex(0);
     this->ui->lineEdit_2->setText(CONF->GetNick());
+    this->setAttribute(Qt::WA_DeleteOnClose);
 }
 
 ConnectWin::~ConnectWin()

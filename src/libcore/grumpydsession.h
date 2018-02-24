@@ -179,6 +179,7 @@ namespace GrumpyIRC
             QDateTime GetLastUpdateOfUserList();
             //! Return user list from cache
             QList<QVariant> GetUserList();
+            QList<QString> GetRoles();
             QString Version;
             bool IsOpening = false;
             QHash<QString, QVariant> Preferences;

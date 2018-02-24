@@ -14,6 +14,7 @@
 #define GRUMPYDCFWIN_H
 
 #include <QDialog>
+#include <QHash>
 #include <QTimer>
 #include <QDateTime>
 
@@ -39,6 +40,7 @@ namespace GrumpyIRC
             void on_buttonBox_accepted();
             void on_tabWidget_currentChanged(int index);
             void OnRefresh();
+            void on_tableUser_customContextMenuRequested(const QPoint &position);
 
         private:
             template <typename T>
@@ -49,6 +51,7 @@ namespace GrumpyIRC
             void ClearUserList();
             void RefreshUserList();
             Ui::GrumpydCfWin *ui;
+            QHash<QString, unsigned int> uid;
             //! Remember if we loaded user window, so that we don't need to load userlist everytime this form is open
             //! we only load it when user switch the tab there and when this variable is false
             bool userLoaded = false;

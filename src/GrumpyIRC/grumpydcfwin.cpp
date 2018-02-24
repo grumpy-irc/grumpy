@@ -12,9 +12,12 @@
 
 #include "../libcore/grumpydsession.h"
 #include "../libcore/generic.h"
+#include "grumpyeventhandler.h"
+#include "grumpydusercfgwin.h"
 #include "grumpyconf.h"
 #include "grumpydcfwin.h"
 #include "ui_grumpydcfwin.h"
+#include <QMenu>
 
 using namespace GrumpyIRC;
 
@@ -124,13 +127,18 @@ void GrumpydCfWin::OnRefresh()
     this->lastKnownRefresh = this->GrumpySession->GetLastUpdateOfUserList();
     QList<QVariant> users = this->GrumpySession->GetUserList();
     this->ClearUserList();
+    this->uid.clear();
     int row = 0;
     foreach (QVariant user_info, users)
     {
         QHash<QString, QVariant> info = user_info.toHash();
+        if (!info.contains("name") || !info.contains("id"))
+        {
+            continue;
+        }
         this->ui->tableUser->insertRow(row);
-        if (info.contains("name"))
-            this->ui->tableUser->setItem(row, 0, new QTableWidgetItem(info["name"].toString()));
+        this->ui->tableUser->setItem(row, 0, new QTableWidgetItem(info["name"].toString()));
+        this->uid.insert(info["name"].toString(), info["id"].toUInt());
         if (info.contains("locked"))
             this->ui->tableUser->setItem(row, 1, new QTableWidgetItem(Generic::Bool2String(info["locked"].toBool())));
         if (info.contains("online"))
@@ -143,4 +151,24 @@ void GrumpydCfWin::OnRefresh()
 
     // Make rows a bit smaller for easier reading
     this->ui->tableUser->resizeRowsToContents();
+}
+
+void GrumpyIRC::GrumpydCfWin::on_tableUser_customContextMenuRequested(const QPoint &position)
+{
+    QMenu Menu;
+    QPoint p = this->ui->tableUser->viewport()->mapToGlobal(position);
+    QAction *menuAdd = new QAction(QObject::tr("Create user"), &Menu);
+    Menu.addAction(menuAdd);
+    QAction *menuRemove = new QAction(QObject::tr("Remove"), &Menu);
+    Menu.addAction(menuRemove);
+
+    QAction* selectedItem = Menu.exec(p);
+    if (!selectedItem)
+        return;
+
+    if (selectedItem == menuAdd)
+    {
+        GrumpydUserCfgWin *new_user = new GrumpydUserCfgWin(this->GrumpySession, this);
+        new_user->show();
+    }
 }

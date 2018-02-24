@@ -518,6 +518,11 @@ QList<QVariant> GrumpydSession::GetUserList()
     return this->userList;
 }
 
+QList<QString> GrumpydSession::GetRoles()
+{
+    return this->roles;
+}
+
 void GrumpydSession::OnSslHandshakeFailure(QList<QSslError> errors, bool *ok)
 {
     foreach(QSslError x, errors)
@@ -667,6 +672,12 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVarian
     } else if (text == GP_CMD_SYS_LIST_USER)
     {
         this->processUserList(parameters);
+    } else if (text == GP_CMD_SYS_CREATE_USER)
+    {
+        if (parameters.contains("username"))
+        {
+            this->systemWindow->InsertText("Successfuly added user: " + parameters["username"].toString());
+        }
     } else
     {
         QHash<QString, QVariant> params;
