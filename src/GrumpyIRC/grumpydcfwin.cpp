@@ -105,7 +105,7 @@ void GrumpydCfWin::RefreshUserList()
     this->GrumpySession->SendProtocolCommand(GP_CMD_SYS_LIST_USER);
     this->userLoaded = true;
     if (!this->timer->isActive())
-        this->timer->start(1000);
+        this->timer->start(100);
 }
 
 void GrumpyIRC::GrumpydCfWin::on_tabWidget_currentChanged(int index)
