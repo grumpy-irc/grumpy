@@ -145,7 +145,7 @@ void User::RegisterScrollback(VirtualScrollback *scrollback, bool skip)
 
 bool User::IsLocked()
 {
-    return this->IsLocked();
+    return this->locked;
 }
 
 void User::Lock()
