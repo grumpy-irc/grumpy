@@ -678,6 +678,12 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVarian
         {
             this->systemWindow->InsertText("Successfuly added user: " + parameters["username"].toString());
         }
+    } else if (text == GP_CMD_SYS_REMOVE_USER)
+    {
+        if (parameters.contains("username"))
+        {
+            this->systemWindow->InsertText("Removed user: " + parameters["username"].toString());
+        }
     } else
     {
         QHash<QString, QVariant> params;

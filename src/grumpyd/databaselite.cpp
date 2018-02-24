@@ -586,22 +586,39 @@ void DatabaseLite::RemoveScrollback(unsigned int id)
 void DatabaseLite::RemoveUser(User *user)
 {
     user_id_t id = user->GetID();
-    QString sql = "BEGIN; "\
-                  "DELETE FROM scrollback_items WHERE user_id = ?1; "\
-                  "DELETE FROM networks WHERE user_id = ?1; "\
-                  "DELETE FROM settings WHERE user_id = ?1; "\
-                  "DELETE FROM users WHERE id = ?1;"\
-                  "DELETE FROM scrollbacks WHERE user_id = ?1;"\
-                  "COMMIT;";
-    std::shared_ptr<SqlResult> result;
     QList<QVariant> params;
-    params << id;
-    result = this->database->ExecuteQuery_Bind(sql, params);
+    std::shared_ptr<SqlResult> result;
+    if (!this->database->ExecuteNonQuery("BEGIN;"))
+        goto error;
 
+    params << QString::number(id);
+
+    result = this->database->ExecuteQuery_Bind("DELETE FROM scrollback_items WHERE user_id = ?;", params);
     if (result->InError)
-    {
+        goto error;
+    result = this->database->ExecuteQuery_Bind("DELETE FROM networks WHERE user_id = ?1;", params);
+    if (result->InError)
+        goto error;
+    result = this->database->ExecuteQuery_Bind("DELETE FROM settings WHERE user_id = ?1;", params);
+    if (result->InError)
+        goto error;
+    result = this->database->ExecuteQuery_Bind("DELETE FROM users WHERE id = ?1;", params);
+    if (result->InError)
+        goto error;
+    result = this->database->ExecuteQuery_Bind("DELETE FROM scrollbacks WHERE user_id = ?1;", params);
+    if (result->InError)
+        goto error;
+
+
+    if (!this->database->ExecuteNonQuery("COMMIT;"))
+        goto error;
+
+    return;
+
+    error:
+        GRUMPY_ERROR("SQLITE BUG: " + this->LastError);
+        this->database->ExecuteNonQuery("ROLLBACK;");
         throw new Exception("Unable to remove user using sql: " + this->LastError, BOOST_CURRENT_FUNCTION);
-    }
 }
 
 QList<QVariant> DatabaseLite::FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size)

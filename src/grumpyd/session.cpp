@@ -461,6 +461,9 @@ void Session::processLockUser(QHash<QString, QVariant> parameters)
 
     target->Lock();
 
+    if (!parameters.contains("username"))
+        parameters.insert("username", target->GetName());
+
     // Confirm success
     this->protocol->SendProtocolCommand(GP_CMD_SYS_LOCK_USER, parameters);
 }
@@ -493,6 +496,9 @@ void Session::processUnlockUser(QHash<QString, QVariant> parameters)
     }
 
     target->Unlock();
+
+    if (!parameters.contains("username"))
+        parameters.insert("username", target->GetName());
 
     // Confirm success
     this->protocol->SendProtocolCommand(GP_CMD_SYS_UNLOCK_USER, parameters);
@@ -581,12 +587,14 @@ void Session::processRemoveUser(QHash<QString, QVariant> parameters)
         this->TransferError(GP_CMD_SYS_REMOVE_USER, "Can't remove self", GP_ESELFTARGET);
         return;
     }
-
+    QString username = target->GetName();
     // Kick & lock user to ensure no active sessions for this user exist
     target->Lock();
 
     if (User::RemoveUser(target->GetID()))
     {
+        if (!parameters.contains("username"))
+            parameters.insert("username", username);
         this->protocol->SendProtocolCommand(GP_CMD_SYS_REMOVE_USER, parameters);
     } else
     {

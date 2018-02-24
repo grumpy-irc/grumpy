@@ -16,6 +16,7 @@
 #include "grumpydusercfgwin.h"
 #include "grumpyconf.h"
 #include "grumpydcfwin.h"
+#include "messagebox.h"
 #include "ui_grumpydcfwin.h"
 #include <QMenu>
 
@@ -170,5 +171,18 @@ void GrumpyIRC::GrumpydCfWin::on_tableUser_customContextMenuRequested(const QPoi
     {
         GrumpydUserCfgWin *new_user = new GrumpydUserCfgWin(this->GrumpySession, this);
         new_user->show();
+    } else if (selectedItem == menuRemove)
+    {
+        int selected_row = this->ui->tableUser->currentRow();
+        QString user_name = this->ui->tableUser->item(selected_row, 0)->text();
+        user_id_t user_id = this->uid[user_name];
+        MessageBox *question = new MessageBox("grumpyd-delete-user", "Remove user", "Do you really want to delete user " + user_name + "?", this);
+        MessageBoxResponse response = question->Exec(MessageBoxType_Question);
+        if (response != MessageBoxResponse_Yes)
+            return;
+        QHash<QString, QVariant> user;
+        user.insert("id", user_id);
+        this->GrumpySession->SendProtocolCommand(GP_CMD_SYS_REMOVE_USER, user);
+        this->GrumpySession->SendProtocolCommand(GP_CMD_SYS_LIST_USER);
     }
 }
