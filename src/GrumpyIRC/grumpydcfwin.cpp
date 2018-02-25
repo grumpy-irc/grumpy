@@ -182,8 +182,7 @@ void GrumpyIRC::GrumpydCfWin::on_tableUser_customContextMenuRequested(const QPoi
         int selected_row = this->ui->tableUser->currentRow();
         QString user_name = this->ui->tableUser->item(selected_row, 0)->text();
         user_id_t user_id = this->uid[user_name];
-        MessageBox *question = new MessageBox("grumpyd-delete-user", "Remove user", "Do you really want to delete user " + user_name + "?", this);
-        MessageBoxResponse response = question->Exec(MessageBoxType_Question);
+        MessageBoxResponse response = MessageBox::Question("grumpyd-delete-user", "Remove user", "Do you really want to delete user " + user_name + "?", this);
         if (response != MessageBoxResponse_Yes)
             return;
         QHash<QString, QVariant> user;
@@ -195,9 +194,8 @@ void GrumpyIRC::GrumpydCfWin::on_tableUser_customContextMenuRequested(const QPoi
         int selected_row = this->ui->tableUser->currentRow();
         QString user_name = this->ui->tableUser->item(selected_row, 0)->text();
         user_id_t user_id = this->uid[user_name];
-        MessageBox *question = new MessageBox("grumpyd-lock-user", "Lock user", "Do you really want to lock user " + user_name + "? This will also disconnect them from all their grumpy sessions. "\
-                                                                                "IRC sessions will remain active, but user will not be able to control them.", this);
-        MessageBoxResponse response = question->Exec(MessageBoxType_Question);
+        MessageBoxResponse response = MessageBox::Question("grumpyd-lock-user", "Lock user", "Do you really want to lock user " + user_name + "? This will also disconnect them from all their grumpy sessions. "\
+                                                           "IRC sessions will remain active, but user will not be able to control them.", this);
         if (response != MessageBoxResponse_Yes)
             return;
         QHash<QString, QVariant> user;
