@@ -19,6 +19,10 @@
   <property name="windowTitle">
    <string>About</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="embedded.qrc">
+    <normaloff>:/icons/img/grumpy_logo.png</normaloff>:/icons/img/grumpy_logo.png</iconset>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QLabel" name="label">

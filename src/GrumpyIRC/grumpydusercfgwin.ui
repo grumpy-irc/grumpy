@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Add or modify user</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="embedded.qrc">
+    <normaloff>:/icons/img/grumpy_logo.png</normaloff>:/icons/img/grumpy_logo.png</iconset>
   </property>
   <layout class="QFormLayout" name="formLayout">
    <item row="0" column="0">
@@ -71,6 +75,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="embedded.qrc"/>
+ </resources>
  <connections/>
 </ui>
