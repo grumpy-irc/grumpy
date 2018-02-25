@@ -279,6 +279,22 @@ int SystemCmds::GrumpyLink(SystemCommand *command, CommandArgs command_args)
 int SystemCmds::Query(SystemCommand *command, CommandArgs command_args)
 {
     (void)command;
+    if (command_args.Parameters.count() < 1)
+    {
+        GRUMPY_ERROR(QObject::tr("This command requires 1 or 2 parameters"));
+        return 1;
+    }
+    QString target = command_args.Parameters.first();
+    QString text;
+    if (command_args.Parameters.count() > 1)
+        text = command_args.ParameterLine.mid(target.size() + 1);
+    ScrollbackFrame *scrollback = MainWindow::Main->GetScrollbackManager()->GetCurrentScrollback();
+    if (!scrollback->GetSession())
+    {
+        GRUMPY_ERROR("You can't use query in this window");
+        return 2;
+    }
+    scrollback->GetSession()->Query(scrollback->GetScrollback(), target, text);
     return 0;
 }
 
