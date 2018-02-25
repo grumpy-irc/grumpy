@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #include "core.h"
 #include "configuration.h"
@@ -172,7 +172,8 @@ QList<Scrollback *> IRCSession::GetScrollbacks()
     QList<Scrollback*> sx;
     // Fetch all windows we manage
     sx.append(this->users.values());
-    sx.append(this->systemWindow);
+    if (this->systemWindow != nullptr)
+        sx.append(this->systemWindow);
     sx.append(this->channels.values());
     return sx;
 }
