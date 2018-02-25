@@ -88,6 +88,16 @@ void DatabaseDummy::RemoveUser(User *user)
 
 }
 
+void DatabaseDummy::UnlockUser(User *user)
+{
+
+}
+
+void DatabaseDummy::LockUser(User *user)
+{
+
+}
+
 void DatabaseDummy::LoadWindows()
 {
 

@@ -44,6 +44,8 @@ namespace GrumpyIRC
             virtual void RemoveNetwork(IRCSession *session)=0;
             virtual void RemoveUser(User *user)=0;
             virtual void RemoveScrollback(User *owner, Scrollback *sx)=0;
+            virtual void LockUser(User *user)=0;
+            virtual void UnlockUser(User *user)=0;
             virtual void StoreScrollback(User *owner, Scrollback *sx)=0;
             virtual void UpdateNetwork(IRCSession *session)=0;
             virtual void StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem *item)=0;

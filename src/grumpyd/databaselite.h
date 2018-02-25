@@ -54,6 +54,8 @@ namespace GrumpyIRC
             void RemoveNetwork(IRCSession *session);
             void RemoveScrollback(unsigned int id);
             void RemoveUser(User *user);
+            void LockUser(User *user);
+            void UnlockUser(User *user);
             QList<QVariant> FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size);
             void UpdateNetwork(IRCSession *session);
             void RemoveScrollback(User *owner, Scrollback *sx);

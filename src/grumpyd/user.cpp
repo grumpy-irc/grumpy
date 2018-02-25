@@ -104,9 +104,10 @@ bool User::IsValid(QString user)
     return true;
 }
 
-User::User(QString Name, QString Password, user_id_t User_ID)
+User::User(QString Name, QString Password, user_id_t User_ID, bool is_locked)
 {
     this->username = Name;
+    this->locked = is_locked;
     this->DefaultNick = "Grumpyd user";
     this->role = NULL;
     this->id = User_ID;
@@ -198,11 +199,13 @@ void User::Lock()
 {
     this->locked = true;
     this->Kick();
+    Grumpyd::GetBackend()->LockUser(this);
 }
 
 void User::Unlock()
 {
     this->locked = false;
+    Grumpyd::GetBackend()->UnlockUser(this);
 }
 
 void User::Kick()

@@ -128,7 +128,7 @@ void DatabaseLite::LoadRoles()
 void DatabaseLite::LoadUsers()
 {
     Q_ASSERT(User::UserInfo.size() == 0);
-    std::shared_ptr<SqlResult> userlist = this->database->ExecuteQuery("SELECT id, name, password, role FROM users;");
+    std::shared_ptr<SqlResult> userlist = this->database->ExecuteQuery("SELECT id, name, password, role, is_locked FROM users;");
     if (!userlist->Count())
     {
         CONF->Init = true;
@@ -138,7 +138,7 @@ void DatabaseLite::LoadUsers()
         while (user < userlist->Count())
         {
             SqlRow row = userlist->GetRow(user++);
-            User *ux = new User(row.GetField(1).toString(), row.GetField(2).toString(), row.GetField(0).toInt());
+            User *ux = new User(row.GetField(1).toString(), row.GetField(2).toString(), row.GetField(0).toInt(), row.GetField(4).toBool());
             User::UserInfo.append(ux);
             if (Role::Roles.contains(row.GetField(3).toString()))
                 ux->SetRole(Role::Roles[row.GetField(3).toString()]);
@@ -492,12 +492,13 @@ void DatabaseLite::StoreUser(User *item)
     QStringList Parameters;
     Parameters << QString::number(item->GetID())
                << item->GetName()
-               << item->GetPassword();
+               << item->GetPassword()
+               << Generic::Bool2String(item->IsLocked());
     QString SQL;
 
     if (item->GetRole())
     {
-        SQL = "INSERT INTO users (id, name, password, is_locked, role) VALUES (?,?,?,0,?);";
+        SQL = "INSERT INTO users (id, name, password, is_locked, role) VALUES (?,?,?,?,?);";
         Parameters << item->GetRole()->GetName();
     } else
     {
@@ -619,6 +620,26 @@ void DatabaseLite::RemoveUser(User *user)
         GRUMPY_ERROR("SQLITE BUG: " + this->LastError);
         this->database->ExecuteNonQuery("ROLLBACK;");
         throw new Exception("Unable to remove user using sql: " + this->LastError, BOOST_CURRENT_FUNCTION);
+}
+
+void DatabaseLite::LockUser(User *user)
+{
+    user_id_t id = user->GetID();
+    QList<QVariant> params;
+    params << QString::number(id);
+    std::shared_ptr<SqlResult> result = this->database->ExecuteQuery_Bind("UPDATE users SET is_locked = 1 WHERE id = ?;", params);
+    if (result->InError)
+        throw new Exception("Unable to lock user using sql: " + this->LastError, BOOST_CURRENT_FUNCTION);
+}
+
+void DatabaseLite::UnlockUser(User *user)
+{
+    user_id_t id = user->GetID();
+    QList<QVariant> params;
+    params << QString::number(id);
+    std::shared_ptr<SqlResult> result = this->database->ExecuteQuery_Bind("UPDATE users SET is_locked = 0 WHERE id = ?;", params);
+    if (result->InError)
+        throw new Exception("Unable to unlock user using sql: " + this->LastError, BOOST_CURRENT_FUNCTION);
 }
 
 QList<QVariant> DatabaseLite::FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size)

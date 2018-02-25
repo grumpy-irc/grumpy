@@ -45,7 +45,7 @@ namespace GrumpyIRC
             static bool RemoveUser(user_id_t id);
             static bool IsValid(QString user);
 
-            User(QString Name, QString Password, user_id_t User_ID);
+            User(QString Name, QString Password, user_id_t User_ID, bool is_locked = false);
             ~User();
             int GetSessionCount();
             int GetIRCSessionCount();

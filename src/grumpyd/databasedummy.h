@@ -35,6 +35,8 @@ namespace GrumpyIRC
             void LoadSessions();
             void UpdateNetwork(IRCSession *session);
             void RemoveUser(User *user);
+            void UnlockUser(User *user);
+            void LockUser(User *user);
             void LoadWindows();
             void LoadText();
             void StoreScrollback(User *owner, Scrollback *sx);
