@@ -94,7 +94,7 @@ void GrumpydCfWin::ClearUserList()
 {
     this->ui->tableUser->clear();
     QStringList heading;
-    heading << "User" << "Is locked" << "Is online" << "IRC sessions" << "Role";
+    heading << "User" << "Is locked" << "Is online" << "Grumpyd sessions" << "IRC sessions" << "Role";
     this->ui->tableUser->verticalHeader()->setVisible(false);
     this->ui->tableUser->setColumnCount(heading.size());
     this->ui->tableUser->setHorizontalHeaderLabels(heading);
@@ -144,10 +144,12 @@ void GrumpydCfWin::OnRefresh()
             this->ui->tableUser->setItem(row, 1, new QTableWidgetItem(Generic::Bool2String(info["locked"].toBool())));
         if (info.contains("online"))
             this->ui->tableUser->setItem(row, 2, new QTableWidgetItem(Generic::Bool2String(info["online"].toBool())));
+        if (info.contains("gp_session_count"))
+            this->ui->tableUser->setItem(row, 3, new QTableWidgetItem(QString::number(info["gp_session_count"].toInt())));
         if (info.contains("irc_session_count"))
-            this->ui->tableUser->setItem(row, 3, new QTableWidgetItem(QString::number(info["irc_session_count"].toInt())));
+            this->ui->tableUser->setItem(row, 4, new QTableWidgetItem(QString::number(info["irc_session_count"].toInt())));
         if (info.contains("role"))
-            this->ui->tableUser->setItem(row, 4, new QTableWidgetItem(info["role"].toString()));
+            this->ui->tableUser->setItem(row, 5, new QTableWidgetItem(info["role"].toString()));
     }
 
     // Make rows a bit smaller for easier reading
