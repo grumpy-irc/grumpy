@@ -239,7 +239,16 @@ void GrumpydSession::RequestPart(Scrollback *window)
 
 void GrumpydSession::Query(Scrollback *window, QString target, QString message)
 {
-    window->InsertText("This feature is not yet supported over grumpyd", ScrollbackItemType_SystemError);
+    IRCSession *ircs = this->GetSessionFromWindow(window);
+    if (!ircs)
+        return;
+    QHash<QString, QVariant> parameters;
+    parameters.insert("network_id", QVariant(ircs->GetSID()));
+    parameters.insert("scrollback_id", QVariant(window->GetOriginalID()));
+    if (!message.isEmpty())
+        parameters.insert("message", message);
+    parameters.insert("target", target);
+    this->gp->SendProtocolCommand(GP_CMD_QUERY, parameters);
 }
 
 libircclient::Channel *GrumpydSession::GetChannel(Scrollback *window)

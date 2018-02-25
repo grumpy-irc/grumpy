@@ -273,6 +273,7 @@ void Session::processMessage(QHash<QString, QVariant> parameters)
     if (!scrollback)
     {
         GRUMPY_ERROR("Unable to find scrollback id " + QString::number(sid) + " message can't be delivered for user " + this->loggedUser->GetName());
+        this->TransferError(GP_CMD_MESSAGE, "Scrollback not found", GP_ESCROLLBACKNOTFOUND);
         return;
     }
     if (!parameters.contains("type"))
@@ -393,6 +394,44 @@ void Session::processInfo(QHash<QString, QVariant> parameters)
         irc->RetrieveChannelInviteList(NULL, parameters["channel_name"].toString());
     else if (tx == "+e")
         irc->RetrieveChannelExceptionList(NULL, parameters["channel_name"].toString());
+}
+
+void Session::processQuery(QHash<QString, QVariant> parameters)
+{
+    if (!this->IsAuthorized(PRIVILEGE_USE_IRC))
+    {
+        this->PermissionDeny(GP_CMD_QUERY);
+        return;
+    }
+
+    // We have the original ID of scrollback so let's find it here
+    unsigned int nsid = parameters["network_id"].toUInt();
+    scrollback_id_t sid = parameters["scrollback_id"].toUInt();
+    if (!parameters.contains("target"))
+    {
+        this->TransferError(GP_CMD_QUERY, "No target", GP_ENOUSER);
+        return;
+    }
+    QString target = parameters["target"].toString();
+    // let's find the network
+    SyncableIRCSession* irc = this->loggedUser->GetSIRCSession(nsid);
+    if (!irc)
+    {
+        GRUMPY_ERROR("Unable to find network with id " + QString::number(nsid) + " message can't be delivered for user " + this->loggedUser->GetName());
+        this->TransferError(GP_CMD_QUERY, "Network not found", GP_ENETWORKNOTFOUND);
+        return;
+    }
+    Scrollback *scrollback = irc->GetScrollback(sid);
+    if (!scrollback)
+    {
+        GRUMPY_ERROR("Unable to find scrollback id " + QString::number(sid) + " message can't be delivered for user " + this->loggedUser->GetName());
+        this->TransferError(GP_CMD_QUERY, "Scrollback not found", GP_ESCROLLBACKNOTFOUND);
+        return;
+    }
+    QString msg;
+    if (parameters.contains("message"))
+        msg = parameters["message"].toString();
+    irc->Query(scrollback, target, msg);
 }
 
 void Session::processUserList(QHash<QString, QVariant> parameters)
@@ -690,6 +729,9 @@ void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
     } else if (text == GP_CMD_SYS_REMOVE_USER)
     {
         this->processRemoveUser(parameters);
+    } else if (text == GP_CMD_QUERY)
+    {
+        this->processQuery(parameters);
     } else
     {
         // We received some unknown packet, send it back to client so that it at least knows we don't support this

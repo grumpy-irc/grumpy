@@ -83,6 +83,7 @@
 #define GP_CMD_RESYNC_MODE                 28
 #define GP_CMD_RESYNC_SCROLLBACK_PB        29 // Used to resync the scrollback's property bag - only change or append new items, doesn't clear existing ones
 #define GP_CMD_OVERRIDE_SCROLLBACK_PB      30 // Replaces the property bag with another hash
+#define GP_CMD_QUERY                       31
 #define GP_CMD_SYS_LIST_USER               40 // List grumpyd users
 #define GP_CMD_SYS_CREATE_USER             41 // Create a new user
 #define GP_CMD_SYS_REMOVE_USER             42 // Removes a user
