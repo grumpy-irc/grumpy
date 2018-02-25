@@ -107,7 +107,7 @@ Scrollback *IRCSession::GetSystemWindow()
 
 Scrollback *IRCSession::GetScrollback(QString name)
 {
-    if (this->systemWindow->GetTarget() == name)
+    if (this->systemWindow && this->systemWindow->GetTarget() == name)
         return this->systemWindow;
 
     name = name.toLower();
@@ -123,7 +123,7 @@ Scrollback *IRCSession::GetScrollback(QString name)
 
 Scrollback *IRCSession::GetScrollback(scrollback_id_t sid)
 {
-    if (this->systemWindow->GetOriginalID() == sid)
+    if (this->systemWindow && this->systemWindow->GetOriginalID() == sid)
         return this->systemWindow;
 
     foreach (Scrollback *scrollback, this->users.values())
@@ -143,7 +143,7 @@ Scrollback *IRCSession::GetScrollback(scrollback_id_t sid)
 
 Scrollback *IRCSession::GetScrollbackByOriginal(scrollback_id_t original_sid)
 {
-    if (this->systemWindow->GetOriginalID() == original_sid)
+    if (this->systemWindow && this->systemWindow->GetOriginalID() == original_sid)
         return this->systemWindow;
 
     foreach (Scrollback *scrollback, this->users.values())
