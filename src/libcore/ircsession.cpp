@@ -738,6 +738,7 @@ void IRCSession::OnKICK(libircclient::Parser *px, libircclient::Channel *channel
 void IRCSession::OnCTCP(libircclient::Parser *px, QString ctcp, QString pars)
 {
     QString target = px->GetParameters()[0];
+    ctcp = ctcp.toUpper();
     if (ctcp == "ACTION")
     {
         this->processME(px, pars);

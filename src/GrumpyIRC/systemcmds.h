@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #ifndef SYSTEMCMDS
 #define SYSTEMCMDS
@@ -21,13 +21,14 @@ namespace GrumpyIRC
 {
     namespace SystemCmds
     {
-        int Exit(SystemCommand *command, CommandArgs args);
-        int Alias(SystemCommand *command, CommandArgs args);
-        int Echo(SystemCommand *command, CommandArgs args);
-        int Notice(SystemCommand *command, CommandArgs args);
-        int SendMessage(SystemCommand *command, CommandArgs args);
-        int NextSessionNick(SystemCommand *command, CommandArgs args);
-        int Nick(SystemCommand *command, CommandArgs args);
+        int Exit(SystemCommand *command, CommandArgs command_args);
+        int Alias(SystemCommand *command, CommandArgs command_args);
+        int CTCP(SystemCommand *command, CommandArgs command_args);
+        int Echo(SystemCommand *command, CommandArgs command_args);
+        int Notice(SystemCommand *command, CommandArgs command_args);
+        int SendMessage(SystemCommand *command, CommandArgs command_args);
+        int NextSessionNick(SystemCommand *command, CommandArgs command_args);
+        int Nick(SystemCommand *command, CommandArgs command_args);
         int Netstat(SystemCommand *command, CommandArgs command_args);
         int RAW(SystemCommand *command, CommandArgs command_args);
         int Grumpy(SystemCommand *command, CommandArgs command_args);

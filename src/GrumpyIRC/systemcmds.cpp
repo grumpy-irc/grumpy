@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #include "systemcmds.h"
 #include "mainwindow.h"
@@ -30,19 +30,19 @@
 
 using namespace GrumpyIRC;
 
-int SystemCmds::Exit(SystemCommand *command, CommandArgs args)
+int SystemCmds::Exit(SystemCommand *command, CommandArgs command_args)
 {
     Q_UNUSED(command);
     // quit message
-    QString quit_msg = args.ParameterLine;
+    QString quit_msg = command_args.ParameterLine;
     MainWindow::Exit();
     return 0;
 }
 
-int SystemCmds::Alias(SystemCommand *command, CommandArgs args)
+int SystemCmds::Alias(SystemCommand *command, CommandArgs command_args)
 {
     Q_UNUSED(command);
-    if (!args.Parameters.count())
+    if (!command_args.Parameters.count())
     {
         QHash<QString, QString> hash = CoreWrapper::GrumpyCore->GetCommandProcessor()->GetAliasRdTable();
         unsigned int size = static_cast<unsigned int>(Generic::LongestString(hash.keys()));
@@ -51,34 +51,34 @@ int SystemCmds::Alias(SystemCommand *command, CommandArgs args)
         return 0;
     }
 
-    if (args.Parameters.count() == 1)
+    if (command_args.Parameters.count() == 1)
     {
         GRUMPY_ERROR("This need to provide 2 or more parameters for this to work");
         return 1;
     }
 
-    if (CoreWrapper::GrumpyCore->GetCommandProcessor()->Exists(args.Parameters[0]))
+    if (CoreWrapper::GrumpyCore->GetCommandProcessor()->Exists(command_args.Parameters[0]))
     {
         GRUMPY_ERROR("This name is already used by some other");
         return 1;
     }
 
-    QString value = args.ParameterLine.mid(args.Parameters[0].size() + 1);
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterAlias(args.Parameters[0], value);
+    QString value = command_args.ParameterLine.mid(command_args.Parameters[0].size() + 1);
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterAlias(command_args.Parameters[0], value);
     return 0;
 }
 
-int SystemCmds::Echo(SystemCommand *command, CommandArgs args)
+int SystemCmds::Echo(SystemCommand *command, CommandArgs command_args)
 {
     Q_UNUSED(command);
-    MainWindow::Main->GetCurrentScrollbackFrame()->InsertText(args.ParameterLine);
+    MainWindow::Main->GetCurrentScrollbackFrame()->InsertText(command_args.ParameterLine);
     return 0;
 }
 
-int SystemCmds::Notice(SystemCommand *command, CommandArgs args)
+int SystemCmds::Notice(SystemCommand *command, CommandArgs command_args)
 {
     Q_UNUSED(command);
-    if (args.Parameters.count() < 1)
+    if (command_args.Parameters.count() < 1)
     {
         GRUMPY_ERROR(QObject::tr("This command requires some text"));
         return 1;
@@ -86,72 +86,72 @@ int SystemCmds::Notice(SystemCommand *command, CommandArgs args)
     Scrollback *sx = MainWindow::Main->GetScrollbackManager()->GetCurrentScrollback()->GetScrollback();
     if (sx->GetType() == ScrollbackType_System)
     {
-        if (args.Parameters.count() < 2)
+        if (command_args.Parameters.count() < 2)
         {
             GRUMPY_ERROR(QObject::tr("This command requires target and some text"));
             return 1;
         }
-        QString target = args.Parameters[0];
-        QString text = args.ParameterLine.mid(target.size() + 1);
+        QString target = command_args.Parameters[0];
+        QString text = command_args.ParameterLine.mid(target.size() + 1);
         Scrollback *sx = MainWindow::Main->GetCurrentScrollbackFrame()->GetScrollback();
         sx->GetSession()->SendNotice(sx, target, text);
     }
     else
     {
-        sx->GetSession()->SendNotice(sx, args.ParameterLine);
+        sx->GetSession()->SendNotice(sx, command_args.ParameterLine);
     }
     return 0;
 }
 
-int SystemCmds::SendMessage(SystemCommand *command, CommandArgs args)
+int SystemCmds::SendMessage(SystemCommand *command, CommandArgs command_args)
 {
-    if (args.Parameters.size() < 2)
+    if (command_args.Parameters.size() < 2)
     {
         GRUMPY_ERROR("You need to provide at least 2 parameters");
         return 1;
     }
 
     // MSG should just echo the message to current window
-    QString target = args.Parameters[0];
-    QString text = args.ParameterLine.mid(target.size() + 1);
+    QString target = command_args.Parameters[0];
+    QString text = command_args.ParameterLine.mid(target.size() + 1);
     Scrollback *sx = MainWindow::Main->GetCurrentScrollbackFrame()->GetScrollback();
     sx->GetSession()->SendMessage(sx, target, text);
     return 0;
 }
 
-int SystemCmds::NextSessionNick(SystemCommand *command, CommandArgs args)
+int SystemCmds::NextSessionNick(SystemCommand *command, CommandArgs command_args)
 {
     Q_UNUSED(command);
-    if (args.Parameters.count() != 1)
+    if (command_args.Parameters.count() != 1)
     {
         GRUMPY_ERROR(QObject::tr("This command requires precisely 1 parameter"));
         return 1;
     }
-    GCFG->SetValue("next-session-nick", args.ParameterLine);
+    GCFG->SetValue("next-session-nick", command_args.ParameterLine);
     return 0;
 }
 
-int SystemCmds::Nick(SystemCommand *command, CommandArgs args)
+int SystemCmds::Nick(SystemCommand *command, CommandArgs command_args)
 {
     Q_UNUSED(command);
     // get a current scrollback
     ScrollbackFrame *scrollback = MainWindow::Main->GetScrollbackManager()->GetCurrentScrollback();
     if (!scrollback)
         throw new GrumpyIRC::NullPointerException("scrollback", BOOST_CURRENT_FUNCTION);
-    if (args.Parameters.count() != 1)
+    if (command_args.Parameters.count() != 1)
     {
         GRUMPY_ERROR(QObject::tr("This command requires precisely 1 parameter"));
         return 1;
     }
     if (scrollback->GetSession())
     {
-        scrollback->GetSession()->SendRaw(scrollback->GetScrollback(), "NICK " + args.Parameters[0]);
+        scrollback->GetSession()->SendRaw(scrollback->GetScrollback(), "NICK " + command_args.Parameters[0]);
         return 0;
     }
     else
     {
-        CONF->SetNick(args.Parameters[0]);
-        scrollback->InsertText(QString("Your default nick was changed to " + args.Parameters[0]));
+        CONF->SetNick(command_args.Parameters[0]);
+        scrollback->InsertText(QString("Your default nick was changed to " + command_args.Parameters[0]));
         return 0;
     }
 }
@@ -444,4 +444,25 @@ int SystemCmds::Uptime(SystemCommand *command, CommandArgs command_args)
     QDateTime uptime = CONF->GetConfiguration()->GetStartupDateTime();
     sx->InsertText("Uptime since " + uptime.toString() + ": " + QString::number(uptime.secsTo(QDateTime::currentDateTime()) / 60) + " min");
     return 0;
+}
+
+int SystemCmds::CTCP(SystemCommand *command, CommandArgs command_args)
+{
+    Q_UNUSED(command);
+    // if there is no parameter we throw some error
+    if (command_args.Parameters.count() < 2)
+    {
+        GRUMPY_ERROR(QObject::tr("This command requires exactly 2 parameters"));
+        return 0;
+    }
+    Scrollback *sx = MainWindow::Main->GetCurrentScrollbackFrame()->GetScrollback();
+    if (!sx->GetSession())
+    {
+        GRUMPY_ERROR("You can only use this command in a connected server window");
+        return 0;
+    }
+    QString parameters = "";
+    if (command_args.Parameters.count() > 2)
+        parameters = command_args.ParameterLine.mid(command_args.Parameters[0].length() + command_args.Parameters[1].length() + 2);
+    sx->GetSession()->SendCTCP(sx, command_args.Parameters[0], command_args.Parameters[1].toUpper(), parameters);
 }
