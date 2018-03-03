@@ -369,6 +369,14 @@ void IRCSession::init(bool preindexed)
     this->_port = 0;
 }
 
+void IRCSession::whoisIs(libircclient::Parser *parser)
+{
+    if (parser->GetParameters().count() < 2)
+        return;
+
+    this->systemWindow->InsertText("WHOIS: " + parser->GetParameters()[1] + " " + parser->GetText());
+}
+
 Scrollback *IRCSession::GetScrollbackForUser(QString user)
 {
     QString user_l = user.toLower();
@@ -1097,6 +1105,69 @@ void IRCSession::OnINVITE(libircclient::Parser *px)
     this->systemWindow->InsertText(this->GetNick() + ": " + px->GetSourceUserInfo()->GetNick() + " invites you to join " + px->GetText());
 }
 
+void IRCSession::OnWhoisUser(libircclient::Parser *px, libircclient::User *user)
+{
+    this->systemWindow->InsertText("WHOIS  === BEGINNING ===");
+    this->systemWindow->InsertText("WHOIS: " + user->ToString() + " has realname: " + user->GetRealname());
+}
+
+void IRCSession::OnWhoisIdle(libircclient::Parser *px, unsigned int seconds_idle, QDateTime signon_time)
+{
+    if (px->GetParameters().count() < 2)
+        return;
+    this->systemWindow->InsertText("WHOIS: " + px->GetParameters()[1] + " is idle " + QString::number(seconds_idle) + " seconds. "\
+                                   "Online since " + signon_time.toString());
+}
+
+void IRCSession::OnWhoisOperator(libircclient::Parser *px)
+{
+    this->whoisIs(px);
+}
+
+void IRCSession::OnWhoisRegNick(libircclient::Parser *px)
+{
+    this->whoisIs(px);
+}
+
+void IRCSession::OnWhoisChannels(libircclient::Parser *px)
+{
+    if (px->GetParameters().count() < 2)
+        return;
+    this->systemWindow->InsertText("WHOIS: " + px->GetParameters()[1] + " is on channels: " + px->GetText());
+}
+
+void IRCSession::OnWhoisHost(libircclient::Parser *px)
+{
+    if (px->GetParameters().count() < 3)
+        return;
+    this->systemWindow->InsertText("WHOIS: " + px->GetParameters()[1] + " is connected using " + px->GetParameters()[2] + ": " + px->GetText());
+}
+
+void IRCSession::OnWhoisEnd(libircclient::Parser *px)
+{
+    Q_UNUSED(px);
+    this->systemWindow->InsertText("WHOIS  === END ===");
+}
+
+void IRCSession::OnAway(libircclient::Parser *px)
+{
+    if (px->GetParameters().count() < 2)
+        return;
+    this->systemWindow->InsertText(px->GetParameters()[1] + " is away: " + px->GetText());
+}
+
+void IRCSession::OnWhoisGen(libircclient::Parser *px)
+{
+    this->whoisIs(px);
+}
+
+void IRCSession::OnWhoisAcc(libircclient::Parser *px)
+{
+    if (px->GetParameters().count() < 3)
+        return;
+    this->systemWindow->InsertText("WHOIS: " + px->GetParameters()[1] + " is logged in as " + px->GetParameters()[2]);
+}
+
 void IRCSession::processME(libircclient::Parser *px, QString message)
 {
     Scrollback *sx = NULL;
@@ -1193,6 +1264,17 @@ void IRCSession::connInternalSocketSignals()
     connect(this->network, SIGNAL(Event_CAP_Timeout()), this, SLOT(OnCapabilitiesNotSupported()));
     connect(this->network, SIGNAL(Event_NUMERIC_UNKNOWN(libircclient::Parser*)), this, SLOT(OnServerSideUnknown(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_INVITE(libircclient::Parser*)), this, SLOT(OnINVITE(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_WhoisUser(libircclient::Parser*,libircclient::User*)), this, SLOT(OnWhoisUser(libircclient::Parser*,libircclient::User*)));
+    connect(this->network, SIGNAL(Event_WhoisIdle(libircclient::Parser*,uint,QDateTime)), this, SLOT(OnWhoisIdle(libircclient::Parser*,uint,QDateTime)));
+    connect(this->network, SIGNAL(Event_WhoisOperator(libircclient::Parser*)), this, SLOT(OnWhoisOperator(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_WhoisRegNick(libircclient::Parser*)), this, SLOT(OnWhoisRegNick(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_WhoisChannels(libircclient::Parser*)), this, SLOT(OnWhoisChannels(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_WhoisServer(libircclient::Parser*)), this, SLOT(OnWhoisHost(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_WhoisEnd(libircclient::Parser*)), this, SLOT(OnWhoisEnd(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_RplAway(libircclient::Parser*)), this, SLOT(OnAway(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_WhoisAccount(libircclient::Parser*)), this, SLOT(OnWhoisAcc(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_WhoisSpecial(libircclient::Parser*)), this, SLOT(OnWhoisGen(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_WhoisSecure(libircclient::Parser*)), this, SLOT(OnWhoisGen(libircclient::Parser*)));
 }
 
 void IRCSession::_gs_ResyncNickChange(QString new_, QString old_)

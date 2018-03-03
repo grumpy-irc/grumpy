@@ -179,6 +179,17 @@ namespace GrumpyIRC
             virtual void OnServerSideUnknown(libircclient::Parser *px);
             virtual void OnCapabilitiesNotSupported();
             virtual void OnINVITE(libircclient::Parser *px);
+            virtual void OnWhoisUser(libircclient::Parser *px, libircclient::User *user);
+            virtual void OnWhoisIdle(libircclient::Parser *px, unsigned int seconds_idle, QDateTime signon_time);
+            virtual void OnWhoisOperator(libircclient::Parser *px);
+            virtual void OnWhoisRegNick(libircclient::Parser *px);
+            virtual void OnWhoisChannels(libircclient::Parser *px);
+            virtual void OnWhoisHost(libircclient::Parser *px);
+            virtual void OnWhoisEnd(libircclient::Parser *px);
+            virtual void OnAway(libircclient::Parser *px);
+            // Generic whois
+            virtual void OnWhoisGen(libircclient::Parser *px);
+            virtual void OnWhoisAcc(libircclient::Parser *px);
 
         protected:
             static unsigned int lastID;
@@ -223,6 +234,7 @@ namespace GrumpyIRC
         private:
             bool isRetrievingWhoInfo(QString channel);
             void init(bool preindexed);
+            void whoisIs(libircclient::Parser *parser);
             QList<QString> retrievingWho;
     };
 }
