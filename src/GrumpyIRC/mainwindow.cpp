@@ -129,6 +129,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         GRUMPY_ERROR("SSL support is not available, you won't be able to connect using SSL (probably missing OpenSSL libraries?)");
     this->HideProgress();
     this->ui->actionEnable_proxy->setChecked(CONF->UsingProxy());
+    Proxy::Init();
     if (!CONF->SafeMode)
         this->Execute(CONF->GetAutorun());
 }
