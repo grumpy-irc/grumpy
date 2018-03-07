@@ -19,6 +19,12 @@ Some features:
 * Supports IRCv3 protocol (http://ircv3.net/)
 * Extensible and very powerfull auto-completion mechanism
 
+Inspired by:
+* mIRC
+* Quassel
+* KVirc
+* Pidgeon
+
 How to build
 ==========================
 
@@ -57,5 +63,7 @@ information on license for a given file.
 
 
 Grumpy is currently a work in progress and is unfinished. Use on your own risk.
-There is no manual yet. You can ask for help at #grumpy on network
-irc.tm-irc.org
+See wiki on GitHub for docs. You can ask for help at #GrumpyChat on networks
+irc.tm-irc.org or freenode.net
+
+

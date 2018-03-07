@@ -255,76 +255,6 @@
        </item>
        <item>
         <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="0">
-          <widget class="QPushButton" name="pushButton_5">
-           <property name="text">
-            <string>Text color</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QPushButton" name="pushButton_4">
-           <property name="text">
-            <string>Background color</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
-          <widget class="QPushButton" name="pushButton_C1">
-           <property name="text">
-            <string>1</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="2">
-          <widget class="QPushButton" name="pushButton_C3">
-           <property name="text">
-            <string>3</string>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="0">
-          <widget class="QPushButton" name="pushButton_C6">
-           <property name="text">
-            <string>6</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QPushButton" name="pushButton_C2">
-           <property name="text">
-            <string>2</string>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="1">
-          <widget class="QPushButton" name="pushButton_C7">
-           <property name="text">
-            <string>7</string>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="2">
-          <widget class="QPushButton" name="pushButton_C8">
-           <property name="text">
-            <string>8</string>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="1">
-          <widget class="QPushButton" name="pushButton_C12">
-           <property name="text">
-            <string>12</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QPushButton" name="pushButton_CQ">
-           <property name="text">
-            <string>+q</string>
-           </property>
-          </widget>
-         </item>
          <item row="2" column="2">
           <widget class="QPushButton" name="pushButton_IC">
            <property name="text">
@@ -332,24 +262,17 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
-          <widget class="QPushButton" name="pushButton_EC">
-           <property name="text">
-            <string>Error</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
+         <item row="4" column="1">
           <widget class="QPushButton" name="pushButton_CA">
            <property name="text">
             <string>+a</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="2">
-          <widget class="QPushButton" name="pushButton_CO">
+         <item row="2" column="4">
+          <widget class="QPushButton" name="pushButton_TC">
            <property name="text">
-            <string>+o</string>
+            <string>Timestamp</string>
            </property>
           </widget>
          </item>
@@ -360,38 +283,45 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
-          <widget class="QPushButton" name="pushButton_WC">
-           <property name="text">
-            <string>Warning</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="3">
-          <widget class="QPushButton" name="pushButton_C4">
-           <property name="text">
-            <string>4</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="4">
+         <item row="6" column="4">
           <widget class="QPushButton" name="pushButton_C5">
            <property name="text">
             <string>5</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="3">
-          <widget class="QPushButton" name="pushButton_SC">
+         <item row="6" column="2">
+          <widget class="QPushButton" name="pushButton_C3">
            <property name="text">
-            <string>System color</string>
+            <string>3</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="4">
-          <widget class="QPushButton" name="pushButton_HC">
+         <item row="7" column="2">
+          <widget class="QPushButton" name="pushButton_C8">
            <property name="text">
-            <string>Highlight</string>
+            <string>8</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QPushButton" name="pushButton_5">
+           <property name="text">
+            <string>Text color</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="4">
+          <widget class="QPushButton" name="pushButton_C15">
+           <property name="text">
+            <string>15</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="3">
+          <widget class="QPushButton" name="pushButton_C14">
+           <property name="text">
+            <string>14</string>
            </property>
           </widget>
          </item>
@@ -402,59 +332,150 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="3">
-          <widget class="QPushButton" name="pushButton_CH">
+         <item row="0" column="3">
+          <widget class="QPushButton" name="pushButton_SC">
            <property name="text">
-            <string>+h</string>
+            <string>System color</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="4">
-          <widget class="QPushButton" name="pushButton_CV">
+         <item row="2" column="1">
+          <widget class="QPushButton" name="pushButton_EC">
            <property name="text">
-            <string>+v</string>
+            <string>Error</string>
            </property>
           </widget>
          </item>
-         <item row="6" column="3">
-          <widget class="QPushButton" name="pushButton_C9">
-           <property name="text">
-            <string>9</string>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="0">
+         <item row="8" column="0">
           <widget class="QPushButton" name="pushButton_C11">
            <property name="text">
             <string>11</string>
            </property>
           </widget>
          </item>
-         <item row="6" column="4">
+         <item row="6" column="0">
+          <widget class="QPushButton" name="pushButton_C1">
+           <property name="text">
+            <string>1</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="4">
+          <widget class="QPushButton" name="pushButton_CV">
+           <property name="text">
+            <string>+v</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QPushButton" name="pushButton_CQ">
+           <property name="text">
+            <string>+q</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="1">
+          <widget class="QPushButton" name="pushButton_C12">
+           <property name="text">
+            <string>12</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="3">
+          <widget class="QPushButton" name="pushButton_CH">
+           <property name="text">
+            <string>+h</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QPushButton" name="pushButton_C7">
+           <property name="text">
+            <string>7</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QPushButton" name="pushButton_4">
+           <property name="text">
+            <string>Background color</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QPushButton" name="pushButton_C6">
+           <property name="text">
+            <string>6</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="4">
           <widget class="QPushButton" name="pushButton_C10">
            <property name="text">
             <string>10</string>
            </property>
           </widget>
          </item>
-         <item row="7" column="2">
+         <item row="6" column="1">
+          <widget class="QPushButton" name="pushButton_C2">
+           <property name="text">
+            <string>2</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="3">
+          <widget class="QPushButton" name="pushButton_C9">
+           <property name="text">
+            <string>9</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="2">
           <widget class="QPushButton" name="pushButton_C13">
            <property name="text">
             <string>13</string>
            </property>
           </widget>
          </item>
-         <item row="7" column="3">
-          <widget class="QPushButton" name="pushButton_C14">
+         <item row="0" column="4">
+          <widget class="QPushButton" name="pushButton_HC">
            <property name="text">
-            <string>14</string>
+            <string>Highlight</string>
            </property>
           </widget>
          </item>
-         <item row="7" column="4">
-          <widget class="QPushButton" name="pushButton_C15">
+         <item row="4" column="2">
+          <widget class="QPushButton" name="pushButton_CO">
            <property name="text">
-            <string>15</string>
+            <string>+o</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QPushButton" name="pushButton_WC">
+           <property name="text">
+            <string>Warning</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="3">
+          <widget class="QPushButton" name="pushButton_C4">
+           <property name="text">
+            <string>4</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QPushButton" name="pushButton_UC_2">
+           <property name="text">
+            <string>User (in text)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QPushButton" name="pushButton_LC">
+           <property name="text">
+            <string>Link</string>
            </property>
           </widget>
          </item>

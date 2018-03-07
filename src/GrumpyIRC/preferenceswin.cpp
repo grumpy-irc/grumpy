@@ -229,6 +229,9 @@ void PreferencesWin::refreshSkin(bool enabled)
     this->ui->pushButton_WC->setEnabled(enabled);
     this->ui->pushButton_SC->setEnabled(enabled);
     this->ui->pushButton_UC->setEnabled(enabled);
+    this->ui->pushButton_TC->setEnabled(enabled);
+    this->ui->pushButton_UC_2->setEnabled(enabled);
+    this->ui->pushButton_LC->setEnabled(enabled);
 }
 
 void PreferencesWin::on_tableWidget_cellChanged(int row, int column)
@@ -342,6 +345,9 @@ void GrumpyIRC::PreferencesWin::on_comboBox_currentIndexChanged(int index)
     this->skin_ht.insert(this->ui->pushButton_IC, &this->highlighted_skin->SystemInfo);
     this->skin_ht.insert(this->ui->pushButton_UC, &this->highlighted_skin->Unread);
     this->skin_ht.insert(this->ui->pushButton_WC, &this->highlighted_skin->Warning);
+    this->skin_ht.insert(this->ui->pushButton_TC, &this->highlighted_skin->Timestamp);
+    this->skin_ht.insert(this->ui->pushButton_UC_2, &this->highlighted_skin->UserColor);
+    this->skin_ht.insert(this->ui->pushButton_LC, &this->highlighted_skin->LinkColor);
     //this->skin_ht.insert(this->ui->pushButton_CA, &this->highlighted_skin->)
 
     foreach (QPushButton *button, this->skin_ht.keys())
@@ -547,4 +553,19 @@ void GrumpyIRC::PreferencesWin::on_pushButton_C14_clicked()
 void GrumpyIRC::PreferencesWin::on_pushButton_C15_clicked()
 {
 
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_TC_clicked()
+{
+    this->updateColor();
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_UC_2_clicked()
+{
+    this->updateColor();
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButton_LC_clicked()
+{
+    this->updateColor();
 }

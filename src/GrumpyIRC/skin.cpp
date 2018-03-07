@@ -93,6 +93,10 @@ void Skin::LoadHash(QHash<QString, QVariant> hash)
     UNSERIALIZE_COLOR(SystemColor);
     UNSERIALIZE_COLOR(SystemInfo);
     UNSERIALIZE_COLOR(TextColor);
+    UNSERIALIZE_COLOR(Unread);
+    UNSERIALIZE_COLOR(Timestamp);
+    UNSERIALIZE_COLOR(UserColor);
+    UNSERIALIZE_COLOR(LinkColor);
 }
 
 QHash<QString, QVariant> Skin::ToHash()
@@ -108,6 +112,10 @@ QHash<QString, QVariant> Skin::ToHash()
     SERIALIZE_COLOR(SystemColor);
     SERIALIZE_COLOR(SystemInfo);
     SERIALIZE_COLOR(TextColor);
+    SERIALIZE_COLOR(Unread);
+    SERIALIZE_COLOR(Timestamp);
+    SERIALIZE_COLOR(LinkColor);
+    SERIALIZE_COLOR(UserColor);
     return hash;
 }
 
@@ -126,6 +134,9 @@ void Skin::setDefaults()
     this->SystemColor = QColor(71, 245, 92);
     this->UserListAwayColor = QColor(180, 180, 180);
     this->TextColor = QColor(255, 255, 255);
+    this->LinkColor = QColor("#94D7F2");
+    this->Timestamp = QColor("#DCFCAC");
+    this->UserColor = QColor("#B4D6FA");
     this->TextSize = 12;
 #ifdef GRUMPY_WIN
     if (QFontDatabase().families().contains("Consolas"))

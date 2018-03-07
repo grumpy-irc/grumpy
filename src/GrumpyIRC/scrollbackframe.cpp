@@ -47,6 +47,11 @@ irc2htmlcode::Parser ScrollbackFrame::parser;
 
 void ScrollbackFrame::UpdateSkins()
 {
+    parser.TimeColor = Skin::GetCurrent()->Timestamp.name();
+    parser.LinkColor = Skin::GetCurrent()->LinkColor.name();
+    parser.TextColor = Skin::GetCurrent()->TextColor.name();
+    parser.UserColor = Skin::GetCurrent()->UserColor.name();
+
     QHash<unsigned int, QColor> colors = Skin::GetCurrent()->Colors;
     parser.TextColors.clear();
 

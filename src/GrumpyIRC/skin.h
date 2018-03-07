@@ -51,12 +51,16 @@ namespace GrumpyIRC
             QString FontFamily;
             QFont TextFont;
             QColor TextColor;
+            //! Color of username in the scrollback text, used by html
+            QColor UserColor;
+            QColor LinkColor;
             QColor UserListAwayColor;
             QColor HighligtedColor;
             QColor SystemInfo;
             QColor Error;
             QColor Warning;
             QColor SystemColor;
+            QColor Timestamp;
             QColor Unread;
             QColor BackgroundColor;
             QHash<char, QColor> ModeColors;

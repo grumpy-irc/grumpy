@@ -81,7 +81,10 @@ namespace GrumpyIRC
             void on_pushButton_C13_clicked();
             void on_pushButton_C14_clicked();
             void on_pushButton_C15_clicked();
-        private:
+            void on_pushButton_TC_clicked();
+            void on_pushButton_UC_2_clicked();
+            void on_pushButton_LC_clicked();
+    private:
             void highlights_reload();
             void updateColor();
             void highlights_append_row(int row, Highlighter *hl);
