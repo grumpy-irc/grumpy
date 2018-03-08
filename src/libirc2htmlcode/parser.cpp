@@ -27,7 +27,7 @@ Parser::Parser()
     this->cacheMiss = 0;
     this->Protocols << "http" << "https" << "ftp" << "irc" << "ircs";
     this->LinkSeparators << ' ' << ',' << '(' << ')';
-    this->Separators << ' ' << '.' << ',' << ':' << ';' << '!' << '(' << ')';
+    this->Separators << ' ' << ',' << ':' << ';' << '!' << '(' << ')';
     this->SeparatorsPriv << ' ' << '(';
     // We expect a dark background so black and white mixed up
     this->TextColors.insert(0,    "#000000"); // White
@@ -167,6 +167,16 @@ QString Parser::linkChannels(QString source)
             int channel_end = current_pos;
             while (++channel_end < source.size())
             {
+                char current_symbol = source[channel_end].toLatin1();
+                if (this->SeparateOnDotSpace && current_symbol == '.')
+                {
+                    // If dot is last symbol in text
+                    if (channel_end + 1 == source.size())
+                        break;
+                    // If it's not but next symbol is a space
+                    if (channel_end + 1 < source.size() && source[channel_end+1].toLatin1() == ' ')
+                        break;
+                }
                 if (this->Separators.contains(source[channel_end].toLatin1()))
                 {
                     break;
