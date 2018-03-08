@@ -25,7 +25,7 @@ Parser::Parser()
     this->LinkColor = "#94D7F2";
     this->cacheMiss = 0;
     this->Protocols << "http" << "https" << "ftp" << "irc" << "ircs";
-    this->LinkSeparators << ' ';
+    this->LinkSeparators << ' ' << '.' << ',' << '(' << ')';
     this->Separators << ' ' << '.' << ',' << ':' << ';' << '!' << '(' << ')';
     this->SeparatorsPriv << ' ' << '(';
     // We expect a dark background so black and white mixed up
