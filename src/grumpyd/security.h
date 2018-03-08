@@ -24,6 +24,8 @@
 #define PRIVILEGE_LOCK_USER         "lockuser"
 #define PRIVILEGE_UNLOCK_USER       "unlockuser"
 #define PRIVILEGE_LIST_USERS        "listuser"
+#define PRIVILEGE_DOWNLOAD_TEXT     "downloadtext"  // let user download all content of their scrollback
+#define PRIVILEGE_SEARCH_TEXT       "searchtext"    // let user perform SQL search
 
 #include <QString>
 #include <QHash>
@@ -36,10 +38,10 @@ namespace GrumpyIRC
         public:
             static void Defaults();
             static QHash<QString, Role*> Roles;
-            static void CreateRole(QString name);
+            static void CreateRole(QString name, QString desc);
             static Role *DefaultRole;
 
-            Role(QString name);
+            Role(QString name, QString ds);
             ~Role();
             void Grant(QString perm);
             void Revoke(QString perm);
@@ -47,11 +49,13 @@ namespace GrumpyIRC
             void RevokeRole(Role *role);
             bool IsAuthorized(QString perm);
             QString GetName() const;
+            QString GetDescription() const;
 
         private:
             QList<QString> permissions;
             QList<QString> roles;
             QString roleName;
+            QString description;
     };
 }
 
