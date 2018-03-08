@@ -117,8 +117,15 @@ QString Parser::linkUrl(QString source, QString protocol)
         while (++end < source.size())
         {
             char current_symbol = source[end].toLatin1();
-            if (this->SeparateOnDotSpace && current_symbol == '.' && end+1 < source.size() && source[end+1].toLatin1() == ' ')
-                break;
+            if (this->SeparateOnDotSpace && current_symbol == '.')
+            {
+                // If dot is last symbol in text
+                if (end + 1 == source.size())
+                    break;
+                // If it's not but next symbol is a space
+                if (end + 1 < source.size() && source[end+1].toLatin1() == ' ')
+                    break;
+            }
             if (this->LinkSeparators.contains(current_symbol))
                 break;
         }
