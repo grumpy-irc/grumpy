@@ -724,6 +724,8 @@ void GrumpydSession::kill()
             window->SetDead(true);
     }
     this->scrollbackHash.clear();
+    this->roles.clear();
+    this->userList.clear();
 }
 
 void GrumpydSession::processNewScrollbackItem(QHash<QString, QVariant> hash)
