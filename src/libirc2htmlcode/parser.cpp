@@ -22,6 +22,7 @@ Parser::Parser()
     this->ChannelSymbol = '#';
     this->resolveCacheSize = 2000;
     this->cacheHits = 0;
+    this->SeparateOnDotSpace = true;
     this->LinkColor = "#94D7F2";
     this->cacheMiss = 0;
     this->Protocols << "http" << "https" << "ftp" << "irc" << "ircs";
@@ -115,7 +116,10 @@ QString Parser::linkUrl(QString source, QString protocol)
         int end = position;
         while (++end < source.size())
         {
-            if (this->LinkSeparators.contains(source[end].toLatin1()))
+            char current_symbol = source[end].toLatin1();
+            if (this->SeparateOnDotSpace && current_symbol == '.' && end+1 < source.size() && source[end+1].toLatin1() == ' ')
+                break;
+            if (this->LinkSeparators.contains(current_symbol))
                 break;
         }
         QString lx = source.mid(position, end - position);

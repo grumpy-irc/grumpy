@@ -46,6 +46,9 @@ namespace irc2htmlcode
             QList<char> LinkSeparators;
             QList<char> SeparatorsPriv;
             QList<char> Separators;
+            //! If true, trailing dot will be considered a separator as well
+            //! example: http://test.tld. will be linked as http://test.tld
+            bool SeparateOnDotSpace;
             QHash<unsigned int, QString> TextColors;
 
         private:
