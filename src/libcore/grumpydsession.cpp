@@ -600,6 +600,8 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVarian
         this->gp->SendProtocolCommand(GP_CMD_LOGIN, params);
     } else if (text == GP_CMD_LOGIN_FAIL)
     {
+        emit this->Event_AuthenticationFailed();
+        this->AutoReconnect = false;
         this->closeError("Invalid username or password provided");
     } else if (text == GP_CMD_CHANNEL_RESYNC)
     {

@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #ifndef NETWORKSESSION_H
 #define NETWORKSESSION_H
@@ -81,6 +81,8 @@ namespace GrumpyIRC
             QDateTime connectedOn;
         signals:
             void Event_Deleted();
+            //! Used when authentication to underlying protocol fails
+            void Event_AuthenticationFailed();
 
         //public slots:
     };
