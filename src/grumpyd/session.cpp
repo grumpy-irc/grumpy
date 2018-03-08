@@ -757,6 +757,13 @@ void Session::processLogin(QHash<QString, QVariant> parameters)
     this->loggedUser = User::Login(parameters["username"].toString(), User::EncryptPw(parameters["password"].toString()));
     if (this->loggedUser)
     {
+        if (this->loggedUser->IsLocked())
+        {
+            GRUMPY_LOG("SID " + QString::number(this->SID) + " failed to login (is locked) to name " + parameters["username"].toString());
+            this->TransferError(GP_CMD_LOGIN, "Account is locked", GP_ELOCKED);
+            this->protocol->SendProtocolCommand(GP_CMD_LOGIN_FAIL);
+            return;
+        }
         if (!this->IsAuthorized(PRIVILEGE_LOGIN))
         {
             this->PermissionDeny(GP_CMD_LOGIN);
@@ -769,7 +776,7 @@ void Session::processLogin(QHash<QString, QVariant> parameters)
         this->loggedUser->InsertSession(this);
     } else
     {
-        GRUMPY_LOG("SID " + QString::number(this->SID) + " failed to login to name " + parameters["username"].toString());
+        GRUMPY_LOG("SID " + QString::number(this->SID) + " failed to login (wrong user / pass) to name " + parameters["username"].toString());
         this->protocol->SendProtocolCommand(GP_CMD_LOGIN_FAIL);
     }
 }
