@@ -142,6 +142,7 @@ void DatabaseLite::LoadUsers()
             User::UserInfo.append(ux);
             if (Role::Roles.contains(row.GetField(3).toString()))
                 ux->SetRole(Role::Roles[row.GetField(3).toString()]);
+            ux->StorageLoad();
         }
     }
 }
@@ -412,7 +413,7 @@ QHash<QString, QVariant> DatabaseLite::GetConfiguration(user_id_t user)
 
 void DatabaseLite::UpdateDB(unsigned int patch)
 {
-    GRUMPY_DEBUG("Updating schema to version " + QString::number(patch), 1);
+    GRUMPY_LOG("Updating schema to version " + QString::number(patch));
     if (!this->database->ExecuteNonQuery(GetSource("patch_sql_" + QString::number(patch) + ".sql")))
         throw new Exception("Failed to upgrade DB to version " + QString::number(patch) + ", error: " + this->LastError, BOOST_CURRENT_FUNCTION);
 }
@@ -609,6 +610,9 @@ void DatabaseLite::RemoveUser(User *user)
     result = this->database->ExecuteQuery_Bind("DELETE FROM scrollbacks WHERE user_id = ?1;", params);
     if (result->InError)
         goto error;
+    result = this->database->ExecuteQuery_Bind("DELETE FROM user_data WHERE user_id = ?1;", params);
+    if (result->InError)
+        goto error;
 
 
     if (!this->database->ExecuteNonQuery("COMMIT;"))
@@ -724,6 +728,65 @@ void DatabaseLite::RemoveScrollback(User *owner, Scrollback *sx)
 
     if (result->InError)
         throw new Exception("Unable to remove scrollback from db: " + this->LastError, BOOST_CURRENT_FUNCTION);
+}
+
+QHash<QString, QByteArray> DatabaseLite::GetStorage(user_id_t user)
+{
+    QList<QVariant> p;
+    p << user;
+    QHash<QString, QByteArray> result;
+    std::shared_ptr<SqlResult> data = this->database->ExecuteQuery_Bind("SELECT key, data FROM user_data WHERE user_id = ?1;", p);
+    if (data->InError)
+        throw new Exception("Unable to fetch user data: " + this->LastError, BOOST_CURRENT_FUNCTION);
+
+    unsigned int item = 0;
+    while (item < data->Count())
+    {
+        SqlRow row = data->GetRow(item++);
+        QString key = row.GetField(0).toString();
+        QByteArray value = row.GetField(1).toByteArray();
+        if (!result.contains(key))
+            result.insert(key, value);
+    }
+    return result;
+}
+
+void DatabaseLite::InsertStorage(user_id_t user, QString key, QByteArray data)
+{
+    QList<QVariant> Parameters;
+    Parameters << user
+               << key
+               << data;
+    std::shared_ptr<SqlResult> result = this->database->ExecuteQuery_Bind("INSERT INTO user_data (user_id, key, data) VALUES (?, ?, ?);", Parameters);
+    if (result->InError)
+    {
+        throw new Exception("Unable to store user data: " + this->LastError, BOOST_CURRENT_FUNCTION);
+    }
+}
+
+void DatabaseLite::UpdateStorage(user_id_t user, QString key, QByteArray data)
+{
+    QList<QVariant> Parameters;
+    Parameters << user
+               << key
+               << data;
+    std::shared_ptr<SqlResult> result = this->database->ExecuteQuery_Bind("UPDATE user_data SET data = ?3 WHERE user_id = ?1 AND key = ?2;", Parameters);
+    if (result->InError)
+    {
+        throw new Exception("Unable to store user data: " + this->LastError, BOOST_CURRENT_FUNCTION);
+    }
+}
+
+void DatabaseLite::RemoveStorage(user_id_t user, QString key)
+{
+    QList<QVariant> Parameters;
+    Parameters << user
+               << key;
+    std::shared_ptr<SqlResult> result = this->database->ExecuteQuery_Bind("REMOVE FROM user_data WHERE user_id = ?1 AND key = ?2;", Parameters);
+    if (result->InError)
+    {
+        throw new Exception("Unable to remove user data: " + this->LastError, BOOST_CURRENT_FUNCTION);
+    }
 }
 
 void DatabaseLite::UpdateRoles()

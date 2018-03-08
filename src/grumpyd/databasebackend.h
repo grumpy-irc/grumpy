@@ -52,6 +52,10 @@ namespace GrumpyIRC
             virtual void UpdateRoles()=0;
             virtual QHash<QString, QVariant> GetConfiguration(user_id_t user)=0;
             virtual void SetConfiguration(user_id_t user, QHash<QString, QVariant> data)=0;
+            virtual QHash<QString, QByteArray> GetStorage(user_id_t user)=0;
+            virtual void InsertStorage(user_id_t user, QString key, QByteArray data)=0;
+            virtual void UpdateStorage(user_id_t user, QString key, QByteArray data)=0;
+            virtual void RemoveStorage(user_id_t user, QString key)=0;
     };
 }
 

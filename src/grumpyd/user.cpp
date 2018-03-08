@@ -15,6 +15,7 @@
 #include "corewrapper.h"
 #include "user.h"
 #include "security.h"
+#include "grumpyconf.h"
 #include "databasebackend.h"
 #include "grumpyd.h"
 #include "session.h"
@@ -214,6 +215,62 @@ void User::Kick()
     {
         session->Kick();
     }
+}
+
+QByteArray User::StorageGet(QString key)
+{
+    if (!this->storage.contains(key))
+        return QByteArray();
+    return this->storage[key];
+}
+
+bool User::StorageSet(QString key, QByteArray data)
+{
+    // Count current size of storage
+    unsigned long long current_size = 0;
+    foreach (QString item, this->storage.keys())
+        current_size += this->storage[item].size();
+
+    // If the current storage size + size of new data is higher than total allowed size, deny the request
+    if (CONF->MaxPersonalStorageSize < current_size + data.size())
+        return false;
+
+    if (!this->storage.contains(key))
+    {
+        this->storage.insert(key, data);
+        Grumpyd::GetBackend()->InsertStorage(this->id, key, data);
+    }
+    else
+    {
+        this->storage[key] = data;
+        Grumpyd::GetBackend()->UpdateStorage(this->id, key, data);
+    }
+
+    return true;
+}
+
+void User::StorageDelete(QString key)
+{
+    if (!this->storage.contains(key))
+        return;
+
+    Grumpyd::GetBackend()->RemoveStorage(this->id, key);
+    this->storage.remove(key);
+}
+
+QList<QString> User::StorageList()
+{
+    return this->storage.keys();
+}
+
+bool User::StorageContains(QString key)
+{
+    return this->storage.contains(key);
+}
+
+void User::StorageLoad()
+{
+    this->storage = Grumpyd::GetBackend()->GetStorage(this->id);
 }
 
 SyncableIRCSession *User::ConnectToIRCServer(libirc::ServerAddress info)

@@ -18,7 +18,7 @@
 
 #ifdef GRUMPY_SQLITE
 
-#define GRUMPYD_SCHEMA_VERSION 1
+#define GRUMPYD_SCHEMA_VERSION 3
 
 #include <QMutex>
 
@@ -59,6 +59,10 @@ namespace GrumpyIRC
             QList<QVariant> FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size);
             void UpdateNetwork(IRCSession *session);
             void RemoveScrollback(User *owner, Scrollback *sx);
+            QHash<QString, QByteArray> GetStorage(user_id_t user);
+            void InsertStorage(user_id_t user, QString key, QByteArray data);
+            void UpdateStorage(user_id_t user, QString key, QByteArray data);
+            void RemoveStorage(user_id_t user, QString key);
             void UpdateRoles();
             int GetLastUserID();
             QString LastStatement;

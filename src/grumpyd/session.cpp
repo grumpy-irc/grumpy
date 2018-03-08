@@ -653,6 +653,88 @@ void Session::processRemoveUser(QHash<QString, QVariant> parameters)
     }
 }
 
+void Session::processStorageSet(QHash<QString, QVariant> parameters)
+{
+    if (!this->IsAuthorized(PRIVILEGE_USE_STORAGE))
+    {
+        this->PermissionDeny(GP_CMD_STORAGE_SET);
+        return;
+    }
+
+    if (!parameters.contains("key") || !parameters.contains("data"))
+    {
+        this->TransferError(GP_CMD_STORAGE_SET, "Invalid data", GP_ERROR);
+        return;
+    }
+
+    bool ok = this->loggedUser->StorageSet(parameters["key"].toString(), parameters["data"].toByteArray());
+
+    if (ok)
+    {
+        QHash<QString, QVariant> result;
+        result.insert("key", parameters["key"].toString());
+        this->protocol->SendProtocolCommand(GP_CMD_STORAGE_SET, result);
+    } else
+    {
+        this->TransferError(GP_CMD_STORAGE_SET, "Not enough space in personal storage", GP_ENOSPACE);
+        return;
+    }
+}
+
+void Session::processStorageDel(QHash<QString, QVariant> parameters)
+{
+    if (!this->IsAuthorized(PRIVILEGE_USE_STORAGE))
+    {
+        this->PermissionDeny(GP_CMD_STORAGE_DEL);
+        return;
+    }
+
+    if (!parameters.contains("key"))
+    {
+        this->TransferError(GP_CMD_STORAGE_DEL, "Missing key", GP_ERROR);
+        return;
+    }
+
+    QString key = parameters["key"].toString();
+    if (!this->loggedUser->StorageContains(key))
+    {
+        this->TransferError(GP_CMD_STORAGE_GET, "No such key", GP_ERROR);
+    } else
+    {
+        this->loggedUser->StorageDelete(key);
+        QHash<QString, QVariant> result;
+        result.insert("key", parameters["key"].toString());
+        this->protocol->SendProtocolCommand(GP_CMD_STORAGE_DEL, result);
+    }
+}
+
+void Session::processStorageGet(QHash<QString, QVariant> parameters)
+{
+    if (!this->IsAuthorized(PRIVILEGE_USE_STORAGE))
+    {
+        this->PermissionDeny(GP_CMD_STORAGE_GET);
+        return;
+    }
+
+    if (!parameters.contains("key"))
+    {
+        this->TransferError(GP_CMD_STORAGE_GET, "Missing key", GP_ERROR);
+        return;
+    }
+
+    QString key = parameters["key"].toString();
+    if (!this->loggedUser->StorageContains(key))
+    {
+        this->TransferError(GP_CMD_STORAGE_GET, "No such key", GP_ERROR);
+    } else
+    {
+        QHash<QString, QVariant> result;
+        result.insert("key", parameters["key"].toString());
+        result.insert("data", this->loggedUser->StorageGet(key));
+        this->protocol->SendProtocolCommand(GP_CMD_STORAGE_GET, result);
+    }
+}
+
 void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
 {
     if (text == GP_CMD_HELLO)
@@ -729,6 +811,15 @@ void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
     } else if (text == GP_CMD_SYS_REMOVE_USER)
     {
         this->processRemoveUser(parameters);
+    } else if (text == GP_CMD_STORAGE_DEL)
+    {
+        this->processStorageDel(parameters);
+    } else if (text == GP_CMD_STORAGE_GET)
+    {
+        this->processStorageGet(parameters);
+    } else if (text == GP_CMD_STORAGE_SET)
+    {
+        this->processStorageSet(parameters);
     } else if (text == GP_CMD_QUERY)
     {
         this->processQuery(parameters);

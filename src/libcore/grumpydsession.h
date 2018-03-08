@@ -40,6 +40,7 @@
 #define GP_ENOSERVER             -3
 #define GP_ENETWORKNOTFOUND      -4
 #define GP_ESCROLLBACKNOTFOUND   -5
+#define GP_ENOSPACE              -6
 #define GP_ESSLHANDSHAKEFAILED   -20
 #define GP_EIRCNOTCONN           -21
 #define GP_ENOUSER               -40
@@ -85,6 +86,9 @@
 #define GP_CMD_RESYNC_SCROLLBACK_PB        29 // Used to resync the scrollback's property bag - only change or append new items, doesn't clear existing ones
 #define GP_CMD_OVERRIDE_SCROLLBACK_PB      30 // Replaces the property bag with another hash
 #define GP_CMD_QUERY                       31
+#define GP_CMD_STORAGE_SET                 32 // Used to write data to personal BLOB storage
+#define GP_CMD_STORAGE_GET                 33 // Used to read data from personal BLOB storage
+#define GP_CMD_STORAGE_DEL                 34
 #define GP_CMD_SYS_LIST_USER               40 // List grumpyd users
 #define GP_CMD_SYS_CREATE_USER             41 // Create a new user
 #define GP_CMD_SYS_REMOVE_USER             42 // Removes a user

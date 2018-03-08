@@ -94,6 +94,9 @@ namespace GrumpyIRC
             void processUnlockUser(QHash<QString, QVariant> parameters);
             void processCreateUser(QHash<QString, QVariant> parameters);
             void processRemoveUser(QHash<QString, QVariant> parameters);
+            void processStorageSet(QHash<QString, QVariant> parameters);
+            void processStorageDel(QHash<QString, QVariant> parameters);
+            void processStorageGet(QHash<QString, QVariant> parameters);
 
             QTcpSocket *socket;
             QString peer;

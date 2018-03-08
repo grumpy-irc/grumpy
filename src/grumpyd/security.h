@@ -26,6 +26,7 @@
 #define PRIVILEGE_LIST_USERS        "listuser"
 #define PRIVILEGE_DOWNLOAD_TEXT     "downloadtext"  // let user download all content of their scrollback
 #define PRIVILEGE_SEARCH_TEXT       "searchtext"    // let user perform SQL search
+#define PRIVILEGE_USE_STORAGE       "usestorage"
 
 #include <QString>
 #include <QHash>

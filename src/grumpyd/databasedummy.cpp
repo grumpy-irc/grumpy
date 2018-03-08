@@ -128,3 +128,23 @@ void DatabaseDummy::UpdateUser(User *user)
 
 }
 
+QHash<QString, QByteArray> DatabaseDummy::GetStorage(user_id_t user)
+{
+    return QHash<QString, QByteArray>();
+}
+
+void DatabaseDummy::InsertStorage(user_id_t user, QString key, QByteArray data)
+{
+
+}
+
+void DatabaseDummy::UpdateStorage(user_id_t user, QString key, QByteArray data)
+{
+
+}
+
+void DatabaseDummy::RemoveStorage(user_id_t user, QString key)
+{
+
+}
+

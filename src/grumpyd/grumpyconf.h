@@ -57,6 +57,8 @@ namespace GrumpyIRC
             QString PID;
             bool Daemon;
             bool StorageDummy;
+            //! This is maximum allowed size of personal storage per user (for BLOB storage, not scrollback storage)
+            unsigned long long MaxPersonalStorageSize = 1048576;
     };
 }
 

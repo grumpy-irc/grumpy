@@ -10,6 +10,15 @@ CREATE TABLE users
     "is_locked" NUMERIC NOT NULL
 );
 
+/* Personal storage for users */
+CREATE TABLE user_data
+(
+    "id" INTEGER PRIMARY KEY NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "key" TEXT NOT NULL,
+    "data" BLOB
+);
+
 CREATE INDEX idx_user_name ON users(name);
 
 CREATE TABLE roles
@@ -102,5 +111,5 @@ CREATE TABLE meta
 );
 
 /* This is just to track the version information for updates */
-INSERT INTO meta (key, value) VALUES ('version', '2');
+INSERT INTO meta (key, value) VALUES ('version', '3');
 

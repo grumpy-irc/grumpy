@@ -78,6 +78,12 @@ namespace GrumpyIRC
             void Lock();
             void Unlock();
             void Kick();
+            QByteArray StorageGet(QString key);
+            bool StorageSet(QString key, QByteArray data);
+            void StorageDelete(QString key);
+            QList<QString> StorageList();
+            bool StorageContains(QString key);
+            void StorageLoad();
             QString DefaultNick;
 
         private:
@@ -90,6 +96,9 @@ namespace GrumpyIRC
             QList<SyncableIRCSession*> sessions;
             QString username;
             QString password;
+            //! Personal storage that allow power users to store or retrieve various meta data
+            //! Used to share settings across GrumpyChat installations for example
+            QHash<QString, QByteArray> storage;
             bool locked = false;
     };
 }

@@ -43,6 +43,10 @@ namespace GrumpyIRC
             void StoreNetwork(IRCSession *session);
             void StoreUser(User *item);
             void UpdateUser(User *user);
+            QHash<QString, QByteArray> GetStorage(user_id_t user);
+            void InsertStorage(user_id_t user, QString key, QByteArray data);
+            void UpdateStorage(user_id_t user, QString key, QByteArray data);
+            void RemoveStorage(user_id_t user, QString key);
     };
 }
 
