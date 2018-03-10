@@ -77,6 +77,31 @@ PreferencesWin::PreferencesWin(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
     this->ui->lineEdit_FormatMsg->setText(CONF->GetMessageFormat());
     this->ui->lineEdit_FormatNt->setText(CONF->GetNoticeFormat());
     this->ui->lineEdit_FormatText->setText(CONF->GetLineFormat());
+
+    this->ui->comboBox_Enc->addItem("Default");
+    this->ui->comboBox_Enc->addItem("ASCII");
+    this->ui->comboBox_Enc->addItem("UTF-8");
+    this->ui->comboBox_Enc->addItem("UTF-16");
+    this->ui->comboBox_Enc->addItem("Latin");
+
+    switch (CONF->GetEncoding())
+    {
+        case libircclient::EncodingDefault:
+            this->ui->comboBox_Enc->setCurrentIndex(0);
+            break;
+        case libircclient::EncodingASCII:
+            this->ui->comboBox_Enc->setCurrentIndex(1);
+            break;
+        case libircclient::EncodingUTF8:
+            this->ui->comboBox_Enc->setCurrentIndex(2);
+            break;
+        case libircclient::EncodingUTF16:
+            this->ui->comboBox_Enc->setCurrentIndex(3);
+            break;
+        case libircclient::EncodingLatin:
+            this->ui->comboBox_Enc->setCurrentIndex(4);
+            break;
+    }
 }
 
 PreferencesWin::~PreferencesWin()
@@ -120,6 +145,24 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
     CONF->SetIRCIgnoredNumerics(ignored_nums);
     //CONF->setl
     ScrollbackFrame::UpdateSkins();
+    switch(this->ui->comboBox_Enc->currentIndex())
+    {
+        case 0:
+            CONF->SetEncoding(libircclient::EncodingDefault);
+            break;
+        case 1:
+            CONF->SetEncoding(libircclient::EncodingASCII);
+            break;
+        case 2:
+            CONF->SetEncoding(libircclient::EncodingUTF8);
+            break;
+        case 3:
+            CONF->SetEncoding(libircclient::EncodingUTF16);
+            break;
+        case 4:
+            CONF->SetEncoding(libircclient::EncodingLatin);
+            break;
+    }
     CONF->Save();
     this->close();
 }

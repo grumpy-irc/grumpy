@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #ifndef GRUMPYCONF_H
 #define GRUMPYCONF_H
@@ -20,12 +20,13 @@
 #define GCFG CoreWrapper::GrumpyCore->GetConfiguration()
 
 #ifdef CONF
-#error "CONF is already defined, redefinig is not supported, grumpy can't be compiled with libraries that define their own CONF option"
+#error "CONF is already defined, redefining is not supported, grumpy can't be compiled with libraries that define their own CONF option"
 #endif
 #define CONF GrumpyIRC::GrumpyConf::Conf
 
 #include <QVariant>
 #include <QNetworkProxy>
+#include "../libirc/libircclient/network.h"
 
 namespace GrumpyIRC
 {
@@ -55,6 +56,8 @@ namespace GrumpyIRC
             void SetLineFormat(QString format);
             void SetNoticeFormat(QString format);
             void SetMessageFormat(QString format);
+            void SetEncoding(libircclient::Encoding encoding);
+            libircclient::Encoding GetEncoding();
             QString GetNoticeFormat();
             QString GetMessageFormat();
             QString GetActionFormat();

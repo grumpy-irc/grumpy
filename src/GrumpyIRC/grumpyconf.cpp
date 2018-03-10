@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #include "corewrapper.h"
 #include "skin.h"
@@ -131,6 +131,16 @@ void GrumpyConf::SetNoticeFormat(QString format)
 void GrumpyConf::SetMessageFormat(QString format)
 {
     GCFG->SetValue("message_format", format);
+}
+
+void GrumpyConf::SetEncoding(libircclient::Encoding encoding)
+{
+    GCFG->SetValue("encoding", static_cast<int> (encoding));
+}
+
+libircclient::Encoding GrumpyConf::GetEncoding()
+{
+    return static_cast<libircclient::Encoding> (GCFG->GetValueAsInt("encoding"));
 }
 
 QString GrumpyConf::GetNoticeFormat()

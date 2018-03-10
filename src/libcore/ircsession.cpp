@@ -39,7 +39,7 @@ void IRCSession::Exit(QString message)
     }
 }
 
-IRCSession *IRCSession::Open(Scrollback *system_window, libirc::ServerAddress &server, QString network, QString nick, QString ident, QString username)
+IRCSession *IRCSession::Open(Scrollback *system_window, libirc::ServerAddress &server, QString network, QString nick, QString ident, QString username, libircclient::Encoding network_enc)
 {
     if (!server.IsValid())
         throw new GrumpyIRC::Exception("Server object is not valid", BOOST_CURRENT_FUNCTION);
@@ -47,7 +47,7 @@ IRCSession *IRCSession::Open(Scrollback *system_window, libirc::ServerAddress &s
     QString network_name = network;
     if (network.isEmpty())
         network_name = server.GetHost();
-    libircclient::Network *nx = new libircclient::Network(server, network_name);
+    libircclient::Network *nx = new libircclient::Network(server, network_name, network_enc);
     if (!nick.isEmpty())
         nx->SetDefaultNick(nick);
     if (!ident.isEmpty())

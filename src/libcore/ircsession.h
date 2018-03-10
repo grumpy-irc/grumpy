@@ -23,6 +23,7 @@
 #include <QString>
 #include <QAbstractSocket>
 #include "../libirc/libirc/serializableitem.h"
+#include "../libirc/libircclient/network.h"
 #include "networksession.h"
 #include "libcore_global.h"
 
@@ -62,7 +63,7 @@ namespace GrumpyIRC
         public:
             static void Exit(QString message);
             static IRCSession *Open(Scrollback *system_window, libirc::ServerAddress &server, QString network = "", QString nick = "",
-                                    QString ident = "", QString username = "");
+                                    QString ident = "", QString username = "", libircclient::Encoding network_enc = libircclient::EncodingDefault);
             static QMutex Sessions_Lock;
 			static QList<IRCSession*> Sessions;
 
