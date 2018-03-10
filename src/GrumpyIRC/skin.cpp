@@ -97,6 +97,31 @@ void Skin::LoadHash(QHash<QString, QVariant> hash)
     UNSERIALIZE_COLOR(Timestamp);
     UNSERIALIZE_COLOR(UserColor);
     UNSERIALIZE_COLOR(LinkColor);
+    unsigned int color_id = 0;
+    while(color_id < 16)
+    {
+        QString key = "colors_" + QString::number(color_id);
+        if (hash.contains(key))
+        {
+            if (!this->Colors.contains(color_id))
+                this->Colors.insert(color_id, hash[key].toString());
+            else
+                this->Colors[color_id] = QColor(hash[key].toString());
+        }
+        color_id++;
+    }
+    QList<char> ml = {'v', 'h', 'o', 'a', 'q'};
+    foreach (char mode, ml)
+    {
+        QString key = "ModeColor_" + QString(mode);
+        if (hash.contains(key))
+        {
+            if (!this->ModeColors.contains(mode))
+                this->ModeColors.insert(mode, QColor(hash[key].toString()));
+            else
+                this->ModeColors[mode] = QColor(hash[key].toString());
+        }
+    }
 }
 
 QHash<QString, QVariant> Skin::ToHash()
@@ -116,6 +141,15 @@ QHash<QString, QVariant> Skin::ToHash()
     SERIALIZE_COLOR(Timestamp);
     SERIALIZE_COLOR(LinkColor);
     SERIALIZE_COLOR(UserColor);
+    unsigned int color_id = 0;
+    while(color_id < 16)
+    {
+        if (this->Colors.contains(color_id))
+            hash.insert("colors_" + QString::number(color_id), this->Colors[color_id].name());
+        color_id++;
+    }
+    foreach (char mode, this->ModeColors.keys())
+        hash.insert("ModeColor_" + QString(mode), this->ModeColors[mode].name());
     return hash;
 }
 
@@ -183,13 +217,13 @@ Skin::Skin(Skin *forked)
     this->Warning = forked->Warning;
     this->SystemColor = forked->SystemColor;
     this->UserListAwayColor = forked->UserListAwayColor;
+    this->FontFamily = forked->FontFamily;
     this->TextColor = forked->TextColor;
+    this->UserColor = forked->UserColor;
     this->TextFont = forked->TextFont;
     this->SystemInfo = forked->SystemInfo;
-    this->Unread = QColor(240, 250, 102);
-    this->ModeColors.insert('v', QColor(244, 254, 10));
-    this->ModeColors.insert('h', QColor(212, 250, 145));
-    this->ModeColors.insert('o', QColor(92, 247, 14));
-    this->ModeColors.insert('a', QColor(255, 156, 190));
-    this->ModeColors.insert('q', QColor(255, 206, 156));
+    this->Unread = forked->Unread;
+    this->ModeColors = forked->ModeColors;
+    this->Colors = forked->Colors;
+    this->LinkColor = forked->LinkColor;
 }
