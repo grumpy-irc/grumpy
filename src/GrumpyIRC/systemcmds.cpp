@@ -465,4 +465,5 @@ int SystemCmds::CTCP(SystemCommand *command, CommandArgs command_args)
     if (command_args.Parameters.count() > 2)
         parameters = command_args.ParameterLine.mid(command_args.Parameters[0].length() + command_args.Parameters[1].length() + 2);
     sx->GetSession()->SendCTCP(sx, command_args.Parameters[0], command_args.Parameters[1].toUpper(), parameters);
+    return 0;
 }

@@ -267,6 +267,9 @@ static QString ItemToPlainText(ScrollbackItem item)
         case ScrollbackItemType_Message:
             result = item.GetUser().GetNick() + ": " + item.GetText();
             break;
+        default:
+            result = item.GetText();
+            break;
     }
     return result;
 }

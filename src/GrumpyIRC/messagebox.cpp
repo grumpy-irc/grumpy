@@ -82,6 +82,9 @@ MessageBoxResponse MessageBox::Exec(MessageBoxType type)
             //this->ui->label->setPixmap();
             this->ui->pushOK->setVisible(true);
             break;
+        case MessageBoxType_Error:
+            this->ui->pushOK->setVisible(true);
+            break;
         case MessageBoxType_QuestionCancel:
             this->ui->pushCancel->setVisible(true);
         case MessageBoxType_Question:

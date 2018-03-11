@@ -492,10 +492,15 @@ void Scrollback::InsertText(ScrollbackItem item)
             case ScrollbackItemType_Kick:
             case ScrollbackItemType_Nick:
             case ScrollbackItemType_Part:
+            case ScrollbackItemType_Join:
+            case ScrollbackItemType_Mode:
             case ScrollbackItemType_Quit:
             case ScrollbackItemType_System:
             case ScrollbackItemType_Topic:
                 this->SetState(ScrollbackState_UnreadSystem);
+                break;
+            // To silence compiler warnings
+            default:
                 break;
         }
     }

@@ -115,7 +115,7 @@ User::User(QString Name, QString Password, user_id_t User_ID, bool is_locked)
     this->conf = new UserConf(User_ID);
     this->conf->Load();
     this->password = Password;
-    if (LastID > User::LastID)
+    if (this->id > User::LastID)
         User::LastID = this->id;
 }
 
