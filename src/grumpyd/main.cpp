@@ -293,6 +293,7 @@ int main(int argc, char *argv[])
         CONF->SetStorage(CONF->GetStorage());
         GrumpyIRC::CoreWrapper::GrumpyCore->GetConfiguration()->Save();
         GRUMPY_LOG("Grumpyd starting...");
+        GRUMPY_LOG("Version: " + QString(GRUMPY_VERSION_STRING) + " Qt: " + QString(QT_VERSION_STR) + "/" + QString(qVersion()));
         GrumpyIRC::Grumpyd *daemon = new GrumpyIRC::Grumpyd();
         QTimer::singleShot(0, daemon, SLOT(Main()));
         GRUMPY_DEBUG("Verbosity level: " + QString::number(verbosity), 1);
