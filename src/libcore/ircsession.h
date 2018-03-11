@@ -14,8 +14,6 @@
 #define IRCSESSION_H
 
 #include "definitions.h"
-
-
 #include <QMutex>
 #include <QObject>
 #include <QTimer>
@@ -127,6 +125,7 @@ namespace GrumpyIRC
             QString GetIdent() const;
             bool UsingSSL() const;
             unsigned int GetPort() const;
+            QList<long long> GetPingHistory();
             bool IsAutoreconnect(Scrollback *window);
             void SetAutoreconnect(Scrollback *window, bool reconnect);
             QList<int> IgnoredNums;
@@ -191,6 +190,7 @@ namespace GrumpyIRC
             // Generic whois
             virtual void OnWhoisGen(libircclient::Parser *px);
             virtual void OnWhoisAcc(libircclient::Parser *px);
+            virtual void OnPong(libircclient::Parser *px);
 
         protected:
             static unsigned int lastID;
@@ -232,6 +232,7 @@ namespace GrumpyIRC
             libircclient::Network *network;
             QHash<QString, Scrollback*> users;
             Scrollback *systemWindow;
+            QList<long long> pingHistory;
         private:
             bool isRetrievingWhoInfo(QString channel);
             void init(bool preindexed);

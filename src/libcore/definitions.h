@@ -23,6 +23,7 @@ typedef unsigned int scrollback_id_t;
 #define CONFIGURATION_PATH "grumpyirc"
 #define PYTHON_ENGINE
 #define PRODUCTION_BUILD
+#define GRUMPY_PING_HIST 200
 
 #if defined _WIN64 || defined _WIN32
     #define GRUMPY_WIN

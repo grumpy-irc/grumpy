@@ -226,23 +226,28 @@ int lastPacketSize = 0;
 void MainWindow::UpdateStatus()
 {
     this->windowCount->setText(QString::number(Scrollback::ScrollbackList.count()) + " scrollbacks");
-    int synced = this->GetScrollbackManager()->GetCurrentScrollback()->GetSynced();
-    int total = this->GetScrollbackManager()->GetCurrentScrollback()->GetItems();
+    ScrollbackFrame *current_scrollback = this->GetScrollbackManager()->GetCurrentScrollback();
+    int synced = current_scrollback->GetSynced();
+    int total = current_scrollback->GetItems();
     this->statusFrame->setText("Items (synced/total): " + QString::number(synced) + " / " + QString::number(total));
-    libircclient::User *self_ident = this->GetCurrentScrollbackFrame()->GetIdentity();
-    QString mode = this->GetCurrentScrollbackFrame()->GetLocalUserMode();
+    libircclient::User *self_ident = current_scrollback->GetIdentity();
+    QString mode = current_scrollback->GetLocalUserMode();
     if (!mode.isEmpty())
         mode = "(" + mode + ")";
     if (!self_ident)
         this->identFrame->setText("");
     else
         this->identFrame->setText(self_ident->ToString() + " " + mode);
-    QString extra = this->GetCurrentScrollbackFrame()->GetTitle();
-    if (this->GetCurrentScrollbackFrame()->IsChannel() && this->GetCurrentScrollbackFrame()->GetSession())
+    QString extra = current_scrollback->GetTitle();
+    if (current_scrollback->IsChannel() && current_scrollback->GetSession())
     {
-        libircclient::Channel *channel = this->GetCurrentScrollbackFrame()->GetSession()->GetChannel(this->GetCurrentScrollbackFrame()->GetScrollback());
+        libircclient::Channel *channel = current_scrollback->GetSession()->GetChannel(current_scrollback->GetScrollback());
         if (channel && !channel->GetMode().IsEmpty())
             extra += QString(" <b>(") + channel->GetMode().ToString() + QString(")</b>");
+    }
+    if (!current_scrollback->IsGrumpy() && current_scrollback->GetNetwork())
+    {
+        extra += " lag: " + QString::number(current_scrollback->GetNetwork()->GetLag()) + "ms";
     }
     this->overviewFrame->setText(extra);
 

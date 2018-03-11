@@ -648,6 +648,11 @@ unsigned int IRCSession::GetPort() const
     return this->_port;
 }
 
+QList<long long> IRCSession::GetPingHistory()
+{
+    return this->pingHistory;
+}
+
 bool IRCSession::IsAutoreconnect(Scrollback *window)
 {
     Q_UNUSED(window);
@@ -1169,6 +1174,15 @@ void IRCSession::OnWhoisAcc(libircclient::Parser *px)
     this->systemWindow->InsertText("WHOIS: " + px->GetParameters()[1] + " is logged in as " + px->GetParameters()[2]);
 }
 
+void IRCSession::OnPong(libircclient::Parser *px)
+{
+    Q_UNUSED(px);
+    if (this->pingHistory.count() > GRUMPY_PING_HIST)
+        this->pingHistory.removeFirst();
+
+    this->pingHistory.append(this->network->GetLag());
+}
+
 void IRCSession::processME(libircclient::Parser *px, QString message)
 {
     Scrollback *sx = NULL;
@@ -1271,6 +1285,7 @@ void IRCSession::connInternalSocketSignals()
     connect(this->network, SIGNAL(Event_WhoisRegNick(libircclient::Parser*)), this, SLOT(OnWhoisRegNick(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_WhoisChannels(libircclient::Parser*)), this, SLOT(OnWhoisChannels(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_WhoisServer(libircclient::Parser*)), this, SLOT(OnWhoisHost(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_PONG(libircclient::Parser*)), this, SLOT(OnPong(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_WhoisEnd(libircclient::Parser*)), this, SLOT(OnWhoisEnd(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_RplAway(libircclient::Parser*)), this, SLOT(OnAway(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_WhoisAccount(libircclient::Parser*)), this, SLOT(OnWhoisAcc(libircclient::Parser*)));
