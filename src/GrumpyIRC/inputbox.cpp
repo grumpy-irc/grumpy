@@ -35,7 +35,7 @@ InputBox::InputBox(ScrollbackFrame *parent) : QFrame(parent), ui(new Ui::InputBo
     this->ui->textEdit->setPalette(Skin::GetCurrent()->Palette());
     this->ui->lineEdit->setPalette(Skin::GetCurrent()->Palette());
     this->historyPosition = 0;
-    this->isPassword = false;
+    this->isSecure = false;
     this->parent = parent;
 }
 
@@ -63,10 +63,10 @@ void InputBox::ProcessInput()
 
 void InputBox::Secure()
 {
-    this->isPassword = !this->isPassword;
-    this->ui->lineEdit->setVisible(this->isPassword);
-    this->ui->textEdit->setVisible(!this->isPassword);
-    if (this->isPassword)
+    this->isSecure = !this->isSecure;
+    this->ui->lineEdit->setVisible(this->isSecure);
+    this->ui->textEdit->setVisible(!this->isSecure);
+    if (this->isSecure)
     {
         // Copy the text from textEdit to lineEdit
         this->ui->lineEdit->setText(this->ui->textEdit->toPlainText());
@@ -83,7 +83,7 @@ void InputBox::Secure()
 
 void InputBox::Complete()
 {
-    if (this->isPassword)
+    if (this->isSecure)
         return;
 
     if (!InputBox::AE)
@@ -134,7 +134,7 @@ void InputBox::Focus()
 
 void InputBox::InsertAtCurrentPosition(QString text)
 {
-    if (!this->isPassword)
+    if (!this->isSecure)
         this->ui->textEdit->insertPlainText(text);
 }
 
@@ -143,9 +143,14 @@ void InputBox::InsertEnter()
     this->ui->textEdit->insertPlainText("\n");
 }
 
+bool InputBox::IsSecure()
+{
+    return this->isSecure;
+}
+
 void InputBox::History(bool up)
 {
-    if (this->isPassword)
+    if (this->isSecure)
         return;
 
     if (up)

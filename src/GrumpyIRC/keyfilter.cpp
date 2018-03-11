@@ -13,7 +13,9 @@
 #include <QKeyEvent>
 #include <QEvent>
 #include "inputbox.h"
+#include "grumpyconf.h"
 #include "keyfilter.h"
+#include "colorbox.h"
 
 using namespace GrumpyIRC;
 
@@ -49,6 +51,11 @@ bool KeyFilter::eventFilter(QObject *obj, QEvent *event)
             if (keyEvent->key() == Qt::Key_K)
             {
                 this->parentInput->InsertAtCurrentPosition(QString((char)3));
+                if (!this->parentInput->IsSecure() && CONF->GetColorBoxShow())
+                {
+                    ColorBox color_box(this->parentInput);
+                    color_box.exec();
+                }
                 return true;
             }
             return QObject::eventFilter(obj, event);

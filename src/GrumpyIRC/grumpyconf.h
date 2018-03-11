@@ -64,6 +64,8 @@ namespace GrumpyIRC
             QString GetDefaultKickReason();
             QString GetDefaultAwayReason();
             QString GetAutorun();
+            void SetColorBoxShow(bool yes);
+            bool GetColorBoxShow();
             void SetAutorun(QString data);
             void SetLabeledH(QString text);
             void SetStandardH(QString text);

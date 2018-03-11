@@ -39,6 +39,7 @@ namespace GrumpyIRC
             void Focus();
             void InsertAtCurrentPosition(QString text);
             void InsertEnter();
+            bool IsSecure();
             void History(bool up = false);
 
         private slots:
@@ -46,7 +47,7 @@ namespace GrumpyIRC
 
         private:
             void insertToHistory();
-            bool isPassword;
+            bool isSecure;
             int historyPosition;
             unsigned int historySize;
             QStringList history;

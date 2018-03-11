@@ -174,6 +174,16 @@ QString GrumpyConf::GetAutorun()
     return GCFG->GetValueAsString("execute_autorun", default_autorun);
 }
 
+void GrumpyConf::SetColorBoxShow(bool yes)
+{
+    GCFG->SetValue("color_box_show", yes);
+}
+
+bool GrumpyConf::GetColorBoxShow()
+{
+    return GCFG->GetValueAsBool("color_box_show", true);
+}
+
 void GrumpyConf::SetAutorun(QString data)
 {
     GCFG->SetValue("execute_autorun", data);
