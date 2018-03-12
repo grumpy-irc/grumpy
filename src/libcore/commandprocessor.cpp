@@ -26,6 +26,7 @@ CommandProcessor::CommandProcessor()
 {
     this->SplitLong = true;
     this->LongSize = 300;
+    this->MinimalSize = 20;
     this->CommentChar = '#';
     this->CommandPrefix = '/';
 }
@@ -71,7 +72,7 @@ int CommandProcessor::ProcessText(QString text, Scrollback *window, bool comment
     return 0;
 }
 
-static QList<QString> Split(int size, QString text)
+static QList<QString> Split(int size, int minimal_size, QString text)
 {
     QList<QString> messages;
     while (text.size() > size)
@@ -79,13 +80,32 @@ static QList<QString> Split(int size, QString text)
         // We need to find a part of text which is divided by space
         if (!text.mid(0, size).contains(" "))
         {
-            messages.append(text.mid(0, size));
-            text = text.mid(size);
+            QString trimmed_part = text.mid(size);
+            if (trimmed_part.size() < minimal_size)
+            {
+                // The remaining part of text is too short, we don't want to send message this short because it looks weird
+                // let's make it bigger by shortening the previous part and making this one longer
+                int proper_size = size - minimal_size;
+                trimmed_part = text.mid(proper_size);
+                messages.append(text.mid(0, proper_size));
+            } else
+            {
+                messages.append(text.mid(0, size));
+            }
+            text = trimmed_part;
         } else
         {
             QString shortened_text = text.mid(0, size);
             shortened_text = shortened_text.mid(0, shortened_text.lastIndexOf(" "));
-            text = text.mid(shortened_text.length() + 1);
+            QString remaining_text = text.mid(shortened_text.length() + 1);
+            if (remaining_text.size() < minimal_size)
+            {
+                // Too short, make big
+                shortened_text = text.mid(0, size - minimal_size);
+                shortened_text = shortened_text.mid(0, shortened_text.lastIndexOf(" "));
+                remaining_text = text.mid(shortened_text.length() + 1);
+            }
+            text = remaining_text;
             messages.append(shortened_text);
         }
     }
@@ -199,7 +219,7 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
         // This is a channel window, so we send this as a message to the channel
         if (this->SplitLong && command.size() > static_cast<int>(this->LongSize))
         {
-            QList<QString> messages = Split(static_cast<int>(this->LongSize), command);
+            QList<QString> messages = Split(static_cast<int>(this->LongSize), static_cast<int>(this->MinimalSize), command);
             foreach (QString text, messages)
                 window->GetSession()->SendMessage(window, text);
             return 0;

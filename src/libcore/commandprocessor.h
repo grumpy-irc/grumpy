@@ -66,6 +66,7 @@ namespace GrumpyIRC
             void RegisterAlias(QString name, QString target);
             bool SplitLong;
             unsigned int LongSize;
+            unsigned int MinimalSize;
             char CommandPrefix;
             char CommentChar;
         private:
