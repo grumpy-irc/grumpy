@@ -29,7 +29,12 @@ ColorBox::ColorBox(InputBox *in, QWidget *parent) : QDialog(parent),
 {
     this->input = in;
     this->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-    this->move(this->input->pos());
+
+    // Hack to move color box to input box
+    QPoint target_position = in->parentWidget()->mapToGlobal(in->geometry().topLeft());
+    target_position.setY(target_position.y() - 80);
+    this->move(target_position);
+    //this->move(this->mapFrom(this->input->parentWidget(), this->input->pos()));
     this->ui->setupUi(this);
     this->ui->label_1->setPalette(Skin::Current->Colors[1]);
     this->ui->label_2->setPalette(Skin::Current->Colors[2]);

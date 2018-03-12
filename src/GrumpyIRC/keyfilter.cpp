@@ -53,7 +53,7 @@ bool KeyFilter::eventFilter(QObject *obj, QEvent *event)
                 this->parentInput->InsertAtCurrentPosition(QString((char)3));
                 if (!this->parentInput->IsSecure() && CONF->GetColorBoxShow())
                 {
-                    ColorBox color_box(this->parentInput);
+                    ColorBox color_box(this->parentInput, this->parentInput);
                     color_box.exec();
                 }
                 return true;

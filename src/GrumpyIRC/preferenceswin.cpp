@@ -41,6 +41,7 @@ PreferencesWin::PreferencesWin(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
     this->ui->lineEdit_3->setText(QString::number(CONF->GetSplitMaxSize()));
     this->ui->checkBox->setChecked(CONF->GetIgnoreSSLProblems());
     this->ui->checkBoxSplitMs->setChecked(CONF->GetSplit());
+    this->ui->checkBox_Colors->setChecked(CONF->GetColorBoxShow());
     this->ui->plainTextEditAutorun->setPlainText(CONF->GetAutorun());
     this->ui->lineEdit_ChannelH->setText(CONF->GetChannelHeader());
     this->ui->lineEdit_LabeledH->setText(CONF->GetLabeledHeader());
@@ -132,6 +133,7 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
     CONF->SetStandardH(this->ui->lineEdit_StandardH->text());
     CONF->SetMessageFormat(this->ui->lineEdit_FormatMsg->text());
     CONF->SetLineFormat(this->ui->lineEdit_FormatText->text());
+    CONF->SetColorBoxShow(this->ui->checkBox_Colors->isChecked());
     QList<int> ignored_nums;
     QList<QString> ignored = this->ui->lineEdit_4->text().split(",");
     foreach (QString numeric, ignored)
