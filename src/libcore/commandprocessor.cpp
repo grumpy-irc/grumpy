@@ -142,6 +142,12 @@ void GrumpyIRC::CommandProcessor::RegisterAlias(QString name, QString target)
     this->aliasList.insert(name, target);
 }
 
+void CommandProcessor::UnregisterAlias(QString name)
+{
+    if (this->aliasList.contains(name))
+        this->aliasList.remove(name);
+}
+
 int CommandProcessor::ProcessItem(QString command, Scrollback *window)
 {
     command = command.trimmed();

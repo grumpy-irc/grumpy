@@ -69,6 +69,7 @@ namespace GrumpyIRC
             QList<QString> GetAList();
             bool Exists(QString name) const;
             void RegisterAlias(QString name, QString target);
+            void UnregisterAlias(QString name);
             //! Whether long text message should be split
             bool SplitLong;
             //! How many characters is a long message
