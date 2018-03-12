@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #ifndef COMMANDPROCESSOR_H
 #define COMMANDPROCESSOR_H
@@ -49,6 +49,11 @@ namespace GrumpyIRC
             QString _name;
     };
 
+    /*!
+     * \brief The CommandProcessor class provides the universal processor of IRC commands
+     *
+     * Basically all input from user should be handled using this class
+     */
     class LIBCORESHARED_EXPORT CommandProcessor
     {
         public:
@@ -64,10 +69,16 @@ namespace GrumpyIRC
             QList<QString> GetAList();
             bool Exists(QString name) const;
             void RegisterAlias(QString name, QString target);
+            //! Whether long text message should be split
             bool SplitLong;
+            //! How many characters is a long message
             unsigned int LongSize;
+            //! Minimal size of message to send when splitting a long message, this is needed to prevent delivery of short messages
+            //! that would contain just one short word
             unsigned int MinimalSize;
+            //! Prefix symbol for commands
             char CommandPrefix;
+            //! Prefix for comments for script processor
             char CommentChar;
         private:
             QHash<QString, QString> aliasList;
