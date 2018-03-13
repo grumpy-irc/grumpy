@@ -23,6 +23,7 @@ namespace GrumpyIRC
     {
         int Exit(SystemCommand *command, CommandArgs command_args);
         int Alias(SystemCommand *command, CommandArgs command_args);
+        int UnAlias(SystemCommand *command, CommandArgs command_args);
         int CTCP(SystemCommand *command, CommandArgs command_args);
         int Echo(SystemCommand *command, CommandArgs command_args);
         int Notice(SystemCommand *command, CommandArgs command_args);

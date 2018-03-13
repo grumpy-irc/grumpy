@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #include "../libirc/libircclient/channel.h"
 #include "../libirc/libircclient/network.h"
@@ -94,6 +94,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.next_session_nick",   (SC_Callback)SystemCmds::NextSessionNick));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.echo",                (SC_Callback)SystemCmds::Echo));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.alias",               (SC_Callback)SystemCmds::Alias));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.unalias",             (SC_Callback)SystemCmds::UnAlias));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.link",                (SC_Callback)SystemCmds::GrumpyLink));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("unsecuregrumpyd",            (SC_Callback)SystemCmds::UnsecureGrumpy));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpyd",                    (SC_Callback)SystemCmds::Grumpy));

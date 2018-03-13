@@ -467,3 +467,16 @@ int SystemCmds::CTCP(SystemCommand *command, CommandArgs command_args)
     sx->GetSession()->SendCTCP(sx, command_args.Parameters[0], command_args.Parameters[1].toUpper(), parameters);
     return 0;
 }
+
+int SystemCmds::UnAlias(SystemCommand *command, CommandArgs command_args)
+{
+    Q_UNUSED(command);
+    if (command_args.Parameters.count() != 1)
+    {
+        GRUMPY_ERROR("This need to provide 1 parameter for this to work");
+        return 1;
+    }
+
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->UnregisterAlias(command_args.Parameters[0]);
+    return 0;
+}
