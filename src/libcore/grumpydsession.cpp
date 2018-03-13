@@ -107,7 +107,10 @@ void GrumpydSession::SendRaw(Scrollback *window, QString raw, libircclient::Prio
 {
     IRCSession *ircs = this->GetSessionFromWindow(window);
     if (!ircs)
+    {
+        GRUMPY_ERROR("Unknown command");
         return;
+    }
 
     QHash<QString, QVariant> parameters;
     parameters.insert("network_id", QVariant(ircs->GetSID()));
