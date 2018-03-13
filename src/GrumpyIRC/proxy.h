@@ -8,6 +8,8 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU General Public License for more details.
 
+// Copyright (c) Petr Bena 2015 - 2018
+
 #ifndef PROXY_H
 #define PROXY_H
 

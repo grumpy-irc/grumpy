@@ -4,6 +4,7 @@
 # Set up some basic aliases, these are most likely not present on any IRCD but if they were
 # you can remove them by commenting them out
 /grumpy.alias alias grumpy.alias
+/grumpy.alias unalias grumpy.unalias
 /grumpy.alias echo grumpy.echo
 /grumpy.alias quit grumpy.quit
 /grumpy.alias join grumpy.join
