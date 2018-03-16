@@ -38,6 +38,7 @@ namespace GrumpyIRC
         int Query(SystemCommand *command, CommandArgs command_args);
         int UnsecureGrumpy(SystemCommand *command, CommandArgs command_args);
         int Server(SystemCommand *command, CommandArgs command_args);
+        int Topic(SystemCommand *command, CommandArgs command_args);
         int JOIN(SystemCommand *command, CommandArgs command_args);
         int KICK(SystemCommand *command, CommandArgs command_args);
         int Uptime(SystemCommand *command, CommandArgs command_args);

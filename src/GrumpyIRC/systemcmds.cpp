@@ -223,6 +223,11 @@ int SystemCmds::RAW(SystemCommand *command, CommandArgs command_args)
         return 1;
     }
     ScrollbackFrame *scrollback = MainWindow::Main->GetScrollbackManager()->GetCurrentScrollback();
+    if (!scrollback->GetSession())
+    {
+        GRUMPY_ERROR(QObject::tr("You can only use this command in windows that are attached to some network"));
+        return 1;
+    }
     scrollback->GetSession()->SendRaw(scrollback->GetScrollback(), command_args.ParameterLine);
     return 0;
 }
@@ -480,3 +485,24 @@ int SystemCmds::UnAlias(SystemCommand *command, CommandArgs command_args)
     CoreWrapper::GrumpyCore->GetCommandProcessor()->UnregisterAlias(command_args.Parameters[0]);
     return 0;
 }
+
+int SystemCmds::Topic(SystemCommand *command, CommandArgs command_args)
+{
+    Q_UNUSED(command);
+    ScrollbackFrame *scrollback = MainWindow::Main->GetScrollbackManager()->GetCurrentScrollback();
+    if (!scrollback->GetSession() || !scrollback->GetSession()->IsConnected() || scrollback->GetScrollback()->GetType() != ScrollbackType_Channel)
+    {
+        GRUMPY_ERROR(QObject::tr("You can only use this command in channel windows that are connected to some network"));
+        return 1;
+    }
+    if (command_args.ParameterLine.isEmpty())
+    {
+        // User wants to retrieve existing topic
+        scrollback->GetSession()->SendRaw(scrollback->GetScrollback(), "TOPIC " + scrollback->GetScrollback()->GetTarget());
+    } else
+    {
+        scrollback->GetSession()->SendRaw(scrollback->GetScrollback(), "TOPIC " + scrollback->GetScrollback()->GetTarget() + " :" + command_args.ParameterLine);
+    }
+    return 0;
+}
+

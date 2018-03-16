@@ -6,6 +6,10 @@
 /grumpy.alias alias grumpy.alias
 /grumpy.alias unalias grumpy.unalias
 /grumpy.alias echo grumpy.echo
+
+# Now these are usually present on all IRCD but we override them with our "better" version
+# if you want to use native version provided by IRCD, simply remove them
+/grumpy.alias topic grumpy.topic
 /grumpy.alias quit grumpy.quit
 /grumpy.alias join grumpy.join
 /grumpy.alias kick grumpy.kick
