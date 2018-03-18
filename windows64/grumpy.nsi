@@ -43,7 +43,7 @@ OutFile "${INSTALLER_NAME}"
 BrandingText "${APP_NAME}"
 XPStyle on
 InstallDirRegKey "${REG_ROOT}" "${REG_APP_PATH}" ""
-InstallDir "$PROGRAMFILES\Huggle"
+InstallDir "$PROGRAMFILES\GrumpyChat"
 
 !include "MUI.nsh"
 
@@ -90,7 +90,7 @@ SectionEnd
 Function UninstallPrevious
 
     ; Check for uninstaller.
-    DetailPrint "Checking for previous huggle versions"    
+    DetailPrint "Checking for previous GrumpyChat versions"    
     ReadRegStr $R0 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" \
   "UninstallString"
 
@@ -134,7 +134,6 @@ WriteUninstaller "$INSTDIR\uninstall.exe"
 !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
 CreateDirectory "$SMPROGRAMS\$SM_Folder"
 CreateShortCut "$SMPROGRAMS\$SM_Folder\${APP_NAME}.lnk" "$INSTDIR\${MAIN_APP_EXE}" "" "$INSTDIR\grumpy.ico" 0
-CreateShortCut "$SMPROGRAMS\$SM_Folder\PyHuggle.lnk" "$INSTDIR\py_hug.exe" "" "$INSTDIR\grumpy.ico" 0
 CreateShortCut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\${MAIN_APP_EXE}" "" "$INSTDIR\grumpy.ico" 0
 CreateShortCut "$SMPROGRAMS\$SM_Folder\Uninstall ${APP_NAME}.lnk" "$INSTDIR\uninstall.exe"
 
