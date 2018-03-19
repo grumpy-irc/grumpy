@@ -121,6 +121,9 @@
    <property name="text">
     <string>&amp;Favorites</string>
    </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionToggle_secret">
    <property name="text">
