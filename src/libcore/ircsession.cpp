@@ -1291,6 +1291,8 @@ void IRCSession::connInternalSocketSignals()
     connect(this->network, SIGNAL(Event_WhoisAccount(libircclient::Parser*)), this, SLOT(OnWhoisAcc(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_WhoisSpecial(libircclient::Parser*)), this, SLOT(OnWhoisGen(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_WhoisSecure(libircclient::Parser*)), this, SLOT(OnWhoisGen(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_WhoisHost(libircclient::Parser*)), this, SLOT(OnWhoisGen(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_WhoisModes(libircclient::Parser*)), this, SLOT(OnWhoisGen(libircclient::Parser*)));
 }
 
 void IRCSession::_gs_ResyncNickChange(QString new_, QString old_)
