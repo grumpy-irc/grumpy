@@ -8,13 +8,14 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #ifndef SCROLLBACKFRAME_H
 #define SCROLLBACKFRAME_H
 
 #include <QFrame>
 #include <QStandardItemModel>
+#include <QGraphicsOpacityEffect>
 #include <QThread>
 #include <QMutex>
 #include <QTimer>
@@ -154,6 +155,8 @@ namespace GrumpyIRC
             void writeText(ScrollbackItem item, int highlighted = 0);
             QString itemsToString(QList<ScrollbackItem> items);
             bool isVisible;
+            // Doesn't work :(
+            //QGraphicsOpacityEffect *opacityEffect;
             QTimer scroller;
             bool isClean;
             int maxItems;

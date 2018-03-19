@@ -64,6 +64,7 @@ namespace GrumpyIRC
             void UpdateStatus();
             void Notify(QString heading, QString text);
             void OpenUrl(QString url);
+            void UpdateSkin();
             void Execute(QString text);
             void HideProgress();
             void ShowProgress();
@@ -88,7 +89,7 @@ namespace GrumpyIRC
             void on_actionProxy_triggered();
             void on_actionEnable_proxy_toggled(bool arg1);
 
-    private:
+        private:
             QString processInput(QString text);
             void closeEvent(QCloseEvent *event);
             QSystemTrayIcon tray;

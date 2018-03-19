@@ -25,6 +25,7 @@
 #include "skin.h"
 #include "ui_preferenceswin.h"
 #include "scrollbackframe.h"
+#include "mainwindow.h"
 #include "corewrapper.h"
 #include "grumpyconf.h"
 
@@ -166,6 +167,7 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
             break;
     }
     CONF->Save();
+    MainWindow::Main->UpdateSkin();
     this->close();
 }
 
@@ -277,6 +279,8 @@ void PreferencesWin::refreshSkin(bool enabled)
     this->ui->pushButton_TC->setEnabled(enabled);
     this->ui->pushButton_UC_2->setEnabled(enabled);
     this->ui->pushButton_LC->setEnabled(enabled);
+    this->ui->horizontalSlider->setEnabled(enabled);
+    this->ui->lineEdit_Image->setEnabled(enabled);
 }
 
 void PreferencesWin::on_tableWidget_cellChanged(int row, int column)
@@ -376,6 +380,8 @@ void GrumpyIRC::PreferencesWin::on_comboBox_currentIndexChanged(int index)
     this->ui->lineEdit_SkinFont->setText(this->highlighted_skin->FontFamily);
     this->ui->lineEdit_SkinSz->setText(QString::number(this->highlighted_skin->TextSize));
     this->ui->lineEdit_SkinName->setText(this->highlighted_skin->Name);
+    this->ui->lineEdit_Image->setText(this->highlighted_skin->BackgroundImage);
+    this->ui->horizontalSlider->setValue(this->highlighted_skin->Opacity);
 
     // This is to save us some coding, it's a little bit slower but scales much better:
     // We put a pointer to every button and color of current skin into a hash table
@@ -410,6 +416,8 @@ void GrumpyIRC::PreferencesWin::on_pushButton_clicked()
     this->highlighted_skin->Name = this->ui->lineEdit_SkinName->text();
     this->highlighted_skin->TextSize = this->ui->lineEdit_SkinSz->text().toInt();
     this->highlighted_skin->FontFamily = this->ui->lineEdit_SkinFont->text();
+    this->highlighted_skin->BackgroundImage = this->ui->lineEdit_Image->text();
+    this->highlighted_skin->Opacity = this->ui->horizontalSlider->value();
 }
 
 void GrumpyIRC::PreferencesWin::on_pushButton_3_clicked()

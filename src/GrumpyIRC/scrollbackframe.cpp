@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #include <QScrollBar>
 #include <QMenu>
@@ -90,7 +90,6 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     this->inputBox = new InputBox(this);
     this->ui->splitter->addWidget(this->textEdit);
     this->ui->splitter->addWidget(this->inputBox);
-    this->textEdit->setFont(Skin::GetCurrent()->TextFont);
     this->LastMenuTooltipUpdate = QDateTime::currentDateTime().addSecs(-50);
     this->_parent = parentWindow;
     this->TreeNode = NULL;
@@ -115,7 +114,10 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     connect(this->scrollback, SIGNAL(Event_StateModified()), this, SLOT(OnState()));
     connect(this->textEdit, SIGNAL(Event_Link(QString)), this, SLOT(OnLink(QString)));
     connect(&this->scroller, SIGNAL(timeout()), this, SLOT(OnScroll()));
+    //this->opacityEffect = new QGraphicsOpacityEffect();
     this->UpdateSkin();
+    //this->textEdit->setGraphicsEffect(this->opacityEffect);
+    //this->textEdit->setAutoFillBackground(true);
     this->maxItems = 200;
     this->userFrame = new UserFrame(this);
     this->Highlighting = true;
@@ -136,6 +138,7 @@ ScrollbackFrame::~ScrollbackFrame()
     //! \todo Handle deletion of TreeNode from list of scbs
     //delete this->TreeNode;
     delete this->ui;
+    //delete this->opacityEffect;
 }
 
 QString ScrollbackFrame::GetWindowName() const
@@ -853,8 +856,17 @@ QString ScrollbackFrame::GetLocalUserMode()
 
 void ScrollbackFrame::UpdateSkin()
 {
+    this->textEdit->setFont(Skin::GetCurrent()->TextFont);
+    QString style_sheet = ScrollbackFrame::parser.GetStyle();
+
+    if (!Skin::GetCurrent()->BackgroundImage.isEmpty())
+    {
+        // Picture
+        style_sheet = "QFrame { border-image: url(" + Skin::GetCurrent()->BackgroundImage + "); }\n\n" + style_sheet;
+    }
+
     this->textEdit->setPalette(Skin::GetCurrent()->Palette());
-    this->textEdit->SetStyleSheet(ScrollbackFrame::parser.GetStyle());
+    this->textEdit->SetStyleSheet(style_sheet);
 }
 
 int ScrollbackFrame::GetSynced()

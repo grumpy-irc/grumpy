@@ -63,6 +63,11 @@ namespace GrumpyIRC
             QColor Timestamp;
             QColor Unread;
             QColor BackgroundColor;
+            QString BackgroundImage;
+            //! Changes opacity of background image relative to background color
+            int BackgroundImageOpacity = 0;
+            //! Changes opacity of whole GrumpyChat window
+            int Opacity = 0;
             QHash<char, QColor> ModeColors;
         private:
             void setDefaults();

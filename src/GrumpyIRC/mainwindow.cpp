@@ -124,7 +124,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->restoreGeometry(GCFG->GetValue("mainwindow_geometry").toByteArray());
     this->restoreState(GCFG->GetValue("mainwindow_state").toByteArray());
     this->userWidget->hide();
-    ScrollbackFrame::UpdateSkins();
+    this->UpdateSkin();
     if (GCFG->GetValueAsBool("systemwx_hide", false))
         this->systemWindow->ToggleHide();
     if (!QSslSocket::supportsSsl())
@@ -285,6 +285,14 @@ void MainWindow::OpenUrl(QString url)
         this->handler->OpenLink(url);
     else if (url.startsWith("ircs://") || url.startsWith("irc://"))
         this->OpenIRCNetworkLink(url);
+}
+
+void MainWindow::UpdateSkin()
+{
+    ScrollbackFrame::UpdateSkins();
+    float opacity = Skin::GetCurrent()->Opacity;
+    opacity = opacity / 100;
+    this->setWindowOpacity(opacity);
 }
 
 void MainWindow::Execute(QString text)

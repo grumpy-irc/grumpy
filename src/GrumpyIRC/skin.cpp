@@ -97,6 +97,9 @@ void Skin::LoadHash(QHash<QString, QVariant> hash)
     UNSERIALIZE_COLOR(Timestamp);
     UNSERIALIZE_COLOR(UserColor);
     UNSERIALIZE_COLOR(LinkColor);
+    UNSERIALIZE_STRING(BackgroundImage);
+    UNSERIALIZE_INT(Opacity);
+    UNSERIALIZE_INT(BackgroundImageOpacity);
     unsigned int color_id = 0;
     while(color_id < 16)
     {
@@ -141,6 +144,9 @@ QHash<QString, QVariant> Skin::ToHash()
     SERIALIZE_COLOR(Timestamp);
     SERIALIZE_COLOR(LinkColor);
     SERIALIZE_COLOR(UserColor);
+    SERIALIZE(Opacity);
+    SERIALIZE(BackgroundImageOpacity);
+    SERIALIZE(BackgroundImage);
     unsigned int color_id = 0;
     while(color_id < 16)
     {
@@ -205,10 +211,15 @@ void Skin::setDefaults()
     this->Colors.insert(13,   QColor("#F7C3F1")); // Pink
     this->Colors.insert(14,   QColor("#C4C4C4")); // Grey
     this->Colors.insert(15,   QColor("#DADADA")); // Light grey
+    this->BackgroundImageOpacity = 100;
+    this->Opacity = 100;
+    //this->BackgroundImage = ":/icons/img/pexels/black_lines.jpg";
+    this->BackgroundImage = "";
 }
 
 Skin::Skin(Skin *forked)
 {
+    this->setDefaults();
     SkinList.append(this);
     this->Name = forked->Name + " (fork)";
     this->BackgroundColor = forked->BackgroundColor;
@@ -226,4 +237,6 @@ Skin::Skin(Skin *forked)
     this->ModeColors = forked->ModeColors;
     this->Colors = forked->Colors;
     this->LinkColor = forked->LinkColor;
+    this->BackgroundImage = forked->BackgroundImage;
+    this->Opacity = forked->Opacity;
 }
