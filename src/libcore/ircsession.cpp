@@ -770,7 +770,7 @@ void IRCSession::OnCTCP(libircclient::Parser *px, QString ctcp, QString pars)
     {
         if (!px->GetSourceUserInfo())
             return;
-        this->GetNetwork()->SendNotice("VERSION Grumpy IRC client " + QString(GRUMPY_VERSION_STRING) + " http://github.com/grumpy-irc", px->GetSourceUserInfo()->GetNick());
+        this->GetNetwork()->SendNotice("VERSION GrumpyChat " + QString(GRUMPY_VERSION_STRING) + " http://github.com/grumpy-irc", px->GetSourceUserInfo()->GetNick());
     } else if (ctcp == "TIME")
     {
         if (!px->GetSourceUserInfo())
