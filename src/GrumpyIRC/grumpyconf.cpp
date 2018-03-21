@@ -17,6 +17,7 @@
 #include "grumpyconf.h"
 #include "../libcore/configuration.h"
 #include "../libcore/core.h"
+#include "../libirc/libircclient/user.h"
 
 using namespace GrumpyIRC;
 
@@ -299,6 +300,23 @@ QList<int> GrumpyConf::IgnoredNums()
 void GrumpyConf::SetIRCIgnoredNumerics(QList<int> list)
 {
     GCFG->SetValue("ignored_nmrs", Generic::QIntListToVariantList(list));
+}
+
+QString GrumpyConf::GetDefaultBanMask()
+{
+    return GCFG->GetValueAsString("ban_mask", "*!*@$host");
+}
+
+void GrumpyConf::SetDefaultBanMask(QString ban)
+{
+    GCFG->SetValue("ban_mask", ban);
+}
+
+QString GrumpyConf::GetMaskForUser(libircclient::User *user)
+{
+    return this->GetDefaultBanMask().replace("$nick", user->GetNick())
+                                    .replace("$ident", user->GetIdent())
+                                    .replace("$host", user->GetHost());
 }
 
 void GrumpyConf::SetProxy(int proxy)

@@ -397,7 +397,7 @@ int SystemCmds::KICK(SystemCommand *command, CommandArgs command_args)
     (void)command;
     if (command_args.ParameterLine.isEmpty())
     {
-        GRUMPY_ERROR("You need to provide some channel names to join, they can be even separated by comma or space");
+        GRUMPY_ERROR("You need to provide some user name to kick, you can also use channel name as optional first parameter, if ommited current channel will be used");
         return 0;
     }
 
@@ -509,3 +509,85 @@ int SystemCmds::Topic(SystemCommand *command, CommandArgs command_args)
     return 0;
 }
 
+
+int SystemCmds::KickBan(SystemCommand *command, CommandArgs command_args)
+{
+    (void)command;
+    if (command_args.ParameterLine.isEmpty())
+    {
+        GRUMPY_ERROR("You need to provide some user name to kick, you can also use channel name as optional first parameter, if ommited current channel will be used");
+        return 1;
+    }
+
+    Scrollback *sx = MainWindow::Main->GetCurrentScrollbackFrame()->GetScrollback();
+    if (!sx->GetSession())
+    {
+        GRUMPY_ERROR("You can only use this command in a connected server window");
+        return 2;
+    }
+    if (!command_args.Parameters[0].startsWith('#') && sx->GetType() != ScrollbackType_Channel)
+    {
+        GRUMPY_ERROR("This is not a channel window!!");
+        return 4;
+    }
+
+    SystemCmds::Ban(command, command_args);
+    SystemCmds::KICK(command, command_args);
+    return 0;
+}
+
+int SystemCmds::Ban(SystemCommand *command, CommandArgs command_args)
+{
+    (void)command;
+    if (command_args.ParameterLine.isEmpty())
+    {
+        GRUMPY_ERROR("You need to provide name of channel (optional) or at least name of user you want to ban");
+        return 1;
+    }
+
+    Scrollback *sx = MainWindow::Main->GetCurrentScrollbackFrame()->GetScrollback();
+    NetworkSession *session = sx->GetSession();
+    if (!session)
+    {
+        GRUMPY_ERROR("You can only use this command in a connected server window");
+        return 1;
+    }
+    if (!command_args.Parameters[0].startsWith('#') && sx->GetType() != ScrollbackType_Channel)
+    {
+        GRUMPY_ERROR("This is not a channel window!!");
+        return 3;
+    }
+    QString channel_name, target;
+    if (command_args.Parameters[0].startsWith('#'))
+    {
+        channel_name = command_args.Parameters[0];
+        command_args.Parameters.removeAt(0);
+    } else
+    {
+        channel_name = sx->GetTarget();
+    }
+    if (command_args.Parameters.size() == 0)
+    {
+        GRUMPY_ERROR("No target");
+        return 4;
+    }
+    target = command_args.Parameters[0];
+    // We need to find this user in channel
+    libircclient::Network *network = session->GetNetwork(sx);
+    if (!network)
+        return 2;
+    libircclient::Channel *channel = network->GetChannel(channel_name);
+    if (!channel)
+    {
+        GRUMPY_ERROR("Unknown channel, are you in it?");
+        return 5;
+    }
+    libircclient::User *target_user = channel->GetUser(target);
+    if (!target_user)
+    {
+        GRUMPY_ERROR("No such user in " + channel_name);
+        return 6;
+    }
+    session->SendRaw(sx, "MODE " + channel_name + " +b " + CONF->GetMaskForUser(target_user));
+    return 0;
+}

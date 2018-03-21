@@ -28,6 +28,11 @@
 #include <QNetworkProxy>
 #include "../libirc/libircclient/network.h"
 
+namespace libircclient
+{
+    class User;
+}
+
 namespace GrumpyIRC
 {
     class Configuration;
@@ -88,6 +93,9 @@ namespace GrumpyIRC
             bool FirstRun();
             QList<int> IgnoredNums();
             void SetIRCIgnoredNumerics(QList<int> list);
+            QString GetDefaultBanMask();
+            void SetDefaultBanMask(QString ban);
+            QString GetMaskForUser(libircclient::User *user);
 
             /////////////////////////////////////////////////////////////////////////
             // Proxy

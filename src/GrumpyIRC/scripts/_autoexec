@@ -13,6 +13,8 @@
 /grumpy.alias quit grumpy.quit
 /grumpy.alias join grumpy.join
 /grumpy.alias kick grumpy.kick
+/grumpy.alias ban grumpy.ban
+/grumpy.alias kb grumpy.kickban
 
 # This message can be safely removed
 /echo Welcome to GrumpyChat v. $grumpy.version
