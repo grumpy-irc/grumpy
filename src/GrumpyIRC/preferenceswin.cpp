@@ -47,6 +47,7 @@ PreferencesWin::PreferencesWin(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
     this->ui->lineEdit_ChannelH->setText(CONF->GetChannelHeader());
     this->ui->lineEdit_LabeledH->setText(CONF->GetLabeledHeader());
     this->ui->lineEdit_StandardH->setText(CONF->GetStandardHeader());
+    this->ui->le_Mask->setText(CONF->GetDefaultBanMask());
     QString ignored;
     foreach (int numeric, CONF->IgnoredNums())
     {
@@ -135,6 +136,7 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
     CONF->SetMessageFormat(this->ui->lineEdit_FormatMsg->text());
     CONF->SetLineFormat(this->ui->lineEdit_FormatText->text());
     CONF->SetColorBoxShow(this->ui->checkBox_Colors->isChecked());
+    CONF->SetDefaultBanMask(this->ui->le_Mask->text());
     QList<int> ignored_nums;
     QList<QString> ignored = this->ui->lineEdit_4->text().split(",");
     foreach (QString numeric, ignored)

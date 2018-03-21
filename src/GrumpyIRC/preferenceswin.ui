@@ -127,6 +127,16 @@
         <widget class="QLineEdit" name="lineEdit_4"/>
        </item>
        <item>
+        <widget class="QLabel" name="label_27">
+         <property name="text">
+          <string>User mask - used for bans / exceptions etc. ($nick, $ident, $host)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="le_Mask"/>
+       </item>
+       <item>
         <layout class="QFormLayout" name="formLayout_5">
          <item row="0" column="0">
           <widget class="QLabel" name="label_19">
