@@ -1121,7 +1121,13 @@ void IRCSession::OnWhoisIdle(libircclient::Parser *px, unsigned int seconds_idle
 {
     if (px->GetParameters().count() < 2)
         return;
-    this->systemWindow->InsertText("WHOIS: " + px->GetParameters()[1] + " is idle " + QString::number(seconds_idle) + " seconds. "\
+    int days, hours, minutes, seconds;
+    Generic::SecondsToTimeSpan((int)seconds_idle, &days, &hours, &minutes, &seconds);
+    QString idle_string;
+    if (days > 0)
+        idle_string = QString::number(days) + " days ";
+    idle_string += Generic::DoubleDigit(hours) + ":" + Generic::DoubleDigit(minutes) + ":" + Generic::DoubleDigit(seconds);
+    this->systemWindow->InsertText("WHOIS: " + px->GetParameters()[1] + " is idle " + idle_string + ". "\
                                    "Online since " + signon_time.toString());
 }
 

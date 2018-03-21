@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #ifndef CPPEXTENSION_H
 #define CPPEXTENSION_H
@@ -28,5 +28,7 @@ namespace GrumpyIRC
         public slots:
     };
 }
+
+Q_DECLARE_INTERFACE(GrumpyIRC::CppExtension, "org.grumpy.extension.qt")
 
 #endif // CPPEXTENSION_H

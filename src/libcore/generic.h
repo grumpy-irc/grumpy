@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #ifndef GENERIC_H
 #define GENERIC_H
@@ -65,7 +65,9 @@ namespace GrumpyIRC
         LIBCORESHARED_EXPORT QList<QVariant> QIntListToVariantList(QList<int> list);
         LIBCORESHARED_EXPORT QString ExpandedString(QString string, unsigned int minimum_size, unsigned int maximum_size = 0);
         LIBCORESHARED_EXPORT int LongestString(QList<QString> list);
+        LIBCORESHARED_EXPORT QString DoubleDigit(int digit);
         LIBCORESHARED_EXPORT HostInfo GetHostPortInfo(QString target, int default_port);
+        LIBCORESHARED_EXPORT bool SecondsToTimeSpan(int time, int *days, int *hours, int *minutes, int *seconds);
     }
 }
 

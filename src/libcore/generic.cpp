@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #include "definitions.h"
 
@@ -267,4 +267,29 @@ Generic::HostInfo Generic::GetHostPortInfo(QString target, int default_port)
     }
     info.Port = p;
     return info;
+}
+
+bool Generic::SecondsToTimeSpan(int time, int *days, int *hours, int *minutes, int *seconds)
+{
+    if (time < 0)
+        return false;
+
+    int remaining_time = time;
+    *days = remaining_time / (60 * 60 * 24);
+    remaining_time -= *days * (60 * 60 * 24);
+    *hours = remaining_time / (60 * 60);
+    remaining_time -= *hours * (60 * 60);
+    *minutes = remaining_time / 60;
+    remaining_time -= *minutes * 60;
+    *seconds = remaining_time;
+    return true;
+}
+
+QString Generic::DoubleDigit(int digit)
+{
+    if (digit < 0)
+        return QString::number(digit);
+    if (digit > 10)
+        return QString::number(digit);
+    return "0" + QString::number(digit);
 }
