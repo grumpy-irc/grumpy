@@ -29,6 +29,10 @@
 #include "scrollbackframe.h"
 #include "inputbox.h"
 #include "widgetfactory.h"
+#include <QDesktopServices>
+#if QT_VERSION >= 0x050000
+    #include <QStandardPaths>
+#endif
 #include <QApplication>
 
 using namespace GrumpyIRC;
@@ -93,8 +97,14 @@ int main(int argc, char *argv[])
         delete tp;
 
         // Initialize core first
+        QString home_path;
+#if QT_VERSION >= 0x050000
+        home_path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+#else
+        home_path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#endif
         CoreWrapper::GrumpyCore = new Core();
-        CoreWrapper::GrumpyCore->InitCfg();
+        CoreWrapper::GrumpyCore->InitCfg(home_path);
         GrumpyConf::Conf->Load();
         CoreWrapper::GrumpyCore->SetSystemEventHandler(new GrumpyEventHandler());
         CoreWrapper::GrumpyCore->InstallFactory(new WidgetFactory());

@@ -43,6 +43,8 @@ namespace GrumpyIRC
             virtual void SetValue(QString key, bool value);
             virtual void SetValue(QString key, int value);
             virtual void SetValue(QString key, QString value);
+            virtual void SetHomePath(QString path);
+            virtual QString GetHomePath();
             virtual QDateTime GetStartupDateTime();
             virtual void Load();
             virtual void Save();
@@ -50,6 +52,7 @@ namespace GrumpyIRC
 
         protected:
             QString configuration_path;
+            QString home_path;
             QHash<QString, QVariant> Options;
             QDateTime startupDateTime;
     };

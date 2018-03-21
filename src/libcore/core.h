@@ -30,7 +30,7 @@ namespace GrumpyIRC
 
             Core();
             virtual ~Core();
-            void InitCfg();
+            void InitCfg(QString home_path = "");
             CommandProcessor *GetCommandProcessor();
             void SetSystemEventHandler(EventHandler *e);
             EventHandler *GetCurrentEventHandler();

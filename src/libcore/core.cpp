@@ -8,13 +8,14 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #include "configuration.h"
 #include "core.h"
 #include "commandprocessor.h"
 #include "factory.h"
 #include "eventhandler.h"
+#include <QDir>
 
 GrumpyIRC::Core *GrumpyIRC::Core::GrumpyCore = NULL;
 
@@ -46,9 +47,16 @@ void GrumpyIRC::Core::InstallFactory(Factory *f)
     this->factory = f;
 }
 
-void GrumpyIRC::Core::InitCfg()
+void GrumpyIRC::Core::InitCfg(QString home_path)
 {
     this->config = new Configuration();
+
+    if (!home_path.isEmpty())
+    {
+        this->config->SetHomePath(home_path);
+        this->config->SetAlternativeConfigFile(home_path + QDir::separator() + CONFIGURATION_FILE);
+    }
+
     this->config->Load();
 }
 

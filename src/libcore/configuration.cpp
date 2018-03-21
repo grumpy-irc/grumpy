@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #include "configuration.h"
 #include <QStringList>
@@ -94,6 +94,16 @@ void Configuration::SetValue(QString key, QVariant value)
     // Now if the value exists we just update it
     // some autosave might do here
     this->Options[key] = value;
+}
+
+void Configuration::SetHomePath(QString path)
+{
+    this->home_path = path;
+}
+
+QString Configuration::GetHomePath()
+{
+    return this->home_path;
 }
 
 QDateTime Configuration::GetStartupDateTime()
