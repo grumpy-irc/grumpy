@@ -105,6 +105,8 @@ void SyncableIRCSession::Connect()
     QString nick = this->owner->GetConfiguration()->GetValueAsString("nick", "GrumpydUser");
     this->SetNick(nick);
     this->network->SetDefaultNick(nick);
+    if (!this->GetIdent().isEmpty())
+        this->network->SetDefaultIdent(this->GetIdent());
     this->network->Connect();
     (((VirtualScrollback*)this->systemWindow)->PartialSync());
     this->timerUL.start(this->ulistUpdateTime);
