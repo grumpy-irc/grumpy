@@ -12,7 +12,7 @@ mkdir temp
 cd temp
 
 if [ "$QTTYPE" = "4" ]; then
-        cmake ../src -DUNIT_TESTS=true
+        cmake ../src -DQT5_BUILD=FALSE -DUNIT_TESTS=true
 	make || exit 1
 fi
 
