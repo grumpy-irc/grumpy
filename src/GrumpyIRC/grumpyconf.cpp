@@ -312,6 +312,11 @@ void GrumpyConf::SetDefaultBanMask(QString ban)
     GCFG->SetValue("ban_mask", ban);
 }
 
+QString GrumpyConf::GetMaskForUser(libircclient::User user)
+{
+    return this->GetMaskForUser(&user);
+}
+
 QString GrumpyConf::GetMaskForUser(libircclient::User *user)
 {
     return this->GetDefaultBanMask().replace("$nick", user->GetNick())

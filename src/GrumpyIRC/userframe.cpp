@@ -179,7 +179,7 @@ QString UserFrame::generateBan()
             while(current_batch_size-- > 0)
             {
                 mode += "b";
-                parameters += "*!*@" + (users.at(0).GetHost()) + " ";
+                parameters += CONF->GetMaskForUser(users.at(0)) + " ";
                 users.removeAt(0);
             }
 

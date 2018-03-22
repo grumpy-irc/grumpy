@@ -95,6 +95,7 @@ namespace GrumpyIRC
             void SetIRCIgnoredNumerics(QList<int> list);
             QString GetDefaultBanMask();
             void SetDefaultBanMask(QString ban);
+            QString GetMaskForUser(libircclient::User user);
             QString GetMaskForUser(libircclient::User *user);
 
             /////////////////////////////////////////////////////////////////////////
