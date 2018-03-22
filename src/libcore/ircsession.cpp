@@ -214,6 +214,7 @@ void IRCSession::Connect(libircclient::Network *Network)
     this->_ssl = Network->IsSSL();
     this->_port = Network->GetPort();
     this->_nick = Network->GetNick();
+    this->_ident = Network->GetIdent();
     delete this->network;
     this->network = Network;
     this->connInternalSocketSignals();

@@ -36,6 +36,7 @@ SyncableIRCSession *SyncableIRCSession::Open(Scrollback *system_window, libirc::
         throw new GrumpyIRC::Exception("Server object is not valid", BOOST_CURRENT_FUNCTION);
     SyncableIRCSession *sx = new SyncableIRCSession(system_window, owner);
     libircclient::Network *nx = new libircclient::Network(server, server.GetHost());
+    nx->SetDefaultIdent(owner->GetConfiguration()->GetValueAsString("ident", "grumpy"));
     sx->Connect(nx);
     Grumpyd::GetBackend()->StoreNetwork(sx);
     return sx;
@@ -46,7 +47,7 @@ SyncableIRCSession::SyncableIRCSession(QHash<QString, QVariant> sx, User *user, 
     this->owner = user;
     this->snifferEnabled = false;
     
-    ((VirtualScrollback*)this->systemWindow)->SetOwner(owner);
+    ((VirtualScrollback*)this->systemWindow)->SetOwner(this->owner);
     this->post_init();
 }
 
@@ -55,7 +56,7 @@ SyncableIRCSession::SyncableIRCSession(Scrollback *system, User *user, Scrollbac
     this->owner = user;
     this->snifferEnabled = false;
 
-    ((VirtualScrollback*)this->systemWindow)->SetOwner(owner);
+    ((VirtualScrollback*)this->systemWindow)->SetOwner(this->owner);
     this->post_init();
 }
 
@@ -105,8 +106,7 @@ void SyncableIRCSession::Connect()
     QString nick = this->owner->GetConfiguration()->GetValueAsString("nick", "GrumpydUser");
     this->SetNick(nick);
     this->network->SetDefaultNick(nick);
-    if (!this->GetIdent().isEmpty())
-        this->network->SetDefaultIdent(this->GetIdent());
+    this->network->SetDefaultIdent(this->owner->GetConfiguration()->GetValueAsString("ident", "grumpy"));
     this->network->Connect();
     (((VirtualScrollback*)this->systemWindow)->PartialSync());
     this->timerUL.start(this->ulistUpdateTime);
