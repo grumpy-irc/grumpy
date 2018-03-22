@@ -53,6 +53,8 @@ void GrumpyIRC::Core::InitCfg(QString home_path)
 
     if (!home_path.isEmpty())
     {
+        if (!QDir().exists(home_path))
+            QDir().mkpath(home_path);
         this->config->SetHomePath(home_path);
         this->config->SetAlternativeConfigFile(home_path + QDir::separator() + CONFIGURATION_FILE);
     }

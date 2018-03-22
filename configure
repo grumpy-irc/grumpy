@@ -228,12 +228,14 @@ if [ ! -d "src/libirc/libirc" ];then
 fi
 
 if [ "$QT5" -eq 10 ];then
-    QT5=0
-    echo $WARN"WARNING: No version of QT was explicitly specified, assuming you want to use QT4 (use --qt5 if not)"$NORMAL
+    QT5=1
+    echo $WARN"WARNING: No version of QT was explicitly specified, assuming you want to use QT5 (use --qt4 if not)"$NORMAL
 fi
 
 if [ "$QT5" -eq 1 ];then
     CMAKE_ARGS="$CMAKE_ARGS -DQT5_BUILD=true"
+else
+    CMAKE_ARGS="$CMAKE_ARGS -DQT5_BUILD=false"
 fi
 
 if [ "$PYTHON" -eq 1 ];then
