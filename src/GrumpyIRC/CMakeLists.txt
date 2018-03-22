@@ -41,7 +41,7 @@ ADD_EXECUTABLE(grumpy ${src} ${grumpy_HEADERS_MOC} ${headers} ${grumpy_RESOURCES
 if (QT5_BUILD)
     qt5_use_modules(grumpy Core Multimedia Gui Widgets Xml)
 endif()
-TARGET_LINK_LIBRARIES(grumpy core irc2htmlcode ${QT_LIBRARIES})
+TARGET_LINK_LIBRARIES(grumpy grumpycore irc2htmlcode ${QT_LIBRARIES})
 if (NOT WIN32)
     INSTALL(TARGETS grumpy RUNTIME DESTINATION bin)
 endif()

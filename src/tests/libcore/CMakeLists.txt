@@ -43,5 +43,5 @@ ADD_EXECUTABLE(core_ut ${src} ${core_ut_HEADERS_MOC} ${core_ut_RESOURCES_RCC} ${
 if (QT5_BUILD)
     qt5_use_modules(core_ut Core Test)
 endif()
-TARGET_LINK_LIBRARIES(core_ut core ${QT_LIBRARIES})
+TARGET_LINK_LIBRARIES(core_ut grumpycore ${QT_LIBRARIES})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})

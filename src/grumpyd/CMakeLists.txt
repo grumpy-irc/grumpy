@@ -42,7 +42,7 @@ ADD_EXECUTABLE(grumpyd ${src} ${grumpyd_HEADERS_MOC} ${grumpyd_RESOURCES_RCC} ${
 if (QT5_BUILD)
     qt5_use_modules(grumpyd Core)
 endif()
-TARGET_LINK_LIBRARIES(grumpyd core ${QT_LIBRARIES})
+TARGET_LINK_LIBRARIES(grumpyd grumpycore ${QT_LIBRARIES})
 if (NOT WIN32)
     INSTALL(TARGETS grumpyd RUNTIME DESTINATION bin)
 endif()

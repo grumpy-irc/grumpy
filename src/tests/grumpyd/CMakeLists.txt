@@ -42,5 +42,5 @@ ADD_EXECUTABLE(grumpyd_ut ${src} ${grumpyd_ut_HEADERS_MOC} ${grumpyd_ut_RESOURCE
 if (QT5_BUILD)
     qt5_use_modules(grumpyd_ut Core Test)
 endif()
-TARGET_LINK_LIBRARIES(grumpyd_ut core ${QT_LIBRARIES})
+TARGET_LINK_LIBRARIES(grumpyd_ut grumpycore ${QT_LIBRARIES})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
