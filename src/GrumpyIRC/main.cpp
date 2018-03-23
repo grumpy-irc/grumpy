@@ -105,6 +105,7 @@ int main(int argc, char *argv[])
 #endif
         CoreWrapper::GrumpyCore = new Core();
         CoreWrapper::GrumpyCore->InitCfg(home_path);
+        CoreWrapper::GrumpyCore->LoadCfg();
         GrumpyConf::Conf->Load();
         CoreWrapper::GrumpyCore->SetSystemEventHandler(new GrumpyEventHandler());
         CoreWrapper::GrumpyCore->InstallFactory(new WidgetFactory());

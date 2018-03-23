@@ -32,18 +32,12 @@ Grumpyd *Grumpyd::grumpyd = NULL;
 
 QString Grumpyd::GetCFPath()
 {
-    QString cf = QCoreApplication::applicationDirPath() + "/etc/";
-    if (!QDir().exists(cf))
-        QDir().mkpath(cf);
-    return cf;
+    return CONF->GetCertFilePath();
 }
 
 QString Grumpyd::GetDFPath()
 {
-    QString cf = QCoreApplication::applicationDirPath() + "/var/";
-    if (!QDir().exists(cf))
-        QDir().mkpath(cf);
-    return cf;
+    return CONF->GetDatafilePath();
 }
 
 QString Grumpyd::GetPathSSLCert()

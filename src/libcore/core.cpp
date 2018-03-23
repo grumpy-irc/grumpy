@@ -59,7 +59,10 @@ void GrumpyIRC::Core::InitCfg(QString home_path)
         this->config->SetHomePath(home_path);
         this->config->SetAlternativeConfigFile(home_path + QDir::separator() + CONFIGURATION_FILE);
     }
+}
 
+void GrumpyIRC::Core::LoadCfg()
+{
     this->config->Load();
 }
 

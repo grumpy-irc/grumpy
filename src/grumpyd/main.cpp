@@ -8,10 +8,11 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #include <QCoreApplication>
 #include <QFile>
+#include <QDir>
 #include <QProcess>
 #include <csignal>
 #include <iostream>
@@ -44,6 +45,7 @@
 // Terminal parameters
 
 int verbosity = 0;
+QString config_file;
 
 void err(QString text)
 {
@@ -123,8 +125,7 @@ int config(GrumpyIRC::TerminalParser *parser, QStringList params)
         return TP_RESULT_SHUT;
     }
 
-    CONF->GetConfiguration()->SetAlternativeConfigFile(params[0]);
-    CONF->GetConfiguration()->Load();
+    config_file = params[0];
 
     return TP_RESULT_OK;
 }
@@ -284,16 +285,36 @@ int main(int argc, char *argv[])
         signal(SIGINT, signal_handler);
 
         GrumpyIRC::CoreWrapper::GrumpyCore = new GrumpyIRC::Core();
+
         // Install our own scrollback factory that creates scrollbacks which are automagically network synced
         GrumpyIRC::CoreWrapper::GrumpyCore->SetSystemEventHandler(new GrumpyIRC::GDEventHandler());
+
+        // Event handler does logging too so now we can write to logs
+        GRUMPY_LOG("Grumpyd starting...");
+        GRUMPY_LOG("Version: " + QString(GRUMPY_VERSION_STRING) + " Qt: " + QString(QT_VERSION_STR) + "/" + QString(qVersion()));
         GrumpyIRC::CoreWrapper::GrumpyCore->InstallFactory(new GrumpyIRC::ScrollbackFactory());
         GrumpyIRC::CoreWrapper::GrumpyCore->InitCfg();
+        if (!config_file.isEmpty())
+            CONF->GetConfiguration()->SetAlternativeConfigFile(config_file);
+        GrumpyIRC::CoreWrapper::GrumpyCore->LoadCfg();
         GrumpyIRC::Core::GrumpyCore->GetConfiguration()->Verbosity = verbosity;
         // Save the configuration immediately so that we have the configuration file
         CONF->SetStorage(CONF->GetStorage());
+        CONF->SetDatafilePath(CONF->GetDatafilePath());
+        CONF->SetCertFilePath(CONF->GetCertFilePath());
+        GRUMPY_LOG("Datafile path: " + CONF->GetDatafilePath());
+        // Check if the datafile path exists
+        if (!QDir().exists(CONF->GetDatafilePath()))
+        {
+            // Let's try to make it
+            // We might fail here
+            if (!QDir().mkpath(CONF->GetDatafilePath()))
+            {
+                GRUMPY_ERROR("Unable to create datafile path: " + CONF->GetDatafilePath());
+                return 1;
+            }
+        }
         GrumpyIRC::CoreWrapper::GrumpyCore->GetConfiguration()->Save();
-        GRUMPY_LOG("Grumpyd starting...");
-        GRUMPY_LOG("Version: " + QString(GRUMPY_VERSION_STRING) + " Qt: " + QString(QT_VERSION_STR) + "/" + QString(qVersion()));
         GrumpyIRC::Grumpyd *daemon = new GrumpyIRC::Grumpyd();
         QTimer::singleShot(0, daemon, SLOT(Main()));
         GRUMPY_DEBUG("Verbosity level: " + QString::number(verbosity), 1);

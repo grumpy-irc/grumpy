@@ -8,8 +8,9 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
+#include <QCoreApplication>
 #include "grumpyconf.h"
 #include "../libcore/configuration.h"
 #include "corewrapper.h"
@@ -72,7 +73,27 @@ QString GrumpyConf::GetStorage()
 
 void GrumpyConf::SetStorage(QString name)
 {
-    GCFG->SetValue("storage", QVariant(name));
+    GCFG->SetValue("storage", name);
+}
+
+QString GrumpyConf::GetDatafilePath()
+{
+    return GCFG->GetValueAsString("datafile", QCoreApplication::applicationDirPath() + "/var/");
+}
+
+void GrumpyConf::SetDatafilePath(QString name)
+{
+    GCFG->SetValue("datafile", name);
+}
+
+QString GrumpyConf::GetCertFilePath()
+{
+    return GCFG->GetValueAsString("certfile", QCoreApplication::applicationDirPath() + "/etc/");
+}
+
+void GrumpyConf::SetCertFilePath(QString path)
+{
+    GCFG->SetValue("certfile", path);
 }
 
 

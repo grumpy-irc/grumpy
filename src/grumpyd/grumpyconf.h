@@ -38,6 +38,10 @@ namespace GrumpyIRC
             Configuration *GetConfiguration();
             QString GetStorage();
             void SetStorage(QString name);
+            QString GetDatafilePath();
+            void SetDatafilePath(QString name);
+            QString GetCertFilePath();
+            void SetCertFilePath(QString path);
             QString GetQuitMessage();
             void SetNick(QString nick);
             unsigned int GetMaxLoadSize();
