@@ -627,7 +627,7 @@
        <item>
         <widget class="QCheckBox" name="checkBoxSplitMs">
          <property name="text">
-          <string>Split message that are longer than:</string>
+          <string>Split message that is longer than:</string>
          </property>
         </widget>
        </item>

@@ -632,7 +632,7 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVarian
         this->syncing = true;
         if (parameters.contains("logged"))
         {
-            this->systemWindow->InsertText("There is " + QString::number(parameters["logged"].toInt()) + " opened sessions as this user");
+            this->systemWindow->InsertText("There is " + QString::number(parameters["logged"].toInt()) + " open sessions as this user");
         }
         this->systemWindow->InsertText("Synchronizing networks");
         this->gp->SendProtocolCommand(GP_CMD_NETWORK_INFO);
