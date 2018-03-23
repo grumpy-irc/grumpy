@@ -16,5 +16,13 @@
 /grumpy.alias ban grumpy.ban
 /grumpy.alias kb grumpy.kickban
 
-# This message can be safely removed
+# These lines can be safely removed
 /echo Welcome to GrumpyChat v. $grumpy.version
+/echo Some tips for easy start:
+/echo * Change the default nickname: /nick <default nickname> (in this window)
+/echo * Connect to an IRC server: /server [irc(s)://] hostname [:port]
+/echo   For example: /server ircs://chat.freenode.net
+/echo * Connect to grumpyd: /grumpyd hostname username password
+/echo Full manual at https://github.com/grumpy-irc/grumpy/wiki
+/echo
+/echo Have fun!
