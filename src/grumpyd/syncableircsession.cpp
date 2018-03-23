@@ -36,7 +36,7 @@ SyncableIRCSession *SyncableIRCSession::Open(Scrollback *system_window, libirc::
         throw new GrumpyIRC::Exception("Server object is not valid", BOOST_CURRENT_FUNCTION);
     SyncableIRCSession *sx = new SyncableIRCSession(system_window, owner);
     libircclient::Network *nx = new libircclient::Network(server, server.GetHost());
-    nx->SetDefaultIdent(owner->GetConfiguration()->GetValueAsString("ident", "grumpy"));
+    nx->SetDefaultIdent(owner->GetConfiguration()->GetValueAsString("ident", DEFAULT_IDENT));
     sx->Connect(nx);
     Grumpyd::GetBackend()->StoreNetwork(sx);
     return sx;
@@ -106,7 +106,7 @@ void SyncableIRCSession::Connect()
     QString nick = this->owner->GetConfiguration()->GetValueAsString("nick", "GrumpydUser");
     this->SetNick(nick);
     this->network->SetDefaultNick(nick);
-    this->network->SetDefaultIdent(this->owner->GetConfiguration()->GetValueAsString("ident", "grumpy"));
+    this->network->SetDefaultIdent(this->owner->GetConfiguration()->GetValueAsString("ident", DEFAULT_IDENT));
     this->network->Connect();
     (((VirtualScrollback*)this->systemWindow)->PartialSync());
     this->timerUL.start(this->ulistUpdateTime);

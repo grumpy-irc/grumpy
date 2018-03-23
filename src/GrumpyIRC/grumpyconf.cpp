@@ -57,7 +57,7 @@ void GrumpyConf::SetNick(QString nick)
 
 QString GrumpyConf::GetIdent()
 {
-    return GCFG->GetValueAsString("ident", "grumpy");
+    return GCFG->GetValueAsString("ident", DEFAULT_IDENT);
 }
 
 void GrumpyConf::SetIdent(QString ident)
