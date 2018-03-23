@@ -24,5 +24,6 @@
 /echo   For example: /server ircs://chat.freenode.net
 /echo * Connect to grumpyd: /grumpyd hostname username password
 /echo Full manual at https://github.com/grumpy-irc/grumpy/wiki
+/echo For support click here: ircs://irc.tm-irc.org/#GrumpyChat
 /echo
 /echo Have fun!
