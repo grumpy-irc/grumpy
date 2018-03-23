@@ -242,7 +242,7 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
             if (self)
             {
                 QString server_str = ":" + self->ToString() + " PRIVMSG " + window->GetTarget() + " :";
-                long_size -= server_str.length();
+                long_size -= server_str.length() + 1;
             }
         }
         // failsafe for extreme cases and invalid config
