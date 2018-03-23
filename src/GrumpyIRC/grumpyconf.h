@@ -97,6 +97,8 @@ namespace GrumpyIRC
             void SetDefaultBanMask(QString ban);
             QString GetMaskForUser(libircclient::User user);
             QString GetMaskForUser(libircclient::User *user);
+            bool GetAutoReduceMaxSendSize();
+            void SetAutoReduceMaxSendSize(bool yes);
 
             /////////////////////////////////////////////////////////////////////////
             // Proxy

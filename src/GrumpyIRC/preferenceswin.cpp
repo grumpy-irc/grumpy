@@ -41,6 +41,8 @@ PreferencesWin::PreferencesWin(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
     this->ui->lineEdit_2->setText(CONF->GetName());
     this->ui->lineEdit_3->setText(QString::number(CONF->GetSplitMaxSize()));
     this->ui->checkBox->setChecked(CONF->GetIgnoreSSLProblems());
+    bool x = CONF->GetAutoReduceMaxSendSize();
+    this->ui->checkBox_Trim->setChecked(x);
     this->ui->checkBoxSplitMs->setChecked(CONF->GetSplit());
     this->ui->checkBox_Colors->setChecked(CONF->GetColorBoxShow());
     this->ui->plainTextEditAutorun->setPlainText(CONF->GetAutorun());
@@ -128,8 +130,10 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
     CONF->SetSplitMaxSize(this->ui->lineEdit_3->text().toInt());
     CONF->SetSplit(this->ui->checkBoxSplitMs->isChecked());
     CONF->SetAutorun(this->ui->plainTextEditAutorun->toPlainText());
+    CONF->SetAutoReduceMaxSendSize(this->ui->checkBox_Trim->isChecked());
     CoreWrapper::GrumpyCore->GetCommandProcessor()->LongSize = CONF->GetSplitMaxSize();
     CoreWrapper::GrumpyCore->GetCommandProcessor()->SplitLong = CONF->GetSplit();
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->AutoReduceMsgSize = CONF->GetAutoReduceMaxSendSize();
     CONF->SetChannelH(this->ui->lineEdit_ChannelH->text());
     CONF->SetLabeledH(this->ui->lineEdit_LabeledH->text());
     CONF->SetStandardH(this->ui->lineEdit_StandardH->text());

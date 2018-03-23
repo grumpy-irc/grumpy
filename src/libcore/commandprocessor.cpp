@@ -18,6 +18,7 @@
 #include "ircsession.h"
 #include "generic.h"
 #include "../libirc/libircclient/network.h"
+#include "../libirc/libircclient/user.h"
 #include "eventhandler.h"
 
 using namespace GrumpyIRC;
@@ -25,7 +26,8 @@ using namespace GrumpyIRC;
 CommandProcessor::CommandProcessor()
 {
     this->SplitLong = true;
-    this->LongSize = 300;
+    this->LongSize = 512;
+    this->AutoReduceMsgSize = true;
     this->MinimalSize = 20;
     this->CommentChar = '#';
     this->CommandPrefix = '/';
@@ -75,6 +77,9 @@ int CommandProcessor::ProcessText(QString text, Scrollback *window, bool comment
 static QList<QString> Split(int size, int minimal_size, QString text)
 {
     QList<QString> messages;
+    // Minimal size must be at least 2 times smaller than size
+    if (size < minimal_size * 2)
+        size = minimal_size * 2;
     while (text.size() > size)
     {
         // We need to find a part of text which is divided by space
@@ -223,9 +228,31 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
     if (window->IsDead() != true && (window->GetType() == ScrollbackType_Channel || window->GetType() == ScrollbackType_User))
     {
         // This is a channel window, so we send this as a message to the channel
-        if (this->SplitLong && command.size() > static_cast<int>(this->LongSize))
+        // If the message is too long we split it
+        int long_size = this->LongSize;
+        int minm_size = this->MinimalSize;
+        if (this->SplitLong && this->AutoReduceMsgSize)
         {
-            QList<QString> messages = Split(static_cast<int>(this->LongSize), static_cast<int>(this->MinimalSize), command);
+            // We automatically reduce the maximal size of the message by length of user string and channel so that we comply with RFC
+            // part of each message from server to clients:
+            // :user!ident@hostname PRIVMSG #channel_name :text of message
+            // ^           this text                      ^  <- needs to be considered part of message (the length of this)
+            libircclient::User *self = window->GetSession()->GetSelfNetworkID(window);
+            // In extreme case this could be NULL
+            if (self)
+            {
+                QString server_str = ":" + self->ToString() + " PRIVMSG " + window->GetTarget() + " :";
+                long_size -= server_str.length();
+            }
+        }
+        // failsafe for extreme cases and invalid config
+        if (long_size < 20)
+            long_size = 20;
+        if ((minm_size * 2) > long_size)
+            minm_size = long_size / 2;
+        if (this->SplitLong && command.size() > long_size)
+        {
+            QList<QString> messages = Split(long_size, minm_size, command);
             foreach (QString text, messages)
                 window->GetSession()->SendMessage(window, text);
             return 0;

@@ -262,7 +262,7 @@ void GrumpyConf::SetSplitMaxSize(int size)
 
 int GrumpyConf::GetSplitMaxSize()
 {
-    return GCFG->GetValueAsInt("split_max_word_size", 200);
+    return GCFG->GetValueAsInt("split_max_word_size", 512);
 }
 
 void GrumpyConf::SetSplit(bool split)
@@ -321,7 +321,17 @@ QString GrumpyConf::GetMaskForUser(libircclient::User *user)
 {
     return this->GetDefaultBanMask().replace("$nick", user->GetNick())
                                     .replace("$ident", user->GetIdent())
-                                    .replace("$host", user->GetHost());
+            .replace("$host", user->GetHost());
+}
+
+bool GrumpyConf::GetAutoReduceMaxSendSize()
+{
+    return GCFG->GetValueAsBool("auto_reduce_max_send_size", true);
+}
+
+void GrumpyConf::SetAutoReduceMaxSendSize(bool yes)
+{
+    GCFG->SetValue("auto_reduce_max_send_size", yes);
 }
 
 void GrumpyConf::SetProxy(int proxy)

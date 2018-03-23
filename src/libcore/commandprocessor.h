@@ -72,11 +72,12 @@ namespace GrumpyIRC
             void UnregisterAlias(QString name);
             //! Whether long text message should be split
             bool SplitLong;
+            bool AutoReduceMsgSize = true;
             //! How many characters is a long message
-            unsigned int LongSize;
+            int LongSize;
             //! Minimal size of message to send when splitting a long message, this is needed to prevent delivery of short messages
             //! that would contain just one short word
-            unsigned int MinimalSize;
+            int MinimalSize;
             //! Prefix symbol for commands
             char CommandPrefix;
             //! Prefix for comments for script processor

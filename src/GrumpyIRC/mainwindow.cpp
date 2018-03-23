@@ -115,6 +115,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("raw",                        (SC_Callback)SystemCmds::RAW));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("query",                      (SC_Callback)SystemCmds::Query));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("ctcp",                       (SC_Callback)SystemCmds::CTCP));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->AutoReduceMsgSize = CONF->GetAutoReduceMaxSendSize();
     CoreWrapper::GrumpyCore->GetCommandProcessor()->LongSize = CONF->GetSplitMaxSize();
     CoreWrapper::GrumpyCore->GetCommandProcessor()->SplitLong = CONF->GetSplit();
     this->ui->actionOpen_window->setVisible(false);

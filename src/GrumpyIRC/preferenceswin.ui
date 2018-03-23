@@ -642,6 +642,23 @@
         </widget>
        </item>
        <item>
+        <widget class="QLabel" name="label_28">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Please note:&lt;/span&gt; RFC states that every IRC message should be in total max 512 bytes, including the channel name and full user string (nick!ident@hostname)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_Trim">
+         <property name="text">
+          <string>Reduce the message size to split by size of channel and user string to comply with RFC</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="label_6">
          <property name="text">
           <string>Execute these commands upon start:</string>
