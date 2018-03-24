@@ -901,6 +901,11 @@ void GrumpydSession::processPreferences(QHash<QString, QVariant> hash)
         is_missing = true;
         this->Preferences.insert("nick", Core::GrumpyCore->GetConfiguration()->GetValueAsString("nick", "GrumpydUser"));
     }
+    if (!this->Preferences.contains("quit_message"))
+    {
+        is_missing = true;
+        this->Preferences.insert("quit_message", "GrumpyChat - bouncer shutting down for maintenance. https://github.com/grumpy-irc/grumpy");
+    }
     if (is_missing)
     {
         this->systemWindow->InsertText("No default user preferences found for this user, fixing up");

@@ -28,6 +28,8 @@ GrumpydCfWin::GrumpydCfWin(GrumpydSession *session, QWidget *parent) : QDialog(p
     this->GrumpySession = session;
     this->ui->checkBox->setChecked(this->getBool("offline_ms_bool", true));
     this->ui->lineEdit_3->setText(this->getString("nick", "GrumpydUser"));
+    this->ui->lineEdit_4->setText(this->getString("ident", "g"));
+    this->ui->lineEdit_5->setText(this->getString("quit_message", "https://github.com/grumpy-irc/grumpy"));
     this->ui->lineEdit_6->setText(QString::number(this->getUInt("maximum_bsize", 2000)));
     this->ui->lineEdit_2->setText(QString::number(this->getUInt("initial_bsize", 80)));
     this->ui->plainTextEdit->setPlainText(this->getString("session_on_conn_raw", "AWAY"));
@@ -50,6 +52,8 @@ void GrumpyIRC::GrumpydCfWin::on_buttonBox_accepted()
     this->set("default_nick", this->ui->lineEdit_3->text());
     this->set("default_ident", this->ui->lineEdit_4->text());
     this->set("nick", this->ui->lineEdit_3->text());
+    this->set("ident", this->ui->lineEdit_4->text());
+    this->set("quit_message", this->ui->lineEdit_5->text());
     this->set("session_on_conn_raw", this->ui->plainTextEdit->toPlainText());
     this->set("session_on_disc_raw", this->ui->plainTextEdit_2->toPlainText());
     this->set("initial_bsize", this->ui->lineEdit_2->text().toUInt());

@@ -175,6 +175,18 @@ void User::RemoveIRCSession(SyncableIRCSession *session)
     this->sessions.removeAll(session);
 }
 
+void User::DisconnectAllGrumpySessions()
+{
+    foreach (Session *session, this->sessions_gp)
+        session->Disconnect();
+}
+
+void User::DisconnectAllIRCSessions()
+{
+    foreach (SyncableIRCSession *session, this->sessions)
+        session->RequestDisconnect(NULL, this->GetConfiguration()->GetValueAsString("quit_message"), false);
+}
+
 void User::SetRole(Role *rx)
 {
     this->role = rx;

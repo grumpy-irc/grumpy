@@ -19,6 +19,7 @@
 #include "grumpyconf.h"
 #include "databasedummy.h"
 #include "databaselite.h"
+#include "user.h"
 #include "sleeper.h"
 #include "listener.h"
 #include "../libcore/core.h"
@@ -82,6 +83,15 @@ Grumpyd::~Grumpyd()
 {
     delete this->listenerSSL;
     delete this->listener;
+}
+
+void Grumpyd::Kill()
+{
+    foreach (User *user, User::UserInfo)
+    {
+        user->DisconnectAllGrumpySessions();
+        user->DisconnectAllIRCSessions();
+    }
 }
 
 DatabaseBackend *Grumpyd::GetBackend()

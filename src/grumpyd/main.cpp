@@ -212,6 +212,9 @@ int secured_port(GrumpyIRC::TerminalParser *parser, QStringList params)
 
 void grumpyd_terminate()
 {
+    // Stop all sessions
+    GrumpyIRC::Grumpyd::grumpyd->Kill();
+
     // Delete instance of grumpyd first
     delete GrumpyIRC::Grumpyd::grumpyd;
 
