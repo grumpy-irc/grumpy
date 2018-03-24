@@ -55,6 +55,7 @@ namespace GrumpyIRC
             void TransferError(gp_command_t source, QString description, int id);
             void PermissionDeny(gp_command_t source);
             void Kick();
+            void Shutdown();
             void Disconnect();
             bool IsRunning;
             int MaxScrollbackSyncItems;

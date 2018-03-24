@@ -88,10 +88,7 @@ Grumpyd::~Grumpyd()
 void Grumpyd::Kill()
 {
     foreach (User *user, User::UserInfo)
-    {
-        user->DisconnectAllGrumpySessions();
-        user->DisconnectAllIRCSessions();
-    }
+        user->Shutdown();
 }
 
 DatabaseBackend *Grumpyd::GetBackend()

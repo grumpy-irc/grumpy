@@ -175,6 +175,14 @@ void User::RemoveIRCSession(SyncableIRCSession *session)
     this->sessions.removeAll(session);
 }
 
+void User::Shutdown()
+{
+    foreach (Session *session, this->sessions_gp)
+        session->Shutdown();
+
+    this->DisconnectAllIRCSessions();
+}
+
 void User::DisconnectAllGrumpySessions()
 {
     foreach (Session *session, this->sessions_gp)

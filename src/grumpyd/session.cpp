@@ -196,6 +196,12 @@ void Session::Kick()
     this->Disconnect();
 }
 
+void Session::Shutdown()
+{
+    this->TransferError(0, "Grumpyd is shutting down", 0);
+    this->Disconnect();
+}
+
 void Session::Disconnect()
 {
     this->SessionState = State_Killing;
