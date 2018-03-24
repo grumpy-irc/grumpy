@@ -37,6 +37,7 @@ SyncableIRCSession *SyncableIRCSession::Open(Scrollback *system_window, libirc::
     SyncableIRCSession *sx = new SyncableIRCSession(system_window, owner);
     libircclient::Network *nx = new libircclient::Network(server, server.GetHost());
     nx->SetDefaultIdent(owner->GetConfiguration()->GetValueAsString("ident", DEFAULT_IDENT));
+    nx->SetDefaultUsername(owner->GetConfiguration()->GetValueAsString("user", "GrumpyChat"));
     sx->Connect(nx);
     Grumpyd::GetBackend()->StoreNetwork(sx);
     return sx;

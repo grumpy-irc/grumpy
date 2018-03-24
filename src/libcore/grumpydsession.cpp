@@ -892,6 +892,11 @@ void GrumpydSession::processPreferences(QHash<QString, QVariant> hash)
         is_missing = true;
         this->Preferences.insert("offline_ms_text", "I am currently away, your message was logged and I will read it when I return");
     }
+    if (!this->Preferences.contains("user"))
+    {
+        is_missing = true;
+        this->Preferences.insert("user", Core::GrumpyCore->GetConfiguration()->GetValueAsString("name", "Grumpy Chat"));
+    }
     if (!this->Preferences.contains("maximum_bsize"))
     {
         is_missing = true;
