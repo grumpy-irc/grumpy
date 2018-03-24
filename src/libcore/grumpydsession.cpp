@@ -432,6 +432,7 @@ void GrumpydSession::Connect()
     this->connectedOn = QDateTime::currentDateTime();
     this->gp = new libgp::GP();
     connect(this->gp, SIGNAL(Event_Connected()), this, SLOT(OnConnected()));
+    connect(this->gp, SIGNAL(Event_Disconnected()), this, SLOT(OnDisconnect()));
     connect(this->gp, SIGNAL(Event_IncomingCommand(gp_command_t, QHash<QString, QVariant>)), this, SLOT(OnIncomingCommand(gp_command_t, QHash<QString, QVariant>)));
     connect(this->gp, SIGNAL(Event_ConnectionFailed(QString,int)), this, SLOT(OnError(QString,int)));
     connect(this->gp, SIGNAL(Event_SslHandshakeFailure(QList<QSslError>, bool*)), this, SLOT(OnSslHandshakeFailure(QList<QSslError>, bool*)));
@@ -544,7 +545,7 @@ void GrumpydSession::OnSslHandshakeFailure(QList<QSslError> errors, bool *ok)
 
 void GrumpydSession::OnDisconnect()
 {
-    this->closeError("Remote host closed the connection for unknown reasons");
+    this->closeError("Remote host closed the socket!");
 }
 
 void GrumpydSession::OnTimeout()
