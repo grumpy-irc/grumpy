@@ -42,7 +42,7 @@ QString GrumpyConf::GetQuitMessage()
 
 QString GrumpyConf::GetRawQuitMessage()
 {
-    return GCFG->GetValueAsString("quit_message", "GrumpyChat v. $version. Such client. WOW. Much quit.");
+    return GCFG->GetValueAsString("quit_message", "GrumpyChat v. $version. Such client. WOW. Much quit. https://github.com/grumpy-irc/grumpy");
 }
 
 void GrumpyConf::SetQuitMessage(QString text)
