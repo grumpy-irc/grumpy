@@ -126,7 +126,7 @@ namespace GrumpyIRC
             //void SetParent(ScrollbackFrame* parentWindow);
             bool IsDeletable;
             bool ShowJQP;
-            bool Highlighting;
+            bool Muted;
             void SetVisible(bool is_visible);
             ScrollbackList_Node *TreeNode;
             bool Refreshing = false;

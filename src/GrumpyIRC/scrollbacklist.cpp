@@ -182,6 +182,7 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     QAction *menuJoinAll = NULL;
     QAction *menuSound = NULL;
     QAction *menuNotify = NULL;
+    QAction *menuDeaf = NULL;
 
     if (wx)
     {
@@ -260,6 +261,10 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
         menuNotify->setCheckable(true);
         menuNotify->setChecked(wx->GetScrollback()->GetPropertyAsBool("notify"));
         Menu.addAction(menuNotify);
+        menuDeaf = new QAction(QObject::tr("Mute"), &Menu);
+        menuDeaf->setCheckable(true);
+        menuDeaf->setChecked(wx->Muted);
+        Menu.addAction(menuDeaf);
     }
 
     QAction* selectedItem = Menu.exec(globalPos);
@@ -336,6 +341,9 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     } else if (selectedItem == menuNotify)
     {
         wx->SetProperty("notify", menuNotify->isChecked());
+    } else if (selectedItem == menuDeaf)
+    {
+        wx->Muted = !wx->Muted;
     }
 }
 

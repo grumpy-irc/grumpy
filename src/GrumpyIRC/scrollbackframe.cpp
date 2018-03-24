@@ -120,7 +120,7 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     //this->textEdit->setAutoFillBackground(true);
     this->maxItems = 200;
     this->userFrame = new UserFrame(this);
-    this->Highlighting = true;
+    this->Muted = false;
     this->precachedNetwork = NULL;
     this->isVisible = false;
     this->currentScrollbar = 0;
@@ -299,7 +299,7 @@ void ScrollbackFrame::_insertText_(ScrollbackItem item)
         is_opening = ((GrumpydSession*)this->scrollback->GetSession())->IsOpening;
     if (Highlighter::IsMatch(&item, this->GetNetwork()))
     {
-        if (!is_opening)
+        if (!is_opening && !this->Muted)
             UiHooks::OnScrollbackItemHighlight(this, &item);
         highlighted = GRUMPY_H_YES;
     }
