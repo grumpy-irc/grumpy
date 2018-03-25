@@ -140,7 +140,7 @@ namespace GrumpyIRC
             void UserList_Refresh(libircclient::User *ux);
             void OnState();
             void UserList_Remove(QString user, bool bulk);
-            void UserList_Rename(QString old, libircclient::User *us);
+            void UserList_Alter(QString old, libircclient::User *us);
             void OnFinishSortBulk();
             void OnDead();
             void OnLink(QString url);

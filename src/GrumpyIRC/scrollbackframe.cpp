@@ -104,7 +104,7 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     connect(this->scrollback, SIGNAL(Event_ChangedDeadStatus()), this, SLOT(OnDead()));
     connect(this->scrollback, SIGNAL(Event_UserInserted(libircclient::User*, bool)), this, SLOT(UserList_Insert(libircclient::User*, bool)));
     connect(this->scrollback, SIGNAL(Event_Reload()), this, SLOT(Refresh()));
-    connect(this->scrollback, SIGNAL(Event_UserAltered(QString,libircclient::User*)), this, SLOT(UserList_Rename(QString,libircclient::User*)));
+    connect(this->scrollback, SIGNAL(Event_UserAltered(QString,libircclient::User*)), this, SLOT(UserList_Alter(QString,libircclient::User*)));
     connect(this->scrollback, SIGNAL(Event_UserRemoved(QString, bool)), this, SLOT(UserList_Remove(QString, bool)));
     connect(this->scrollback, SIGNAL(Event_InsertText(ScrollbackItem)), this, SLOT(_insertText_(ScrollbackItem)));
     connect(this->scrollback, SIGNAL(Event_Closed()), this, SLOT(OnClosed()));
@@ -345,9 +345,10 @@ void ScrollbackFrame::UserList_Remove(QString user, bool bulk)
     this->userFrame->RemoveUser(user);
 }
 
-void ScrollbackFrame::UserList_Rename(QString old, libircclient::User *us)
+void ScrollbackFrame::UserList_Alter(QString old, libircclient::User *us)
 {
-    this->userFrame->ChangeNick(us->GetNick(), old);
+    this->userFrame->RemoveUser(old);
+    this->userFrame->InsertUser(us, false);
 }
 
 void ScrollbackFrame::OnDead()
