@@ -1190,6 +1190,33 @@ void IRCSession::OnPong(libircclient::Parser *px)
     this->pingHistory.append(this->network->GetLag());
 }
 
+void IRCSession::OnSelfCHGH(libircclient::Parser *px, QString old_host, QString old_ident, QString new_host, QString new_ident)
+{
+    if (old_host != new_host)
+        this->systemWindow->InsertText("Your hostname was changed from " + old_host + " to " + new_host);
+    if (old_ident != new_ident)
+        this->systemWindow->InsertText("Your ident was changed from " + old_ident + " to " + new_ident);
+}
+
+void IRCSession::OnCHGH(libircclient::Parser *px, QString old_host, QString old_ident, QString new_host, QString new_ident)
+{
+    QString nick = px->GetSourceUserInfo()->GetNick();
+    // This event is called after the nick is changed in all channels
+    foreach (libircclient::Channel *channel, this->GetNetwork()->GetChannels())
+    {
+        if (!channel->ContainsUser(nick))
+            continue;
+        if (!this->channels.contains(channel->GetName().toLower()))
+            continue;
+        // Get a scrollback window and write a host change message to it
+        Scrollback *scrollback = this->channels[channel->GetName().toLower()];
+        // We don't have a custom message type for this change yet
+        // scrollback->InsertText("Something here");
+        scrollback->UserListChange(nick, channel->GetUser(nick), UserListChange_Alter);
+        emit this->Event_UserListWasModified(scrollback, channel);
+    }
+}
+
 void IRCSession::processME(libircclient::Parser *px, QString message)
 {
     Scrollback *sx = NULL;
@@ -1295,6 +1322,8 @@ void IRCSession::connInternalSocketSignals()
     connect(this->network, SIGNAL(Event_PONG(libircclient::Parser*)), this, SLOT(OnPong(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_WhoisEnd(libircclient::Parser*)), this, SLOT(OnWhoisEnd(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_RplAway(libircclient::Parser*)), this, SLOT(OnAway(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_SelfCHGHOST(libircclient::Parser*,QString,QString,QString,QString)), this, SLOT(OnSelfCHGH(libircclient::Parser*,QString,QString,QString,QString)));
+    connect(this->network, SIGNAL(Event_CHGHOST(libircclient::Parser*,QString,QString,QString,QString)), this, SLOT(OnCHGH(libircclient::Parser*,QString,QString,QString,QString)));
     connect(this->network, SIGNAL(Event_WhoisAccount(libircclient::Parser*)), this, SLOT(OnWhoisAcc(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_WhoisSpecial(libircclient::Parser*)), this, SLOT(OnWhoisGen(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_WhoisSecure(libircclient::Parser*)), this, SLOT(OnWhoisGen(libircclient::Parser*)));

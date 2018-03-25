@@ -135,6 +135,7 @@ namespace GrumpyIRC
             //! Emited when a new window for this session is open, needed by grumpyd for network sync
             void Event_ScrollbackIsOpen(Scrollback *window);
             void Event_ScrollbackIsClosed(Scrollback *window);
+            void Event_UserListWasModified(Scrollback *window, libircclient::Channel *channel);
         protected slots:
             virtual void OnOutgoingRawMessage(QByteArray message);
             virtual void OnIncomingRawMessage(QByteArray message);
@@ -191,6 +192,8 @@ namespace GrumpyIRC
             virtual void OnWhoisGen(libircclient::Parser *px);
             virtual void OnWhoisAcc(libircclient::Parser *px);
             virtual void OnPong(libircclient::Parser *px);
+            virtual void OnSelfCHGH(libircclient::Parser *px, QString old_host, QString old_ident, QString new_host, QString new_ident);
+            virtual void OnCHGH(libircclient::Parser *px, QString old_host, QString old_ident, QString new_host, QString new_ident);
 
         protected:
             static unsigned int lastID;
