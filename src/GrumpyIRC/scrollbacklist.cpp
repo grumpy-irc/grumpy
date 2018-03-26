@@ -21,6 +21,7 @@
 #include "../libcore/grumpydsession.h"
 #include "grumpyconf.h"
 #include "packetsnifferwin.h"
+#include "hooks.h"
 #include "messagebox.h"
 #include "grumpydcfwin.h"
 #include "skin.h"
@@ -157,11 +158,13 @@ void ScrollbackList::OnUpdate()
 
 void GrumpyIRC::ScrollbackList::on_treeView_activated(const QModelIndex &index)
 {
+    UiHooks::OnInput();
     this->switchWindow(index);
 }
 
 void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPoint &pos)
 {
+    UiHooks::OnInput();
     ScrollbackFrame *wx = this->selectedWindow();
     // We have some window selected so let's display a menu
     QPoint globalPos = this->ui->treeView->viewport()->mapToGlobal(pos);

@@ -15,6 +15,7 @@
 #include "corewrapper.h"
 #include "../libcore/core.h"
 #include "inputbox.h"
+#include "hooks.h"
 #include "messagebox.h"
 #include "skin.h"
 #include "keyfilter.h"
@@ -46,6 +47,7 @@ InputBox::~InputBox()
 
 void InputBox::ProcessInput()
 {
+    UiHooks::OnInput();
     // Check if the text user is about to send isn't too long
     QString text = this->ui->textEdit->toPlainText();
     int size = text.size();
@@ -189,6 +191,7 @@ void InputBox::insertToHistory()
 
 void GrumpyIRC::InputBox::on_lineEdit_returnPressed()
 {
+    UiHooks::OnInput();
     CoreWrapper::GrumpyCore->GetCommandProcessor()->ProcessText(this->ui->lineEdit->text(), this->parent->GetScrollback());
     this->ui->lineEdit->setText("");
 }

@@ -41,8 +41,7 @@ PreferencesWin::PreferencesWin(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
     this->ui->lineEdit_2->setText(CONF->GetName());
     this->ui->lineEdit_3->setText(QString::number(CONF->GetSplitMaxSize()));
     this->ui->checkBox->setChecked(CONF->GetIgnoreSSLProblems());
-    bool x = CONF->GetAutoReduceMaxSendSize();
-    this->ui->checkBox_Trim->setChecked(x);
+    this->ui->checkBox_Trim->setChecked(CONF->GetAutoReduceMaxSendSize());
     this->ui->checkBoxSplitMs->setChecked(CONF->GetSplit());
     this->ui->checkBox_Colors->setChecked(CONF->GetColorBoxShow());
     this->ui->plainTextEditAutorun->setPlainText(CONF->GetAutorun());
@@ -50,6 +49,9 @@ PreferencesWin::PreferencesWin(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
     this->ui->lineEdit_LabeledH->setText(CONF->GetLabeledHeader());
     this->ui->lineEdit_StandardH->setText(CONF->GetStandardHeader());
     this->ui->le_Mask->setText(CONF->GetDefaultBanMask());
+    this->ui->lineEdit_AutoAway->setText(QString::number(CONF->GetAutoAwayTime()));
+    this->ui->lineEdit_Away->setText(CONF->GetAutoAwayMsg());
+    this->ui->checkBox_AutoAway->setChecked(CONF->GetAutoAway());
     QString ignored;
     foreach (int numeric, CONF->IgnoredNums())
     {
@@ -141,6 +143,9 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
     CONF->SetLineFormat(this->ui->lineEdit_FormatText->text());
     CONF->SetColorBoxShow(this->ui->checkBox_Colors->isChecked());
     CONF->SetDefaultBanMask(this->ui->le_Mask->text());
+    CONF->SetAutoAwayMsg(this->ui->lineEdit_Away->text());
+    CONF->SetAutoAway(this->ui->checkBox_AutoAway->isChecked());
+    CONF->SetAutoAwayTime(this->ui->lineEdit_AutoAway->text().toInt());
     QList<int> ignored_nums;
     QList<QString> ignored = this->ui->lineEdit_4->text().split(",");
     foreach (QString numeric, ignored)
@@ -173,6 +178,7 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
             break;
     }
     CONF->Save();
+    MainWindow::Main->SetupAutoAway();
     MainWindow::Main->UpdateSkin();
     this->close();
 }

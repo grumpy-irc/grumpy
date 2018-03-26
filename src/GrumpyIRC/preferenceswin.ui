@@ -43,15 +43,15 @@
            </property>
           </widget>
          </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="leNickFix"/>
+         </item>
          <item row="2" column="0">
           <widget class="QLabel" name="label_3">
            <property name="text">
             <string>Default ident:</string>
            </property>
           </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QLineEdit" name="leNickFix"/>
          </item>
          <item row="2" column="1">
           <widget class="QLineEdit" name="leIdent"/>
@@ -63,6 +63,9 @@
            </property>
           </widget>
          </item>
+         <item row="3" column="1">
+          <widget class="QLineEdit" name="lineEdit"/>
+         </item>
          <item row="4" column="0">
           <widget class="QLabel" name="label_5">
            <property name="text">
@@ -70,11 +73,35 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
-          <widget class="QLineEdit" name="lineEdit"/>
-         </item>
          <item row="4" column="1">
           <widget class="QLineEdit" name="lineEdit_2"/>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_29">
+           <property name="text">
+            <string>Away message</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLineEdit" name="lineEdit_Away"/>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="label_30">
+           <property name="text">
+            <string>Auto away time in seconds</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QLineEdit" name="lineEdit_AutoAway"/>
+         </item>
+         <item row="7" column="1">
+          <widget class="QCheckBox" name="checkBox_AutoAway">
+           <property name="text">
+            <string>Auto away</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>

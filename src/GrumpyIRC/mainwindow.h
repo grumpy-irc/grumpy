@@ -75,6 +75,8 @@ namespace GrumpyIRC
             void OpenIRCNetworkLink(QString link);
             void OpenServer(libirc::ServerAddress server);
             void EnableGrumpydContext(bool enable);
+            void SetupAutoAway();
+            void ResetAutoAway();
 
         private slots:
             void OnRefresh();
@@ -88,13 +90,16 @@ namespace GrumpyIRC
             void on_actionToggle_secret_triggered();
             void on_actionProxy_triggered();
             void on_actionEnable_proxy_toggled(bool arg1);
+            void OnAutoAway();
 
         private:
             QString processInput(QString text);
             void closeEvent(QCloseEvent *event);
             QSystemTrayIcon tray;
             bool isFork;
+            bool isAway;
             QTimer timer;
+            QTimer *timerAway;
             QLabel *statusFrame;
             QLabel *identFrame;
             QLabel *windowCount;

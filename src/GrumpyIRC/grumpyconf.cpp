@@ -334,6 +334,38 @@ void GrumpyConf::SetAutoReduceMaxSendSize(bool yes)
     GCFG->SetValue("auto_reduce_max_send_size", yes);
 }
 
+void GrumpyConf::SetAutoAwayMsg(QString message)
+{
+    GCFG->SetValue("auto_away_text", message);
+}
+
+QString GrumpyConf::GetAutoAwayMsg()
+{
+    return GCFG->GetValueAsString("auto_away_text", "I am currently AFK");
+}
+
+void GrumpyConf::SetAutoAway(bool yes)
+{
+    GCFG->SetValue("auto_away", yes);
+}
+
+bool GrumpyConf::GetAutoAway()
+{
+    return GCFG->GetValueAsBool("auto_away", true);
+}
+
+int GrumpyConf::GetAutoAwayTime()
+{
+    return GCFG->GetValueAsInt("auto_away_time", 60 * 10);
+}
+
+void GrumpyConf::SetAutoAwayTime(int time)
+{
+    if (time < 10)
+        time = 10;
+    GCFG->SetValue("auto_away_time", time);
+}
+
 void GrumpyConf::SetProxy(int proxy)
 {
     GCFG->SetValue("proxy", proxy);

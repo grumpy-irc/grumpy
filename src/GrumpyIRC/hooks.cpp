@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #include "hooks.h"
 #include "../libcore/scrollback.h"
@@ -33,7 +33,7 @@ void UiHooks::OnScrollbackItemHighlight(ScrollbackFrame *scrollback, ScrollbackI
 
 void UiHooks::OnInput()
 {
-
+    MainWindow::Main->ResetAutoAway();
 }
 
 

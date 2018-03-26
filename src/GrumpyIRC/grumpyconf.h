@@ -99,6 +99,12 @@ namespace GrumpyIRC
             QString GetMaskForUser(libircclient::User *user);
             bool GetAutoReduceMaxSendSize();
             void SetAutoReduceMaxSendSize(bool yes);
+            void SetAutoAwayMsg(QString message);
+            QString GetAutoAwayMsg();
+            void SetAutoAway(bool yes);
+            bool GetAutoAway();
+            int GetAutoAwayTime();
+            void SetAutoAwayTime(int time);
 
             /////////////////////////////////////////////////////////////////////////
             // Proxy

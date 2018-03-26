@@ -57,7 +57,9 @@ void MainWindow::Exit()
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
+    this->timerAway = nullptr;
     Main = this;
+    this->isAway = false;
     this->isFork = false;
     this->ui->setupUi(this);
     this->windowList = new ScrollbackList(this);
@@ -135,6 +137,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->HideProgress();
     this->ui->actionEnable_proxy->setChecked(CONF->UsingProxy());
     Proxy::Init();
+    this->SetupAutoAway();
     if (!CONF->SafeMode)
         this->Execute(CONF->GetAutorun());
 }
@@ -164,6 +167,7 @@ MainWindow::~MainWindow()
     ScrollbacksManager::Global = NULL;
     delete this->ui;
     delete this->handler;
+    delete this->timerAway;
 }
 
 ScrollbacksManager *MainWindow::GetScrollbackManager()
@@ -380,6 +384,52 @@ void MainWindow::EnableGrumpydContext(bool enable)
     this->ui->actionLoad_more_items_from_remote->setVisible(enable);
 }
 
+void MainWindow::SetupAutoAway()
+{
+    bool enable = CONF->GetAutoAway();
+    if (this->timerAway == nullptr && enable)
+    {
+        this->timerAway = new QTimer();
+        connect(this->timerAway, SIGNAL(timeout()), this, SLOT(OnAutoAway()));
+    }
+    if (this->timerAway != nullptr && !enable)
+    {
+        this->timerAway->stop();
+        delete this->timerAway;
+        this->timerAway = nullptr;
+    }
+    if (this->timerAway != nullptr)
+    {
+        // This resets the timer. This function is called only when grumpy start or time changes.
+        this->timerAway->setInterval(CONF->GetAutoAwayTime() * 1000);
+        this->ResetAutoAway();
+    }
+}
+
+void MainWindow::ResetAutoAway()
+{
+    if (this->timerAway == nullptr)
+        return;
+
+    if (this->isAway)
+    {
+        this->isAway = false;
+        this->systemWindow->InsertText("You were automatically marked as no longer away.");
+        GrumpydSession::Sessions_Lock.lock();
+        foreach (NetworkSession *session, GrumpydSession::Sessions)
+        {
+            session->UnsetAway();
+        }
+        GrumpydSession::Sessions_Lock.unlock();
+        IRCSession::Sessions_Lock.lock();
+        foreach (IRCSession *session, IRCSession::Sessions)
+            session->UnsetAway();
+        IRCSession::Sessions_Lock.unlock();
+    }
+    this->timerAway->stop();
+    this->timerAway->start();
+}
+
 void MainWindow::OnRefresh()
 {
     this->UpdateStatus();
@@ -453,4 +503,26 @@ void GrumpyIRC::MainWindow::on_actionEnable_proxy_toggled(bool arg1)
 {
     Proxy p;
     p.Enable(arg1);
+}
+
+void MainWindow::OnAutoAway()
+{
+    if (!CONF->GetAutoAway())
+        return;
+
+    this->systemWindow->InsertText("You are now automatically being marked as away. You can change this in preferences.");
+    this->isAway = true;
+    this->timerAway->stop();
+
+    // Change all connections to away now
+    GrumpydSession::Sessions_Lock.lock();
+    foreach (NetworkSession *session, GrumpydSession::Sessions)
+    {
+        session->SetAway(CONF->GetAutoAwayMsg());
+    }
+    GrumpydSession::Sessions_Lock.unlock();
+    IRCSession::Sessions_Lock.lock();
+    foreach (IRCSession *session, IRCSession::Sessions)
+        session->SetAway(CONF->GetAutoAwayMsg());
+    IRCSession::Sessions_Lock.unlock();
 }
