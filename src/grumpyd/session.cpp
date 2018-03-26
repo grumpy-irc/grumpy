@@ -42,6 +42,7 @@ QList<Session *> Session::Sessions()
 
 Session::Session(qintptr socket_ptr, bool ssl)
 {
+    this->IsAway = false;
     this->usingSsl = ssl;
     this->protocol = NULL;
     if (ssl)
@@ -741,6 +742,29 @@ void Session::processStorageGet(QHash<QString, QVariant> parameters)
     }
 }
 
+void Session::processAway(QHash<QString, QVariant> parameters)
+{
+    if (!this->IsAuthorized(PRIVILEGE_USE_IRC))
+    {
+        this->PermissionDeny(GP_CMD_AWAY);
+        return;
+    }
+
+    if (!parameters.contains("away"))
+    {
+        this->TransferError(GP_CMD_AWAY, "Missing state", GP_ERROR);
+        return;
+    }
+
+    this->AwayReason.clear();
+    this->IsAway = parameters["away"].toBool();
+    if (parameters.contains("reason"))
+        this->AwayReason = parameters["reason"].toString();
+
+    // Let session handler know about this
+    emit this->OnAway();
+}
+
 void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
 {
     if (text == GP_CMD_HELLO)
@@ -829,6 +853,9 @@ void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
     } else if (text == GP_CMD_QUERY)
     {
         this->processQuery(parameters);
+    } else if (text == GP_CMD_AWAY)
+    {
+        this->processAway(parameters);
     } else
     {
         // We received some unknown packet, send it back to client so that it at least knows we don't support this

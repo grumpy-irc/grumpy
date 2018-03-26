@@ -31,4 +31,9 @@ void UiHooks::OnScrollbackItemHighlight(ScrollbackFrame *scrollback, ScrollbackI
     }
 }
 
+void UiHooks::OnInput()
+{
+
+}
+
 

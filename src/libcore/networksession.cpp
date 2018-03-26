@@ -18,11 +18,28 @@ NetworkSession::NetworkSession()
 {
     this->createdOn = QDateTime::currentDateTime();
     this->connectedOn = QDateTime::currentDateTime();
+    this->isAway = false;
 }
 
 NetworkSession::~NetworkSession()
 {
     emit this->Event_Deleted();
+}
+
+void NetworkSession::SetAway(QString reason)
+{
+    (void)reason;
+    this->isAway = true;
+}
+
+void NetworkSession::UnsetAway()
+{
+    this->isAway = false;
+}
+
+bool NetworkSession::IsAway()
+{
+    return this->isAway;
 }
 
 QDateTime NetworkSession::GetCreationDateTime()

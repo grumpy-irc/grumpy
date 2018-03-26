@@ -58,6 +58,8 @@ namespace GrumpyIRC
             void Shutdown();
             void Disconnect();
             bool IsRunning;
+            bool IsAway;
+            QString AwayReason;
             int MaxScrollbackSyncItems;
             State SessionState;
 
@@ -67,6 +69,7 @@ namespace GrumpyIRC
 
         signals:
             void OnError(int error, QString text);
+            void OnAway();
 
         private:
             static unsigned long lSID;
@@ -98,6 +101,7 @@ namespace GrumpyIRC
             void processStorageSet(QHash<QString, QVariant> parameters);
             void processStorageDel(QHash<QString, QVariant> parameters);
             void processStorageGet(QHash<QString, QVariant> parameters);
+            void processAway(QHash<QString, QVariant> parameters);
 
             QTcpSocket *socket;
             QString peer;

@@ -89,6 +89,7 @@
 #define GP_CMD_STORAGE_SET                 32 // Used to write data to personal BLOB storage
 #define GP_CMD_STORAGE_GET                 33 // Used to read data from personal BLOB storage
 #define GP_CMD_STORAGE_DEL                 34
+#define GP_CMD_AWAY                        35 // Change status
 #define GP_CMD_SYS_LIST_USER               40 // List grumpyd users
 #define GP_CMD_SYS_CREATE_USER             41 // Create a new user
 #define GP_CMD_SYS_REMOVE_USER             42 // Removes a user
@@ -172,6 +173,8 @@ namespace GrumpyIRC
             void Connect();
             bool IsAutoreconnect(Scrollback *window);
             void SetAutoreconnect(Scrollback *window, bool reconnect);
+            void SetAway(QString reason);
+            void UnsetAway();
             libircclient::User *GetSelfNetworkID(Scrollback *window);
             unsigned long long GetCompressedBytesRcvd();
             unsigned long long GetCompressedBytesSent();

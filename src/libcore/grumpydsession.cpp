@@ -467,6 +467,23 @@ void GrumpydSession::SetAutoreconnect(Scrollback *window, bool reconnect)
     return ircs->SetAutoreconnect(window, reconnect);
 }
 
+void GrumpydSession::SetAway(QString reason)
+{
+    QHash<QString, QVariant> parameters;
+    parameters.insert("away", QVariant(true));
+    parameters.insert("reason", reason);
+    this->gp->SendProtocolCommand(GP_CMD_AWAY, parameters);
+    NetworkSession::SetAway(reason);
+}
+
+void GrumpydSession::UnsetAway()
+{
+    QHash<QString, QVariant> parameters;
+    parameters.insert("away", QVariant(false));
+    this->gp->SendProtocolCommand(GP_CMD_AWAY, parameters);
+    NetworkSession::UnsetAway();
+}
+
 libircclient::User *GrumpydSession::GetSelfNetworkID(Scrollback *window)
 {
     IRCSession *ircs = this->GetSessionFromWindow(window);

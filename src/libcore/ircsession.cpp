@@ -604,6 +604,22 @@ void IRCSession::RetrieveChannelBanList(Scrollback *window, QString channel_name
     this->GetNetwork()->TransferRaw("MODE " + channel_name + " +b", libircclient::Priority_Low);
 }
 
+void IRCSession::SetAway(QString reason)
+{
+    if (!this->network)
+        return;
+    this->network->SetAway(true, reason);
+    NetworkSession::SetAway(reason);
+}
+
+void IRCSession::UnsetAway()
+{
+    if (!this->network)
+        return;
+    this->network->SetAway(false);
+    NetworkSession::UnsetAway();
+}
+
 QString IRCSession::GetLocalUserModeAsString(Scrollback *window)
 {
     Q_UNUSED(window);

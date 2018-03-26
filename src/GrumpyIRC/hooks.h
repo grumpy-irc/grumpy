@@ -24,6 +24,8 @@ namespace GrumpyIRC
     {
         public:
             static void OnScrollbackItemHighlight(ScrollbackFrame *scrollback, ScrollbackItem *item);
+            //! Called anytime user generates some sort of user input - click a window, write into console, whatever
+            static void OnInput();
     };
 }
 

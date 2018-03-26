@@ -62,6 +62,9 @@ namespace GrumpyIRC
             virtual void RetrieveChannelBanList(Scrollback *window, QString channel_name)=0;
             virtual void RequestReconnect(Scrollback *window)=0;
             virtual void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete)=0;
+            virtual void SetAway(QString reason);
+            virtual void UnsetAway();
+            virtual bool IsAway();
             //! Request the selected window to be removed from window tree
             //! the windows are never directly removed because there might be complex structures depending on them
             //! you always need to ASK the window to delete itself
@@ -79,6 +82,7 @@ namespace GrumpyIRC
         protected:
             QDateTime createdOn;
             QDateTime connectedOn;
+            bool isAway;
         signals:
             void Event_Deleted();
             //! Used when authentication to underlying protocol fails

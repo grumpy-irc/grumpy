@@ -117,6 +117,8 @@ namespace GrumpyIRC
             void RetrieveChannelExceptionList(Scrollback *window, QString channel_name);
             void RetrieveChannelInviteList(Scrollback *window, QString channel_name);
             void RetrieveChannelBanList(Scrollback *window, QString channel_name);
+            void SetAway(QString reason);
+            void UnsetAway();
             QString GetLocalUserModeAsString(Scrollback *window);
             QString GetName() const;
             QString GetHostname() const;
