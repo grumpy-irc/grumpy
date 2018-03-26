@@ -759,10 +759,14 @@ void Session::processAway(QHash<QString, QVariant> parameters)
     this->AwayReason.clear();
     this->IsAway = parameters["away"].toBool();
     if (parameters.contains("reason"))
+    {
         this->AwayReason = parameters["reason"].toString();
+    }
 
     // Let session handler know about this
     emit this->OnAway();
+    this->loggedUser->LastAwayReason = this->AwayReason;
+    this->loggedUser->UpdateAway();
 }
 
 void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)

@@ -411,6 +411,7 @@ void ScrollbackFrame::Refresh()
 void ScrollbackFrame::Menu(QPoint pn)
 {
     QPoint globalPos = this->textEdit->viewport()->mapToGlobal(pn);
+    UiHooks::OnInput();
     QMenu Menu;
     // Items
     QAction *menuCopy = new QAction(QObject::tr("Copy"), &Menu);

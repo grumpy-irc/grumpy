@@ -15,6 +15,7 @@
 #include "grumpyconf.h"
 #include "../libcore/exception.h"
 #include "../libcore/networksession.h"
+#include "hooks.h"
 #include "userframe.h"
 #include "userframeitem.h"
 #include "scriptwin.h"
@@ -57,6 +58,7 @@ void UserFrame::on_listWidget_customContextMenuRequested(const QPoint &pos)
     // We have some window selected so let's display a menu
     QPoint globalPos = this->ui->listWidget->viewport()->mapToGlobal(pos);
     QMenu Menu;
+    UiHooks::OnInput();
     // Items
     QAction *menuQuery = new QAction("PM", &Menu);
     Menu.addAction(menuQuery);

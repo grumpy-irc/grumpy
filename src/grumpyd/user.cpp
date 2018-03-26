@@ -149,6 +149,11 @@ void User::InsertSession(Session *sx)
         return;
     }
     this->sessions_gp.append(sx);
+    // Someone just connected to this user account, let's remove the away status if set before by auto-away system
+    // please keep in mind that by default GrumpyChat has 2 away systems: one that is based on first and last session
+    // disconnect and then another one UI based controlled by clients, that is the one we care about here, the first
+    // one was already handled in code above this.
+    this->UpdateAway();
 }
 
 QString User::GetName() const
@@ -293,6 +298,30 @@ void User::StorageLoad()
     this->storage = Grumpyd::GetBackend()->GetStorage(this->id);
 }
 
+void User::UpdateAway()
+{
+    bool now_is_away = this->IsAway();
+    QString reason = "I am currently away on all clients";
+    if (!this->LastAwayReason.isEmpty())
+        reason = this->LastAwayReason;
+    if (this->isAway != now_is_away)
+    {
+        this->isAway = now_is_away;
+        if (!this->IsConnectedToIRC())
+            return;
+        // Change away status on all IRC networks
+        foreach (SyncableIRCSession *session, this->sessions)
+        {
+            if (!session->IsConnected())
+                continue;
+            if (now_is_away)
+                session->SetAway(reason);
+            else
+                session->UnsetAway();
+        }
+    }
+}
+
 SyncableIRCSession *User::ConnectToIRCServer(libirc::ServerAddress info)
 {
     Scrollback *system_window = CoreWrapper::GrumpyCore->NewScrollback(NULL, info.GetHost(), ScrollbackType_System);
@@ -323,6 +352,20 @@ bool User::IsAuthorized(QString perm)
 bool User::IsOnline()
 {
     return this->sessions_gp.count() > 0;
+}
+
+bool User::IsAway()
+{
+    if (!this->IsOnline())
+        return true;
+    foreach (Session *session, this->sessions_gp)
+    {
+        if (session->IsAway)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool User::IsConnectedToIRC()

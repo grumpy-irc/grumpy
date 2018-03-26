@@ -62,6 +62,8 @@ namespace GrumpyIRC
             bool IsAuthorized(QString perm);
             //! Return true if this user is currently connected to grumpyd
             bool IsOnline();
+            //! Return true if user is offline or all sessions are marked as away
+            bool IsAway();
             //! Return true if user is connected at least to 1 IRC server
             bool IsConnectedToIRC();
             QList<Session*> GetGPSessions() const;
@@ -88,7 +90,10 @@ namespace GrumpyIRC
             QList<QString> StorageList();
             bool StorageContains(QString key);
             void StorageLoad();
+            //! Checks all sessions for being away, if away on all of them, set AWAY on IRC
+            void UpdateAway();
             QString DefaultNick;
+            QString LastAwayReason;
 
         private:
             static user_id_t LastID;
@@ -104,6 +109,7 @@ namespace GrumpyIRC
             //! Used to share settings across GrumpyChat installations for example
             QHash<QString, QByteArray> storage;
             bool locked = false;
+            bool isAway = false;
     };
 }
 
