@@ -360,12 +360,12 @@ bool User::IsAway()
         return true;
     foreach (Session *session, this->sessions_gp)
     {
-        if (session->IsAway)
+        if (!session->IsAway)
         {
-            return true;
+            return false;
         }
     }
-    return false;
+    return true;
 }
 
 bool User::IsConnectedToIRC()
