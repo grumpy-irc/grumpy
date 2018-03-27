@@ -91,6 +91,7 @@ namespace GrumpyIRC
             void on_actionProxy_triggered();
             void on_actionEnable_proxy_toggled(bool arg1);
             void OnAutoAway();
+            void on_actionExport_to_html_triggered();
 
         private:
             QString processInput(QString text);

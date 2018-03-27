@@ -30,6 +30,7 @@
 #include "scrollbacklist.h"
 #include "ui_mainwindow.h"
 #include "userwidget.h"
+#include "messagebox.h"
 #include "linkhandler.h"
 #include "proxy.h"
 #include "systemcmds.h"
@@ -38,6 +39,7 @@
 #include "scrollbackframe.h"
 #include "scrollbacksmanager.h"
 #include <QProgressBar>
+#include <QFileDialog>
 #include "skin.h"
 
 using namespace GrumpyIRC;
@@ -525,4 +527,22 @@ void MainWindow::OnAutoAway()
     foreach (IRCSession *session, IRCSession::Sessions)
         session->SetAway(CONF->GetAutoAwayMsg());
     IRCSession::Sessions_Lock.unlock();
+}
+
+void GrumpyIRC::MainWindow::on_actionExport_to_html_triggered()
+{
+    QString file = QFileDialog::getSaveFileName(this, "Export to html", CONF->GetLastSavePath(), "HTML (*.htm *.html);;All files (*.*)");
+    if (file.isEmpty())
+        return;
+    QFile f(file);
+    QFileInfo fi(file);
+    CONF->SetLastSavePath(fi.absolutePath());
+    if (!f.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text))
+    {
+        MessageBox::Display("html-export-fail", "Error", "Unable to write to " + file, this);
+        return;
+    }
+    QTextStream s(&f);
+    s << this->GetCurrentScrollbackFrame()->ToHtml();
+    f.close();
 }

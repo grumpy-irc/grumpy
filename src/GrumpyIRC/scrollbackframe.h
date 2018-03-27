@@ -111,6 +111,7 @@ namespace GrumpyIRC
             void RequestDisconnect();
             void RequestMore(unsigned int count);
             void RefreshHtml();
+            QString ToHtml();
             void SendCtcp(QString target, QString ctcp, QString text);
             void RefreshHtmlIfNeeded();
             void SetProperty(QString name, QVariant value);

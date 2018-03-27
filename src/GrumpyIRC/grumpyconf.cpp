@@ -366,6 +366,16 @@ void GrumpyConf::SetAutoAwayTime(int time)
     GCFG->SetValue("auto_away_time", time);
 }
 
+void GrumpyConf::SetLastSavePath(QString path)
+{
+    GCFG->SetValue("save_path", path);
+}
+
+QString GrumpyConf::GetLastSavePath()
+{
+    return GCFG->GetValueAsString("save_path");
+}
+
 void GrumpyConf::SetProxy(int proxy)
 {
     GCFG->SetValue("proxy", proxy);

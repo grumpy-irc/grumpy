@@ -105,6 +105,8 @@ namespace GrumpyIRC
             bool GetAutoAway();
             int GetAutoAwayTime();
             void SetAutoAwayTime(int time);
+            void SetLastSavePath(QString path);
+            QString GetLastSavePath();
 
             /////////////////////////////////////////////////////////////////////////
             // Proxy

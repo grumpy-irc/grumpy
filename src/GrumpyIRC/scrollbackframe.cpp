@@ -777,6 +777,11 @@ void ScrollbackFrame::RefreshHtml()
     this->isClean = false;
 }
 
+QString ScrollbackFrame::ToHtml()
+{
+    return this->textEdit->document()->toHtml();
+}
+
 void ScrollbackFrame::SendCtcp(QString target, QString ctcp, QString text)
 {
     if (this->GetSession())
