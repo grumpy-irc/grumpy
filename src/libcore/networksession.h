@@ -64,7 +64,6 @@ namespace GrumpyIRC
             virtual void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete)=0;
             virtual void SetAway(QString reason);
             virtual void UnsetAway();
-            virtual bool IsAway();
             //! Request the selected window to be removed from window tree
             //! the windows are never directly removed because there might be complex structures depending on them
             //! you always need to ASK the window to delete itself
@@ -75,9 +74,11 @@ namespace GrumpyIRC
 #ifdef _MSC_VER
             QDateTime GetCreationDateTime();
             QDateTime GetConnectionDateTime();
+            bool IsAway();
 #else
             virtual QDateTime GetCreationDateTime();
             virtual QDateTime GetConnectionDateTime();
+            virtual bool IsAway();
 #endif
         protected:
             QDateTime createdOn;
