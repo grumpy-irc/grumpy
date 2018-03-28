@@ -788,6 +788,14 @@ QString ScrollbackFrame::ToHtml()
     // Ugly hack to change the background, for some reason Qt doesn't export it
     text.replace("<body style=\"", "<body style=\"background-color: " + Skin::GetCurrent()->BackgroundColor.name() + "; color: " +
                  Skin::GetCurrent()->TextColor.name() + ";");
+    if (this->GetNetwork())
+    {
+        // Replace channel joins
+        if (this->GetNetwork()->IsSSL())
+            text.replace("<a href=\"irc_join://", "<a href=\"ircs://" + this->GetNetwork()->GetServerAddress() + "/");
+        else
+            text.replace("<a href=\"irc_join://", "<a href=\"irc://" + this->GetNetwork()->GetServerAddress() + "/");
+    }
     return text;
 }
 
