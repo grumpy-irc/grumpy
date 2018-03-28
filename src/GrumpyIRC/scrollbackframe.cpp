@@ -566,6 +566,11 @@ QString ScrollbackFrame::GetTitle()
     return this->scrollback->GetTarget();
 }
 
+QString ScrollbackFrame::ToString()
+{
+    return this->textEdit->document()->toPlainText();
+}
+
 void ScrollbackFrame::UpdateColor()
 {
     if (this->TreeNode)
@@ -779,7 +784,11 @@ void ScrollbackFrame::RefreshHtml()
 
 QString ScrollbackFrame::ToHtml()
 {
-    return this->textEdit->document()->toHtml();
+    QString text = this->textEdit->document()->toHtml();
+    // Ugly hack to change the background, for some reason Qt doesn't export it
+    text.replace("<body style=\"", "<body style=\"background-color: " + Skin::GetCurrent()->BackgroundColor.name() + "; color: " +
+                 Skin::GetCurrent()->TextColor.name() + ";");
+    return text;
 }
 
 void ScrollbackFrame::SendCtcp(QString target, QString ctcp, QString text)

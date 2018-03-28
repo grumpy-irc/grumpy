@@ -98,6 +98,7 @@ namespace GrumpyIRC
             Scrollback *GetScrollback();
             UserFrame *GetUserFrame();
             QString GetTitle();
+            QString ToString();
             void UpdateColor();
             void Focus();
             void RequestClose();

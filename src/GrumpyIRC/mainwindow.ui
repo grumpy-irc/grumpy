@@ -54,6 +54,7 @@
     <addaction name="actionLoad_more_items_from_remote"/>
     <addaction name="actionToggle_secret"/>
     <addaction name="actionExport_to_html"/>
+    <addaction name="actionExport_to_plain_text"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuScrollback"/>
@@ -150,6 +151,11 @@
   <action name="actionExport_to_html">
    <property name="text">
     <string>Export to html</string>
+   </property>
+  </action>
+  <action name="actionExport_to_plain_text">
+   <property name="text">
+    <string>Export to plain text</string>
    </property>
   </action>
  </widget>

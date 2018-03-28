@@ -546,3 +546,21 @@ void GrumpyIRC::MainWindow::on_actionExport_to_html_triggered()
     s << this->GetCurrentScrollbackFrame()->ToHtml();
     f.close();
 }
+
+void GrumpyIRC::MainWindow::on_actionExport_to_plain_text_triggered()
+{
+    QString file = QFileDialog::getSaveFileName(this, "Export to plain text", CONF->GetLastSavePath(), "Text (*.txt);;All files (*.*)");
+    if (file.isEmpty())
+        return;
+    QFile f(file);
+    QFileInfo fi(file);
+    CONF->SetLastSavePath(fi.absolutePath());
+    if (!f.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text))
+    {
+        MessageBox::Display("text-export-fail", "Error", "Unable to write to " + file, this);
+        return;
+    }
+    QTextStream s(&f);
+    s << this->GetCurrentScrollbackFrame()->ToString();
+    f.close();
+}
