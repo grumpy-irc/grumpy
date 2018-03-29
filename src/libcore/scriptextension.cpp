@@ -1,0 +1,170 @@
+//This program is free software: you can redistribute it and/or modify
+//it under the terms of the GNU Lesser General Public License as published by
+//the Free Software Foundation, either version 3 of the License, or
+//(at your option) any later version.
+
+//This program is distributed in the hope that it will be useful,
+//but WITHOUT ANY WARRANTY; without even the implied warranty of
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//GNU Lesser General Public License for more details.
+
+// Copyright (c) Petr Bena 2015 - 2018
+
+#include "scriptextension.h"
+#include "exception.h"
+#include <QFile>
+
+using namespace GrumpyIRC;
+
+QHash<QString, ScriptExtension*>    ScriptExtension::extensions;
+QList<QString>                      ScriptExtension::loadedPaths;
+
+ScriptExtension::ScriptExtension()
+{
+    this->isWorking = false;
+    this->isLoaded = false;
+    this->engine = nullptr;
+}
+
+ScriptExtension::~ScriptExtension()
+{
+    delete this->engine;
+    if (!this->scriptPath.isEmpty())
+        ScriptExtension::loadedPaths.removeAll(this->scriptPath);
+    if (this->isLoaded && ScriptExtension::extensions.contains(this->GetName()))
+        ScriptExtension::extensions.remove(this->scriptName);
+}
+
+bool ScriptExtension::Load(QString path, QString *error)
+{
+    if (this->engine || this->isLoaded)
+    {
+        *error = "You can't run Load multiple times";
+        return false;
+    }
+    if (ScriptExtension::loadedPaths.contains(path))
+    {
+        *error = "This script is already loaded";
+        return false;
+    }
+
+    this->scriptPath = path;
+
+    // Try to read the script
+    QFile file(path);
+    if (!file.open(QFile::ReadOnly))
+    {
+        *error = "Unable to read file";
+        return false;
+    }
+    QTextStream stream(&file);
+    this->sourceCode = stream.readAll();
+    file.close();
+
+    this->engine = new QScriptEngine();
+    this->script_ptr = this->engine->evaluate(this->sourceCode);
+    this->isLoaded = true;
+    if (!this->executeFunctionAsBool("ext_init"))
+    {
+        *error = "Unable to load script, ext_init() didn't return true";
+        return false;
+    }
+
+    this->isWorking = true;
+
+    if (!this->IsWorking())
+    {
+        *error = "Unable to load script, ext_is_working() didn't return true";
+        this->isWorking = false;
+        return false;
+    }
+
+    this->scriptAuthor = this->executeFunctionAsString("ext_get_author");
+    this->scriptDesc = this->executeFunctionAsString("ext_get_desc");
+    this->scriptName = this->executeFunctionAsString("ext_get_name");
+    this->scriptVers = this->executeFunctionAsString("ext_get_version");
+
+    if (this->scriptName.isEmpty())
+    {
+        *error = "Unable to load script, ext_get_name returned nothing";
+        this->isWorking = false;
+        return false;
+    }
+
+    this->scriptName = this->scriptName.toLower();
+
+    if (this->extensions.contains(this->scriptName))
+    {
+        *error = this->scriptName + " is already loaded";
+        this->isWorking = false;
+        return false;
+    }
+
+    // Loading is done, let's assume everything works
+    ScriptExtension::loadedPaths.append(this->scriptPath);
+    ScriptExtension::extensions.insert(this->GetName(), this);
+    return true;
+}
+
+QString ScriptExtension::GetDescription()
+{
+    return this->scriptDesc;
+}
+
+QString ScriptExtension::GetName()
+{
+    return this->scriptName;
+}
+
+QString ScriptExtension::GetVersion()
+{
+    return this->scriptVers;
+}
+
+bool ScriptExtension::IsWorking()
+{
+    if (!this->isWorking || !this->isLoaded)
+        return false;
+
+    return this->executeFunctionAsBool("ext_is_working");
+}
+
+bool ScriptExtension::executeFunctionAsBool(QString function)
+{
+    return this->executeFunction(function, QScriptValueList()).toBool();
+}
+
+QString ScriptExtension::executeFunctionAsString(QString function)
+{
+    return this->executeFunction(function, QScriptValueList()).toString();
+}
+
+QString ScriptExtension::executeFunctionAsString(QString function, QScriptValueList parameters)
+{
+    return this->executeFunction(function, parameters).toString();
+}
+
+QScriptValue ScriptExtension::executeFunction(QString function, QScriptValueList parameters)
+{
+    if (!this->isLoaded)
+        throw new ScriptException("Call to script function of extension that isn't loaded", BOOST_CURRENT_FUNCTION, this);
+
+    QScriptValue fc = this->engine->globalObject().property(function);
+    QScriptValue result = fc.call(QScriptValue(), parameters);
+    return result;
+}
+
+bool ScriptExtension::executeFunctionAsBool(QString function, QScriptValueList parameters)
+{
+    return this->executeFunction(function, parameters).toBool();
+}
+
+ScriptException::ScriptException(QString Message, QString function_id, ScriptExtension *extension) : Exception(Message, function_id)
+{
+
+}
+
+ScriptException::~ScriptException()
+{
+
+}

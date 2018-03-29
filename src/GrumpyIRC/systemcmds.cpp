@@ -27,6 +27,7 @@
 #include "../libcore/generic.h"
 #include "../libcore/grumpydsession.h"
 #include "../libcore/ircsession.h"
+#include "../libcore/scriptextension.h"
 
 using namespace GrumpyIRC;
 
@@ -589,5 +590,26 @@ int SystemCmds::Ban(SystemCommand *command, CommandArgs command_args)
         return 6;
     }
     session->SendRaw(sx, "MODE " + channel_name + " +b " + CONF->GetMaskForUser(target_user));
+    return 0;
+}
+
+int SystemCmds::Script(SystemCommand *command, CommandArgs command_args)
+{
+    Q_UNUSED(command);
+    if (command_args.ParameterLine.isEmpty())
+    {
+        GRUMPY_ERROR("This need to provide file name for this to work");
+        return 1;
+    }
+
+    ScriptExtension *extension = new ScriptExtension();
+    QString error;
+    if (!extension->Load(command_args.ParameterLine, &error))
+    {
+        delete extension;
+        GRUMPY_ERROR(error);
+        return 1;
+    }
+    Core::GrumpyCore->RegisterExtension(extension);
     return 0;
 }

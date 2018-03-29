@@ -44,6 +44,7 @@ namespace GrumpyIRC
         int Ban(SystemCommand *command, CommandArgs command_args);
         int KICK(SystemCommand *command, CommandArgs command_args);
         int Uptime(SystemCommand *command, CommandArgs command_args);
+        int Script(SystemCommand *command, CommandArgs command_args);
     }
 }
 

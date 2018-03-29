@@ -26,6 +26,8 @@ namespace GrumpyIRC
             virtual QString GetVersion()=0;
             virtual QString GetName()=0;
             virtual QString GetDescription()=0;
+            virtual bool IsWorking()=0;
+            virtual void Hook_Shutdown() {}
 
         //signals:
 

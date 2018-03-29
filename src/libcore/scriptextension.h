@@ -1,0 +1,62 @@
+//This program is free software: you can redistribute it and/or modify
+//it under the terms of the GNU Lesser General Public License as published by
+//the Free Software Foundation, either version 3 of the License, or
+//(at your option) any later version.
+
+//This program is distributed in the hope that it will be useful,
+//but WITHOUT ANY WARRANTY; without even the implied warranty of
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//GNU Lesser General Public License for more details.
+
+// Copyright (c) Petr Bena 2015 - 2018
+
+#ifndef SCRIPTEXTENSION_H
+#define SCRIPTEXTENSION_H
+
+#include "extension.h"
+#include "exception.h"
+#include <QtScript>
+#include <QHash>
+
+namespace GrumpyIRC
+{
+    class ScriptExtension : public Extension
+    {
+        public:
+            ScriptExtension();
+            ~ScriptExtension();
+            bool Load(QString path, QString *error);
+            QString GetDescription();
+            QString GetName();
+            QString GetVersion();
+            bool IsWorking();
+
+        private:
+            static QList<QString> loadedPaths;
+            static QHash<QString, ScriptExtension*> extensions;
+            bool executeFunctionAsBool(QString function, QScriptValueList parameters);
+            bool executeFunctionAsBool(QString function);
+            QString executeFunctionAsString(QString function);
+            QString executeFunctionAsString(QString function, QScriptValueList parameters);
+            QScriptValue executeFunction(QString function, QScriptValueList parameters);
+            QScriptEngine *engine;
+            QScriptValue script_ptr;
+            QString sourceCode;
+            QString scriptPath;
+            QString scriptName;
+            QString scriptDesc;
+            QString scriptAuthor;
+            QString scriptVers;
+            bool isWorking;
+            bool isLoaded;
+    };
+
+    class ScriptException : public Exception
+    {
+        public:
+            ScriptException(QString Message, QString function_id, ScriptExtension *extension);
+            ~ScriptException();
+    };
+}
+
+#endif // SCRIPTEXTENSION_H

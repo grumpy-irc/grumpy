@@ -13,6 +13,7 @@
 #include "configuration.h"
 #include "core.h"
 #include "commandprocessor.h"
+#include "extension.h"
 #include "factory.h"
 #include "eventhandler.h"
 #include <QDir>
@@ -30,6 +31,13 @@ GrumpyIRC::Core::Core()
 
 GrumpyIRC::Core::~Core()
 {
+    // Unload all extensions
+    foreach (Extension *extension, this->extensions)
+    {
+        extension->Hook_Shutdown();
+        delete extension;
+    }
+    this->extensions.clear();
     delete this->config;
     delete this->factory;
     delete this->commandProcessor;
@@ -39,6 +47,23 @@ GrumpyIRC::Core::~Core()
 GrumpyIRC::Scrollback *GrumpyIRC::Core::NewScrollback(GrumpyIRC::Scrollback *parent, QString name, ScrollbackType type)
 {
     return this->factory->NewScrollback(parent, name, type);
+}
+
+void GrumpyIRC::Core::RegisterExtension(GrumpyIRC::Extension *extension)
+{
+    if (!this->extensions.contains(extension))
+        this->extensions.append(extension);
+}
+
+void GrumpyIRC::Core::UnregisterExtension(GrumpyIRC::Extension *extension)
+{
+    if (this->extensions.contains(extension))
+        this->extensions.removeAll(extension);
+}
+
+QList<GrumpyIRC::Extension *> GrumpyIRC::Core::GetExtensions()
+{
+    return this->extensions;
 }
 
 void GrumpyIRC::Core::InstallFactory(Factory *f)
