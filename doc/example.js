@@ -5,6 +5,7 @@
 // These functions are all mandatory
 function ext_init()
 {
+    grumpy_log("Hello there");
     return true;
 }
 

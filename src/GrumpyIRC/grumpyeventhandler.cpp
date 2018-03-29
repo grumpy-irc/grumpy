@@ -57,5 +57,10 @@ void GrumpyEventHandler::OnError(QString text)
 void GrumpyEventHandler::OnSystemLog(QString text)
 {
     qDebug() << "LOG: " + text;
+    if (!MainWindow::Main)
+        return;
+
+    // Write log to system window
+    MainWindow::Main->WriteToCurrentWindow(text, ScrollbackItemType_System);
 }
 

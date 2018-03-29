@@ -11,7 +11,9 @@
 // Copyright (c) Petr Bena 2015 - 2018
 
 #include "scriptextension.h"
+#include "core.h"
 #include "exception.h"
+#include "eventhandler.h"
 #include <QFile>
 
 using namespace GrumpyIRC;
@@ -64,6 +66,7 @@ bool ScriptExtension::Load(QString path, QString *error)
     this->engine = new QScriptEngine();
     this->script_ptr = this->engine->evaluate(this->sourceCode);
     this->isLoaded = true;
+    this->registerFunctions();
     if (!this->executeFunctionAsBool("ext_init"))
     {
         *error = "Unable to load script, ext_init() didn't return true";
@@ -152,6 +155,54 @@ QScriptValue ScriptExtension::executeFunction(QString function, QScriptValueList
     QScriptValue fc = this->engine->globalObject().property(function);
     QScriptValue result = fc.call(QScriptValue(), parameters);
     return result;
+}
+
+/////////////////////////////////////////
+// Function exports
+/////////////////////////////////////////
+
+static QScriptValue error_log(QScriptContext *context, QScriptEngine *engine)
+{
+    if (context->argumentCount() < 1)
+    {
+        // Wrong number of parameters
+        return QScriptValue(engine, false);
+    }
+    QString text = context->argument(0).toString();
+    GRUMPY_ERROR(text);
+    return QScriptValue(engine, true);
+}
+
+static QScriptValue debug_log(QScriptContext *context, QScriptEngine *engine)
+{
+    if (context->argumentCount() < 2)
+    {
+        // Wrong number of parameters
+        return QScriptValue(engine, false);
+    }
+    QString text = context->argument(0).toString();
+    int verbosity = context->argument(1).toInt32();
+    GRUMPY_DEBUG(text, verbosity);
+    return QScriptValue(engine, true);
+}
+
+static QScriptValue log(QScriptContext *context, QScriptEngine *engine)
+{
+    if (context->argumentCount() < 1)
+    {
+        // Wrong number of parameters
+        return QScriptValue(engine, false);
+    }
+    QString text = context->argument(0).toString();
+    GRUMPY_LOG(text);
+    return QScriptValue(engine, true);
+}
+
+void ScriptExtension::registerFunctions()
+{
+    this->engine->globalObject().setProperty("grumpy_debug_log", this->engine->newFunction(debug_log, 2));
+    this->engine->globalObject().setProperty("grumpy_error_log", this->engine->newFunction(error_log, 1));
+    this->engine->globalObject().setProperty("grumpy_log", this->engine->newFunction(log, 1));
 }
 
 bool ScriptExtension::executeFunctionAsBool(QString function, QScriptValueList parameters)
