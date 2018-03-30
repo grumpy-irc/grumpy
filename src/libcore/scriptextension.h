@@ -32,6 +32,7 @@ namespace GrumpyIRC
             ~ScriptExtension();
             bool Load(QString path, QString *error);
             bool LoadSrc(QString unique_id, QString source, QString *error);
+            void Unload();
             QString GetDescription();
             QString GetName();
             QString GetVersion();
@@ -48,6 +49,7 @@ namespace GrumpyIRC
             QString executeFunctionAsString(QString function);
             QString executeFunctionAsString(QString function, QScriptValueList parameters);
             QScriptValue executeFunction(QString function, QScriptValueList parameters);
+            QScriptValue executeFunction(QString function);
             //! Makes all functions available to ECMA
             void registerFunctions();
             QScriptEngine *engine;

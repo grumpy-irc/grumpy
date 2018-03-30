@@ -613,3 +613,45 @@ int SystemCmds::Script(SystemCommand *command, CommandArgs command_args)
     Core::GrumpyCore->RegisterExtension(extension);
     return 0;
 }
+
+int SystemCmds::RemoveScript(SystemCommand *command, CommandArgs command_args)
+{
+    (void)command;
+    if (command_args.ParameterLine.isEmpty())
+    {
+        GRUMPY_ERROR("This need to provide name of script for this to work, use /grumpy.script.list to list them");
+        return 1;
+    }
+
+    ScriptExtension *e = ScriptExtension::GetExtensionByName(command_args.ParameterLine);
+    if (!e)
+    {
+        GRUMPY_ERROR("No such extension loaded, use /grumpy.script.list to list them");
+        return 1;
+    }
+    e->Unload();
+    Core::GrumpyCore->UnregisterExtension(e);
+    delete e;
+    return 0;
+}
+
+int SystemCmds::ScriptList(SystemCommand *command, CommandArgs command_args)
+{
+    (void)command_args;
+    (void)command;
+    Scrollback *sx = MainWindow::Main->GetCurrentScrollbackFrame()->GetScrollback();
+    QList<ScriptExtension*> extensions = ScriptExtension::GetExtensions();
+    if (extensions.isEmpty())
+    {
+        sx->InsertText("No scripts loaded");
+        return 0;
+    }
+    sx->InsertText("Name                | Author      | Version   | Description");
+    sx->InsertText("--------------------+-------------+-----------+---------------------");
+    foreach (ScriptExtension *ext, extensions)
+    {
+        sx->InsertText(Generic::ExpandedString(ext->GetName(), 20, 20) + "| " + Generic::ExpandedString(ext->GetAuthor(), 12, 12) + "| " +
+                       Generic::ExpandedString(ext->GetVersion(), 10, 10) + "| " + ext->GetDescription());
+    }
+    return 0;
+}

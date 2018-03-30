@@ -825,6 +825,7 @@ void Session::processRemoveScript(QHash<QString, QVariant> parameters)
         return;
     }
 
+    e->Unload();
     Core::GrumpyCore->UnregisterExtension(e);
     delete e;
 

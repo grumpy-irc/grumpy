@@ -120,6 +120,13 @@ bool ScriptExtension::LoadSrc(QString unique_id, QString source, QString *error)
     return this->loadSource(source, error);
 }
 
+void ScriptExtension::Unload()
+{
+    if (this->IsWorking())
+        this->executeFunction("ext_unload");
+    this->isWorking = false;
+}
+
 QString ScriptExtension::GetDescription()
 {
     return this->scriptDesc;
@@ -215,6 +222,11 @@ QString ScriptExtension::executeFunctionAsString(QString function)
 QString ScriptExtension::executeFunctionAsString(QString function, QScriptValueList parameters)
 {
     return this->executeFunction(function, parameters).toString();
+}
+
+QScriptValue ScriptExtension::executeFunction(QString function)
+{
+    return this->executeFunction(function, QScriptValueList());
 }
 
 QScriptValue ScriptExtension::executeFunction(QString function, QScriptValueList parameters)

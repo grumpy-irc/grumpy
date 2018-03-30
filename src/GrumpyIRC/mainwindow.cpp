@@ -109,7 +109,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.topic",               (SC_Callback)SystemCmds::Topic));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.kickban",             (SC_Callback)SystemCmds::KickBan));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.ban",                 (SC_Callback)SystemCmds::Ban));
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.script",              (SC_Callback)SystemCmds::Script));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.script.load",         (SC_Callback)SystemCmds::Script));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.script.unload",       (SC_Callback)SystemCmds::RemoveScript));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.script.list",         (SC_Callback)SystemCmds::ScriptList));
 
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("server",                     (SC_Callback)SystemCmds::Server));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("nick",                       (SC_Callback)SystemCmds::Nick));
