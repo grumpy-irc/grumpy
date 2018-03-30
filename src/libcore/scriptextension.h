@@ -34,7 +34,7 @@ namespace GrumpyIRC
             ~ScriptExtension();
             bool Load(QString path, QString *error);
             bool LoadSrc(QString unique_id, QString source, QString *error);
-            void Unload();
+            virtual void Unload();
             QString GetDescription();
             QString GetName();
             QString GetVersion();
@@ -46,7 +46,7 @@ namespace GrumpyIRC
         private slots:
             void OnError(QScriptValue e);
 
-        private:
+        protected:
             static QList<QString> loadedPaths;
             static QHash<QString, ScriptExtension*> extensions;
             bool loadSource(QString source, QString *error);
@@ -57,7 +57,7 @@ namespace GrumpyIRC
             QScriptValue executeFunction(QString function, QScriptValueList parameters);
             QScriptValue executeFunction(QString function);
             //! Makes all functions available to ECMA
-            void registerFunctions();
+            virtual void registerFunctions();
             QScriptEngine *engine;
             QScriptValue script_ptr;
             QString sourceCode;

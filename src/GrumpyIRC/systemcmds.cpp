@@ -16,6 +16,7 @@
 #include "scrollbacksmanager.h"
 #include "scrollbackframe.h"
 #include "corewrapper.h"
+#include "uiscript.h"
 #include "../libirc/libircclient/channel.h"
 #include "../libirc/libircclient/network.h"
 #include "../libirc/libirc/serveraddress.h"
@@ -602,7 +603,7 @@ int SystemCmds::Script(SystemCommand *command, CommandArgs command_args)
         return 1;
     }
 
-    ScriptExtension *extension = new ScriptExtension();
+    UiScript *extension = new UiScript();
     QString error;
     if (!extension->Load(command_args.ParameterLine, &error))
     {
