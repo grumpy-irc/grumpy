@@ -185,6 +185,7 @@ void InputBox::insertToHistory()
         {
             this->history.removeAt(0);
         }
+        UiHooks::OnInputHistInsert(this->parent, line);
         this->history.append(line);
     }
 }

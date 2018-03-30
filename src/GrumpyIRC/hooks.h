@@ -23,9 +23,14 @@ namespace GrumpyIRC
     class UiHooks
     {
         public:
+            static void OnExit();
+            static void OnMainWindowStart();
             static void OnScrollbackItemHighlight(ScrollbackFrame *scrollback, ScrollbackItem *item);
+            static void OnNewScrollbackFrame(ScrollbackFrame *scrollback);
             //! Called anytime user generates some sort of user input - click a window, write into console, whatever
             static void OnInput();
+            //! Called when something is added to input box history
+            static void OnInputHistInsert(ScrollbackFrame *scrollback, QString text);
     };
 }
 

@@ -42,6 +42,8 @@ namespace GrumpyIRC
             QString GetAuthor();
             bool IsWorking();
             QScriptValue ExecuteFunction(QString function, QScriptValueList parameters);
+            virtual unsigned int GetContextID();
+            virtual QString GetContext();
 
         private slots:
             void OnError(QScriptValue e);

@@ -22,6 +22,10 @@ typedef unsigned int scrollback_id_t;
 #define CONFIGURATION_FILE "grumpy.ini"
 #define CONFIGURATION_PATH "grumpyirc"
 
+#define GRUMPY_SCRIPT_CONTEXT_CORE            0
+#define GRUMPY_SCRIPT_CONTEXT_GRUMPY_CHAT     1
+#define GRUMPY_SCRIPT_CONTEXT_GRUMPY_DAEMON   2
+
 // Default ident for IRC protocol
 #define DEFAULT_IDENT "g"
 #define PYTHON_ENGINE

@@ -8,12 +8,13 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #include "scrollbacksmanager.h"
 #include "grumpyconf.h"
 #include "scrollbacklist.h"
 #include "scrollbackframe.h"
+#include "hooks.h"
 #include "userframe.h"
 #include "userwidget.h"
 #include "mainwindow.h"
@@ -53,6 +54,7 @@ ScrollbackFrame *ScrollbacksManager::CreateWindow(QString name, ScrollbackFrame 
         parent_tree = parent->TreeNode;
     if (scrollbacks)
         scrollbacks->RegisterWindow(window, parent_tree);
+    UiHooks::OnNewScrollbackFrame(window);
     return window;
 }
 

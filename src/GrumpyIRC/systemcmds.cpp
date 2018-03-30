@@ -511,7 +511,6 @@ int SystemCmds::Topic(SystemCommand *command, CommandArgs command_args)
     return 0;
 }
 
-
 int SystemCmds::KickBan(SystemCommand *command, CommandArgs command_args)
 {
     (void)command;

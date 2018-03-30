@@ -177,6 +177,16 @@ QScriptValue ScriptExtension::ExecuteFunction(QString function, QScriptValueList
     this->executeFunction(function, parameters);
 }
 
+unsigned int ScriptExtension::GetContextID()
+{
+    return GRUMPY_SCRIPT_CONTEXT_CORE;
+}
+
+QString ScriptExtension::GetContext()
+{
+    return "core";
+}
+
 void ScriptExtension::OnError(QScriptValue e)
 {
     GRUMPY_ERROR(this->GetName() + ": exception: " + e.toString());
@@ -697,10 +707,20 @@ static QScriptValue set_cfg(QScriptContext *context, QScriptEngine *engine)
     return QScriptValue();
 }
 
+static QScriptValue get_context(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
+
+    return QScriptValue(engine, extension->GetContext());
+}
+
 void ScriptExtension::registerFunctions()
 {
     this->engine->globalObject().setProperty("grumpy_set_cfg", this->engine->newFunction(set_cfg, 2));
     this->engine->globalObject().setProperty("grumpy_get_cfg", this->engine->newFunction(get_cfg, 2));
+    this->engine->globalObject().setProperty("grumpy_get_context", this->engine->newFunction(get_context, 0));
     this->engine->globalObject().setProperty("grumpy_network_send_raw", this->engine->newFunction(network_send_raw, 2));
     this->engine->globalObject().setProperty("grumpy_register_cmd", this->engine->newFunction(register_cmd, 2));
     this->engine->globalObject().setProperty("grumpy_debug_log", this->engine->newFunction(debug_log, 2));

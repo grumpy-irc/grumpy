@@ -36,6 +36,7 @@
 #include "systemcmds.h"
 #include "grumpyconf.h"
 #include "preferenceswin.h"
+#include "hooks.h"
 #include "scrollbackframe.h"
 #include "scrollbacksmanager.h"
 #include <QProgressBar>
@@ -48,6 +49,7 @@ MainWindow *MainWindow::Main;
 
 void MainWindow::Exit()
 {
+    UiHooks::OnExit();
     ScrollbackFrame::ExitThread();
     IRCSession::Exit(CONF->GetQuitMessage());
     GCFG->SetValue("mainwindow_state", QVariant(MainWindow::Main->saveState()));
@@ -145,6 +147,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->SetupAutoAway();
     if (!CONF->SafeMode)
         this->Execute(CONF->GetAutorun());
+    UiHooks::OnMainWindowStart();
 }
 
 MainWindow::MainWindow(bool fork, MainWindow *parent)

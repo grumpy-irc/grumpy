@@ -78,3 +78,9 @@ function ext_get_author()
 // bool grumpy_scrollback_get_type(window_id)       // returns channel / system / user
 // bool grumpy_scrollback_get_target(window_id)     // returns target name
 // bool grumpy_scrollback_write(window_id, text)    // writes to scrollback
+//
+// functions available with UI only
+// void ext_ui_on_exit()                     // On exit
+// void ext_ui_on_history(window_id, text)   // When new item is added to history
+// void ext_ui_on_main_window_start()        // On main
+// void ext_ui_on_new_scrollback_frame(window_id) // When new scrollback frame is created

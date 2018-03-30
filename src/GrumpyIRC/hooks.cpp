@@ -11,11 +11,31 @@
 // Copyright (c) Petr Bena 2015 - 2018
 
 #include "hooks.h"
+#include "uiscript.h"
+#include "../libcore/core.h"
 #include "../libcore/scrollback.h"
 #include "scrollbackframe.h"
 #include "mainwindow.h"
 
 using namespace GrumpyIRC;
+
+void UiHooks::OnExit()
+{
+    foreach (ScriptExtension *script, UiScript::GetExtensions())
+    {
+        if (script->GetContextID() == GRUMPY_SCRIPT_CONTEXT_GRUMPY_CHAT)
+            ((UiScript*)script)->Hook_OnExit();
+    }
+}
+
+void UiHooks::OnMainWindowStart()
+{
+    foreach (ScriptExtension *script, UiScript::GetExtensions())
+    {
+        if (script->GetContextID() == GRUMPY_SCRIPT_CONTEXT_GRUMPY_CHAT)
+            ((UiScript*)script)->Hook_OnMainWindowStart();
+    }
+}
 
 void UiHooks::OnScrollbackItemHighlight(ScrollbackFrame *scrollback, ScrollbackItem *item)
 {
@@ -31,9 +51,27 @@ void UiHooks::OnScrollbackItemHighlight(ScrollbackFrame *scrollback, ScrollbackI
     }
 }
 
+void UiHooks::OnNewScrollbackFrame(ScrollbackFrame *scrollback)
+{
+    foreach (ScriptExtension *script, UiScript::GetExtensions())
+    {
+        if (script->GetContextID() == GRUMPY_SCRIPT_CONTEXT_GRUMPY_CHAT)
+            ((UiScript*)script)->Hook_OnScrollbackFrameCreated(scrollback->GetScrollback());
+    }
+}
+
 void UiHooks::OnInput()
 {
     MainWindow::Main->ResetAutoAway();
+}
+
+void UiHooks::OnInputHistInsert(ScrollbackFrame *scrollback, QString text)
+{
+    foreach (ScriptExtension *script, UiScript::GetExtensions())
+    {
+        if (script->GetContextID() == GRUMPY_SCRIPT_CONTEXT_GRUMPY_CHAT)
+            ((UiScript*)script)->Hook_OnHistory(scrollback->GetScrollback(), text);
+    }
 }
 
 
