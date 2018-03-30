@@ -12,6 +12,8 @@
 
 #include "scriptextension.h"
 #include "core.h"
+#include "configuration.h"
+#include "definitions.h"
 #include "exception.h"
 #include "eventhandler.h"
 #include "networksession.h"
@@ -637,8 +639,68 @@ static QScriptValue register_cmd(QScriptContext *context, QScriptEngine *engine)
     return QScriptValue(engine, true);
 }
 
+static QScriptValue get_cfg(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
+    if (context->argumentCount() < 1)
+    {
+        // Wrong number of parameters
+        GRUMPY_ERROR(extension->GetName() + ": get_cfg(key): requires 1 parameter");
+        return QScriptValue(engine, false);
+    }
+    QScriptValue default_value;
+    if (context->argumentCount() > 1)
+        default_value = context->argument(1);
+    QString key = context->argument(0).toString();
+
+    if (!Core::GrumpyCore->GetConfiguration()->Extension_Contains(extension->GetName(), key))
+        return default_value;
+
+    QVariant value = Core::GrumpyCore->GetConfiguration()->Extension_GetValue(extension->GetName(), key);
+    QScriptValue result;
+    switch (value.type())
+    {
+        case QVariant::Bool:
+            result = QScriptValue(engine, value.toBool());
+            break;
+        case QVariant::Int:
+            result = QScriptValue(engine, value.toInt());
+            break;
+        case QVariant::String:
+            result = QScriptValue(engine, value.toString());
+            break;
+        default:
+            result = default_value;
+            break;
+    }
+
+    return result;
+}
+
+static QScriptValue set_cfg(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
+
+    if (context->argumentCount() < 2)
+    {
+        GRUMPY_ERROR(extension->GetName() + ": set_cfg(key, value): requires 2 parameters");
+        return QScriptValue(engine, false);
+    }
+    QString key = context->argument(0).toString();
+    QVariant value = context->argument(1).toVariant();
+
+    Core::GrumpyCore->GetConfiguration()->Extension_SetValue(extension->GetName(), key, value);
+}
+
 void ScriptExtension::registerFunctions()
 {
+    this->engine->globalObject().setProperty("grumpy_set_cfg", this->engine->newFunction(set_cfg, 2));
+    this->engine->globalObject().setProperty("grumpy_get_cfg", this->engine->newFunction(get_cfg, 2));
+    this->engine->globalObject().setProperty("grumpy_network_send_raw", this->engine->newFunction(network_send_raw, 2));
     this->engine->globalObject().setProperty("grumpy_register_cmd", this->engine->newFunction(register_cmd, 2));
     this->engine->globalObject().setProperty("grumpy_debug_log", this->engine->newFunction(debug_log, 2));
     this->engine->globalObject().setProperty("grumpy_error_log", this->engine->newFunction(error_log, 1));

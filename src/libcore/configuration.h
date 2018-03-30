@@ -30,6 +30,8 @@ namespace GrumpyIRC
 
             Configuration();
             virtual ~Configuration();
+
+            // General config
             virtual bool Contains(QString key);
             virtual QVariant GetValue(QString key);
             virtual void SetAlternativeConfigFile(QString file);
@@ -44,6 +46,21 @@ namespace GrumpyIRC
             virtual void SetValue(QString key, int value);
             virtual void SetValue(QString key, QString value);
             virtual void SetHomePath(QString path);
+
+            // Extension config
+            virtual bool        Extension_Contains(QString extension, QString key);
+            virtual QVariant    Extension_GetValue(QString extension, QString key);
+            virtual bool        Extension_GetValueAsBool(QString extension, QString key, bool none = false);
+            virtual QString     Extension_GetValueAsString(QString extension, QString key, QString default_value = "");
+            virtual int         Extension_GetValueAsInt(QString extension, QString key, int none = 0);
+            virtual float       Extension_GetValueAsFloat(QString extension, QString key, float none = 0);
+            virtual void        Extension_RemoveValue(QString extension, QString key);
+            virtual void        Extension_SetValue(QString extension, QString key, QVariant value);
+            virtual void        Extension_SetValue(QString extension, QString key, bool value);
+            virtual void        Extension_SetValue(QString extension, QString key, int value);
+            virtual void        Extension_SetValue(QString extension, QString key, QString value);
+
+            // Miscelancelous
             virtual QString GetHomePath();
             virtual QDateTime GetStartupDateTime();
             virtual void Load();
@@ -55,6 +72,8 @@ namespace GrumpyIRC
             QString home_path;
             QHash<QString, QVariant> Options;
             QDateTime startupDateTime;
+        private:
+            inline QString mkExt(QString e, QString k) { return "ext_" + e + "/" + k; }
     };
 
     inline void Configuration::SetValue(QString key, bool value) { this->SetValue(key, QVariant(value)); }

@@ -101,6 +101,61 @@ void Configuration::SetHomePath(QString path)
     this->home_path = path;
 }
 
+bool Configuration::Extension_Contains(QString extension, QString key)
+{
+    return this->Options.contains(this->mkExt(extension, key));
+}
+
+QVariant Configuration::Extension_GetValue(QString extension, QString key)
+{
+    return this->GetValue(this->mkExt(extension, key));
+}
+
+bool Configuration::Extension_GetValueAsBool(QString extension, QString key, bool none)
+{
+    return this->GetValueAsBool(this->mkExt(extension, key), none);
+}
+
+QString Configuration::Extension_GetValueAsString(QString extension, QString key, QString default_value)
+{
+    return this->GetValueAsString(this->mkExt(extension, key), default_value);
+}
+
+int Configuration::Extension_GetValueAsInt(QString extension, QString key, int none)
+{
+    return this->GetValueAsInt(this->mkExt(extension, key), none);
+}
+
+float Configuration::Extension_GetValueAsFloat(QString extension, QString key, float none)
+{
+    return this->GetValueAsFloat(this->mkExt(extension, key), none);
+}
+
+void Configuration::Extension_RemoveValue(QString extension, QString key)
+{
+    this->RemoveValue(this->mkExt(extension, key));
+}
+
+void Configuration::Extension_SetValue(QString extension, QString key, QVariant value)
+{
+    this->SetValue(this->mkExt(extension, key), value);
+}
+
+void Configuration::Extension_SetValue(QString extension, QString key, bool value)
+{
+    this->SetValue(this->mkExt(extension, key), value);
+}
+
+void Configuration::Extension_SetValue(QString extension, QString key, int value)
+{
+    this->SetValue(this->mkExt(extension, key), value);
+}
+
+void Configuration::Extension_SetValue(QString extension, QString key, QString value)
+{
+    this->SetValue(this->mkExt(extension, key), value);
+}
+
 QString Configuration::GetHomePath()
 {
     return this->home_path;
