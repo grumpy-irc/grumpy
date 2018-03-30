@@ -694,6 +694,7 @@ static QScriptValue set_cfg(QScriptContext *context, QScriptEngine *engine)
     QVariant value = context->argument(1).toVariant();
 
     Core::GrumpyCore->GetConfiguration()->Extension_SetValue(extension->GetName(), key, value);
+    return QScriptValue();
 }
 
 void ScriptExtension::registerFunctions()

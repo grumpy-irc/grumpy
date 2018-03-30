@@ -1,35 +1,8 @@
-// This is a sample extension to GrumpyChat
-// You can load this using command /grumpy.script /path/to/file.js
-// See end of this file for a reference of functions available
-
-// Hooks
-// void ext_shutdown(): called on shutdown
-
-function cmd(window_id, text)
-{
-    grumpy_log("Hello world :)");
-    return 0;
-}
-
-function cmd_print_id(window_id, text)
-{
-    grumpy_scrollback_write(window_id, "ID of this scrollback: " + window_id);
-    return 0;
-}
-
-// This function try to register a command in grumpy and print error if it fails
-function safe_cmd_reg(command_name, callback)
-{
-    if (!grumpy_register_cmd(command_name, callback))
-        grumpy_error_log("Unable to register command: " + command_name);
-}
+// This extension preserves a history of each scrollback by its name
+// which is actually pretty bad way to do it.
 
 function ext_init()
 {
-    grumpy_log("Loaded");
-    // Register a new command /hello, which calls cmd()
-    safe_cmd_reg("hello", "cmd");
-    safe_cmd_reg("debug.scrollback", "cmd_print_id");
     return true;
 }
 
@@ -40,12 +13,12 @@ function ext_is_working()
 
 function ext_get_name()
 {
-    return "Sample extension";
+    return "history_store";
 }
 
 function ext_get_desc()
 {
-    return "This is a sample extension, it implements some channel commands and debug commands";
+    return "Preserves the history of windows by their name";
 }
 
 function ext_get_version()
@@ -60,8 +33,6 @@ function ext_get_author()
 
 // function reference
 //
-// void grumpy_set_cfg(key, val)                    // save a key
-// bool grumpy_get_cfg(key, val)                    // retrieve a key
 // bool grumpy_register_cmd(name, fc)               // register new command
 // bool grumpy_debug_log(text, verbosity)           // writes to debug log
 // bool grumpy_error_log(text)                      // writes to error log

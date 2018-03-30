@@ -1,19 +1,32 @@
 // This is a sample extension to GrumpyChat
-// You can load this using command /grumpy.script /path/to/file.js
-// See end of this file for a reference of functions available
+// Implements some commands for ops
 
-// Hooks
-// void ext_shutdown(): called on shutdown
-
-function cmd(window_id, text)
+function cmd_op(window_id, text)
 {
-    grumpy_log("Hello world :)");
+    if (grumpy_scrollback_get_type(window_id) != "channel")
+    {
+        grumpy_error_log("You can only use this command in channel windows");
+        return 1;
+    }
+    grumpy_network_send_raw(window_id, "PRIVMSG ChanServ :op " + grumpy_scrollback_get_target(window_id));
     return 0;
 }
 
-function cmd_print_id(window_id, text)
+function cmd_deop(window_id, text)
 {
-    grumpy_scrollback_write(window_id, "ID of this scrollback: " + window_id);
+    if (grumpy_scrollback_get_type(window_id) != "channel")
+    {
+        grumpy_error_log("You can only use this command in channel windows");
+        return 1;
+    }
+    grumpy_network_send_raw(window_id, "MODE " + grumpy_scrollback_get_target(window_id) + " -o " + grumpy_network_get_nick(window_id));
+    return 0;
+}
+
+function cmd_optools(window_id, text)
+{
+    grumpy_log("* /op - gives you OP in current window");
+    grumpy_log("* /deop - removes your OP in current window");
     return 0;
 }
 
@@ -26,10 +39,10 @@ function safe_cmd_reg(command_name, callback)
 
 function ext_init()
 {
-    grumpy_log("Loaded");
-    // Register a new command /hello, which calls cmd()
-    safe_cmd_reg("hello", "cmd");
-    safe_cmd_reg("debug.scrollback", "cmd_print_id");
+    // Register new cmds
+    safe_cmd_reg("optools", "cmd_optools");
+    safe_cmd_reg("op", "cmd_op");
+    safe_cmd_reg("deop", "cmd_deop");
     return true;
 }
 
@@ -40,12 +53,12 @@ function ext_is_working()
 
 function ext_get_name()
 {
-    return "Sample extension";
+    return "optools";
 }
 
 function ext_get_desc()
 {
-    return "This is a sample extension, it implements some channel commands and debug commands";
+    return "Implements commands for ops, type /optools.list to list commands";
 }
 
 function ext_get_version()
