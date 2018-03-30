@@ -27,6 +27,8 @@
 #define PRIVILEGE_DOWNLOAD_TEXT     "downloadtext"  // let user download all content of their scrollback
 #define PRIVILEGE_SEARCH_TEXT       "searchtext"    // let user perform SQL search
 #define PRIVILEGE_USE_STORAGE       "usestorage"
+#define PRIVILEGE_MANAGE_SCRIPT     "script"        // Install and remove ECMA scripts
+#define PRIVILEGE_USE_SCRIPT        "use_script"    // Enable disable installed ECMA scripts for themselves
 
 #include <QString>
 #include <QHash>

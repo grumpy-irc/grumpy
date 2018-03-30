@@ -102,6 +102,9 @@ namespace GrumpyIRC
             void processStorageDel(QHash<QString, QVariant> parameters);
             void processStorageGet(QHash<QString, QVariant> parameters);
             void processAway(QHash<QString, QVariant> parameters);
+            void processInstallScript(QHash<QString, QVariant> parameters);
+            void processRemoveScript(QHash<QString, QVariant> parameters);
+            void processScriptLS(QHash<QString, QVariant> parameters);
 
             QTcpSocket *socket;
             QString peer;

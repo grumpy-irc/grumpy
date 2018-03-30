@@ -21,6 +21,44 @@ using namespace GrumpyIRC;
 QHash<QString, ScriptExtension*>    ScriptExtension::extensions;
 QList<QString>                      ScriptExtension::loadedPaths;
 
+ScriptExtension *ScriptExtension::GetExtensionByPath(QString path)
+{
+    foreach (ScriptExtension *extension, ScriptExtension::extensions)
+    {
+        if (extension->scriptPath == path)
+            return extension;
+    }
+
+    return nullptr;
+}
+
+ScriptExtension *ScriptExtension::GetExtensionByEngine(QScriptEngine *e)
+{
+    foreach (ScriptExtension *extension, ScriptExtension::extensions)
+    {
+        if (extension->engine == e)
+            return extension;
+    }
+
+    return nullptr;
+}
+
+ScriptExtension *ScriptExtension::GetExtensionByName(QString extension_name)
+{
+    foreach (ScriptExtension *extension, ScriptExtension::extensions)
+    {
+        if (extension->scriptName == extension_name)
+            return extension;
+    }
+
+    return nullptr;
+}
+
+QList<ScriptExtension *> ScriptExtension::GetExtensions()
+{
+    return ScriptExtension::extensions.values();
+}
+
 ScriptExtension::ScriptExtension()
 {
     this->isWorking = false;
@@ -60,19 +98,68 @@ bool ScriptExtension::Load(QString path, QString *error)
         return false;
     }
     QTextStream stream(&file);
-    this->sourceCode = stream.readAll();
+    QString sx = stream.readAll();
     file.close();
+    return this->loadSource(sx, error);
+}
 
+bool ScriptExtension::LoadSrc(QString unique_id, QString source, QString *error)
+{
+    if (this->engine || this->isLoaded)
+    {
+        *error = "You can't run Load multiple times";
+        return false;
+    }
+    if (ScriptExtension::loadedPaths.contains(unique_id))
+    {
+        *error = "This script is already loaded";
+        return false;
+    }
+
+    this->scriptPath = unique_id;
+    return this->loadSource(source, error);
+}
+
+QString ScriptExtension::GetDescription()
+{
+    return this->scriptDesc;
+}
+
+QString ScriptExtension::GetName()
+{
+    return this->scriptName;
+}
+
+QString ScriptExtension::GetVersion()
+{
+    return this->scriptVers;
+}
+
+QString ScriptExtension::GetPath()
+{
+    return this->scriptPath;
+}
+
+QString ScriptExtension::GetAuthor()
+{
+    return this->scriptAuthor;
+}
+
+bool ScriptExtension::IsWorking()
+{
+    if (!this->isWorking || !this->isLoaded)
+        return false;
+
+    return this->executeFunctionAsBool("ext_is_working");
+}
+
+bool ScriptExtension::loadSource(QString source, QString *error)
+{
+    this->sourceCode = source;
     this->engine = new QScriptEngine();
     this->script_ptr = this->engine->evaluate(this->sourceCode);
     this->isLoaded = true;
     this->registerFunctions();
-    if (!this->executeFunctionAsBool("ext_init"))
-    {
-        *error = "Unable to load script, ext_init() didn't return true";
-        return false;
-    }
-
     this->isWorking = true;
 
     if (!this->IsWorking())
@@ -106,30 +193,13 @@ bool ScriptExtension::Load(QString path, QString *error)
     // Loading is done, let's assume everything works
     ScriptExtension::loadedPaths.append(this->scriptPath);
     ScriptExtension::extensions.insert(this->GetName(), this);
-    return true;
-}
-
-QString ScriptExtension::GetDescription()
-{
-    return this->scriptDesc;
-}
-
-QString ScriptExtension::GetName()
-{
-    return this->scriptName;
-}
-
-QString ScriptExtension::GetVersion()
-{
-    return this->scriptVers;
-}
-
-bool ScriptExtension::IsWorking()
-{
-    if (!this->isWorking || !this->isLoaded)
+    if (!this->executeFunctionAsBool("ext_init"))
+    {
+        *error = "Unable to load script, ext_init() didn't return true";
+        this->isWorking = false;
         return false;
-
-    return this->executeFunctionAsBool("ext_is_working");
+    }
+    return true;
 }
 
 bool ScriptExtension::executeFunctionAsBool(QString function)
@@ -163,18 +233,24 @@ QScriptValue ScriptExtension::executeFunction(QString function, QScriptValueList
 
 static QScriptValue error_log(QScriptContext *context, QScriptEngine *engine)
 {
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
     if (context->argumentCount() < 1)
     {
         // Wrong number of parameters
         return QScriptValue(engine, false);
     }
     QString text = context->argument(0).toString();
-    GRUMPY_ERROR(text);
+    GRUMPY_ERROR(extension->GetName() + ": " + text);
     return QScriptValue(engine, true);
 }
 
 static QScriptValue debug_log(QScriptContext *context, QScriptEngine *engine)
 {
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
     if (context->argumentCount() < 2)
     {
         // Wrong number of parameters
@@ -182,7 +258,7 @@ static QScriptValue debug_log(QScriptContext *context, QScriptEngine *engine)
     }
     QString text = context->argument(0).toString();
     int verbosity = context->argument(1).toInt32();
-    GRUMPY_DEBUG(text, verbosity);
+    GRUMPY_DEBUG(extension->GetName() + ": " + text, verbosity);
     return QScriptValue(engine, true);
 }
 

@@ -98,6 +98,9 @@
 #define GP_CMD_SYS_GRANT_ROLE              45
 #define GP_CMD_SYS_REVOKE_ROLE             46
 #define GP_CMD_SYS_ALTER_USER              47
+#define GP_CMD_SYS_INSTALL_SCRIPT          48
+#define GP_CMD_SYS_UNINST_SCRIPT           49
+#define GP_CMD_SYS_LIST_SCRIPT             50
 
 // PACKET VERIFICATION
 // This system is used to verify if packet was delivered or not

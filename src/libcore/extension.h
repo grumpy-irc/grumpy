@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #ifndef EXTENSION_H
 #define EXTENSION_H
@@ -26,6 +26,7 @@ namespace GrumpyIRC
             virtual QString GetVersion()=0;
             virtual QString GetName()=0;
             virtual QString GetDescription()=0;
+            virtual QString GetAuthor()=0;
             virtual bool IsWorking()=0;
             virtual void Hook_Shutdown() {}
 

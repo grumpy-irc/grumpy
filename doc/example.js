@@ -33,3 +33,9 @@ function ext_get_author()
 {
     return "Petr Bena";
 }
+
+// function reference
+//
+// grumpy_debug_log(text, verbosity) // writes to debug log
+// grumpy_error_log(text) // writes to error log
+// grumpy_log(text) // writes to current scrollback

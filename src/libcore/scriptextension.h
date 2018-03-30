@@ -23,17 +23,26 @@ namespace GrumpyIRC
     class ScriptExtension : public Extension
     {
         public:
+            static ScriptExtension *GetExtensionByPath(QString path);
+            static ScriptExtension *GetExtensionByEngine(QScriptEngine *e);
+            static ScriptExtension *GetExtensionByName(QString extension_name);
+            static QList<ScriptExtension*> GetExtensions();
+
             ScriptExtension();
             ~ScriptExtension();
             bool Load(QString path, QString *error);
+            bool LoadSrc(QString unique_id, QString source, QString *error);
             QString GetDescription();
             QString GetName();
             QString GetVersion();
+            QString GetPath();
+            QString GetAuthor();
             bool IsWorking();
 
         private:
             static QList<QString> loadedPaths;
             static QHash<QString, ScriptExtension*> extensions;
+            bool loadSource(QString source, QString *error);
             bool executeFunctionAsBool(QString function, QScriptValueList parameters);
             bool executeFunctionAsBool(QString function);
             QString executeFunctionAsString(QString function);

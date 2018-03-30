@@ -19,6 +19,7 @@
 #include "../libcore/grumpydsession.h"
 #include "../libcore/eventhandler.h"
 #include "../libcore/generic.h"
+#include "../libcore/scriptextension.h"
 #include "databasebackend.h"
 #include "grumpyconf.h"
 #include "corewrapper.h"
@@ -769,6 +770,95 @@ void Session::processAway(QHash<QString, QVariant> parameters)
     this->loggedUser->UpdateAway();
 }
 
+void Session::processInstallScript(QHash<QString, QVariant> parameters)
+{
+    if (!this->IsAuthorized(PRIVILEGE_MANAGE_SCRIPT))
+    {
+        this->PermissionDeny(GP_CMD_SYS_INSTALL_SCRIPT);
+        return;
+    }
+
+    if (!parameters.contains("id"))
+    {
+        this->TransferError(GP_CMD_SYS_INSTALL_SCRIPT, "Missing id", GP_ERROR);
+        return;
+    }
+    if (!parameters.contains("source"))
+    {
+        this->TransferError(GP_CMD_SYS_INSTALL_SCRIPT, "Missing source", GP_ERROR);
+        return;
+    }
+
+    QString error;
+    ScriptExtension *ex = new ScriptExtension();
+    if (!ex->LoadSrc(parameters["id"].toString(), parameters["source"].toString(), &error))
+    {
+        this->TransferError(GP_CMD_SYS_INSTALL_SCRIPT, error, GP_ERROR);
+        delete ex;
+        return;
+    }
+    Core::GrumpyCore->RegisterExtension(ex);
+
+    // No need to send this back
+    parameters.remove("source");
+    this->protocol->SendProtocolCommand(GP_CMD_SYS_INSTALL_SCRIPT, parameters);
+}
+
+void Session::processRemoveScript(QHash<QString, QVariant> parameters)
+{
+    if (!this->IsAuthorized(PRIVILEGE_MANAGE_SCRIPT))
+    {
+        this->PermissionDeny(GP_CMD_SYS_UNINST_SCRIPT);
+        return;
+    }
+
+    ScriptExtension *e = nullptr;
+
+    if (parameters.contains("path"))
+        e = ScriptExtension::GetExtensionByPath(parameters["path"].toString());
+    else if (parameters.contains("name"))
+        e = ScriptExtension::GetExtensionByName(parameters["name"].toString());
+
+    if (e == nullptr)
+    {
+        this->TransferError(GP_CMD_SYS_UNINST_SCRIPT, "Extension not found", GP_ERROR);
+        return;
+    }
+
+    Core::GrumpyCore->UnregisterExtension(e);
+    delete e;
+
+    this->protocol->SendProtocolCommand(GP_CMD_SYS_UNINST_SCRIPT, parameters);
+}
+
+void Session::processScriptLS(QHash<QString, QVariant> parameters)
+{
+    Q_UNUSED(parameters);
+    if (!this->IsAuthorized(PRIVILEGE_USE_SCRIPT))
+    {
+        this->PermissionDeny(GP_CMD_SYS_LIST_SCRIPT);
+        return;
+    }
+
+    QList<QVariant> script_list;
+    foreach (ScriptExtension *s, ScriptExtension::GetExtensions())
+    {
+        QHash<QString, QVariant> data;
+        data.insert("name", s->GetName());
+        data.insert("id", s->GetPath());
+        data.insert("is_working", s->IsWorking());
+        data.insert("author", s->GetAuthor());
+        data.insert("version", s->GetVersion());
+        data.insert("description", s->GetDescription());
+        script_list.append(QVariant(data));
+    }
+
+    QHash<QString, QVariant> response;
+    response.insert("list", QVariant(script_list));
+
+    this->protocol->SendProtocolCommand(GP_CMD_SYS_LIST_SCRIPT, response);
+}
+
 void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
 {
     if (text == GP_CMD_HELLO)
@@ -860,6 +950,15 @@ void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
     } else if (text == GP_CMD_AWAY)
     {
         this->processAway(parameters);
+    } else if (text == GP_CMD_SYS_UNINST_SCRIPT)
+    {
+        this->processRemoveScript(parameters);
+    } else if (text == GP_CMD_SYS_INSTALL_SCRIPT)
+    {
+        this->processInstallScript(parameters);
+    } else if (text == GP_CMD_SYS_LIST_SCRIPT)
+    {
+        this->processScriptLS(parameters);
     } else
     {
         // We received some unknown packet, send it back to client so that it at least knows we don't support this
