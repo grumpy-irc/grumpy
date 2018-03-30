@@ -14,7 +14,8 @@ Some features:
 * Distributed core (grumpyd) similar to Quassel IRC
 * Modular design, you can take the core library
   and build a different interface on top of it
-* Very scalable and extendable
+* Very scalable and extendable, support for extensions
+  written in JavaScript
 * Support all IRC standards and networks
 * Supports IRCv3 protocol (http://ircv3.net/)
 * Extensible and very powerfull auto-completion mechanism
@@ -61,9 +62,8 @@ open source libraries, such as sqlite which may have difference licenses.
 Please see local README's or check headers of source code files for more
 information on license for a given file.
 
-
 Grumpy is currently a work in progress and is unfinished. Use on your own risk.
-See wiki on GitHub for docs. You can ask for help at #GrumpyChat on networks
-irc.tm-irc.org or freenode.net
+See wiki on GitHub for docs. You can ask for help at IRC:
+ircs://irc.tm-irc.org/#GrumpyChat or ircs://chat.freenode.net/#GrumpyChat
 
 
