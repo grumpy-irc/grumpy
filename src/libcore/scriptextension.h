@@ -15,12 +15,14 @@
 
 #include "extension.h"
 #include "exception.h"
+#include "commandprocessor.h"
 #include <QtScript>
 #include <QHash>
 
 namespace GrumpyIRC
 {
-    class ScriptExtension : public Extension
+    class ScriptCommand;
+    class LIBCORESHARED_EXPORT ScriptExtension : public Extension
     {
         public:
             static ScriptExtension *GetExtensionByPath(QString path);
@@ -39,6 +41,10 @@ namespace GrumpyIRC
             QString GetPath();
             QString GetAuthor();
             bool IsWorking();
+            QScriptValue ExecuteFunction(QString function, QScriptValueList parameters);
+
+        private slots:
+            void OnError(QScriptValue e);
 
         private:
             static QList<QString> loadedPaths;
@@ -62,13 +68,30 @@ namespace GrumpyIRC
             QString scriptVers;
             bool isWorking;
             bool isLoaded;
+            QList<ScriptCommand*> scriptCmds;
+            friend class ScriptCommand;
     };
 
-    class ScriptException : public Exception
+    class LIBCORESHARED_EXPORT ScriptException : public Exception
     {
         public:
             ScriptException(QString Message, QString function_id, ScriptExtension *extension);
             ~ScriptException();
+    };
+
+    class LIBCORESHARED_EXPORT ScriptCommand : public SystemCommand
+    {
+        public:
+            ScriptCommand(QString name, ScriptExtension *e, QString function);
+            ~ScriptCommand();
+            ScriptExtension *GetScript();
+            QString GetFN();
+            QScriptEngine *GetEngine();
+            int Run(CommandArgs args);
+
+        private:
+            ScriptExtension *script;
+            QString fn;
     };
 }
 

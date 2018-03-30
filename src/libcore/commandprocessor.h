@@ -32,6 +32,7 @@ namespace GrumpyIRC
         public:
             QString ParameterLine;
             QStringList Parameters;
+            Scrollback *Window;
     };
 
     typedef int (*SC_Callback) (SystemCommand*, CommandArgs);
@@ -42,7 +43,7 @@ namespace GrumpyIRC
             SystemCommand(QString name, SC_Callback callback);
             virtual ~SystemCommand();
             QString GetName();
-            int Run(CommandArgs args);
+            virtual int Run(CommandArgs args);
         protected:
             SC_Callback Callback;
         private:
@@ -59,7 +60,9 @@ namespace GrumpyIRC
         public:
             CommandProcessor();
             ~CommandProcessor();
+            //! Registers a new command to command processor, it is required by whoever registers the command to verify that command with same name isn't already registered
             void RegisterCommand(SystemCommand *sc);
+            void UnregisterCommand(SystemCommand *sc);
             //! Handles a single item - can process only 1 line of text
             int ProcessItem(QString command, Scrollback *window);
             //! Simple idiot proof processor for text that is input by a user

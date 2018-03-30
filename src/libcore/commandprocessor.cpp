@@ -41,9 +41,25 @@ CommandProcessor::~CommandProcessor()
 
 void CommandProcessor::RegisterCommand(SystemCommand *sc)
 {
+    QString lower_name = sc->GetName().toLower();
+
+    // In case this command is already registered throw exception
+    if (this->CommandList.contains(lower_name))
+        throw new Exception("Command already exists: " + lower_name, BOOST_CURRENT_FUNCTION);
+
     GRUMPY_DEBUG("Registering system command: " + sc->GetName(), 2);
-    QString name = sc->GetName().toLower();
-    this->CommandList.insert(name, sc);
+    this->CommandList.insert(lower_name, sc);
+}
+
+void CommandProcessor::UnregisterCommand(SystemCommand *sc)
+{
+    QString lower_name = sc->GetName().toLower();
+
+    if (!this->CommandList.contains(lower_name))
+        return;
+
+    GRUMPY_DEBUG("Unregistering system command: " + sc->GetName(), 2);
+    this->CommandList.remove(lower_name);
 }
 
 int CommandProcessor::ProcessText(QString text, Scrollback *window, bool comments_rm)
@@ -164,6 +180,7 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
         // This is a system command
         command = command.mid(1);
         CommandArgs parameters;
+        parameters.Window = window;
         QString command_name = command.toLower();
         // Get parameters
         if (command.contains(" "))

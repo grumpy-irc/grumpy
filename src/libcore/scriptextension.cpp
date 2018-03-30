@@ -68,6 +68,10 @@ ScriptExtension::ScriptExtension()
 
 ScriptExtension::~ScriptExtension()
 {
+    // Delete all registered script commands
+    while (!this->scriptCmds.isEmpty())
+        delete this->scriptCmds.first();
+
     delete this->engine;
     if (!this->scriptPath.isEmpty())
         ScriptExtension::loadedPaths.removeAll(this->scriptPath);
@@ -160,10 +164,23 @@ bool ScriptExtension::IsWorking()
     return this->executeFunctionAsBool("ext_is_working");
 }
 
+QScriptValue ScriptExtension::ExecuteFunction(QString function, QScriptValueList parameters)
+{
+    this->executeFunction(function, parameters);
+}
+
+void ScriptExtension::OnError(QScriptValue e)
+{
+    GRUMPY_ERROR(this->GetName() + ": exception: " + e.toString());
+}
+
 bool ScriptExtension::loadSource(QString source, QString *error)
 {
     this->sourceCode = source;
     this->engine = new QScriptEngine();
+
+    connect(this->engine, SIGNAL(signalHandlerException(QScriptValue)), this, SLOT(OnError(QScriptValue)));
+
     this->script_ptr = this->engine->evaluate(this->sourceCode);
     this->isLoaded = true;
     this->registerFunctions();
@@ -251,6 +268,7 @@ static QScriptValue error_log(QScriptContext *context, QScriptEngine *engine)
     if (context->argumentCount() < 1)
     {
         // Wrong number of parameters
+        GRUMPY_ERROR(extension->GetName() + ": error_log(text, verbosity): requires 2 parameters");
         return QScriptValue(engine, false);
     }
     QString text = context->argument(0).toString();
@@ -266,6 +284,7 @@ static QScriptValue debug_log(QScriptContext *context, QScriptEngine *engine)
     if (context->argumentCount() < 2)
     {
         // Wrong number of parameters
+        GRUMPY_ERROR(extension->GetName() + ": debug_log(text, verbosity): requires 2 parameters");
         return QScriptValue(engine, false);
     }
     QString text = context->argument(0).toString();
@@ -276,9 +295,13 @@ static QScriptValue debug_log(QScriptContext *context, QScriptEngine *engine)
 
 static QScriptValue log(QScriptContext *context, QScriptEngine *engine)
 {
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
     if (context->argumentCount() < 1)
     {
         // Wrong number of parameters
+        GRUMPY_ERROR(extension->GetName() + ": log(text): requires 1 parameter");
         return QScriptValue(engine, false);
     }
     QString text = context->argument(0).toString();
@@ -286,8 +309,37 @@ static QScriptValue log(QScriptContext *context, QScriptEngine *engine)
     return QScriptValue(engine, true);
 }
 
+static QScriptValue register_cmd(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
+    if (context->argumentCount() < 2)
+    {
+        // Wrong number of parameters
+        GRUMPY_ERROR(extension->GetName() + ": register_cmd(command_name, callback): requires 2 parameters");
+        return QScriptValue(engine, false);
+    }
+    QString cmd_name = context->argument(0).toString().toLower();
+    if (cmd_name.contains(" "))
+    {
+        GRUMPY_ERROR(extension->GetName() + ": register_cmd(command_name, callback): invalid command name: " + cmd_name);
+        return QScriptValue(engine, false);
+    }
+    QString fc = context->argument(1).toString();
+    if (Core::GrumpyCore->GetCommandProcessor()->Exists(cmd_name))
+    {
+        GRUMPY_ERROR(extension->GetName() + ": register_cmd(command_name, callback): command already registered: " + cmd_name);
+        return QScriptValue(engine, false);
+    }
+    ScriptCommand *command = new ScriptCommand(cmd_name, extension, fc);
+    Core::GrumpyCore->GetCommandProcessor()->RegisterCommand(command);
+    return QScriptValue(engine, true);
+}
+
 void ScriptExtension::registerFunctions()
 {
+    this->engine->globalObject().setProperty("grumpy_register_cmd", this->engine->newFunction(register_cmd, 2));
     this->engine->globalObject().setProperty("grumpy_debug_log", this->engine->newFunction(debug_log, 2));
     this->engine->globalObject().setProperty("grumpy_error_log", this->engine->newFunction(error_log, 1));
     this->engine->globalObject().setProperty("grumpy_log", this->engine->newFunction(log, 1));
@@ -306,4 +358,41 @@ ScriptException::ScriptException(QString Message, QString function_id, ScriptExt
 ScriptException::~ScriptException()
 {
 
+}
+
+ScriptCommand::ScriptCommand(QString name, ScriptExtension *e, QString function) : SystemCommand(name, nullptr)
+{
+    this->fn = function;
+    this->script = e;
+    e->scriptCmds.append(this);
+}
+
+ScriptCommand::~ScriptCommand()
+{
+    this->script->scriptCmds.removeAll(this);
+    Core::GrumpyCore->GetCommandProcessor()->UnregisterCommand(this);
+}
+
+ScriptExtension *ScriptCommand::GetScript()
+{
+    return this->script;
+}
+
+QString ScriptCommand::GetFN()
+{
+    return this->fn;
+}
+
+QScriptEngine *ScriptCommand::GetEngine()
+{
+    return this->script->engine;
+}
+
+int ScriptCommand::Run(CommandArgs args)
+{
+    QScriptValueList parameters;
+    parameters.append(QScriptValue(this->GetEngine(), args.Window->GetID()));
+    parameters.append(QScriptValue(this->GetEngine(), args.ParameterLine));
+    this->script->executeFunction(this->fn, parameters);
+    return 0;
 }

@@ -14,12 +14,14 @@
 #define EXTENSION_H
 
 #include "definitions.h"
+#include "libcore_global.h"
 #include <QString>
 
 namespace GrumpyIRC
 {
-    class Extension
+    class LIBCORESHARED_EXPORT Extension : public QObject
     {
+            Q_OBJECT
         public:
             Extension();
             virtual ~Extension();

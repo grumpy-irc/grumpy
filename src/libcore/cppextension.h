@@ -13,12 +13,13 @@
 #ifndef CPPEXTENSION_H
 #define CPPEXTENSION_H
 
+#include "libcore_global.h"
 #include "extension.h"
 #include <QtPlugin>
 
 namespace GrumpyIRC
 {
-    class CppExtension : public Extension
+    class LIBCORESHARED_EXPORT CppExtension : public Extension
     {
         public:
             CppExtension();
