@@ -123,6 +123,7 @@ namespace GrumpyIRC
     {
             Q_OBJECT
         public:
+            static Scrollback *GetScrollbackByID(scrollback_id_t id);
             static QList<Scrollback*> ScrollbackList;
             static QMutex ScrollbackList_Mutex;
 

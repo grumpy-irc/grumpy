@@ -14,6 +14,8 @@
 #include "core.h"
 #include "exception.h"
 #include "eventhandler.h"
+#include "networksession.h"
+#include "scrollback.h"
 #include <QFile>
 
 using namespace GrumpyIRC;
@@ -309,6 +311,82 @@ static QScriptValue log(QScriptContext *context, QScriptEngine *engine)
     return QScriptValue(engine, true);
 }
 
+static QScriptValue network_send_raw(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
+    if (context->argumentCount() < 2)
+    {
+        // Wrong number of parameters
+        GRUMPY_ERROR(extension->GetName() + ": network_send_raw(window_id, text): requires 2 parameters");
+        return QScriptValue(engine, false);
+    }
+    unsigned int window_id = context->argument(0).toUInt32();
+    QString text = context->argument(1).toString();
+    Scrollback *w = Scrollback::GetScrollbackByID(window_id);
+    if (!w)
+    {
+        GRUMPY_ERROR(extension->GetName() + ": network_send_raw(window_id, text): unknown scrollback");
+        return QScriptValue(engine, false);
+    }
+    if (!w->GetSession())
+    {
+        GRUMPY_ERROR(extension->GetName() + ": network_send_raw(window_id, text): scrollback is not connected to IRC network");
+        return QScriptValue(engine, false);
+    }
+
+    w->GetSession()->SendRaw(w, text);
+
+    return QScriptValue(engine, true);
+}
+
+static QScriptValue scrollback_write(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
+    if (context->argumentCount() < 2)
+    {
+        // Wrong number of parameters
+        GRUMPY_ERROR(extension->GetName() + ": scrollback_write(window_id, text): requires 2 parameters");
+        return QScriptValue(engine, false);
+    }
+    unsigned int window_id = context->argument(0).toUInt32();
+    QString text = context->argument(1).toString();
+    Scrollback *w = Scrollback::GetScrollbackByID(window_id);
+    if (!w)
+    {
+        GRUMPY_ERROR(extension->GetName() + ": scrollback_write(window_id, text): unknown scrollback");
+        return QScriptValue(engine, false);
+    }
+    w->InsertText(text);
+
+    return QScriptValue(engine, true);
+}
+
+static QScriptValue scrollback_get_target(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
+    if (context->argumentCount() < 1)
+    {
+        // Wrong number of parameters
+        GRUMPY_ERROR(extension->GetName() + ": scrollback_get_target(window_id): requires 1 parameter");
+        return QScriptValue(engine, false);
+    }
+    unsigned int window_id = context->argument(0).toUInt32();
+    Scrollback *w = Scrollback::GetScrollbackByID(window_id);
+    if (!w)
+    {
+        GRUMPY_ERROR(extension->GetName() + ": scrollback_get_target(window_id): unknown scrollback");
+        return QScriptValue(engine, false);
+    }
+
+    return QScriptValue(engine, w->GetTarget());
+}
+
 static QScriptValue register_cmd(QScriptContext *context, QScriptEngine *engine)
 {
     ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
@@ -343,6 +421,9 @@ void ScriptExtension::registerFunctions()
     this->engine->globalObject().setProperty("grumpy_debug_log", this->engine->newFunction(debug_log, 2));
     this->engine->globalObject().setProperty("grumpy_error_log", this->engine->newFunction(error_log, 1));
     this->engine->globalObject().setProperty("grumpy_log", this->engine->newFunction(log, 1));
+    this->engine->globalObject().setProperty("grumpy_scrollback_write", this->engine->newFunction(scrollback_write, 2));
+    this->engine->globalObject().setProperty("grumpy_scrollback_get_target", this->engine->newFunction(scrollback_get_target, 1));
+    this->engine->globalObject().setProperty("grumpy_network_send_raw", this->engine->newFunction(network_send_raw, 2));
 }
 
 bool ScriptExtension::executeFunctionAsBool(QString function, QScriptValueList parameters)

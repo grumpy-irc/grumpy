@@ -24,6 +24,16 @@ scrollback_id_t Scrollback::lastID = 1;
 unsigned long long ScrollbackItem::TotalIC = 0;
 #endif
 
+Scrollback *Scrollback::GetScrollbackByID(scrollback_id_t id)
+{
+    foreach (Scrollback *s, Scrollback::ScrollbackList)
+    {
+        if (s->GetID() == id)
+            return s;
+    }
+    return nullptr;
+}
+
 Scrollback::Scrollback(ScrollbackType Type, Scrollback *parent, bool scrollback_hidden)
 {
     this->_maxItems = 800000;
