@@ -1,8 +1,6 @@
 // This is a sample extension to GrumpyChat
 // You can load this using command /grumpy.script /path/to/file.js
-// Use this file as a reference to functions available
-
-// These functions are all mandatory
+// See end of this file for a reference of functions available
 
 function cmd(window_id, text)
 {
@@ -32,6 +30,12 @@ function cmd_deop(window_id, text)
     return 0;
 }
 
+function cmd_print_id(window_id, text)
+{
+    grumpy_scrollback_write(window_id, "ID of this scrollback: " + window_id);
+    return 0;
+}
+
 // This function try to register a command in grumpy and print error if it fails
 function safe_cmd_reg(command_name, callback)
 {
@@ -46,6 +50,7 @@ function ext_init()
     safe_cmd_reg("hello", "cmd");
     safe_cmd_reg("deop", "cmd_deop");
     safe_cmd_reg("op", "cmd_op");
+    safe_cmd_reg("debug.scrollback", "cmd_print_id");
     return true;
 }
 
@@ -61,7 +66,7 @@ function ext_get_name()
 
 function ext_get_desc()
 {
-    return "This is just a sample extension, it doesn't do much useful";
+    return "This is a sample extension, it implements some channel commands and debug commands";
 }
 
 function ext_get_version()
