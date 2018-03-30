@@ -16,6 +16,10 @@
 #include "eventhandler.h"
 #include "networksession.h"
 #include "scrollback.h"
+#include "../libirc/libircclient/user.h"
+#include "../libirc/libircclient/channel.h"
+#include "../libirc/libircclient/priority.h"
+#include "../libirc/libircclient/network.h"
 #include <QFile>
 
 using namespace GrumpyIRC;
@@ -311,6 +315,140 @@ static QScriptValue log(QScriptContext *context, QScriptEngine *engine)
     return QScriptValue(engine, true);
 }
 
+static NetworkSession *meta_network_session_get(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return nullptr;
+    if (context->argumentCount() < 1)
+    {
+        // Wrong number of parameters
+        GRUMPY_ERROR(extension->GetName() + ": network_get_meta(window_id): requires 1 parameter1");
+        return nullptr;
+    }
+    unsigned int window_id = context->argument(0).toUInt32();
+    Scrollback *w = Scrollback::GetScrollbackByID(window_id);
+    if (!w)
+    {
+        GRUMPY_ERROR(extension->GetName() + ": network_get_meta(window_id): unknown scrollback");
+        return nullptr;
+    }
+    if (!w->GetSession())
+    {
+        GRUMPY_ERROR(extension->GetName() + ": network_get_meta(window_id): scrollback is not connected to IRC network");
+        return nullptr;
+    }
+
+    return w->GetSession();
+}
+
+static libircclient::Network *meta_network_get(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return nullptr;
+    if (context->argumentCount() < 1)
+    {
+        // Wrong number of parameters
+        GRUMPY_ERROR(extension->GetName() + ": meta_network_get(window_id): requires 1 parameter1");
+        return nullptr;
+    }
+    unsigned int window_id = context->argument(0).toUInt32();
+    Scrollback *w = Scrollback::GetScrollbackByID(window_id);
+    if (!w)
+    {
+        GRUMPY_ERROR(extension->GetName() + ": meta_network_get(window_id): unknown scrollback");
+        return nullptr;
+    }
+    NetworkSession *session = w->GetSession();
+    if (!session)
+    {
+        GRUMPY_ERROR(extension->GetName() + ": meta_network_get(window_id): scrollback is not connected to IRC network");
+        return nullptr;
+    }
+    libircclient::Network *network = session->GetNetwork(w);
+    if (!network)
+    {
+        GRUMPY_ERROR(extension->GetName() + ": meta_network_get(window_id): scrollback has NULL IRC network");
+        return nullptr;
+    }
+
+    return network;
+}
+
+static QScriptValue network_get_nick(QScriptContext *context, QScriptEngine *engine)
+{
+    libircclient::Network *network = meta_network_get(context, engine);
+    if (!network)
+        return QScriptValue(engine, false);
+
+    return QScriptValue(engine, network->GetNick());
+}
+
+static QScriptValue network_get_ident(QScriptContext *context, QScriptEngine *engine)
+{
+    libircclient::Network *network = meta_network_get(context, engine);
+    if (!network)
+        return QScriptValue(engine, false);
+
+    return QScriptValue(engine, network->GetIdent());
+}
+
+static QScriptValue network_get_host(QScriptContext *context, QScriptEngine *engine)
+{
+    libircclient::Network *network = meta_network_get(context, engine);
+    if (!network)
+        return QScriptValue(engine, false);
+
+    return QScriptValue(engine, network->GetHost());
+}
+
+static QScriptValue network_get_network_name(QScriptContext *context, QScriptEngine *engine)
+{
+    libircclient::Network *network = meta_network_get(context, engine);
+    if (!network)
+        return QScriptValue(engine, false);
+
+    return QScriptValue(engine, network->GetNetworkName());
+}
+
+static QScriptValue network_get_server_host(QScriptContext *context, QScriptEngine *engine)
+{
+    libircclient::Network *network = meta_network_get(context, engine);
+    if (!network)
+        return QScriptValue(engine, false);
+
+    return QScriptValue(engine, network->GetServerAddress());
+}
+
+static QScriptValue network_send_message(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
+    if (context->argumentCount() < 3)
+    {
+        // Wrong number of parameters
+        GRUMPY_ERROR(extension->GetName() + ": network_send_message(window_id, target, text): requires 3 parameters");
+        return QScriptValue(engine, false);
+    }
+    unsigned int window_id = context->argument(0).toUInt32();
+    QString target = context->argument(1).toString();
+    QString text = context->argument(2).toString();
+    Scrollback *w = Scrollback::GetScrollbackByID(window_id);
+    if (!w)
+    {
+        GRUMPY_ERROR(extension->GetName() + ": network_send_raw(window_id, text): unknown scrollback");
+        return QScriptValue(engine, false);
+    }
+    if (!w->GetSession())
+    {
+        GRUMPY_ERROR(extension->GetName() + ": network_send_raw(window_id, text): scrollback is not connected to IRC network");
+        return QScriptValue(engine, false);
+    }
+    w->GetSession()->SendMessage(w, target, text);
+}
+
 static QScriptValue network_send_raw(QScriptContext *context, QScriptEngine *engine)
 {
     ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
@@ -363,6 +501,90 @@ static QScriptValue scrollback_write(QScriptContext *context, QScriptEngine *eng
     w->InsertText(text);
 
     return QScriptValue(engine, true);
+}
+
+static QScriptValue scrollback_has_network(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
+    if (context->argumentCount() < 1)
+    {
+        // Wrong number of parameters
+        GRUMPY_ERROR(extension->GetName() + ": scrollback_has_network(window_id): requires 1 parameter");
+        return QScriptValue(engine, false);
+    }
+    unsigned int window_id = context->argument(0).toUInt32();
+    Scrollback *w = Scrollback::GetScrollbackByID(window_id);
+    if (!w)
+    {
+        GRUMPY_ERROR(extension->GetName() + ": scrollback_has_network(window_id): unknown scrollback");
+        return QScriptValue(engine, false);
+    }
+    if (!w->GetSession())
+        return QScriptValue(engine, false);
+    if (!w->GetSession()->GetNetwork(w))
+        return QScriptValue(engine, false);
+
+    return QScriptValue(engine, true);
+}
+
+static QScriptValue scrollback_has_network_session(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
+    if (context->argumentCount() < 1)
+    {
+        // Wrong number of parameters
+        GRUMPY_ERROR(extension->GetName() + ": scrollback_has_network_session(window_id): requires 1 parameter");
+        return QScriptValue(engine, false);
+    }
+    unsigned int window_id = context->argument(0).toUInt32();
+    Scrollback *w = Scrollback::GetScrollbackByID(window_id);
+    if (!w)
+    {
+        GRUMPY_ERROR(extension->GetName() + ": scrollback_has_network_session(window_id): unknown scrollback");
+        return QScriptValue(engine, false);
+    }
+    if (!w->GetSession())
+    {
+        return QScriptValue(engine, false);
+    }
+
+    return QScriptValue(engine, true);
+}
+
+static QScriptValue scrollback_get_type(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
+    if (context->argumentCount() < 1)
+    {
+        // Wrong number of parameters
+        GRUMPY_ERROR(extension->GetName() + ": scrollback_get_type(window_id): requires 1 parameter");
+        return QScriptValue(engine, false);
+    }
+    unsigned int window_id = context->argument(0).toUInt32();
+    Scrollback *w = Scrollback::GetScrollbackByID(window_id);
+    if (!w)
+    {
+        GRUMPY_ERROR(extension->GetName() + ": scrollback_get_type(window_id): unknown scrollback");
+        return QScriptValue(engine, false);
+    }
+    QString type = "unknown";
+    switch (w->GetType())
+    {
+        case ScrollbackType_Channel:
+            return "channel";
+        case ScrollbackType_System:
+            return "system";
+        case ScrollbackType_User:
+            return "user";
+    }
+
+    return QScriptValue(engine, type);
 }
 
 static QScriptValue scrollback_get_target(QScriptContext *context, QScriptEngine *engine)
@@ -422,7 +644,16 @@ void ScriptExtension::registerFunctions()
     this->engine->globalObject().setProperty("grumpy_error_log", this->engine->newFunction(error_log, 1));
     this->engine->globalObject().setProperty("grumpy_log", this->engine->newFunction(log, 1));
     this->engine->globalObject().setProperty("grumpy_scrollback_write", this->engine->newFunction(scrollback_write, 2));
+    this->engine->globalObject().setProperty("grumpy_scrollback_get_type", this->engine->newFunction(scrollback_get_type, 1));
     this->engine->globalObject().setProperty("grumpy_scrollback_get_target", this->engine->newFunction(scrollback_get_target, 1));
+    this->engine->globalObject().setProperty("grumpy_scrollback_has_network", this->engine->newFunction(scrollback_has_network, 1));
+    this->engine->globalObject().setProperty("grumpy_scrollback_has_network_session", this->engine->newFunction(scrollback_has_network_session, 1));
+    this->engine->globalObject().setProperty("grumpy_network_get_nick", this->engine->newFunction(network_get_nick, 1));
+    this->engine->globalObject().setProperty("grumpy_network_get_ident", this->engine->newFunction(network_get_ident, 1));
+    this->engine->globalObject().setProperty("grumpy_network_get_host", this->engine->newFunction(network_get_host, 1));
+    this->engine->globalObject().setProperty("grumpy_network_get_server_host", this->engine->newFunction(network_get_server_host, 1));
+    this->engine->globalObject().setProperty("grumpy_network_get_network_name", this->engine->newFunction(network_get_network_name, 1));
+    this->engine->globalObject().setProperty("grumpy_network_send_message", this->engine->newFunction(network_send_message, 3));
     this->engine->globalObject().setProperty("grumpy_network_send_raw", this->engine->newFunction(network_send_raw, 2));
 }
 
