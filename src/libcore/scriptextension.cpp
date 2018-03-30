@@ -197,6 +197,14 @@ bool ScriptExtension::loadSource(QString source, QString *error)
     this->sourceCode = source;
     this->engine = new QScriptEngine();
 
+    QScriptSyntaxCheckResult s = this->engine->checkSyntax(source);
+    if (s.state() != QScriptSyntaxCheckResult::Valid)
+    {
+        *error = "Unable to load script, syntax error at line " + QString::number(s.errorLineNumber()) + " column " + QString::number(s.errorColumnNumber()) + ": " + s.errorMessage();
+        this->isWorking = false;
+        return false;
+    }
+
     connect(this->engine, SIGNAL(signalHandlerException(QScriptValue)), this, SLOT(OnError(QScriptValue)));
 
     this->script_ptr = this->engine->evaluate(this->sourceCode);
