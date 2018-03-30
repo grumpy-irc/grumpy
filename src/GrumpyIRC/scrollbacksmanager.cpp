@@ -174,6 +174,7 @@ void ScrollbacksManager::SwitchWindow(ScrollbackFrame *window)
     window->EnableState(false);
     window->SetVisible(true);
     window->RefreshHtmlIfNeeded();
+    UiHooks::OnScrollbackFrameSwitch(window);
 }
 
 ScrollbackFrame *ScrollbacksManager::GetCurrentScrollback() const

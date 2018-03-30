@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #include "../libcore/autocompletionengine.h"
 #include "../libcore/commandprocessor.h"
@@ -127,6 +127,22 @@ void InputBox::Complete()
             suggestions = suggestions.mid(0, suggestions.size() - 2);
         this->parent->InsertText(QString("Multiple results: ") + suggestions);
     }
+}
+
+void InputBox::ClearHistory()
+{
+    this->historyPosition = 0;
+    this->history.clear();
+}
+
+void InputBox::LoadHistory(QList<QString> new_history)
+{
+    foreach (QString item, new_history)
+        this->history.append(item);
+    while ((unsigned int)this->history.size() > this->historySize)
+        this->history.removeAt(0);
+
+    this->historyPosition = this->history.count();
 }
 
 void InputBox::Focus()

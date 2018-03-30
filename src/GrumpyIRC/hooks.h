@@ -25,6 +25,7 @@ namespace GrumpyIRC
         public:
             static void OnExit();
             static void OnMainWindowStart();
+            static void OnScrollbackFrameSwitch(ScrollbackFrame *scrollback);
             static void OnScrollbackItemHighlight(ScrollbackFrame *scrollback, ScrollbackItem *item);
             static void OnNewScrollbackFrame(ScrollbackFrame *scrollback);
             //! Called anytime user generates some sort of user input - click a window, write into console, whatever

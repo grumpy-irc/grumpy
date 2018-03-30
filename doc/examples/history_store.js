@@ -1,6 +1,9 @@
 // This extension preserves a history of each scrollback by its name
 // which is actually pretty bad way to do it.
 
+// This is where we store history for every single scrollback
+var global_history = [];
+
 function ext_init()
 {
     return true;
@@ -29,6 +32,63 @@ function ext_get_version()
 function ext_get_author()
 {
     return "Petr Bena";
+}
+
+function get_win(id)
+{
+    // Here we construct the name of key, because there might be multiple same channels on different networks we prefix each window with network
+    name = "";
+    if (grumpy_scrollback_has_network(id))
+    {
+        name = grumpy_network_get_network_name(id) + "_";
+    }
+    name = name + grumpy_scrollback_get_target(id);
+    if (name == "")
+        name = "system";
+    return name;
+}
+
+function ext_ui_on_exit()
+{
+    for (var key in global_history)
+        grumpy_set_cfg(key, global_history[key]);
+}
+
+function ext_ui_on_history(window_id, text)
+{
+    window_name = get_win(window_id);
+    if (!(window_name in global_history))
+    {
+        global_history[window_name] = text;
+    } else
+    {
+        global_history[window_name] += "\n" + text;
+    }
+}
+
+function refresh_hist(window_id)
+{
+    window_name = get_win(window_id);
+    if (window_name in global_history)
+        return;
+    // try to get a history for that window
+    hist = grumpy_get_cfg(window_name, "");
+    if (hist == "")
+        return;
+    // store to memory
+    ext_ui_on_history(window_id, hist);  
+    grumpy_ui_load_history(window_id, hist);
+}
+
+function ext_ui_on_window_switch(window_id)
+{
+    refresh_hist(window_id);
+}
+
+function ext_ui_on_main_window_start()
+{
+    // System window is always 1
+    refresh_hist(1);
 }
 
 // function reference

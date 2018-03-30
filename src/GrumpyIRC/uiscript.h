@@ -28,8 +28,11 @@ namespace GrumpyIRC
             unsigned int GetContextID();
             void Hook_OnExit();
             void Hook_OnHistory(Scrollback *window, QString text);
+            void Hook_WindowSwitch(Scrollback *window);
             void Hook_OnMainWindowStart();
             void Hook_OnScrollbackFrameCreated(Scrollback *window);
+        protected:
+            void registerFunctions();
     };
 }
 

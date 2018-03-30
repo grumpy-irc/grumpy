@@ -95,6 +95,7 @@ namespace GrumpyIRC
             ScrollbackFrame *GetParent();
             scrollback_id_t GetID();
             NetworkSession *GetSession();
+            InputBox *GetInputBox();
             Scrollback *GetScrollback();
             UserFrame *GetUserFrame();
             QString GetTitle();

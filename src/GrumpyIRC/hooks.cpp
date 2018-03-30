@@ -37,6 +37,15 @@ void UiHooks::OnMainWindowStart()
     }
 }
 
+void UiHooks::OnScrollbackFrameSwitch(ScrollbackFrame *scrollback)
+{
+    foreach (ScriptExtension *script, UiScript::GetExtensions())
+    {
+        if (script->GetContextID() == GRUMPY_SCRIPT_CONTEXT_GRUMPY_CHAT)
+            ((UiScript*)script)->Hook_WindowSwitch(scrollback->GetScrollback());
+    }
+}
+
 void UiHooks::OnScrollbackItemHighlight(ScrollbackFrame *scrollback, ScrollbackItem *item)
 {
     if (!scrollback->IsVisible())

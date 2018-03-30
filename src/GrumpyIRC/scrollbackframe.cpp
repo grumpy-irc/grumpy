@@ -551,6 +551,11 @@ NetworkSession *ScrollbackFrame::GetSession()
     return this->scrollback->GetSession();
 }
 
+InputBox *ScrollbackFrame::GetInputBox()
+{
+    return this->inputBox;
+}
+
 Scrollback *ScrollbackFrame::GetScrollback()
 {
     return this->scrollback;

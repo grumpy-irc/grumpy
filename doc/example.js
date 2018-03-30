@@ -80,7 +80,10 @@ function ext_get_author()
 // bool grumpy_scrollback_write(window_id, text)    // writes to scrollback
 //
 // functions available with UI only
+// bool grumpy_ui_wipe_history(window_id)
+// bool grumpy_ui_load_history(window_id)
 // void ext_ui_on_exit()                     // On exit
 // void ext_ui_on_history(window_id, text)   // When new item is added to history
 // void ext_ui_on_main_window_start()        // On main
+// void ext_ui_on_window_switch(window_id)   // When frame is changed
 // void ext_ui_on_new_scrollback_frame(window_id) // When new scrollback frame is created

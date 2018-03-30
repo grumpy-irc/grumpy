@@ -8,12 +8,14 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #ifndef INPUTBOX_H
 #define INPUTBOX_H
 
 #include <QFrame>
+#include <QList>
+#include <QString>
 
 namespace Ui
 {
@@ -36,6 +38,9 @@ namespace GrumpyIRC
             void ProcessInput();
             void Secure();
             void Complete();
+            void ClearHistory();
+            //! Load data into history
+            void LoadHistory(QList<QString> new_history);
             void Focus();
             void InsertAtCurrentPosition(QString text);
             void InsertEnter();
