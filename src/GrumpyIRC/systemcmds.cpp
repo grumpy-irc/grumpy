@@ -655,3 +655,65 @@ int SystemCmds::ScriptList(SystemCommand *command, CommandArgs command_args)
     }
     return 0;
 }
+
+static bool ReloadExtension(QString name)
+{
+    ScriptExtension *e = ScriptExtension::GetExtensionByName(name);
+    if (!e)
+    {
+        GRUMPY_ERROR("No such extension loaded, use /grumpy.script.list to list them");
+        return 1;
+    }
+    QString extension_path = e->GetPath();
+    e->Unload();
+    Core::GrumpyCore->UnregisterExtension(e);
+    delete e;
+    UiScript *extension = new UiScript();
+    QString error;
+    if (!extension->Load(extension_path, &error))
+    {
+        delete extension;
+        GRUMPY_ERROR(error);
+        return false;
+    }
+    Core::GrumpyCore->RegisterExtension(extension);
+    return true;
+}
+
+int SystemCmds::ScriptReload(SystemCommand *command, CommandArgs command_args)
+{
+    (void)command;
+    if (command_args.ParameterLine.isEmpty())
+    {
+        GRUMPY_ERROR("This need to provide name of script for this to work, use /grumpy.script.list to list them");
+        return 1;
+    }
+
+    if (ReloadExtension(command_args.ParameterLine))
+        return 0;
+    else
+        return 1;
+}
+
+int SystemCmds::ScriptReloadAll(SystemCommand *command, CommandArgs command_args)
+{
+    (void)command_args;
+    (void)command;
+    QStringList el;
+    Scrollback *sx = MainWindow::Main->GetCurrentScrollbackFrame()->GetScrollback();
+    QList<ScriptExtension*> extensions = ScriptExtension::GetExtensions();
+
+    if (extensions.isEmpty())
+    {
+        sx->InsertText("No scripts loaded");
+        return 0;
+    }
+
+    foreach (ScriptExtension *ext, extensions)
+        el.append(ext->GetName());
+
+    foreach (QString name, el)
+        ReloadExtension(name);
+
+    return 0;
+}

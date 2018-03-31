@@ -24,6 +24,7 @@ namespace GrumpyIRC
     class ScriptCommand;
     class LIBCORESHARED_EXPORT ScriptExtension : public Extension
     {
+            Q_OBJECT
         public:
             static ScriptExtension *GetExtensionByPath(QString path);
             static ScriptExtension *GetExtensionByEngine(QScriptEngine *e);

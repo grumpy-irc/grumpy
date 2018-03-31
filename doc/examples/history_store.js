@@ -15,8 +15,82 @@ var only_command = false;
 // This is where we store history for every single scrollback
 var global_history = [];
 
+function get_win(id)
+{
+    // Here we construct the name of key, because there might be multiple same channels on different networks we prefix each window with network
+    var name = "";
+    if (grumpy_scrollback_has_network(id))
+    {
+        name = grumpy_network_get_network_name(id) + "_";
+    }
+    name = name + grumpy_scrollback_get_target(id);
+    if (name == "")
+        name = "system";
+    return name;
+}
+
+function cmd_history_list(window_id, text)
+{
+    var name = get_win(window_id);
+    if (!(name in global_history))
+    {
+        grumpy_error_log("No history found for this window");
+        return 2;
+    }
+    list = global_history[name].split("\n");
+
+    for (var i = 0, len = list.length; i < len; i++)
+        grumpy_scrollback_write(window_id, list[i]);
+
+    return 0;
+}
+
+function cmd_history_search(window_id, text)
+{
+    var name = get_win(window_id);
+    var search_string = text.toLowerCase();
+    if (search_string.length == 0)
+    {
+        grumpy_error_log("This command requires a parameter to search");
+        return 1;
+    }
+    if (!(name in global_history))
+    {
+        grumpy_error_log("No history found for this window");
+        return 2;
+    }
+
+    var list = global_history[name].split("\n");
+    var something_found = false;
+
+    for (var i = 0, len = list.length; i < len; i++)
+    {
+        lc = list[i].toLowerCase();
+        if (lc.indexOf(search_string) !== -1)
+        {
+            // We got a result, let's print it
+            something_found = true;
+            grumpy_scrollback_write(window_id, list[i]);
+        }
+    }
+
+    if (!something_found)
+        grumpy_scrollback_write(window_id, "Nothing found");
+
+    return 0;
+}
+
+// This function try to register a command in grumpy and print error if it fails
+function safe_cmd_reg(command_name, callback)
+{
+    if (!grumpy_register_cmd(command_name, callback))
+        grumpy_error_log("Unable to register command: " + command_name);
+}
+
 function ext_init()
 {
+    safe_cmd_reg("history.list", "cmd_history_list");
+    safe_cmd_reg("history.search", "cmd_history_search");
     return true;
 }
 
@@ -43,20 +117,6 @@ function ext_get_version()
 function ext_get_author()
 {
     return "Petr Bena";
-}
-
-function get_win(id)
-{
-    // Here we construct the name of key, because there might be multiple same channels on different networks we prefix each window with network
-    name = "";
-    if (grumpy_scrollback_has_network(id))
-    {
-        name = grumpy_network_get_network_name(id) + "_";
-    }
-    name = name + grumpy_scrollback_get_target(id);
-    if (name == "")
-        name = "system";
-    return name;
 }
 
 function ext_ui_on_exit()

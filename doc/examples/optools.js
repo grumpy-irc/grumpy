@@ -58,7 +58,7 @@ function ext_get_name()
 
 function ext_get_desc()
 {
-    return "Implements commands for ops, type /optools.list to list commands";
+    return "Implements commands for ops, type /optools to list commands";
 }
 
 function ext_get_version()
