@@ -1,6 +1,17 @@
 // This extension preserves a history of each scrollback by its name
 // which is actually pretty bad way to do it.
 
+//////////////////////////////////////////
+// Configuration
+// How many items to remember, note this will only affect saving of history, not the size of actual history in GrumpyChat
+var history_max = 20;
+// Save only commands
+var only_command = false;
+//////////////////////////////////////////
+
+//////////////////////////////////////////
+//////////////////////////////////////////
+// Code starts here
 // This is where we store history for every single scrollback
 var global_history = [];
 
@@ -51,7 +62,20 @@ function get_win(id)
 function ext_ui_on_exit()
 {
     for (var key in global_history)
-        grumpy_set_cfg(key, global_history[key]);
+    {
+        // Split the items so that we can count them
+        list = global_history[key].split("\n");
+        // Remove extra items
+        while (list.length > history_max)
+            list.shift()
+        // Turn it back to one huge string
+        temp = "";
+        for (var i = 0, len = list.length; i < len; i++)
+            temp += list[i] + "\n";
+        // Remove the extra newline
+        temp = temp.substring(0, temp.length - 1);
+        grumpy_set_cfg(key, temp);
+    }
 }
 
 function ext_ui_on_history(window_id, text)

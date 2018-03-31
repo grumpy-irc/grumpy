@@ -496,8 +496,9 @@ void GrumpyIRC::MainWindow::on_actionToggle_secret_triggered()
 
 QString MainWindow::processInput(QString text)
 {
-    if (text.contains("$grumpy.version"))
-        text = text.replace("$grumpy.version", GCFG->GetVersion());
+    text.replace("$grumpy.version", GCFG->GetVersion());
+    text.replace("$grumpy.home", GCFG->GetHomePath());
+    text.replace("$grumpy.binarypath", QCoreApplication::applicationDirPath());
     return text;
 }
 
