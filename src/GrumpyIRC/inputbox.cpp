@@ -121,6 +121,7 @@ void InputBox::Complete()
     if (result.Suggestions.count())
     {
         QString suggestions;
+        qSort(result.Suggestions);
         foreach(QString sx, result.Suggestions)
             suggestions += sx + ", ";
         if (suggestions.endsWith(", "))
