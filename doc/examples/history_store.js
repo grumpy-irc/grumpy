@@ -18,14 +18,15 @@ var global_history = [];
 function get_win(id)
 {
     // Here we construct the name of key, because there might be multiple same channels on different networks we prefix each window with network
-    var name = "";
+    var name = "history_";
     if (grumpy_scrollback_has_network(id))
     {
-        name = grumpy_network_get_network_name(id) + "_";
+        name += grumpy_network_get_network_name(id) + "_";
     }
-    name = name + grumpy_scrollback_get_target(id);
-    if (name == "")
-        name = "system";
+    var target = grumpy_scrollback_get_target(id);
+    if (target == "")
+        target = "system";
+    name += target;
     return name;
 }
 
@@ -91,6 +92,8 @@ function ext_init()
 {
     safe_cmd_reg("history.list", "cmd_history_list");
     safe_cmd_reg("history.search", "cmd_history_search");
+    history_max = grumpy_get_cfg("history_max", history_max);
+    only_command = grumpy_get_cfg("only_command", only_command);
     return true;
 }
 
