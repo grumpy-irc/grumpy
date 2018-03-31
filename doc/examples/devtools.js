@@ -6,8 +6,15 @@ function cmd_id(window_id, text)
     return 0;
 }
 
+function cmd_network(window_id, text)
+{
+    grumpy_log("Name: \'" + grumpy_network_get_network_name(window_id) + "\' your nick: " + grumpy_network_get_nick(window_id));
+    return 0;
+}
+
 function cmd_help(window_id, text)
 {
+    grumpy_log("/dev.network.info - network info");
     grumpy_log("/dev.scrollback.id - print scrollback id");
     return 0;
 }
@@ -24,6 +31,7 @@ function ext_init()
     // Register new cmds
     safe_cmd_reg("devtools", "cmd_help");
     safe_cmd_reg("dev.scrollback.id", "cmd_id");
+    safe_cmd_reg("dev.network.info", "cmd_network");
     return true;
 }
 
