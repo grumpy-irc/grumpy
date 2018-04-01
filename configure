@@ -35,6 +35,7 @@ WARN=$(tput setaf 3)
 GREEN=$(tput setaf 2)
 NORMAL=$(tput sgr0)
 QT5=10
+UNIT_TESTS=''
 CMAKE_ARGS=''
 PYTHON=0
 _BUILD=0
@@ -52,6 +53,7 @@ do
         echo "=========================================="
         echo " --disable-dependency-tracking: skip all package checks"
         echo " --extension: will build all extensions as well"
+        echo " --unit-test: will build unit tests"
         echo " --qtpath: path to Qt (for example C:\\Qt\\5.4\\mingw\\"
         echo " --qt4: execute QT4 checks"
         echo " --qt5: execute QT5 checks"
@@ -65,6 +67,10 @@ do
     fi
     if [ "$var" = "--extension" ];then
         modules=1
+        continue
+    fi
+    if [ "$var" = "--unit-test" ];then
+        UNIT_TESTS=' -DUNIT_TESTS=true'
         continue
     fi
     if [ "$_BUILD" = "1" ];then
@@ -269,7 +275,7 @@ else
   mkdir "$BUILD" || exit 1
 fi
 cd "$BUILD" || exit 1
-cmake ../src $CMAKE_ARGS || exit 1
+cmake ../src $CMAKE_ARGS $UNIT_TESTS || exit 1
 echo "Everything is ready, you can build grumpy by entering "$BUILD" and typing"
 echo "make"
 

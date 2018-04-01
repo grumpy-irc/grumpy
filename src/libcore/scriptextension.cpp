@@ -18,6 +18,7 @@
 #include "eventhandler.h"
 #include "networksession.h"
 #include "scrollback.h"
+#include "resources.h"
 #include "../libirc/libircclient/user.h"
 #include "../libirc/libircclient/channel.h"
 #include "../libirc/libircclient/priority.h"
@@ -194,10 +195,8 @@ void ScriptExtension::OnError(QScriptValue e)
 
 bool ScriptExtension::loadSource(QString source, QString *error)
 {
-    this->sourceCode = source;
-    this->engine = new QScriptEngine();
-
-    QScriptSyntaxCheckResult s = this->engine->checkSyntax(source);
+    QScriptEngine syntax_check;
+    QScriptSyntaxCheckResult s = syntax_check.checkSyntax(source);
     if (s.state() != QScriptSyntaxCheckResult::Valid)
     {
         *error = "Unable to load script, syntax error at line " + QString::number(s.errorLineNumber()) + " column " + QString::number(s.errorColumnNumber()) + ": " + s.errorMessage();
@@ -205,6 +204,11 @@ bool ScriptExtension::loadSource(QString source, QString *error)
         return false;
     }
 
+    // Prepend the built-in libs
+    source = Resources::GetSource("/core/ecma/irc.js") + Resources::GetSource("/core/ecma/grumpy.js") + source;
+
+    this->sourceCode = source;
+    this->engine = new QScriptEngine();
     connect(this->engine, SIGNAL(signalHandlerException(QScriptValue)), this, SLOT(OnError(QScriptValue)));
 
     this->script_ptr = this->engine->evaluate(this->sourceCode);

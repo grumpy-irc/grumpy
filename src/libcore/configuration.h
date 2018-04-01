@@ -46,6 +46,7 @@ namespace GrumpyIRC
             virtual void SetValue(QString key, int value);
             virtual void SetValue(QString key, QString value);
             virtual void SetHomePath(QString path);
+            virtual void GetVersion(int *major, int *minor, int *revision);
 
             // Extension config
             virtual bool        Extension_Contains(QString extension, QString key);

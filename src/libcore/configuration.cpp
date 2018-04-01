@@ -101,6 +101,17 @@ void Configuration::SetHomePath(QString path)
     this->home_path = path;
 }
 
+void Configuration::GetVersion(int *major, int *minor, int *revision)
+{
+    QList<QString> version = QString(GRUMPY_VERSION_STRING).split(".");
+    if (version.size() > 2)
+    {
+        *major = version[0].toInt();
+        *minor = version[1].toInt();
+        *revision = version[2].toInt();
+    }
+}
+
 bool Configuration::Extension_Contains(QString extension, QString key)
 {
     return this->Options.contains(this->mkExt(extension, key));

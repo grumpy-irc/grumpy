@@ -1,9 +1,12 @@
 #include <QString>
+#include <QCoreApplication>
 #include <QtTest>
+#include <QtScript>
 #include "../../libcore/exception.h"
 #include "../../libcore/configuration.h"
 #include "../../libcore/commandprocessor.h"
 #include "../../libcore/generic.h"
+#include "../../libcore/resources.h"
 
 class LibcoreTest : public QObject
 {
@@ -12,14 +15,31 @@ class LibcoreTest : public QObject
     public:
         LibcoreTest();
 
+    protected:
+        void syntaxCheck(QString path);
+
     private Q_SLOTS:
         void initTestCase();
         void cleanupTestCase();
         void testCaseGenericBool();
+        void testCaseEmbeddedScriptSyntaxCheck();
 };
 
 LibcoreTest::LibcoreTest()
 {
+    QCoreApplication::setApplicationName("grumpy_test");
+}
+
+void LibcoreTest::syntaxCheck(QString path)
+{
+    QScriptEngine syntax_check;
+    QScriptSyntaxCheckResult s = syntax_check.checkSyntax(GrumpyIRC::Resources::GetSource(path));
+    if (s.state() != QScriptSyntaxCheckResult::Valid)
+    {
+        // Debug
+        qWarning() << path + ": l" + QString::number(s.errorLineNumber()) + " c" + QString::number(s.errorColumnNumber()) + ": " + s.errorMessage();
+    }
+    QVERIFY2(s.state() == QScriptSyntaxCheckResult::Valid, "syntax check");
 }
 
 void LibcoreTest::initTestCase()
@@ -43,6 +63,12 @@ void LibcoreTest::testCaseGenericBool()
     QVERIFY2(true, "Failure");
 }
 
-QTEST_APPLESS_MAIN(LibcoreTest)
+void LibcoreTest::testCaseEmbeddedScriptSyntaxCheck()
+{
+    syntaxCheck("/grumpy_core/ecma/irc.js");
+    syntaxCheck("/grumpy_core/ecma/grumpy.js");
+}
+
+QTEST_MAIN(LibcoreTest)
 
 #include "tst_libcoretest.moc"
