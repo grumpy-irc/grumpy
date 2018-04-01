@@ -78,6 +78,7 @@ function ext_get_author()
 // bool grumpy_scrollback_get_type(window_id)       // returns channel / system / user
 // bool grumpy_scrollback_get_target(window_id)     // returns target name
 // bool grumpy_scrollback_write(window_id, text)    // writes to scrollback
+// string grumpy_ecma_version()                     // returns version of ECMA lib
 //
 // functions available with UI only
 // bool grumpy_ui_wipe_history(window_id)

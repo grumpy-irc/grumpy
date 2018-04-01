@@ -719,6 +719,29 @@ static QScriptValue set_cfg(QScriptContext *context, QScriptEngine *engine)
     return QScriptValue();
 }
 
+static QScriptValue get_version(QScriptContext *context, QScriptEngine *engine)
+{
+    Q_UNUSED(context);
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
+
+    int major = 0;
+    int minor = 0;
+    int revision = 0;
+
+    Core::GrumpyCore->GetConfiguration()->GetVersion(&major, &minor, &revision);
+
+    // Marshalling
+    QScriptValue version = engine->newObject();
+    version.setProperty("Major", QScriptValue(engine, major));
+    version.setProperty("Minor", QScriptValue(engine, minor));
+    version.setProperty("Revision", QScriptValue(engine, revision));
+    version.setProperty("String", QString(GRUMPY_VERSION_STRING));
+
+    return version;
+}
+
 static QScriptValue get_context(QScriptContext *context, QScriptEngine *engine)
 {
     ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
@@ -730,26 +753,32 @@ static QScriptValue get_context(QScriptContext *context, QScriptEngine *engine)
 
 void ScriptExtension::registerFunctions()
 {
-    this->engine->globalObject().setProperty("grumpy_set_cfg", this->engine->newFunction(set_cfg, 2));
-    this->engine->globalObject().setProperty("grumpy_get_cfg", this->engine->newFunction(get_cfg, 2));
-    this->engine->globalObject().setProperty("grumpy_get_context", this->engine->newFunction(get_context, 0));
-    this->engine->globalObject().setProperty("grumpy_network_send_raw", this->engine->newFunction(network_send_raw, 2));
-    this->engine->globalObject().setProperty("grumpy_register_cmd", this->engine->newFunction(register_cmd, 2));
-    this->engine->globalObject().setProperty("grumpy_debug_log", this->engine->newFunction(debug_log, 2));
-    this->engine->globalObject().setProperty("grumpy_error_log", this->engine->newFunction(error_log, 1));
-    this->engine->globalObject().setProperty("grumpy_log", this->engine->newFunction(log, 1));
-    this->engine->globalObject().setProperty("grumpy_scrollback_write", this->engine->newFunction(scrollback_write, 2));
-    this->engine->globalObject().setProperty("grumpy_scrollback_get_type", this->engine->newFunction(scrollback_get_type, 1));
-    this->engine->globalObject().setProperty("grumpy_scrollback_get_target", this->engine->newFunction(scrollback_get_target, 1));
-    this->engine->globalObject().setProperty("grumpy_scrollback_has_network", this->engine->newFunction(scrollback_has_network, 1));
-    this->engine->globalObject().setProperty("grumpy_scrollback_has_network_session", this->engine->newFunction(scrollback_has_network_session, 1));
-    this->engine->globalObject().setProperty("grumpy_network_get_nick", this->engine->newFunction(network_get_nick, 1));
-    this->engine->globalObject().setProperty("grumpy_network_get_ident", this->engine->newFunction(network_get_ident, 1));
-    this->engine->globalObject().setProperty("grumpy_network_get_host", this->engine->newFunction(network_get_host, 1));
-    this->engine->globalObject().setProperty("grumpy_network_get_server_host", this->engine->newFunction(network_get_server_host, 1));
-    this->engine->globalObject().setProperty("grumpy_network_get_network_name", this->engine->newFunction(network_get_network_name, 1));
-    this->engine->globalObject().setProperty("grumpy_network_send_message", this->engine->newFunction(network_send_message, 3));
-    this->engine->globalObject().setProperty("grumpy_network_send_raw", this->engine->newFunction(network_send_raw, 2));
+    this->registerFunction("grumpy_get_version", get_version, 0);
+    this->registerFunction("grumpy_set_cfg", set_cfg, 2);
+    this->registerFunction("grumpy_get_cfg", get_cfg, 2);
+    this->registerFunction("grumpy_get_context", get_context, 0);
+    this->registerFunction("grumpy_network_send_raw", network_send_raw, 2);
+    this->registerFunction("grumpy_register_cmd", register_cmd, 2);
+    this->registerFunction("grumpy_debug_log", debug_log, 2);
+    this->registerFunction("grumpy_error_log", error_log, 1);
+    this->registerFunction("grumpy_log", log, 1);
+    this->registerFunction("grumpy_scrollback_write", scrollback_write, 2);
+    this->registerFunction("grumpy_scrollback_get_type", scrollback_get_type, 1);
+    this->registerFunction("grumpy_scrollback_get_target", scrollback_get_target, 1);
+    this->registerFunction("grumpy_scrollback_has_network", scrollback_has_network, 1);
+    this->registerFunction("grumpy_scrollback_has_network_session", scrollback_has_network_session, 1);
+    this->registerFunction("grumpy_network_get_nick", network_get_nick, 1);
+    this->registerFunction("grumpy_network_get_ident", network_get_ident, 1);
+    this->registerFunction("grumpy_network_get_host", network_get_host, 1);
+    this->registerFunction("grumpy_network_get_server_host", network_get_server_host, 1);
+    this->registerFunction("grumpy_network_get_network_name", network_get_network_name, 1);
+    this->registerFunction("grumpy_network_send_message", network_send_message, 3);
+    this->registerFunction("grumpy_network_send_raw", network_send_raw, 2);
+}
+
+void ScriptExtension::registerFunction(QString name, QScriptEngine::FunctionSignature function_signature, int parameters)
+{
+    this->engine->globalObject().setProperty(name, this->engine->newFunction(function_signature, parameters));
 }
 
 bool ScriptExtension::executeFunctionAsBool(QString function, QScriptValueList parameters)

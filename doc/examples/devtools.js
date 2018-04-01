@@ -12,8 +12,16 @@ function cmd_network(window_id, text)
     return 0;
 }
 
+function cmd_info(window_id, text)
+{
+    var v = grumpy_get_version();
+    grumpy_log("GrumpyChat version " + v.String);
+    return 0;
+}
+
 function cmd_help(window_id, text)
 {
+    grumpy_log("/dev.session.info - session info");
     grumpy_log("/dev.network.info - network info");
     grumpy_log("/dev.scrollback.id - print scrollback id");
     return 0;
@@ -30,6 +38,7 @@ function ext_init()
 {
     // Register new cmds
     safe_cmd_reg("devtools", "cmd_help");
+    safe_cmd_reg("dev.session.info", "cmd_info");
     safe_cmd_reg("dev.scrollback.id", "cmd_id");
     safe_cmd_reg("dev.network.info", "cmd_network");
     return true;

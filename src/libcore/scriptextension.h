@@ -59,6 +59,7 @@ namespace GrumpyIRC
             QString executeFunctionAsString(QString function, QScriptValueList parameters);
             QScriptValue executeFunction(QString function, QScriptValueList parameters);
             QScriptValue executeFunction(QString function);
+            virtual void registerFunction(QString name, QScriptEngine::FunctionSignature function_signature, int parameters);
             //! Makes all functions available to ECMA
             virtual void registerFunctions();
             QScriptEngine *engine;
