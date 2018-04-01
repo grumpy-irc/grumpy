@@ -26,24 +26,22 @@ if (UNIT_TESTS)
 endif()
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 
-# Libraries first
+# Unit test
+if (UNIT_TESTS)
+    add_subdirectory (tests)
+endif()
 
+# Libraries
 add_subdirectory (libirc2htmlcode)
 add_subdirectory (libirc/libirc/)
 add_subdirectory (libirc/libircclient/)
 add_subdirectory (libgp)
 
 # GrumpyIRC client itself
-
 add_subdirectory (libcore)
 add_subdirectory (grumpyd)
 add_subdirectory (GrumpyIRC)
 
-# Unit test
-
-if (UNIT_TESTS)
-    add_subdirectory (tests)
-endif()
 
 # Packaging code
 SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Petr Bena")

@@ -25,8 +25,8 @@ branches:
 
 matrix:
   include:
-    - env: QTTYPE=4
-#    - env: QTTYPE=5
+#    - env: QTTYPE=4
+    - env: QTTYPE=5
   exclude:
     - env: THENEEDFORTHIS=FAIL
 
