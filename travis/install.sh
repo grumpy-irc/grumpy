@@ -5,7 +5,7 @@
 #fi
 
 if [ "$QTTYPE" = "5" ]; then
-	sudo apt-get install -y qtbase5-dev qtdeclarative5-dev qt5-default qttools5-dev-tools
+	sudo apt-get install -y qtbase5-dev qtdeclarative5-dev qt5-default qttools5-dev-tools qtscript5-dev
 fi
 
 #sudo apt-get install g++-4.7
