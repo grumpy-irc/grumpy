@@ -60,6 +60,8 @@ function ext_get_author()
 
 // function reference
 //
+// bool grumpy_has_function(name)                   // check if function (any in this list) is available in this grumpy version
+// object grumpy_get_version()                      // return version
 // void grumpy_set_cfg(key, val)                    // save a key
 // bool grumpy_get_cfg(key, val)                    // retrieve a key
 // bool grumpy_register_cmd(name, fc)               // register new command

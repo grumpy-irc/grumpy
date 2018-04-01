@@ -45,6 +45,7 @@ namespace GrumpyIRC
             QScriptValue ExecuteFunction(QString function, QScriptValueList parameters);
             virtual unsigned int GetContextID();
             virtual QString GetContext();
+            bool SupportFunction(QString name);
 
         private slots:
             void OnError(QScriptValue e);
@@ -64,6 +65,7 @@ namespace GrumpyIRC
             virtual void registerFunctions();
             QScriptEngine *engine;
             QScriptValue script_ptr;
+            QList<QString> functionsExported;
             QString sourceCode;
             QString scriptPath;
             QString scriptName;

@@ -188,6 +188,11 @@ QString ScriptExtension::GetContext()
     return "core";
 }
 
+bool ScriptExtension::SupportFunction(QString name)
+{
+    return this->functionsExported.contains(name);
+}
+
 void ScriptExtension::OnError(QScriptValue e)
 {
     GRUMPY_ERROR(this->GetName() + ": exception: " + e.toString());
@@ -751,11 +756,27 @@ static QScriptValue get_context(QScriptContext *context, QScriptEngine *engine)
     return QScriptValue(engine, extension->GetContext());
 }
 
+static QScriptValue has_function(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
+    if (context->argumentCount() < 1)
+    {
+        // Wrong number of parameters
+        GRUMPY_ERROR(extension->GetName() + ": has_function(function): requires 1 parameter");
+        return QScriptValue(engine, false);
+    }
+    QString fx = context->argument(0).toString();
+    return QScriptValue(engine, extension->SupportFunction(fx));
+}
+
 void ScriptExtension::registerFunctions()
 {
     this->registerFunction("grumpy_get_version", get_version, 0);
     this->registerFunction("grumpy_set_cfg", set_cfg, 2);
     this->registerFunction("grumpy_get_cfg", get_cfg, 2);
+    this->registerFunction("grumpy_has_function", has_function, 1);
     this->registerFunction("grumpy_get_context", get_context, 0);
     this->registerFunction("grumpy_network_send_raw", network_send_raw, 2);
     this->registerFunction("grumpy_register_cmd", register_cmd, 2);
@@ -778,6 +799,7 @@ void ScriptExtension::registerFunctions()
 
 void ScriptExtension::registerFunction(QString name, QScriptEngine::FunctionSignature function_signature, int parameters)
 {
+    this->functionsExported.append(name);
     this->engine->globalObject().setProperty(name, this->engine->newFunction(function_signature, parameters));
 }
 

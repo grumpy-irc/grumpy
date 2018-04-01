@@ -114,7 +114,7 @@ void UiScript::Hook_OnScrollbackFrameCreated(Scrollback *window)
 
 void UiScript::registerFunctions()
 {
-    this->engine->globalObject().setProperty("grumpy_ui_load_history", this->engine->newFunction(load_history, 2));
-    this->engine->globalObject().setProperty("grumpy_ui_wipe_history", this->engine->newFunction(clean_history, 2));
+    this->registerFunction("grumpy_ui_load_history", load_history, 2);
+    this->registerFunction("grumpy_ui_wipe_history", clean_history, 2);
     ScriptExtension::registerFunctions();
 }
