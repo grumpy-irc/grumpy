@@ -776,12 +776,8 @@ void IRCSession::OnCTCP(libircclient::Parser *px, QString ctcp, QString pars)
         if (!sc)
         {
             this->systemWindow->InsertText("Incoming CTCP for unknown target (" + target +  ") from " + px->GetSourceInfo() + ": " + final_text);
-        } else
-        {
-            // Process as standard message
-            sc->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Message, libircclient::User(px->GetSourceUserInfo())));
+            return;
         }
-        return;
     }
     if (ctcp == "VERSION")
     {
@@ -794,7 +790,7 @@ void IRCSession::OnCTCP(libircclient::Parser *px, QString ctcp, QString pars)
             return;
         this->GetNetwork()->SendNotice("TIME " + QDateTime::currentDateTime().toString(), px->GetSourceUserInfo()->GetNick());
     }
-    this->systemWindow->InsertText("Incoming CTCP from " + px->GetSourceInfo() + ": " + final_text);
+    this->systemWindow->InsertText("Incoming CTCP for " + target + " from " + px->GetSourceInfo() + ": " + final_text);
 }
 
 void IRCSession::OnMOTD(libircclient::Parser *px)
