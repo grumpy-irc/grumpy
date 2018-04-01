@@ -161,16 +161,16 @@ Scrollback *IRCSession::GetScrollbackByOriginal(scrollback_id_t original_sid)
     return NULL;
 }
 
-libircclient::Network *IRCSession::GetNetwork(Scrollback *window)
+libircclient::Network *IRCSession::GetNetwork(Scrollback *scrollback)
 {
-    Q_UNUSED(window);
+    Q_UNUSED(scrollback);
     return this->network;
 }
 
 QList<Scrollback *> IRCSession::GetScrollbacks()
 {
     QList<Scrollback*> sx;
-    // Fetch all windows we manage
+    // Fetch all scrollbacks we manage
     sx.append(this->users.values());
     if (this->systemWindow != nullptr)
         sx.append(this->systemWindow);
@@ -182,7 +182,7 @@ QList<Scrollback *> IRCSession::GetUserScrollbacks()
 {
     QList<Scrollback*> sx;
 
-    // Fetch all windows we manage
+    // Fetch all scrollbacks we manage
     sx.append(this->users.values());
     return sx;
 }
@@ -191,7 +191,7 @@ QList<Scrollback *> IRCSession::GetChannelScrollbacks()
 {
     QList<Scrollback*> sx;
 
-    // Fetch all windows we manage
+    // Fetch all scrollbacks we manage
     sx.append(this->channels.values());
     return sx;
 }
@@ -222,7 +222,7 @@ void IRCSession::Connect(libircclient::Network *Network)
     this->timerUL.start(this->ulistUpdateTime);
 }
 
-void GrumpyIRC::IRCSession::SendMessage(Scrollback * window, QString target, QString text)
+void GrumpyIRC::IRCSession::SendMessage(Scrollback *scrollback, QString target, QString text)
 {
     if (!this->IsConnected())
     {
@@ -230,11 +230,11 @@ void GrumpyIRC::IRCSession::SendMessage(Scrollback * window, QString target, QSt
         return;
     }
     this->GetNetwork()->SendMessage(text, target);
-    // Write the message to active window
-    window->InsertText(ScrollbackItem("[ >> " + target + " ]: " + text, ScrollbackItemType_Message, this->GetNetwork()->GetLocalUserInfo(), 0, true));
+    // Write the message to active scrollback
+    scrollback->InsertText(ScrollbackItem("[ >> " + target + " ]: " + text, ScrollbackItemType_Message, this->GetNetwork()->GetLocalUserInfo(), 0, true));
 }
 
-void GrumpyIRC::IRCSession::SendNotice(Scrollback * window, QString target, QString text)
+void GrumpyIRC::IRCSession::SendNotice(Scrollback *scrollback, QString target, QString text)
 {
     if (!this->IsConnected())
     {
@@ -242,8 +242,8 @@ void GrumpyIRC::IRCSession::SendNotice(Scrollback * window, QString target, QStr
         return;
     }
     this->GetNetwork()->SendNotice(text, target);
-    // Write the message to active window
-    window->InsertText(ScrollbackItem("[ >> " + target + " ]: " + text, ScrollbackItemType_Notice, this->GetNetwork()->GetLocalUserInfo(), 0, true));
+    // Write the message to active scrollback
+    scrollback->InsertText(ScrollbackItem("[ >> " + target + " ]: " + text, ScrollbackItemType_Notice, this->GetNetwork()->GetLocalUserInfo(), 0, true));
 }
 
 bool IRCSession::IsConnected() const
@@ -263,18 +263,18 @@ void IRCSession::SetNetwork(libircclient::Network *nt)
         scrollback->SetNetwork(nt);
 }
 
-void IRCSession::SendNotice(Scrollback *window, QString text)
+void IRCSession::SendNotice(Scrollback *scrollback, QString text)
 {
     if (!this->IsConnected())
     {
         this->GetSystemWindow()->InsertText("Can't send notices to a disconnected network");
         return;
     }
-    if (window->GetTarget().isEmpty())
-        throw new GrumpyIRC::Exception("window->GetTarget() contains empty string", BOOST_CURRENT_FUNCTION);
-    this->GetNetwork()->SendNotice(text, window->GetTarget());
-    // Write the message to active window
-    window->InsertText(ScrollbackItem(text, ScrollbackItemType_Notice, this->GetNetwork()->GetLocalUserInfo(), 0, true));
+    if (scrollback->GetTarget().isEmpty())
+        throw new GrumpyIRC::Exception("scrollback->GetTarget() contains empty string", BOOST_CURRENT_FUNCTION);
+    this->GetNetwork()->SendNotice(text, scrollback->GetTarget());
+    // Write the message to active scrollback
+    scrollback->InsertText(ScrollbackItem(text, ScrollbackItemType_Notice, this->GetNetwork()->GetLocalUserInfo(), 0, true));
 }
 
 Scrollback *IRCSession::GetScrollbackForChannel(QString channel)
@@ -291,9 +291,9 @@ SessionType IRCSession::GetType()
     return SessionType_IRC;
 }
 
-QList<QString> IRCSession::GetChannels(Scrollback *window)
+QList<QString> IRCSession::GetChannels(Scrollback *scrollback)
 {
-    Q_UNUSED(window);
+    Q_UNUSED(scrollback);
     QList<QString> channel_names;
     if (!this->network)
         return channel_names;
@@ -302,15 +302,15 @@ QList<QString> IRCSession::GetChannels(Scrollback *window)
     return channel_names;
 }
 
-void IRCSession::SyncWindows(QHash<QString, QVariant> windows, QHash<QString, Scrollback*> *hash)
+void IRCSession::SyncWindows(QHash<QString, QVariant> scrollbacks, QHash<QString, Scrollback*> *hash)
 {
     // this is most likely a remote IRC session managed by grumpyd because nothing else would
     // deserialize it, but just to be sure we check once more and grab the pointer to grumpyd
     // in case it really is that
-    NetworkSession *window_session = this;
+    NetworkSession *scrollback_session = this;
     if (this->Root && GrumpyIRC::Generic::IsGrumpy(this->Root))
-        window_session = this->Root->GetSession();
-    foreach (QVariant xx, windows.values())
+        scrollback_session = this->Root->GetSession();
+    foreach (QVariant xx, scrollbacks.values())
     {
         QString name = "unknown_scrollback";
         QHash<QString, QVariant> scrollback_h = xx.toHash();
@@ -332,7 +332,7 @@ void IRCSession::SyncWindows(QHash<QString, QVariant> windows, QHash<QString, Sc
             }
             scrollback->FinishBulk();
         }
-        scrollback->SetSession(window_session);
+        scrollback->SetSession(scrollback_session);
         hash->insert(name.toLower(), scrollback);
     }
 }
@@ -349,7 +349,7 @@ void IRCSession::init(bool preindexed)
     this->AutomaticallyRetrieveBanList = true;
     if (this->systemWindow)
     {
-        // We don't want to let users hide this window
+        // We don't want to let users hide this scrollback
         // it's not safe
         this->systemWindow->SetHidable(false);
         this->systemWindow->SetSession(this);
@@ -451,23 +451,23 @@ void IRCSession::LoadHash(QHash<QString, QVariant> hash)
         this->SyncWindows(hash["channels"].toHash(), &this->channels);
 }
 
-void IRCSession::SendAction(Scrollback *window, QString text)
+void IRCSession::SendAction(Scrollback *scrollback, QString text)
 {
     if (!this->IsConnected())
     {
         this->GetSystemWindow()->InsertText("Can't send messages to a disconnected network");
         return;
     }
-    if (window->GetTarget().isEmpty())
-        throw new GrumpyIRC::Exception("window->GetTarget() contains empty string", BOOST_CURRENT_FUNCTION);
-    this->GetNetwork()->SendAction(text, window->GetTarget());
-    // Write the message to active window
-    window->InsertText(ScrollbackItem(text, ScrollbackItemType_Act, this->GetNetwork()->GetLocalUserInfo()));
+    if (scrollback->GetTarget().isEmpty())
+        throw new GrumpyIRC::Exception("scrollback->GetTarget() contains empty string", BOOST_CURRENT_FUNCTION);
+    this->GetNetwork()->SendAction(text, scrollback->GetTarget());
+    // Write the message to active scrollback
+    scrollback->InsertText(ScrollbackItem(text, ScrollbackItemType_Act, this->GetNetwork()->GetLocalUserInfo()));
 }
 
-void IRCSession::SendRaw(Scrollback *window, QString raw, libircclient::Priority pr)
+void IRCSession::SendRaw(Scrollback *scrollback, QString raw, libircclient::Priority pr)
 {
-    Q_UNUSED(window);
+    Q_UNUSED(scrollback);
     if (!this->IsConnected())
     {
         this->GetSystemWindow()->InsertText("Can't send raw data to a disconnected network");
@@ -476,26 +476,26 @@ void IRCSession::SendRaw(Scrollback *window, QString raw, libircclient::Priority
     this->GetNetwork()->TransferRaw(raw, pr);
 }
 
-void IRCSession::RequestRemove(Scrollback *window)
+void IRCSession::RequestRemove(Scrollback *scrollback)
 {
-    if (!window->IsDead() && window->GetType() != ScrollbackType_User)
+    if (!scrollback->IsDead() && scrollback->GetType() != ScrollbackType_User)
         return;
-    if (window == this->systemWindow)
+    if (scrollback == this->systemWindow)
     {
         // We need to delete everything
         foreach (Scrollback *scrollback, this->users.values())
-            this->rmWindow(scrollback);
+            this->rmScrollback(scrollback);
         foreach (Scrollback *scrollback, this->channels.values())
-            this->rmWindow(scrollback);
-        this->rmWindow(window);
+            this->rmScrollback(scrollback);
+        this->rmScrollback(scrollback);
         return;
     }
-    this->rmWindow(window);
+    this->rmScrollback(scrollback);
 }
 
-void IRCSession::RequestReconnect(Scrollback *window)
+void IRCSession::RequestReconnect(Scrollback *scrollback)
 {
-    Q_UNUSED(window);
+    Q_UNUSED(scrollback);
     if (this->IsConnected())
         return;
 
@@ -508,11 +508,11 @@ void IRCSession::RequestReconnect(Scrollback *window)
     this->network->Reconnect();
 }
 
-void IRCSession::Query(Scrollback *window, QString target, QString message)
+void IRCSession::Query(Scrollback *scrollback, QString target, QString message)
 {
     if (!this->IsConnected())
     {
-        window->InsertText("You are not connected to any irc server", ScrollbackItemType_SystemError);
+        scrollback->InsertText("You are not connected to any irc server", ScrollbackItemType_SystemError);
         return;
     }
     Scrollback *sx = this->GetScrollbackForUser(target);
@@ -528,17 +528,17 @@ void IRCSession::Query(Scrollback *window, QString target, QString message)
     }
 }
 
-libircclient::Channel *IRCSession::GetChannel(Scrollback *window)
+libircclient::Channel *IRCSession::GetChannel(Scrollback *scrollback)
 {
     if (!this->network)
         return NULL;
-    return this->GetNetwork()->GetChannel(window->GetTarget());
+    return this->GetNetwork()->GetChannel(scrollback->GetTarget());
 }
 
-void IRCSession::RequestDisconnect(Scrollback *window, QString reason, bool auto_delete)
+void IRCSession::RequestDisconnect(Scrollback *scrollback, QString reason, bool auto_delete)
 {
     this->_autoReconnect = false;
-    Q_UNUSED(window);
+    Q_UNUSED(scrollback);
     if (!this->IsConnected())
         return;
     // Disconnect the network
@@ -549,14 +549,14 @@ void IRCSession::RequestDisconnect(Scrollback *window, QString reason, bool auto
         delete this;
 }
 
-void IRCSession::RequestPart(Scrollback *window)
+void IRCSession::RequestPart(Scrollback *scrollback)
 {
-    if (window->GetType() != ScrollbackType_Channel)
-        throw new Exception("You can't request part of a window that isn't a channel", BOOST_CURRENT_FUNCTION);
-    this->GetNetwork()->RequestPart(window->GetTarget());
+    if (scrollback->GetType() != ScrollbackType_Channel)
+        throw new Exception("You can't request part of a scrollback that isn't a channel", BOOST_CURRENT_FUNCTION);
+    this->GetNetwork()->RequestPart(scrollback->GetTarget());
 }
 
-libircclient::User *IRCSession::GetSelfNetworkID(Scrollback *window)
+libircclient::User *IRCSession::GetSelfNetworkID(Scrollback *scrollback)
 {
     if (!this->network)
         return NULL;
@@ -565,16 +565,16 @@ libircclient::User *IRCSession::GetSelfNetworkID(Scrollback *window)
     return this->network->GetLocalUserInfo();
 }
 
-void IRCSession::RegisterChannel(libircclient::Channel *channel, Scrollback *window)
+void IRCSession::RegisterChannel(libircclient::Channel *channel, Scrollback *scrollback)
 {
-    this->channels.insert(channel->GetName().toLower(), window);
+    this->channels.insert(channel->GetName().toLower(), scrollback);
     if (!this->GetNetwork()->GetChannel(channel->GetName()))
         this->GetNetwork()->_st_InsertChannel(channel);
 }
 
-void IRCSession::RetrieveChannelExceptionList(Scrollback *window, QString channel_name)
+void IRCSession::RetrieveChannelExceptionList(Scrollback *scrollback, QString channel_name)
 {
-    Q_UNUSED(window);
+    Q_UNUSED(scrollback);
     if (!this->network)
         return;
 
@@ -583,9 +583,9 @@ void IRCSession::RetrieveChannelExceptionList(Scrollback *window, QString channe
     this->GetNetwork()->TransferRaw("MODE " + channel_name + " +e", libircclient::Priority_Low);
 }
 
-void IRCSession::RetrieveChannelInviteList(Scrollback *window, QString channel_name)
+void IRCSession::RetrieveChannelInviteList(Scrollback *scrollback, QString channel_name)
 {
-    Q_UNUSED(window);
+    Q_UNUSED(scrollback);
     if (!this->network)
         return;
 
@@ -594,7 +594,7 @@ void IRCSession::RetrieveChannelInviteList(Scrollback *window, QString channel_n
     this->GetNetwork()->TransferRaw("MODE " + channel_name + " +I", libircclient::Priority_Low);
 }
 
-void IRCSession::RetrieveChannelBanList(Scrollback *window, QString channel_name)
+void IRCSession::RetrieveChannelBanList(Scrollback *scrollback, QString channel_name)
 {
     if (!this->network)
         return;
@@ -620,9 +620,9 @@ void IRCSession::UnsetAway()
     NetworkSession::UnsetAway();
 }
 
-QString IRCSession::GetLocalUserModeAsString(Scrollback *window)
+QString IRCSession::GetLocalUserModeAsString(Scrollback *scrollback)
 {
-    Q_UNUSED(window);
+    Q_UNUSED(scrollback);
     if (!this->network)
         return "";
 
@@ -670,15 +670,15 @@ QList<long long> IRCSession::GetPingHistory()
     return this->pingHistory;
 }
 
-bool IRCSession::IsAutoreconnect(Scrollback *window)
+bool IRCSession::IsAutoreconnect(Scrollback *scrollback)
 {
-    Q_UNUSED(window);
+    Q_UNUSED(scrollback);
     return this->_autoReconnect;
 }
 
-void IRCSession::SetAutoreconnect(Scrollback *window, bool reconnect)
+void IRCSession::SetAutoreconnect(Scrollback *scrollback, bool reconnect)
 {
-    Q_UNUSED(window);
+    Q_UNUSED(scrollback);
     this->_autoReconnect = reconnect;
 }
 
@@ -691,23 +691,23 @@ void IRCSession::OnOutgoingRawMessage(QByteArray message)
         this->data.removeFirst();
 }
 
-void IRCSession::SendMessage(Scrollback *window, QString text)
+void IRCSession::SendMessage(Scrollback *scrollback, QString text)
 {
     if (!this->IsConnected())
     {
         this->GetSystemWindow()->InsertText("Can't send messages to a disconnected network");
         return;
     }
-    if (window->GetTarget().isEmpty())
-        throw new GrumpyIRC::Exception("window->GetTarget() contains empty string", BOOST_CURRENT_FUNCTION);
-    this->GetNetwork()->SendMessage(text, window->GetTarget());
-    // Write the message to active window
-    window->InsertText(ScrollbackItem(text, ScrollbackItemType_Message, this->GetNetwork()->GetLocalUserInfo(), 0, true));
+    if (scrollback->GetTarget().isEmpty())
+        throw new GrumpyIRC::Exception("scrollback->GetTarget() contains empty string", BOOST_CURRENT_FUNCTION);
+    this->GetNetwork()->SendMessage(text, scrollback->GetTarget());
+    // Write the message to active scrollback
+    scrollback->InsertText(ScrollbackItem(text, ScrollbackItemType_Message, this->GetNetwork()->GetLocalUserInfo(), 0, true));
 }
 
-void IRCSession::SendCTCP(Scrollback *window, QString target, QString ctcp, QString param)
+void IRCSession::SendCTCP(Scrollback *scrollback, QString target, QString ctcp, QString param)
 {
-    Q_UNUSED(window);
+    Q_UNUSED(scrollback);
     if (!this->network)
         return;
 
@@ -720,18 +720,18 @@ void IRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
         throw new GrumpyIRC::Exception("Invalid channel name", BOOST_CURRENT_FUNCTION);
     QString ln = channel->GetName().toLower();
     // Find a scrollback for this channel somewhere ;)
-    Scrollback *window;
+    Scrollback *scrollback;
     if (this->channels.contains(ln))
     {
-        window = this->channels[ln];
-        window->SetDead(false);
+        scrollback = this->channels[ln];
+        scrollback->SetDead(false);
     }
     else
     {
-        window = Core::GrumpyCore->NewScrollback(this->systemWindow, channel->GetName(), ScrollbackType_Channel);
-        emit this->Event_ScrollbackIsOpen(window);
-        this->channels.insert(ln, window);
-        window->SetSession(this);
+        scrollback = Core::GrumpyCore->NewScrollback(this->systemWindow, channel->GetName(), ScrollbackType_Channel);
+        emit this->Event_ScrollbackIsOpen(scrollback);
+        this->channels.insert(ln, scrollback);
+        scrollback->SetSession(this);
     }
     // Request some information about users in the channel
     if (!this->retrievingWho.contains(ln))
@@ -814,7 +814,7 @@ void IRCSession::OnSelf_KICK(libircclient::Parser *px, libircclient::Channel *ch
     if (!this->channels.contains(channel->GetName().toLower()))
         return;
 
-    // Write information to channel window
+    // Write information to channel scrollback
     Scrollback *sc = this->channels[channel->GetName().toLower()];
     sc->InsertText("You were kicked from the channel by " + px->GetSourceUserInfo()->ToString() + ": " + px->GetText());
     // The channel is about to be deleted now, let's do something about it
@@ -1365,7 +1365,7 @@ void IRCSession::_gs_ResyncNickChange(QString new_, QString old_)
     }
 }
 
-void IRCSession::rmWindow(Scrollback *window)
+void IRCSession::rmScrollback(Scrollback *window)
 {
     if (window->GetType() != ScrollbackType_User && !window->IsDead())
         throw new Exception("You can't delete window which is alive", BOOST_CURRENT_FUNCTION);

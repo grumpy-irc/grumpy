@@ -794,7 +794,7 @@ QScriptEngine *ScriptCommand::GetEngine()
 int ScriptCommand::Run(CommandArgs args)
 {
     QScriptValueList parameters;
-    parameters.append(QScriptValue(this->GetEngine(), args.Window->GetID()));
+    parameters.append(QScriptValue(this->GetEngine(), args.SrcScrollback->GetID()));
     parameters.append(QScriptValue(this->GetEngine(), args.ParameterLine));
     this->script->executeFunction(this->fn, parameters);
     return 0;

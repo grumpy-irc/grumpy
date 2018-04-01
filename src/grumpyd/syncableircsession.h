@@ -38,8 +38,8 @@ namespace GrumpyIRC
             User *GetOwner() const;
             void ResyncChannel(libircclient::Channel *channel, QHash<QString, QVariant> cx);
             void Resync(QHash<QString, QVariant> network);
-            void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete);
-            void RegisterScrollback(Scrollback *window);
+            void RequestDisconnect(Scrollback *scrollback, QString reason, bool auto_delete);
+            void RegisterScrollback(Scrollback *scrollback);
             Scrollback *GetScrollbackForUser(QString user);
             void SetHostname(QString text);
             void SetName(QString text);
@@ -79,7 +79,7 @@ namespace GrumpyIRC
             void OnMessage(libircclient::Parser *px);
         private:
             void post_init();
-            void rmWindow(Scrollback *window);
+            void rmScrollback(Scrollback *scrollback);
             void resyncULRemove(libircclient::Channel *channel, QString user);
             void resyncUL(libircclient::Channel *channel, int mode, libircclient::User *user);
             //! User who owns this session

@@ -35,8 +35,8 @@ CommandProcessor::CommandProcessor()
 
 CommandProcessor::~CommandProcessor()
 {
-    foreach (QString command, this->CommandList.keys())
-        delete this->CommandList[command];
+    foreach (QString command, this->commandList.keys())
+        delete this->commandList[command];
 }
 
 void CommandProcessor::RegisterCommand(SystemCommand *sc)
@@ -44,25 +44,25 @@ void CommandProcessor::RegisterCommand(SystemCommand *sc)
     QString lower_name = sc->GetName().toLower();
 
     // In case this command is already registered throw exception
-    if (this->CommandList.contains(lower_name))
+    if (this->commandList.contains(lower_name))
         throw new Exception("Command already exists: " + lower_name, BOOST_CURRENT_FUNCTION);
 
     GRUMPY_DEBUG("Registering system command: " + sc->GetName(), 2);
-    this->CommandList.insert(lower_name, sc);
+    this->commandList.insert(lower_name, sc);
 }
 
 void CommandProcessor::UnregisterCommand(SystemCommand *sc)
 {
     QString lower_name = sc->GetName().toLower();
 
-    if (!this->CommandList.contains(lower_name))
+    if (!this->commandList.contains(lower_name))
         return;
 
     GRUMPY_DEBUG("Unregistering system command: " + sc->GetName(), 2);
-    this->CommandList.remove(lower_name);
+    this->commandList.remove(lower_name);
 }
 
-int CommandProcessor::ProcessText(QString text, Scrollback *window, bool comments_rm)
+int CommandProcessor::ProcessText(QString text, Scrollback *scrollback, bool comments_rm)
 {
     text.replace("\r", "");
     QStringList items = text.split("\n");
@@ -73,7 +73,7 @@ int CommandProcessor::ProcessText(QString text, Scrollback *window, bool comment
             if (text.trimmed().startsWith(this->CommentChar))
                 continue;
         }
-        int return_code = this->ProcessItem(line, window);
+        int return_code = this->ProcessItem(line, scrollback);
         switch (-return_code)
         {
             case COMMANDPROCESSOR_ENOTEXIST:
@@ -138,7 +138,7 @@ static QList<QString> Split(int size, int minimal_size, QString text)
 
 QList<QString> CommandProcessor::GetCommands()
 {
-    return this->CommandList.keys();
+    return this->commandList.keys();
 }
 
 QHash<QString, QString> CommandProcessor::GetAliasRdTable()
@@ -153,7 +153,7 @@ QList<QString> GrumpyIRC::CommandProcessor::GetAList()
 
 bool GrumpyIRC::CommandProcessor::Exists(QString name) const
 {
-    return this->CommandList.contains(name) || this->aliasList.contains(name);
+    return this->commandList.contains(name) || this->aliasList.contains(name);
 }
 
 void GrumpyIRC::CommandProcessor::RegisterAlias(QString name, QString target)
@@ -169,7 +169,7 @@ void CommandProcessor::UnregisterAlias(QString name)
         this->aliasList.remove(name);
 }
 
-int CommandProcessor::ProcessItem(QString command, Scrollback *window)
+int CommandProcessor::ProcessItem(QString command, Scrollback *scrollback)
 {
     command = command.trimmed();
     if (command.isEmpty())
@@ -180,7 +180,7 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
         // This is a system command
         command = command.mid(1);
         CommandArgs parameters;
-        parameters.Window = window;
+        parameters.SrcScrollback = scrollback;
         QString command_name = command.toLower();
         // Get parameters
         if (command.contains(" "))
@@ -192,7 +192,7 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
         }
         int recursion_cnt = 0;
         QString temp1;
-        while (!this->CommandList.contains(command_name) && this->aliasList.contains(command_name))
+        while (!this->commandList.contains(command_name) && this->aliasList.contains(command_name))
         {
             if (recursion_cnt++ > 20)
                 return -COMMANDPROCESSOR_ETOOMANYREDS;
@@ -221,28 +221,28 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
             temp2.append(parameters.Parameters);
             parameters.Parameters = temp2;
         }
-        if (!this->CommandList.contains(command_name))
+        if (!this->commandList.contains(command_name))
         {
-            if (window && window->GetSession())
+            if (scrollback && scrollback->GetSession())
             {
-                if (!window->GetSession()->IsConnected())
+                if (!scrollback->GetSession()->IsConnected())
                     return -COMMANDPROCESSOR_ENOTCONNECTED;
                 // We are connected to some IRC network, we will transfer this as IRC command
                 command_name = command_name.toUpper();
                 if (parameters.ParameterLine.isEmpty())
-                    window->GetSession()->SendRaw(window, command_name);
+                    scrollback->GetSession()->SendRaw(scrollback, command_name);
                 else
-                    window->GetSession()->SendRaw(window, command_name + " " + parameters.ParameterLine);
+                    scrollback->GetSession()->SendRaw(scrollback, command_name + " " + parameters.ParameterLine);
                 return 0;
             }
             return -COMMANDPROCESSOR_ENOTEXIST;
         }
-        return this->CommandList[command_name]->Run(parameters);
+        return this->commandList[command_name]->Run(parameters);
     }
     if (command.startsWith(this->CommandPrefix) && (command.length() > 1 && command[1] == this->CommandPrefix))
         command = command.mid(1);
     // It's not a command, let's do something with this
-    if (window->IsDead() != true && (window->GetType() == ScrollbackType_Channel || window->GetType() == ScrollbackType_User))
+    if (scrollback->IsDead() != true && (scrollback->GetType() == ScrollbackType_Channel || scrollback->GetType() == ScrollbackType_User))
     {
         // This is a channel window, so we send this as a message to the channel
         // If the message is too long we split it
@@ -254,11 +254,11 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
             // part of each message from server to clients:
             // :user!ident@hostname PRIVMSG #channel_name :text of message
             // ^           this text                      ^  <- needs to be considered part of message (the length of this)
-            libircclient::User *self = window->GetSession()->GetSelfNetworkID(window);
+            libircclient::User *self = scrollback->GetSession()->GetSelfNetworkID(scrollback);
             // In extreme case this could be NULL
             if (self)
             {
-                QString server_str = ":" + self->ToString() + " PRIVMSG " + window->GetTarget() + " :";
+                QString server_str = ":" + self->ToString() + " PRIVMSG " + scrollback->GetTarget() + " :";
                 long_size -= server_str.length() + 1;
             }
         }
@@ -271,14 +271,14 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *window)
         {
             QList<QString> messages = Split(long_size, minm_size, command);
             foreach (QString text, messages)
-                window->GetSession()->SendMessage(window, text);
+                scrollback->GetSession()->SendMessage(scrollback, text);
             return 0;
         }
-        window->GetSession()->SendMessage(window, command);
+        scrollback->GetSession()->SendMessage(scrollback, command);
     }
     else
     {
-        window->InsertText("You can't send messages to this window", ScrollbackItemType_SystemWarning);
+        scrollback->InsertText("You can't send messages to this window", ScrollbackItemType_SystemWarning);
     }
     return 0;
 }

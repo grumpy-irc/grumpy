@@ -85,41 +85,41 @@ namespace GrumpyIRC
             virtual Scrollback *GetScrollbackForChannel(QString channel);
             //! Retrieves a scrollback for given user, if it doesn't exist it will be created
             virtual Scrollback *GetScrollbackForUser(QString user);
-            virtual libircclient::Network *GetNetwork(Scrollback *window = 0);
+            virtual libircclient::Network *GetNetwork(Scrollback *scrollback = 0);
             virtual QList<Scrollback*> GetScrollbacks();
             virtual QList<Scrollback*> GetUserScrollbacks();
             virtual QList<Scrollback*> GetChannelScrollbacks();
             virtual unsigned int GetSID();
             virtual void Connect(libircclient::Network *Network);
-            void SendMessage(Scrollback *window, QString target, QString text);
-            void SendNotice(Scrollback *window, QString target, QString text);
-            void SendMessage(Scrollback *window, QString text);
-            void SendCTCP(Scrollback *window, QString target, QString ctcp, QString param);
+            void SendMessage(Scrollback *scrollback, QString target, QString text);
+            void SendNotice(Scrollback *scrollback, QString target, QString text);
+            void SendMessage(Scrollback *scrollback, QString text);
+            void SendCTCP(Scrollback *scrollback, QString target, QString ctcp, QString param);
             virtual bool IsConnected() const;
             virtual void SetNetwork(libircclient::Network *nt);
-            void SendNotice(Scrollback *window, QString text);
+            void SendNotice(Scrollback *scrollback, QString text);
             virtual QList<NetworkSniffer_Item*> GetSniffer();
             SessionType GetType();
-            QList<QString> GetChannels(Scrollback *window);
+            QList<QString> GetChannels(Scrollback *scrollback);
             QHash<QString, QVariant> ToHash(int max_items = 2000);
             void LoadHash(QHash<QString, QVariant> hash);
-            void SendAction(Scrollback *window, QString text);
-            void SendRaw(Scrollback *window, QString raw, libircclient::Priority pr = libircclient::Priority_Normal);
-            void RequestRemove(Scrollback *window);
-            void RequestReconnect(Scrollback *window);
-            void Query(Scrollback *window, QString target, QString message);
-            libircclient::Channel *GetChannel(Scrollback *window);
-            void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete);
-            void RequestPart(Scrollback *window);
-            libircclient::User *GetSelfNetworkID(Scrollback *window);
+            void SendAction(Scrollback *scrollback, QString text);
+            void SendRaw(Scrollback *scrollback, QString raw, libircclient::Priority pr = libircclient::Priority_Normal);
+            void RequestRemove(Scrollback *scrollback);
+            void RequestReconnect(Scrollback *scrollback);
+            void Query(Scrollback *scrollback, QString target, QString message);
+            libircclient::Channel *GetChannel(Scrollback *scrollback);
+            void RequestDisconnect(Scrollback *scrollback, QString reason, bool auto_delete);
+            void RequestPart(Scrollback *scrollback);
+            libircclient::User *GetSelfNetworkID(Scrollback *scrollback);
             //! Used mostly only for synchronization with grumpyd
-            virtual void RegisterChannel(libircclient::Channel *channel, Scrollback *window);
-            void RetrieveChannelExceptionList(Scrollback *window, QString channel_name);
-            void RetrieveChannelInviteList(Scrollback *window, QString channel_name);
-            void RetrieveChannelBanList(Scrollback *window, QString channel_name);
+            virtual void RegisterChannel(libircclient::Channel *channel, Scrollback *scrollback);
+            void RetrieveChannelExceptionList(Scrollback *scrollback, QString channel_name);
+            void RetrieveChannelInviteList(Scrollback *scrollback, QString channel_name);
+            void RetrieveChannelBanList(Scrollback *scrollback, QString channel_name);
             void SetAway(QString reason);
             void UnsetAway();
-            QString GetLocalUserModeAsString(Scrollback *window);
+            QString GetLocalUserModeAsString(Scrollback *scrollback);
             QString GetName() const;
             QString GetHostname() const;
             QString GetNick() const;
@@ -128,16 +128,16 @@ namespace GrumpyIRC
             bool UsingSSL() const;
             unsigned int GetPort() const;
             QList<long long> GetPingHistory();
-            bool IsAutoreconnect(Scrollback *window);
-            void SetAutoreconnect(Scrollback *window, bool reconnect);
+            bool IsAutoreconnect(Scrollback *scrollback);
+            void SetAutoreconnect(Scrollback *scrollback, bool reconnect);
             QList<int> IgnoredNums;
             Scrollback *Root;
             bool AutomaticallyRetrieveBanList;
         signals:
-            //! Emited when a new window for this session is open, needed by grumpyd for network sync
-            void Event_ScrollbackIsOpen(Scrollback *window);
-            void Event_ScrollbackIsClosed(Scrollback *window);
-            void Event_UserListWasModified(Scrollback *window, libircclient::Channel *channel);
+            //! Emited when a new scrollback for this session is open, needed by grumpyd for network sync
+            void Event_ScrollbackIsOpen(Scrollback *scrollback);
+            void Event_ScrollbackIsClosed(Scrollback *scrollback);
+            void Event_UserListWasModified(Scrollback *scrollback, libircclient::Channel *channel);
         protected slots:
             virtual void OnOutgoingRawMessage(QByteArray message);
             virtual void OnIncomingRawMessage(QByteArray message);
@@ -211,8 +211,8 @@ namespace GrumpyIRC
             //! This is only called by grumpy session, used for resync, pretty much just a performance tweaks
             //! so that we don't need to call GP_CMD_RESYNC_CHANNEL just for a simple nick change
             virtual void _gs_ResyncNickChange(QString new_, QString old_);
-            virtual void rmWindow(Scrollback *window);
-            virtual void SyncWindows(QHash<QString, QVariant> windows, QHash<QString, Scrollback*> *hash);
+            virtual void rmScrollback(Scrollback *scrollback);
+            virtual void SyncWindows(QHash<QString, QVariant> scrollbacks, QHash<QString, Scrollback*> *hash);
             QTimer timerUL;
             //! Sessions have unique ID that distinct them from sessions made to same irc network
             unsigned int SID;

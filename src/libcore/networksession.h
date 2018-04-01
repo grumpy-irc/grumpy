@@ -41,34 +41,34 @@ namespace GrumpyIRC
         public:
             NetworkSession();
             virtual ~NetworkSession();
-            virtual bool IsAutoreconnect(Scrollback *window)=0;
-            virtual void SetAutoreconnect(Scrollback *window, bool reconnect)=0;
+            virtual bool IsAutoreconnect(Scrollback *scrollback)=0;
+            virtual void SetAutoreconnect(Scrollback *scrollback, bool reconnect)=0;
             virtual bool IsAway(Scrollback *scrollback = NULL)=0;
             virtual bool IsConnected() const=0;
-            virtual libircclient::Network *GetNetwork(Scrollback *window = 0)=0;
-            virtual void SendAction(Scrollback *window, QString text)=0;
-            virtual void SendMessage(Scrollback *window, QString text)=0;
-            virtual void SendRaw(Scrollback *window, QString raw, libircclient::Priority pr = libircclient::Priority_Normal)=0;
-            virtual void SendCTCP(Scrollback *window, QString target, QString ctcp, QString param)=0;
-            virtual void SendNotice(Scrollback *window, QString text)=0;
-            virtual QList<QString> GetChannels(Scrollback *window)=0;
-            virtual libircclient::User *GetSelfNetworkID(Scrollback *window)=0;
-            virtual QString GetLocalUserModeAsString(Scrollback *window)=0;
-            virtual void SendMessage(Scrollback *window, QString target, QString message)=0;
-            virtual void SendNotice(Scrollback *window, QString target, QString message)=0;
-            virtual void Query(Scrollback *window, QString target, QString message)=0;
+            virtual libircclient::Network *GetNetwork(Scrollback *scrollback = 0)=0;
+            virtual void SendAction(Scrollback *scrollback, QString text)=0;
+            virtual void SendMessage(Scrollback *scrollback, QString text)=0;
+            virtual void SendRaw(Scrollback *scrollback, QString raw, libircclient::Priority pr = libircclient::Priority_Normal)=0;
+            virtual void SendCTCP(Scrollback *scrollback, QString target, QString ctcp, QString param)=0;
+            virtual void SendNotice(Scrollback *scrollback, QString text)=0;
+            virtual QList<QString> GetChannels(Scrollback *scrollback)=0;
+            virtual libircclient::User *GetSelfNetworkID(Scrollback *scrollback)=0;
+            virtual QString GetLocalUserModeAsString(Scrollback *scrollback)=0;
+            virtual void SendMessage(Scrollback *scrollback, QString target, QString message)=0;
+            virtual void SendNotice(Scrollback *scrollback, QString target, QString message)=0;
+            virtual void Query(Scrollback *scrollback, QString target, QString message)=0;
             virtual Scrollback *GetSystemWindow()=0;
-            virtual libircclient::Channel *GetChannel(Scrollback *window)=0;
-            virtual void RetrieveChannelBanList(Scrollback *window, QString channel_name)=0;
-            virtual void RequestReconnect(Scrollback *window)=0;
-            virtual void RequestDisconnect(Scrollback *window, QString reason, bool auto_delete)=0;
+            virtual libircclient::Channel *GetChannel(Scrollback *scrollback)=0;
+            virtual void RetrieveChannelBanList(Scrollback *scrollback, QString channel_name)=0;
+            virtual void RequestReconnect(Scrollback *scrollback)=0;
+            virtual void RequestDisconnect(Scrollback *scrollback, QString reason, bool auto_delete)=0;
             virtual void SetAway(QString reason);
             virtual void UnsetAway();
-            //! Request the selected window to be removed from window tree
-            //! the windows are never directly removed because there might be complex structures depending on them
-            //! you always need to ASK the window to delete itself
-            virtual void RequestRemove(Scrollback *window)=0;
-            virtual void RequestPart(Scrollback *window)=0;
+            //! Request the selected scrollback to be removed from scrollback tree
+            //! the scrollbacks are never directly removed because there might be complex structures depending on them
+            //! you always need to ASK the scrollback to delete itself
+            virtual void RequestRemove(Scrollback *scrollback)=0;
+            virtual void RequestPart(Scrollback *scrollback)=0;
             virtual SessionType GetType()=0;
             // Workaround for really weird MSVC bug in their compiler
 #ifdef _MSC_VER

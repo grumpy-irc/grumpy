@@ -32,7 +32,8 @@ namespace GrumpyIRC
         public:
             QString ParameterLine;
             QStringList Parameters;
-            Scrollback *Window;
+            //! Scrollback from which this command was executed
+            Scrollback *SrcScrollback;
     };
 
     typedef int (*SC_Callback) (SystemCommand*, CommandArgs);
@@ -64,9 +65,9 @@ namespace GrumpyIRC
             void RegisterCommand(SystemCommand *sc);
             void UnregisterCommand(SystemCommand *sc);
             //! Handles a single item - can process only 1 line of text
-            int ProcessItem(QString command, Scrollback *window);
+            int ProcessItem(QString command, Scrollback *scrollback);
             //! Simple idiot proof processor for text that is input by a user
-            int ProcessText(QString text, Scrollback *window, bool comments_rm = false);
+            int ProcessText(QString text, Scrollback *scrollback, bool comments_rm = false);
             QList<QString> GetCommands();
             QHash<QString, QString> GetAliasRdTable();
             QList<QString> GetAList();
@@ -87,7 +88,7 @@ namespace GrumpyIRC
             char CommentChar;
         private:
             QHash<QString, QString> aliasList;
-            QHash<QString, SystemCommand*> CommandList;
+            QHash<QString, SystemCommand*> commandList;
     };
 }
 

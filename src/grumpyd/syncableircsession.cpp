@@ -76,7 +76,7 @@ SyncableIRCSession::SyncableIRCSession(unsigned int id, Scrollback *system, User
             this->users.insert(sx->GetTarget().toLower(), sx);
         } else
         {
-            // System window? Ignoring
+            // System scrollback? Ignoring
         }
     }
     this->post_init();
@@ -177,9 +177,9 @@ void SyncableIRCSession::Resync(QHash<QString, QVariant> network)
     session->SendToEverySession(GP_CMD_NETWORK_RESYNC, hash);
 }
 
-void SyncableIRCSession::RequestDisconnect(Scrollback *window, QString reason, bool auto_delete)
+void SyncableIRCSession::RequestDisconnect(Scrollback *scrollback, QString reason, bool auto_delete)
 {
-    IRCSession::RequestDisconnect(window, reason, auto_delete);
+    IRCSession::RequestDisconnect(scrollback, reason, auto_delete);
     // Sync scrollbacks with the clients (at least the dead parameter must be changed)
     foreach (Scrollback *sx, this->users)
         ((VirtualScrollback*)sx)->PartialSync();
@@ -280,7 +280,7 @@ void SyncableIRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
     {
         // Store in SQL
         Grumpyd::GetBackend()->UpdateNetwork(this);
-        // Propagate this new window to every connected user
+        // Propagate this new scrollback to every connected user
         VirtualScrollback *sx = (VirtualScrollback*)this->channels[channel->GetName().toLower()];
         if (sx->PropertyBag.contains("initialized"))
         {
@@ -292,7 +292,7 @@ void SyncableIRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
         if (!sx->GetOwner())
             sx->SetOwner(this->owner);
         sx->Sync();
-        // Now sync the channel with all connected users, we need to do this after we sync the window so that client can assign the window pointer to chan
+        // Now sync the channel with all connected users, we need to do this after we sync the scrollback so that client can assign the scrollback pointer to chan
         Session *session = this->owner->GetAnyGPSession();
         if (!session)
             return;
@@ -569,7 +569,7 @@ void SyncableIRCSession::OnMessage(libircclient::Parser *px)
             Scrollback *scrollback = this->GetScrollbackForUser(px->GetSourceUserInfo()->GetNick());
             if (!scrollback)
             {
-                GRUMPY_DEBUG("Not sending AFK message to nonexistent window: " + px->GetSourceUserInfo()->GetNick(), 2);
+                GRUMPY_DEBUG("Not sending AFK message to nonexistent scrollback: " + px->GetSourceUserInfo()->GetNick(), 2);
                 return;
             }
             // Message
@@ -585,9 +585,9 @@ void SyncableIRCSession::post_init()
     this->IgnoredNums = this->owner->GetConfiguration()->IgnoredNums();
 }
 
-void SyncableIRCSession::rmWindow(Scrollback *window)
+void SyncableIRCSession::rmScrollback(Scrollback *scrollback)
 {
-    IRCSession::rmWindow(window);
+    IRCSession::rmScrollback(scrollback);
     // Update the network in database storage
     Grumpyd::GetBackend()->UpdateNetwork(this);
 }
