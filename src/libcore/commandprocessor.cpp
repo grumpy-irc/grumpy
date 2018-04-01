@@ -250,6 +250,8 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *scrollback)
         int minm_size = this->MinimalSize;
         if (this->SplitLong && this->AutoReduceMsgSize)
         {
+            // THIS IS NOT SENDING ANYTHING ANYWHERE - IT JUST TRIES TO PREDICT THE RESULTING LENGTH OF MESSAGE AS RELAYED
+            // BY IRCD TO CLIENTS!! It's an ugly hack, but it does the job. And it's optional :)
             // We automatically reduce the maximal size of the message by length of user string and channel so that we comply with RFC
             // part of each message from server to clients:
             // :user!ident@hostname PRIVMSG #channel_name :text of message
@@ -258,8 +260,10 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *scrollback)
             // In extreme case this could be NULL
             if (self)
             {
-                QString server_str = ":" + self->ToString() + " PRIVMSG " + scrollback->GetTarget() + " :";
-                long_size -= server_str.length() + 1;
+                // Let's not really contcatenate this for perfomance reason and to prevent people bitching when reviewing the code :)
+                // QString server_str      = ":" + self->ToString()          + " PRIVMSG " + scrollback->GetTarget() + " :";
+                int server_side_str_length = 1   + self->ToString().length() + 9           + scrollback->GetTarget().length() + 3; // (2 for " :" + 1 for \0)
+                long_size -= server_side_str_length;
             }
         }
         // failsafe for extreme cases and invalid config
