@@ -175,7 +175,7 @@ bool ScriptExtension::IsWorking()
 
 QScriptValue ScriptExtension::ExecuteFunction(QString function, QScriptValueList parameters)
 {
-    this->executeFunction(function, parameters);
+    return this->executeFunction(function, parameters);
 }
 
 unsigned int ScriptExtension::GetContextID()
@@ -488,6 +488,7 @@ static QScriptValue network_send_message(QScriptContext *context, QScriptEngine 
         return QScriptValue(engine, false);
     }
     w->GetSession()->SendMessage(w, target, text);
+    return QScriptValue(engine, true);
 }
 
 static QScriptValue network_send_raw(QScriptContext *context, QScriptEngine *engine)
