@@ -73,6 +73,7 @@ ScriptExtension::ScriptExtension()
     this->isWorking = false;
     this->isLoaded = false;
     this->engine = nullptr;
+    this->isUnsafe = Core::GrumpyCore->GetConfiguration()->GetUnsafeScriptFc();
 }
 
 ScriptExtension::~ScriptExtension()
@@ -186,6 +187,11 @@ unsigned int ScriptExtension::GetContextID()
 QString ScriptExtension::GetContext()
 {
     return "core";
+}
+
+bool ScriptExtension::IsUnsafe()
+{
+    return this->isUnsafe;
 }
 
 bool ScriptExtension::SupportFunction(QString name)
@@ -808,6 +814,29 @@ static QScriptValue get_function_list(QScriptContext *context, QScriptEngine *en
     return qScriptValueFromSequence(engine, extension->GetFunctions());
 }
 
+static QScriptValue process(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
+    if (context->argumentCount() < 2)
+    {
+        // Wrong number of parameters
+        GRUMPY_ERROR(extension->GetName() + ": process(window_id, input): requires 2 parameters");
+        return QScriptValue(engine, false);
+    }
+    unsigned int window_id = context->argument(0).toUInt32();
+    QString x = context->argument(1).toString();
+    Scrollback *w = Scrollback::GetScrollbackByID(window_id);
+    if (!w)
+    {
+        GRUMPY_ERROR(extension->GetName() + ": process(window_id): unknown scrollback");
+        return QScriptValue(engine, false);
+    }
+
+    return QScriptValue(engine, Core::GrumpyCore->GetCommandProcessor()->ProcessText(x, w));
+}
+
 void ScriptExtension::registerFunctions()
 {
     this->registerFunction("grumpy_get_function_help", get_function_help, 1, "(function_name): give you help for a function, returns string");
@@ -834,10 +863,15 @@ void ScriptExtension::registerFunctions()
     this->registerFunction("grumpy_network_get_network_name", network_get_network_name, 1, "(scrollback_id): return network for network of scrollback");
     this->registerFunction("grumpy_network_send_message", network_send_message, 3, "(scrollback_id, target, message): sends a silent message to target for network of scrollback");
     this->registerFunction("grumpy_network_send_raw", network_send_raw, 2, "(scrollback_id, text): sends RAW data to network of scrollback");
+    this->registerFunction("grumpy_process", process, 2, "(window_id, text): !unsafe! sends input to command processor, esentially same as entering text to input box in program", true);
 }
 
-void ScriptExtension::registerFunction(QString name, QScriptEngine::FunctionSignature function_signature, int parameters, QString help)
+void ScriptExtension::registerFunction(QString name, QScriptEngine::FunctionSignature function_signature, int parameters, QString help, bool is_unsafe)
 {
+    // Check if this script is allowed to access unsafe functions
+    if (is_unsafe && !this->isUnsafe)
+        return;
+
     this->functionsExported.append(name);
     this->functionsHelp.insert(name, help);
     this->engine->globalObject().setProperty(name, this->engine->newFunction(function_signature, parameters));

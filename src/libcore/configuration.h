@@ -61,6 +61,10 @@ namespace GrumpyIRC
             virtual void        Extension_SetValue(QString extension, QString key, int value);
             virtual void        Extension_SetValue(QString extension, QString key, QString value);
 
+            // Scripting config
+            virtual void SetUnsafeScriptFc(bool enabled);
+            virtual bool GetUnsafeScriptFc();
+
             // Miscelancelous
             virtual QString GetHomePath();
             //! System script path - system wide scripts

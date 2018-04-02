@@ -52,6 +52,7 @@ PreferencesWin::PreferencesWin(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
     this->ui->lineEdit_AutoAway->setText(QString::number(CONF->GetAutoAwayTime()));
     this->ui->lineEdit_Away->setText(CONF->GetAutoAwayMsg());
     this->ui->checkBox_AutoAway->setChecked(CONF->GetAutoAway());
+    this->ui->checkBox_UnsafeScript->setChecked(CONF->GetConfiguration()->GetUnsafeScriptFc());
     QString ignored;
     foreach (int numeric, CONF->IgnoredNums())
     {
@@ -157,7 +158,6 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
     }
     Skin::Current = this->highlighted_skin;
     CONF->SetIRCIgnoredNumerics(ignored_nums);
-    //CONF->setl
     ScrollbackFrame::UpdateSkins();
     switch(this->ui->comboBox_Enc->currentIndex())
     {
@@ -177,6 +177,7 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
             CONF->SetEncoding(libircclient::EncodingLatin);
             break;
     }
+    CONF->GetConfiguration()->SetUnsafeScriptFc(this->ui->checkBox_UnsafeScript->isChecked());
     CONF->Save();
     MainWindow::Main->SetupAutoAway();
     MainWindow::Main->UpdateSkin();

@@ -169,6 +169,16 @@ void Configuration::Extension_SetValue(QString extension, QString key, QString v
     this->SetValue(this->mkExt(extension, key), value);
 }
 
+void Configuration::SetUnsafeScriptFc(bool enabled)
+{
+    this->SetValue("unsafe_script", enabled);
+}
+
+bool Configuration::GetUnsafeScriptFc()
+{
+    return this->GetValueAsBool("unsafe_script", true);
+}
+
 QString Configuration::GetHomePath()
 {
     return this->home_path + QDir::separator();

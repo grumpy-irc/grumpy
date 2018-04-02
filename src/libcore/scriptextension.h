@@ -45,6 +45,7 @@ namespace GrumpyIRC
             QScriptValue ExecuteFunction(QString function, QScriptValueList parameters);
             virtual unsigned int GetContextID();
             virtual QString GetContext();
+            bool IsUnsafe();
             bool SupportFunction(QString name);
             QString GetHelpForFunc(QString name);
             QList<QString> GetFunctions();
@@ -62,7 +63,7 @@ namespace GrumpyIRC
             QString executeFunctionAsString(QString function, QScriptValueList parameters);
             QScriptValue executeFunction(QString function, QScriptValueList parameters);
             QScriptValue executeFunction(QString function);
-            virtual void registerFunction(QString name, QScriptEngine::FunctionSignature function_signature, int parameters, QString help = "");
+            virtual void registerFunction(QString name, QScriptEngine::FunctionSignature function_signature, int parameters, QString help = "", bool is_unsafe = false);
             //! Makes all functions available to ECMA
             virtual void registerFunctions();
             QScriptEngine *engine;
@@ -77,6 +78,7 @@ namespace GrumpyIRC
             QString scriptVers;
             bool isWorking;
             bool isLoaded;
+            bool isUnsafe;
             QList<ScriptCommand*> scriptCmds;
             friend class ScriptCommand;
     };
