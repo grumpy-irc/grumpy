@@ -14,11 +14,12 @@
 #define GRUMPYSCRIPT_H
 
 #include "definitions.h"
+#include "libcore_global.h"
 #include <QHash>
 
 namespace GrumpyIRC
 {
-    class LIBCORESHARE_EXPORT GrumpyScript
+    class LIBCORESHARED_EXPORT GrumpyScript
     {
         public:
             static QString ReplaceVars(QString source, QHash<QString, QString> vars, char prefix = '$', char escape = '\\');
