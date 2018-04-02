@@ -1,4 +1,5 @@
 # This is a script that is executed every time you run grumpy
+# Check bottom of this script for help how to use it
 # Licensed under LGPL
 
 # Set up some basic aliases, these are most likely not present on any IRCD but if they were
@@ -18,6 +19,8 @@
 
 # These lines can be safely removed
 /echo Welcome to GrumpyChat v. $grumpy.version
+/echo Home path (where your config file and scripts can be found): $grumpy.paths.home
+/echo
 /echo Some tips for easy start:
 /echo * Change the default nickname: /nick <default nickname> (in this window)
 /echo * Connect to an IRC server: /server [irc(s)://] hostname [:port]
@@ -27,3 +30,22 @@
 /echo For support click here: ircs://irc.tm-irc.org/#GrumpyChat
 /echo
 /echo Have fun!
+
+##################
+#     HELP       #
+##################
+
+# This is a very primitive scripting interface which can only handle basic commands
+# You can also use couple of variables within here:
+
+# $grumpy.paths.script           Path where system wide scripts should be present
+# $grumpy.paths.extension        Path where system wide extensions should be present
+# $grumpy.paths.home             Home path, user specific config and files
+# $grumpy.paths.home.script      User scripts
+# $grumpy.paths.home.extension   User extensions
+
+# If you want to extend grumpy with custom JavaScript (ECMA) scripts, you can use this:
+# /grumpy.script.load /full/path/to/a/script.js
+# example: /grumpy.script.load $grumpy.paths.home.script/script.js
+
+# For full documentation check https://github.com/grumpy-irc/grumpy/wiki/Scripting

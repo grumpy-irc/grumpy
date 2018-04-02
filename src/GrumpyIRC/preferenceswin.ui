@@ -693,7 +693,13 @@
         </widget>
        </item>
        <item>
-        <widget class="QPlainTextEdit" name="plainTextEditAutorun"/>
+        <widget class="QPlainTextEdit" name="plainTextEditAutorun">
+         <property name="font">
+          <font>
+           <family>Monospace</family>
+          </font>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QFormLayout" name="formLayout_2">
