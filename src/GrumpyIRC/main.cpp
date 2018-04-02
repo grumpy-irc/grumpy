@@ -38,12 +38,15 @@
 using namespace GrumpyIRC;
 
 #ifdef GRUMPY_WIN
+bool keep_cons = false;
 // Normally we would compile this program so it has no console window, but because we are hackers, we want to see a boot log from its startup
 // this function hides the console once the grumpy is started up and main window is loaded
 
 // it doesn't do anything if grumpy is compiled in debug mode, because we want to see it all time in that case :)
 void HideConsole(int hide)
 {
+    if (keep_cons)
+        return;
 #ifndef _DEBUG
     HWND Stealth;
     AllocConsole();
@@ -51,13 +54,17 @@ void HideConsole(int hide)
     ShowWindow(Stealth, hide);
 #endif
 }
-#endif
 
 int Parser_KeepCons(GrumpyIRC::TerminalParser *parser, QStringList params)
 {
+    Q_UNUSED(params);
+    Q_UNUSED(parser);
+
+    keep_cons = true;
 
     return 0;
 }
+#endif
 
 int Parser_Verbosity(GrumpyIRC::TerminalParser *parser, QStringList params)
 {
@@ -88,7 +95,9 @@ int main(int argc, char *argv[])
         TerminalParser *tp = new TerminalParser();
         QList<QString> networks_to_join;
         tp->Register('v', "verbose", "Increase verbosity level", 0, (TP_Callback)Parser_Verbosity);
+#ifdef GRUMPY_WIN
         tp->Register('k', "cons", "Keep console on", 0, (TP_Callback)Parser_KeepCons);
+#endif
         tp->Register('m', "safe", "Start GrumpyChat in a safe mode", 0, (TP_Callback)Parser_SafeMode);
         if (!tp->Parse(argc, argv))
         {
