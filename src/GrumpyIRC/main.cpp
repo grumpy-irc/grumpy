@@ -86,6 +86,7 @@ int main(int argc, char *argv[])
         a.setApplicationName("GrumpyChat");
         a.setOrganizationName("grumpy");
         TerminalParser *tp = new TerminalParser();
+        QList<QString> networks_to_join;
         tp->Register('v', "verbose", "Increase verbosity level", 0, (TP_Callback)Parser_Verbosity);
         tp->Register('k', "cons", "Keep console on", 0, (TP_Callback)Parser_KeepCons);
         tp->Register('m', "safe", "Start GrumpyChat in a safe mode", 0, (TP_Callback)Parser_SafeMode);
@@ -94,6 +95,8 @@ int main(int argc, char *argv[])
             delete tp;
             return ReturnCode;
         }
+        networks_to_join = tp->UnknownParams;
+        // Save memory
         delete tp;
 
         // Initialize core first
@@ -112,6 +115,9 @@ int main(int argc, char *argv[])
         ScrollbackFrame::InitializeThread();
         InputBox::AE = new AutocompletionEngine();
         MainWindow w;
+        foreach (QString network, networks_to_join)
+            w.OpenIRCNetworkLink(network);
+        networks_to_join.clear();
         w.show();
     #ifdef GRUMPY_WIN
         HideConsole(0);

@@ -59,6 +59,8 @@ namespace GrumpyIRC
             QList<TerminalItem> GetItems();
             TerminalItem *GetItem(char name);
             TerminalItem *GetItem(QString name);
+            QList<QString> UnknownParams;
+            QString ProgramName;
 
         private:
             QList<TerminalItem> _items;

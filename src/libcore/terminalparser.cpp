@@ -87,7 +87,11 @@ TerminalParser::TerminalParser()
 
 bool TerminalParser::Parse(int argc, char **argv)
 {
-    int x = 0;
+    // argv 0 should be always name of executed file
+    if (argc)
+        this->ProgramName = QString(argv[0]);
+    // since we already handled the first parameter, we start from 1
+    int x = 1;
     int expected_parameters = 0;
     QStringList parameter_buffer;
     TerminalItem *item = NULL;
@@ -136,8 +140,7 @@ bool TerminalParser::Parse(int argc, char **argv)
                 delete item;
                 return false;
             }
-        }
-        else if (parameter.startsWith("-"))
+        } else if (parameter.startsWith("-"))
         {
             // It's a single character(s), let's process them recursively
             int symbol_px = 0;
@@ -168,6 +171,9 @@ bool TerminalParser::Parse(int argc, char **argv)
                     return false;
                 }
             }
+        } else
+        {
+            this->UnknownParams.append(parameter);
         }
     }
     delete item;

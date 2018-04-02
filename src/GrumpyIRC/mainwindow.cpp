@@ -147,8 +147,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->ui->actionEnable_proxy->setChecked(CONF->UsingProxy());
     Proxy::Init();
     this->SetupAutoAway();
+
     if (!CONF->SafeMode)
         this->Execute(CONF->GetAutorun());
+
     UiHooks::OnMainWindowStart();
 }
 
@@ -361,7 +363,14 @@ void MainWindow::OpenGrumpy(QString hostname, int port, QString username, QStrin
 
 void MainWindow::OpenIRCNetworkLink(QString link)
 {
-    MainWindow::Main->OpenServer(libirc::ServerAddress(link));
+    libirc::ServerAddress network(link);
+    if (!network.IsValid())
+    {
+        GRUMPY_ERROR("Invalid link to IRC network: " + link);
+    } else
+    {
+        this->OpenServer(network);
+    }
 }
 
 void MainWindow::OpenServer(libirc::ServerAddress server)
