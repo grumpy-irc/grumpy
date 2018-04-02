@@ -8,11 +8,10 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #include "skin.h"
 #include <QFontDatabase>
-#include <QStringList>
 
 using namespace GrumpyIRC;
 
@@ -113,7 +112,8 @@ void Skin::LoadHash(QHash<QString, QVariant> hash)
         }
         color_id++;
     }
-    QList<char> ml = {'v', 'h', 'o', 'a', 'q'};
+    QList<char> ml;
+    ml << 'v' << 'h' << 'o' << 'a' << 'q';
     foreach (char mode, ml)
     {
         QString key = "ModeColor_" + QString(mode);
