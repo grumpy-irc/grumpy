@@ -18,6 +18,12 @@ function cmd_fc(window_id, text)
     return 0;
 }
 
+function cmd_reference(window_id, text)
+{
+    grumpy_ecma_print_help();
+    return 0;
+}
+
 function cmd_info(window_id, text)
 {
     var v = grumpy_get_version();
@@ -31,6 +37,7 @@ function cmd_help(window_id, text)
     grumpy_log("/dev.session.info - session info");
     grumpy_log("/dev.network.info - network info");
     grumpy_log("/dev.scrollback.id - print scrollback id");
+    grumpy_log("/dev.function.help - print help for all functions");
     grumpy_log("/dev.has <function name> - check if this version has ECMA function");
     return 0;
 }
@@ -49,6 +56,7 @@ function ext_init()
     safe_cmd_reg("dev.session.info", "cmd_info");
     safe_cmd_reg("dev.scrollback.id", "cmd_id");
     safe_cmd_reg("dev.network.info", "cmd_network");
+    safe_cmd_reg("dev.function.help", "cmd_reference");
     safe_cmd_reg("dev.has", "cmd_fc");
     return true;
 }

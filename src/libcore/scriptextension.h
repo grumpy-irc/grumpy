@@ -46,6 +46,8 @@ namespace GrumpyIRC
             virtual unsigned int GetContextID();
             virtual QString GetContext();
             bool SupportFunction(QString name);
+            QString GetHelpForFunc(QString name);
+            QList<QString> GetFunctions();
 
         private slots:
             void OnError(QScriptValue e);

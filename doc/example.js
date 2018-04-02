@@ -59,6 +59,7 @@ function ext_get_author()
 }
 
 // function reference
+// You can execute grumpy_ecma_print_help() to get an up-to-date help for your current grumpy scripting engine
 //
 // bool grumpy_has_function(name)                   // check if function (any in this list) is available in this grumpy version
 // object grumpy_get_version()                      // return version

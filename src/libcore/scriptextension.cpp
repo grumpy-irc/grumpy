@@ -193,6 +193,18 @@ bool ScriptExtension::SupportFunction(QString name)
     return this->functionsExported.contains(name);
 }
 
+QString ScriptExtension::GetHelpForFunc(QString name)
+{
+    if (!this->functionsHelp.contains(name))
+        return QString();
+    return this->functionsHelp[name];
+}
+
+QList<QString> ScriptExtension::GetFunctions()
+{
+    return this->functionsExported;
+}
+
 void ScriptExtension::OnError(QScriptValue e)
 {
     GRUMPY_ERROR(this->GetName() + ": exception: " + e.toString());
@@ -771,30 +783,56 @@ static QScriptValue has_function(QScriptContext *context, QScriptEngine *engine)
     return QScriptValue(engine, extension->SupportFunction(fx));
 }
 
+static QScriptValue get_function_help(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
+    if (context->argumentCount() < 1)
+    {
+        // Wrong number of parameters
+        GRUMPY_ERROR(extension->GetName() + ": get_function_help(function): requires 1 parameter");
+        return QScriptValue(engine, QString("Function not found"));
+    }
+    QString fx = context->argument(0).toString();
+    return QScriptValue(engine, extension->GetHelpForFunc(fx));
+}
+
+static QScriptValue get_function_list(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
+
+    return qScriptValueFromSequence(engine, extension->GetFunctions());
+}
+
 void ScriptExtension::registerFunctions()
 {
-    this->registerFunction("grumpy_get_version", get_version, 0);
-    this->registerFunction("grumpy_set_cfg", set_cfg, 2);
-    this->registerFunction("grumpy_get_cfg", get_cfg, 2);
-    this->registerFunction("grumpy_has_function", has_function, 1);
-    this->registerFunction("grumpy_get_context", get_context, 0);
-    this->registerFunction("grumpy_network_send_raw", network_send_raw, 2);
-    this->registerFunction("grumpy_register_cmd", register_cmd, 2);
-    this->registerFunction("grumpy_debug_log", debug_log, 2);
-    this->registerFunction("grumpy_error_log", error_log, 1);
-    this->registerFunction("grumpy_log", log, 1);
-    this->registerFunction("grumpy_scrollback_write", scrollback_write, 2);
-    this->registerFunction("grumpy_scrollback_get_type", scrollback_get_type, 1);
-    this->registerFunction("grumpy_scrollback_get_target", scrollback_get_target, 1);
-    this->registerFunction("grumpy_scrollback_has_network", scrollback_has_network, 1);
-    this->registerFunction("grumpy_scrollback_has_network_session", scrollback_has_network_session, 1);
-    this->registerFunction("grumpy_network_get_nick", network_get_nick, 1);
-    this->registerFunction("grumpy_network_get_ident", network_get_ident, 1);
-    this->registerFunction("grumpy_network_get_host", network_get_host, 1);
-    this->registerFunction("grumpy_network_get_server_host", network_get_server_host, 1);
-    this->registerFunction("grumpy_network_get_network_name", network_get_network_name, 1);
-    this->registerFunction("grumpy_network_send_message", network_send_message, 3);
-    this->registerFunction("grumpy_network_send_raw", network_send_raw, 2);
+    this->registerFunction("grumpy_get_function_help", get_function_help, 1, "(function_name): give you help for a function, returns string");
+    this->registerFunction("grumpy_get_function_list", get_function_list, 0, "(): returns array with list of functions");
+    this->registerFunction("grumpy_get_version", get_version, 0, "(): returns version object with properties: Major, Minor, Revision, String");
+    this->registerFunction("grumpy_set_cfg", set_cfg, 2, "(key, value): stores value as key in settings");
+    this->registerFunction("grumpy_get_cfg", get_cfg, 2, "(key, default): returns stored value from ini file");
+    this->registerFunction("grumpy_has_function", has_function, 1, "(function_name): return true or false whether function is present");
+    this->registerFunction("grumpy_get_context", get_context, 0, "(): return execution context, either core or GrumpyChat (core doesn't have ui functions and hooks)");
+    this->registerFunction("grumpy_network_send_raw", network_send_raw, 2, "(scrollback_id, text): sends a RAW data to network that belongs to scrollback");
+    this->registerFunction("grumpy_register_cmd", register_cmd, 2, "(command, function): register new grumpy command that will execute function");
+    this->registerFunction("grumpy_debug_log", debug_log, 2, "(text, verbosity): prints to debug log");
+    this->registerFunction("grumpy_error_log", error_log, 1, "(text): prints to log");
+    this->registerFunction("grumpy_log", log, 1, "(text): prints to log");
+    this->registerFunction("grumpy_scrollback_write", scrollback_write, 2, "(scrollback_id, text): write text");
+    this->registerFunction("grumpy_scrollback_get_type", scrollback_get_type, 1, "(scrollback_id): return type of scrollback; system, channel, user");
+    this->registerFunction("grumpy_scrollback_get_target", scrollback_get_target, 1, "(scrollback_id): return target name of scrollback (channel name, user name)");
+    this->registerFunction("grumpy_scrollback_has_network", scrollback_has_network, 1, "(scrollback_id): return true if scrollback belongs to network");
+    this->registerFunction("grumpy_scrollback_has_network_session", scrollback_has_network_session, 1, "(scrollback_id): returns true if scrollback has existing IRC session");
+    this->registerFunction("grumpy_network_get_nick", network_get_nick, 1, "(scrollback_id): return your nickname for network of scrollback");
+    this->registerFunction("grumpy_network_get_ident", network_get_ident, 1, "(scrollback_id): return your ident for network of scrollback");
+    this->registerFunction("grumpy_network_get_host", network_get_host, 1, "(scrollback_id): return your host for network of scrollback");
+    this->registerFunction("grumpy_network_get_server_host", network_get_server_host, 1, "(scrollback_id): return server hostname for network of scrollback");
+    this->registerFunction("grumpy_network_get_network_name", network_get_network_name, 1, "(scrollback_id): return network for network of scrollback");
+    this->registerFunction("grumpy_network_send_message", network_send_message, 3, "(scrollback_id, target, message): sends a silent message to target for network of scrollback");
+    this->registerFunction("grumpy_network_send_raw", network_send_raw, 2, "(scrollback_id, text): sends RAW data to network of scrollback");
 }
 
 void ScriptExtension::registerFunction(QString name, QScriptEngine::FunctionSignature function_signature, int parameters, QString help)
