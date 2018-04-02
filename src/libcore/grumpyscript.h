@@ -18,7 +18,7 @@
 
 namespace GrumpyIRC
 {
-    class GrumpyScript
+    class LIBCORESHARE_EXPORT GrumpyScript
     {
         public:
             static QString ReplaceVars(QString source, QHash<QString, QString> vars, char prefix = '$', char escape = '\\');
