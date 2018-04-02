@@ -11,6 +11,7 @@
 // Copyright (c) Petr Bena 2015 - 2018
 
 #include "corewrapper.h"
+#include "grumpyeventhandler.h"
 #include "skin.h"
 #include "../libcore/generic.h"
 #include "../libcore/highlighter.h"
@@ -18,6 +19,7 @@
 #include "../libcore/configuration.h"
 #include "../libcore/core.h"
 #include "../libirc/libircclient/user.h"
+#include <QFile>
 
 using namespace GrumpyIRC;
 
@@ -172,7 +174,15 @@ QString GrumpyConf::GetDefaultAwayReason()
 QString GrumpyConf::GetAutorun()
 {
     QString default_autorun = Generic::GetResource(":/text/scripts/_autoexec");
-    return GCFG->GetValueAsString("execute_autorun", default_autorun);
+    QFile f(GCFG->GetHomePath() + "autoexec.cfg");
+    if (!f.open(QIODevice::ReadOnly))
+    {
+        f.close();
+        return default_autorun;
+    }
+    QString content = f.readAll();
+    f.close();
+    return content;
 }
 
 void GrumpyConf::SetColorBoxShow(bool yes)
@@ -187,7 +197,17 @@ bool GrumpyConf::GetColorBoxShow()
 
 void GrumpyConf::SetAutorun(QString data)
 {
-    GCFG->SetValue("execute_autorun", data);
+    QFile f(GCFG->GetHomePath() + "autoexec.cfg");
+
+    if (!f.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text))
+    {
+        f.close();
+        GRUMPY_ERROR("Unable to write autoexec file: " + GCFG->GetHomePath() + "autoexec.cfg");
+        return;
+    }
+
+    f.write(data.toUtf8());
+    f.close();
 }
 
 void GrumpyConf::SetLabeledH(QString text)
