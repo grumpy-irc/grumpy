@@ -15,6 +15,7 @@
 #include "scrollbackframe.h"
 #include "inputbox.h"
 #include "scrollbacksmanager.h"
+#include "messagebox.h"
 #include "../libcore/core.h"
 #include "../libcore/scrollback.h"
 #include <QtScript>
@@ -100,6 +101,26 @@ static QScriptValue clean_history(QScriptContext *context, QScriptEngine *engine
     return QScriptValue(engine, true);
 }
 
+static QScriptValue message_box(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
+    if (context->argumentCount() < 3)
+    {
+        // Wrong number of parameters
+        GRUMPY_ERROR(extension->GetName() + ": message_box(id, title, text): requires 3 parameters");
+        return QScriptValue(engine, false);
+    }
+    QString id = context->argument(0).toString();
+    QString title = context->argument(1).toString();
+    QString text = context->argument(2).toString();
+
+    MessageBox::Display(id, title, text);
+
+    return QScriptValue(engine, 0);
+}
+
 void UiScript::Hook_OnMainWindowStart()
 {
     this->executeFunction("ext_ui_on_main_window_start");
@@ -114,6 +135,7 @@ void UiScript::Hook_OnScrollbackFrameCreated(Scrollback *window)
 
 void UiScript::registerFunctions()
 {
+    this->registerFunction("grumpy_ui_message_box", message_box, 3);
     this->registerFunction("grumpy_ui_load_history", load_history, 2);
     this->registerFunction("grumpy_ui_wipe_history", clean_history, 2);
     ScriptExtension::registerFunctions();

@@ -65,7 +65,7 @@ void LibcoreTest::testCaseGenericBool()
 
 void LibcoreTest::testCaseEmbeddedScriptSyntaxCheck()
 {
-    syntaxCheck("/grumpy_core/ecma/irc.js");
+    syntaxCheck("/grumpy_core/ecma/libirc.js");
     syntaxCheck("/grumpy_core/ecma/grumpy.js");
 }
 

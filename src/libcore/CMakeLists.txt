@@ -39,7 +39,7 @@ endif()
 ADD_DEFINITIONS( -DLIBCORE_LIBRARY -DQT_USE_QSTRINGBUILDER )
 
 
-ADD_LIBRARY(grumpycore SHARED ${src} ${headers})
+ADD_LIBRARY(grumpycore SHARED ${src} ${grumpycore_RESOURCES_RCC} ${headers})
 if (QT5_BUILD)
     qt5_use_modules(grumpycore Core Network Script)
 endif()

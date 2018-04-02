@@ -22,6 +22,7 @@ function cmd_info(window_id, text)
 {
     var v = grumpy_get_version();
     grumpy_log("GrumpyChat version " + v.String);
+    grumpy_log("ECMA lib version: " + grumpy_ecma_version());
     return 0;
 }
 

@@ -210,7 +210,7 @@ bool ScriptExtension::loadSource(QString source, QString *error)
     }
 
     // Prepend the built-in libs
-    source = Resources::GetSource("/core/ecma/irc.js") + Resources::GetSource("/core/ecma/grumpy.js") + source;
+    source = Resources::GetSource("/grumpy_core/ecma/libirc.js") + Resources::GetSource("/grumpy_core/ecma/grumpy.js") + source;
 
     this->sourceCode = source;
     this->engine = new QScriptEngine();
@@ -797,9 +797,10 @@ void ScriptExtension::registerFunctions()
     this->registerFunction("grumpy_network_send_raw", network_send_raw, 2);
 }
 
-void ScriptExtension::registerFunction(QString name, QScriptEngine::FunctionSignature function_signature, int parameters)
+void ScriptExtension::registerFunction(QString name, QScriptEngine::FunctionSignature function_signature, int parameters, QString help)
 {
     this->functionsExported.append(name);
+    this->functionsHelp.insert(name, help);
     this->engine->globalObject().setProperty(name, this->engine->newFunction(function_signature, parameters));
 }
 
