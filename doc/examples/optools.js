@@ -1,24 +1,44 @@
 // This is a sample extension to GrumpyChat
 // Implements some commands for ops
 
-function cmd_op(window_id, text)
+function check_window(window_id)
 {
     if (grumpy_scrollback_get_type(window_id) != "channel")
     {
         grumpy_error_log("You can only use this command in channel windows");
-        return 1;
+        return false;
     }
+    return true;
+}
+
+function cmd_deex(window_id, text)
+{
+    if (!check_window(window_id))
+        return 1;
+    grumpy_network_send_raw(window_id, "MODE " + grumpy_scrollback_get_target(window_id) + " -e *!*@" + grumpy_network_get_host(window_id));
+    return 0;
+}
+
+function cmd_ex(window_id, text)
+{
+    if (!check_window(window_id))
+        return 1;
+    grumpy_network_send_raw(window_id, "MODE " + grumpy_scrollback_get_target(window_id) + " +e *!*@" + grumpy_network_get_host(window_id));
+    return 0;
+}
+
+function cmd_op(window_id, text)
+{
+    if (!check_window(window_id))
+        return 1;
     grumpy_network_send_raw(window_id, "PRIVMSG ChanServ :op " + grumpy_scrollback_get_target(window_id));
     return 0;
 }
 
 function cmd_deop(window_id, text)
 {
-    if (grumpy_scrollback_get_type(window_id) != "channel")
-    {
-        grumpy_error_log("You can only use this command in channel windows");
+    if (!check_window(window_id))
         return 1;
-    }
     grumpy_network_send_raw(window_id, "MODE " + grumpy_scrollback_get_target(window_id) + " -o " + grumpy_network_get_nick(window_id));
     return 0;
 }
@@ -27,6 +47,8 @@ function cmd_optools(window_id, text)
 {
     grumpy_log("* /op - gives you OP in current window");
     grumpy_log("* /deop - removes your OP in current window");
+    grumpy_log("* /ex - setup ban exemption for yourself");
+    grumpy_log("* /deex - removes ban exemption");
     return 0;
 }
 
@@ -41,7 +63,9 @@ function ext_init()
 {
     // Register new cmds
     safe_cmd_reg("optools", "cmd_optools");
+    safe_cmd_reg("deex", "cmd_deex");
     safe_cmd_reg("op", "cmd_op");
+    safe_cmd_reg("ex", "cmd_ex");
     safe_cmd_reg("deop", "cmd_deop");
     return true;
 }
