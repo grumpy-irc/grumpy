@@ -95,7 +95,6 @@ namespace GrumpyIRC
             void on_actionExport_to_plain_text_triggered();
 
         private:
-            QString processInput(QString text);
             void closeEvent(QCloseEvent *event);
             QSystemTrayIcon tray;
             bool isFork;

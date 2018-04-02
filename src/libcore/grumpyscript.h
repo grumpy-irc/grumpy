@@ -22,6 +22,7 @@ namespace GrumpyIRC
     {
         public:
             static QString ReplaceVars(QString source, QHash<QString, QString> vars, char prefix = '$', char escape = '\\');
+            static QString ReplaceStdVars(QString text);
 
             GrumpyScript();
             //virtual ~GrumpyScript()

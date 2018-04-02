@@ -12,7 +12,9 @@
 
 #include "configuration.h"
 #include <QStringList>
+#include <QCoreApplication>
 #include <QDebug>
+#include <QDir>
 #include <QList>
 #include <QSettings>
 
@@ -169,7 +171,27 @@ void Configuration::Extension_SetValue(QString extension, QString key, QString v
 
 QString Configuration::GetHomePath()
 {
-    return this->home_path;
+    return this->home_path + QDir::separator();
+}
+
+QString Configuration::GetScriptPath()
+{
+    return GRUMPY_SCRIPT_PATH;
+}
+
+QString Configuration::GetExtensionPath()
+{
+    return GRUMPY_EXTENSION_PATH;
+}
+
+QString Configuration::GetHomeScriptPath()
+{
+    return this->GetHomePath() + QDir::separator() + "extensions" + QDir::separator();
+}
+
+QString Configuration::GetHomeExtensionPath()
+{
+    return this->GetHomePath() + QDir::separator() + "scripts" + QDir::separator();
 }
 
 QDateTime Configuration::GetStartupDateTime()

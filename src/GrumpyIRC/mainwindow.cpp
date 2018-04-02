@@ -21,6 +21,7 @@
 #include "../libcore/generic.h"
 #include "../libcore/grumpydsession.h"
 #include "../libcore/highlighter.h"
+#include "../libcore/grumpyscript.h"
 #include "../libcore/ircsession.h"
 #include "aboutwin.h"
 #include "corewrapper.h"
@@ -345,7 +346,7 @@ void MainWindow::ExecuteLine(QString line)
     if (line.isEmpty())
         return;
 
-    line = this->processInput(line);
+    line = GrumpyScript::ReplaceStdVars(line);
     CoreWrapper::GrumpyCore->GetCommandProcessor()->ProcessText(line, this->GetCurrentScrollbackFrame()->GetScrollback(), true);
 }
 
@@ -503,14 +504,6 @@ void GrumpyIRC::MainWindow::on_actionFavorites_triggered()
 void GrumpyIRC::MainWindow::on_actionToggle_secret_triggered()
 {
     this->GetCurrentScrollbackFrame()->ToggleSecure();
-}
-
-QString MainWindow::processInput(QString text)
-{
-    text.replace("$grumpy.version", GCFG->GetVersion());
-    text.replace("$grumpy.home", GCFG->GetHomePath());
-    text.replace("$grumpy.binarypath", QCoreApplication::applicationDirPath());
-    return text;
 }
 
 void GrumpyIRC::MainWindow::on_actionProxy_triggered()

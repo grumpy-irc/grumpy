@@ -63,6 +63,14 @@ namespace GrumpyIRC
 
             // Miscelancelous
             virtual QString GetHomePath();
+            //! System script path - system wide scripts
+            virtual QString GetScriptPath();
+            //! System extension path - system wide extensions
+            virtual QString GetExtensionPath();
+            //! User script path
+            virtual QString GetHomeScriptPath();
+            //! User extension path
+            virtual QString GetHomeExtensionPath();
             virtual QDateTime GetStartupDateTime();
             virtual void Load();
             virtual void Save();

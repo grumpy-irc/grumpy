@@ -8,9 +8,12 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #include "grumpyscript.h"
+#include "core.h"
+#include "configuration.h"
+#include <QCoreApplication>
 
 using namespace GrumpyIRC;
 
@@ -44,6 +47,18 @@ QString GrumpyScript::ReplaceVars(QString source, QHash<QString, QString> vars, 
         current_pos++;
     }
     return replaced;
+}
+
+QString GrumpyScript::ReplaceStdVars(QString text)
+{
+    text.replace("$grumpy.version", Core::GrumpyCore->GetConfiguration()->GetVersion());
+    text.replace("$grumpy.paths.home", Core::GrumpyCore->GetConfiguration()->GetHomePath());
+    text.replace("$grumpy.paths.binary", QCoreApplication::applicationDirPath());
+    text.replace("$grumpy.paths.home.script", Core::GrumpyCore->GetConfiguration()->GetHomeScriptPath());
+    text.replace("$grumpy.paths.home.extension", Core::GrumpyCore->GetConfiguration()->GetHomeExtensionPath());
+    text.replace("$grumpy.paths.extension", Core::GrumpyCore->GetConfiguration()->GetExtensionPath());
+    text.replace("$grumpy.paths.script", Core::GrumpyCore->GetConfiguration()->GetScriptPath());
+    return text;
 }
 
 GrumpyScript::GrumpyScript()
