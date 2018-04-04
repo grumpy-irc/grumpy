@@ -108,7 +108,7 @@ void SyncableIRCSession::Connect()
     this->SetNick(nick);
     this->network->SetDefaultNick(nick);
     this->network->SetDefaultIdent(this->owner->GetConfiguration()->GetValueAsString("ident", DEFAULT_IDENT));
-    this->network->SetDefaultUsername(this->owner->GetConfiguration()->GetValueAsString("user", DEFAULT_IDENT));
+    this->network->SetDefaultUsername(this->owner->GetConfiguration()->GetValueAsString("user", "GrumpyChat https://github.com/grumpy-irc/grumpy"));
     this->network->Connect();
     (((VirtualScrollback*)this->systemWindow)->PartialSync());
     this->timerUL.start(this->ulistUpdateTime);
