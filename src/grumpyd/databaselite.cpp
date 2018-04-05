@@ -98,7 +98,14 @@ DatabaseLite::DatabaseLite()
         // Check if datafile is OK
         std::shared_ptr<SqlResult> version_info = this->database->ExecuteQuery("SELECT value FROM meta WHERE key = 'version';");
         if (version_info->InError || version_info->Count() < 1)
-            throw new Exception("The database file is corrupted, no version info in meta table", BOOST_CURRENT_FUNCTION);
+        {
+            // DB is either broken or there is no version in it
+            // let's throw
+            if (!this->database->LastError.isEmpty())
+                throw new Exception("The database file is corrupted: " + this->database->LastError, BOOST_CURRENT_FUNCTION);
+            else
+                throw new Exception("The database file is corrupted, no version info in meta table", BOOST_CURRENT_FUNCTION);
+        }
 
         unsigned int version = version_info->GetRow(0).GetField(0).toString().toUInt();
         if (version < GRUMPYD_SCHEMA_VERSION)
