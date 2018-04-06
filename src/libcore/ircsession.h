@@ -45,10 +45,12 @@ namespace GrumpyIRC
     class Configuration;
     class GrumpydSession;
 
-    class LIBCORESHARED_EXPORT NetworkSniffer_Item
+    class LIBCORESHARED_EXPORT NetworkSniffer_Item : public libirc::SerializableItem
     {
         public:
             NetworkSniffer_Item(QByteArray data, bool is_outgoing);
+            QHash<QString, QVariant> ToHash();
+            void LoadHash(QHash<QString, QVariant> hash);
             bool _outgoing;
             QDateTime Time;
             QString Text;
@@ -130,6 +132,7 @@ namespace GrumpyIRC
             QList<long long> GetPingHistory();
             bool IsAutoreconnect(Scrollback *scrollback);
             void SetAutoreconnect(Scrollback *scrollback, bool reconnect);
+            void SetSniffer(bool enabled, int size);
             QList<int> IgnoredNums;
             Scrollback *Root;
             bool AutomaticallyRetrieveBanList;
@@ -231,6 +234,7 @@ namespace GrumpyIRC
             QList<QString> ignoringInvites;
             QHash<QString, Scrollback*> channels;
             bool snifferEnabled;
+            int snifferSize = 2000;
             Scrollback *highlightCollector;
             int ulistUpdateTime;
             unsigned int maxSnifferBufferSize;

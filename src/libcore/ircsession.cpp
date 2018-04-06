@@ -682,10 +682,18 @@ void IRCSession::SetAutoreconnect(Scrollback *scrollback, bool reconnect)
     this->_autoReconnect = reconnect;
 }
 
+void IRCSession::SetSniffer(bool enabled, int size)
+{
+    this->snifferEnabled = enabled;
+    this->snifferSize = size;
+}
+
 void IRCSession::OnOutgoingRawMessage(QByteArray message)
 {
     if (!this->snifferEnabled)
         return;
+    while(this->data.size() > this->snifferSize)
+        this->data.removeFirst();
     this->data.append(new NetworkSniffer_Item(message, true));
     while ((unsigned int)this->data.size() > this->maxSnifferBufferSize)
         this->data.removeFirst();
@@ -1386,6 +1394,8 @@ void IRCSession::OnIncomingRawMessage(QByteArray message)
 {
     if (!this->snifferEnabled)
         return;
+    while(this->data.size() > this->snifferSize)
+        this->data.removeFirst();
     this->data.append(new NetworkSniffer_Item(message, false));
     while (((unsigned int)this->data.size()) > this->maxSnifferBufferSize)
         this->data.removeFirst();
@@ -1474,6 +1484,22 @@ NetworkSniffer_Item::NetworkSniffer_Item(QByteArray data, bool is_outgoing)
     this->_outgoing = is_outgoing;
     this->Text = QString(data);
     this->Time = QDateTime::currentDateTime();
+}
+
+QHash<QString, QVariant> NetworkSniffer_Item::ToHash()
+{
+    QHash<QString, QVariant> hash;
+    SERIALIZE(_outgoing);
+    SERIALIZE(Text);
+    SERIALIZE(Time);
+    return hash;
+}
+
+void NetworkSniffer_Item::LoadHash(QHash<QString, QVariant> hash)
+{
+    UNSERIALIZE_STRING(Text);
+    UNSERIALIZE_BOOL(_outgoing);
+    UNSERIALIZE_DATETIME(Time);
 }
 
 QList<GrumpyIRC::NetworkSniffer_Item*> GrumpyIRC::IRCSession::GetSniffer()
