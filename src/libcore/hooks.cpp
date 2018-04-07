@@ -8,14 +8,24 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
+#include "core.h"
 #include "hooks.h"
 #include "scrollback.h"
+#include "extension.h"
 
 using namespace GrumpyIRC;
 
 void Hooks::OnScrollback_InsertText(Scrollback *scrollback, ScrollbackItem *item)
 {
 
+}
+
+void Hooks::OnScrollback_Destroyed(Scrollback *scrollback)
+{
+    foreach (Extension *e, Core::GrumpyCore->GetExtensions())
+    {
+        e->Hook_OnScrollbackDestroyed(scrollback);
+    }
 }

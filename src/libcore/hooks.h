@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #ifndef HOOKS_H
 #define HOOKS_H
@@ -24,7 +24,8 @@ namespace GrumpyIRC
     class LIBCORESHARED_EXPORT Hooks
     {
         public:
-            void OnScrollback_InsertText(Scrollback *scrollback, ScrollbackItem *item);
+            static void OnScrollback_InsertText(Scrollback *scrollback, ScrollbackItem *item);
+            static void OnScrollback_Destroyed(Scrollback *scrollback);
     };
 }
 

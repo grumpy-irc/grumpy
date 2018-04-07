@@ -7,6 +7,8 @@
 var history_max = 20;
 // Save only commands
 var only_command = false;
+// Print extra debug
+var debugging_on = false;
 //////////////////////////////////////////
 
 //////////////////////////////////////////
@@ -14,6 +16,12 @@ var only_command = false;
 // Code starts here
 // This is where we store history for every single scrollback
 var global_history = [];
+
+function debug(text)
+{
+    if (debugging_on)
+        grumpy_scrollback_write(grumpy_system_window_id, "DEBUG: " + text);
+}
 
 function get_win(id)
 {
@@ -28,6 +36,35 @@ function get_win(id)
         target = "system";
     name += target;
     return name;
+}
+
+//! Stores the history of window to a file
+function save_hist(key)
+{
+    debug("saving history for " + key + " to config file");
+    // Split the items so that we can count them
+    list = global_history[key].split("\n");
+    // Remove extra items
+    while (list.length > history_max)
+        list.shift()
+    // Turn it back to one huge string
+    temp = ""; 
+    for (var i = 0, len = list.length; i < len; i++)
+        temp += list[i] + "\n";
+    // Remove the extra newline
+    temp = temp.substring(0, temp.length - 1);
+    grumpy_set_cfg(key, temp);
+}
+
+function ext_on_scrollback_destroyed(scrollback_id)
+{
+    // Scrollback was closed, so let's delete it from cache here, so that in case it's reopened, the history will reload
+    var name = get_win(scrollback_id);
+    if (name in global_history)
+    {
+        save_hist(name);
+        delete global_history[name];
+    }
 }
 
 function cmd_history_list(window_id, text)
@@ -126,18 +163,7 @@ function ext_ui_on_exit()
 {
     for (var key in global_history)
     {
-        // Split the items so that we can count them
-        list = global_history[key].split("\n");
-        // Remove extra items
-        while (list.length > history_max)
-            list.shift()
-        // Turn it back to one huge string
-        temp = "";
-        for (var i = 0, len = list.length; i < len; i++)
-            temp += list[i] + "\n";
-        // Remove the extra newline
-        temp = temp.substring(0, temp.length - 1);
-        grumpy_set_cfg(key, temp);
+        save_hist(key);
     }
 }
 
@@ -163,6 +189,7 @@ function refresh_hist(window_id)
     if (hist == "")
         return;
     // store to memory
+    debug("loading history for " + window_name);
     ext_ui_on_history(window_id, hist);  
     grumpy_ui_load_history(window_id, hist);
 }

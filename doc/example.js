@@ -58,7 +58,9 @@ function ext_get_author()
     return "Petr Bena";
 }
 
-// function reference
+///////////////////////////////////////////////////////////////////////////////////////////////
+// Function reference
+///////////////////////////////////////////////////////////////////////////////////////////////
 // You can execute grumpy_ecma_print_help() to get an up-to-date help for your current grumpy scripting engine
 //
 // bool grumpy_has_function(name)                   // check if function (any in this list) is available in this grumpy version
@@ -83,7 +85,14 @@ function ext_get_author()
 // bool grumpy_scrollback_write(window_id, text)    // writes to scrollback
 // string grumpy_ecma_version()                     // returns version of ECMA lib
 //
-// functions available with UI only
+///////////////////////////////////////////////////////////////////////////////////////////////
+// Hooks
+///////////////////////////////////////////////////////////////////////////////////////////////
+// void ext_on_shutdown()                                // On shutdown of core
+// void ext_on_scrollback_destroyed(int scrollback_id)   // Scrollback is deleted from memory
+///////////////////////////////////////////////////////////////////////////////////////////////
+// Functions available with UI only
+///////////////////////////////////////////////////////////////////////////////////////////////
 // bool grumpy_ui_wipe_history(window_id)
 // bool grumpy_ui_load_history(window_id)
 // void ext_ui_on_exit()                     // On exit

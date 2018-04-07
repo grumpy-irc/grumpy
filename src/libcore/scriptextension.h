@@ -49,6 +49,8 @@ namespace GrumpyIRC
             bool SupportFunction(QString name);
             QString GetHelpForFunc(QString name);
             QList<QString> GetFunctions();
+            void Hook_Shutdown();
+            void Hook_OnScrollbackDestroyed(Scrollback *scrollback);
 
         private slots:
             void OnError(QScriptValue e);

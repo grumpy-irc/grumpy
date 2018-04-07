@@ -19,6 +19,7 @@
 
 namespace GrumpyIRC
 {
+    class Scrollback;
     class LIBCORESHARED_EXPORT Extension : public QObject
     {
             Q_OBJECT
@@ -31,6 +32,7 @@ namespace GrumpyIRC
             virtual QString GetAuthor()=0;
             virtual bool IsWorking()=0;
             virtual void Hook_Shutdown() {}
+            virtual void Hook_OnScrollbackDestroyed(Scrollback *scrollback) {}
 
         //signals:
 

@@ -8,11 +8,12 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #include "scrollback.h"
 #include "exception.h"
 #include "ircsession.h"
+#include "hooks.h"
 
 using namespace GrumpyIRC;
 
@@ -76,6 +77,7 @@ Scrollback::Scrollback(QHash<QString, QVariant> hash)
 
 Scrollback::~Scrollback()
 {
+    Hooks::OnScrollback_Destroyed(this);
     ScrollbackList_Mutex.lock();
     ScrollbackList.removeOne(this);
     ScrollbackList_Mutex.unlock();

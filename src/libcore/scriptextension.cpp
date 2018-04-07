@@ -211,6 +211,18 @@ QList<QString> ScriptExtension::GetFunctions()
     return this->functionsExported;
 }
 
+void ScriptExtension::Hook_Shutdown()
+{
+    this->executeFunction("ext_on_shutdown");
+}
+
+void ScriptExtension::Hook_OnScrollbackDestroyed(Scrollback *scrollback)
+{
+    QScriptValueList params;
+    params.append(QScriptValue(this->engine, scrollback->GetID()));
+    this->executeFunction("ext_on_scrollback_destroyed", params);
+}
+
 void ScriptExtension::OnError(QScriptValue e)
 {
     GRUMPY_ERROR(this->GetName() + ": exception: " + e.toString());
@@ -657,6 +669,23 @@ static QScriptValue scrollback_get_target(QScriptContext *context, QScriptEngine
     return QScriptValue(engine, w->GetTarget());
 }
 
+static QScriptValue get_scrollback_list(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
+
+    QList<scrollback_id_t> scrollback_list;
+    Scrollback::ScrollbackList_Mutex.lock();
+    foreach (Scrollback *s, Scrollback::ScrollbackList)
+    {
+        scrollback_list.append(s->GetID());
+    }
+    Scrollback::ScrollbackList_Mutex.unlock();
+
+    return qScriptValueFromSequence(engine, scrollback_list);
+}
+
 static QScriptValue register_cmd(QScriptContext *context, QScriptEngine *engine)
 {
     ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
@@ -851,6 +880,7 @@ void ScriptExtension::registerFunctions()
     this->registerFunction("grumpy_debug_log", debug_log, 2, "(text, verbosity): prints to debug log");
     this->registerFunction("grumpy_error_log", error_log, 1, "(text): prints to log");
     this->registerFunction("grumpy_log", log, 1, "(text): prints to log");
+    this->registerFunction("grumpy_get_scrollback_list", get_scrollback_list, 0, "(): returns a list of all scrollback IDs");
     this->registerFunction("grumpy_scrollback_write", scrollback_write, 2, "(scrollback_id, text): write text");
     this->registerFunction("grumpy_scrollback_get_type", scrollback_get_type, 1, "(scrollback_id): return type of scrollback; system, channel, user");
     this->registerFunction("grumpy_scrollback_get_target", scrollback_get_target, 1, "(scrollback_id): return target name of scrollback (channel name, user name)");
