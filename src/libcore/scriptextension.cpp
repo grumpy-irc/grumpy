@@ -206,6 +206,11 @@ QString ScriptExtension::GetHelpForFunc(QString name)
     return this->functionsHelp[name];
 }
 
+QList<QString> ScriptExtension::GetHooks()
+{
+    return this->hooksExported;
+}
+
 QList<QString> ScriptExtension::GetFunctions()
 {
     return this->functionsExported;
@@ -866,10 +871,20 @@ static QScriptValue process(QScriptContext *context, QScriptEngine *engine)
     return QScriptValue(engine, Core::GrumpyCore->GetCommandProcessor()->ProcessText(x, w));
 }
 
+static QScriptValue get_hook_list(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
+
+    return qScriptValueFromSequence(engine, extension->GetHooks());
+}
+
 void ScriptExtension::registerFunctions()
 {
     this->registerFunction("grumpy_get_function_help", get_function_help, 1, "(function_name): give you help for a function, returns string");
     this->registerFunction("grumpy_get_function_list", get_function_list, 0, "(): returns array with list of functions");
+    this->registerFunction("grumpy_get_hook_list", get_hook_list, 0, "(): returns a list of all hooks");
     this->registerFunction("grumpy_get_version", get_version, 0, "(): returns version object with properties: Major, Minor, Revision, String");
     this->registerFunction("grumpy_set_cfg", set_cfg, 2, "(key, value): stores value as key in settings");
     this->registerFunction("grumpy_get_cfg", get_cfg, 2, "(key, default): returns stored value from ini file");
@@ -894,6 +909,9 @@ void ScriptExtension::registerFunctions()
     this->registerFunction("grumpy_network_send_message", network_send_message, 3, "(scrollback_id, target, message): sends a silent message to target for network of scrollback");
     this->registerFunction("grumpy_network_send_raw", network_send_raw, 2, "(scrollback_id, text): sends RAW data to network of scrollback");
     this->registerFunction("grumpy_process", process, 2, "(window_id, text): !unsafe! sends input to command processor, esentially same as entering text to input box in program", true);
+
+    this->registerHook("ext_on_shutdown", 0, "(): called on exit");
+    this->registerHook("ext_on_scrollback_destroyed", 1, "(int scrollback_id): called when scrollback is deleted");
 }
 
 void ScriptExtension::registerFunction(QString name, QScriptEngine::FunctionSignature function_signature, int parameters, QString help, bool is_unsafe)
@@ -905,6 +923,12 @@ void ScriptExtension::registerFunction(QString name, QScriptEngine::FunctionSign
     this->functionsExported.append(name);
     this->functionsHelp.insert(name, help);
     this->engine->globalObject().setProperty(name, this->engine->newFunction(function_signature, parameters));
+}
+
+void ScriptExtension::registerHook(QString name, int parameters, QString help, bool is_unsafe)
+{
+    this->hooksExported.append(name);
+    this->functionsHelp.insert(name, help);
 }
 
 bool ScriptExtension::executeFunctionAsBool(QString function, QScriptValueList parameters)

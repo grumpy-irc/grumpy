@@ -48,6 +48,7 @@ namespace GrumpyIRC
             bool IsUnsafe();
             bool SupportFunction(QString name);
             QString GetHelpForFunc(QString name);
+            QList<QString> GetHooks();
             QList<QString> GetFunctions();
             void Hook_Shutdown();
             void Hook_OnScrollbackDestroyed(Scrollback *scrollback);
@@ -66,10 +67,12 @@ namespace GrumpyIRC
             QScriptValue executeFunction(QString function, QScriptValueList parameters);
             QScriptValue executeFunction(QString function);
             virtual void registerFunction(QString name, QScriptEngine::FunctionSignature function_signature, int parameters, QString help = "", bool is_unsafe = false);
+            virtual void registerHook(QString name, int parameters, QString help = "", bool is_unsafe = false);
             //! Makes all functions available to ECMA
             virtual void registerFunctions();
             QScriptEngine *engine;
             QScriptValue script_ptr;
+            QList<QString> hooksExported;
             QList<QString> functionsExported;
             QHash<QString, QString> functionsHelp;
             QString sourceCode;
