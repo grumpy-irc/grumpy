@@ -22,6 +22,7 @@
 #include "user.h"
 #include "sleeper.h"
 #include "listener.h"
+#include "databaseqtsql.h"
 #include "../libcore/core.h"
 #include "../libcore/configuration.h"
 #include "../libcore/eventhandler.h"
@@ -110,6 +111,7 @@ static DatabaseBackend *InstantiateStorage(QString type)
 
 void Grumpyd::Main()
 {
+    DatabaseQtSQL::CheckDriver();
     GRUMPY_LOG("Loading storage: " + CONF->GetStorage());
     this->databaseBackend = InstantiateStorage(CONF->GetStorage());
     if (CONF->DBMaint)

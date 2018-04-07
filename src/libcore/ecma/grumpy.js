@@ -1,5 +1,7 @@
 // This is an internal library for use with ECMA
 
+var grumpy_system_window_id = 1;
+
 function grumpy_ecma_loaded()
 {
     return true;

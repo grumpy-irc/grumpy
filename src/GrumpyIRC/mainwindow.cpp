@@ -305,6 +305,8 @@ void MainWindow::OpenUrl(QString url)
         this->handler->OpenLink(url);
     else if (url.startsWith("ircs://") || url.startsWith("irc://"))
         this->OpenIRCNetworkLink(url);
+    else
+        GRUMPY_DEBUG("Unknown url scheme: " + url, 1);
 }
 
 void MainWindow::UpdateSkin()

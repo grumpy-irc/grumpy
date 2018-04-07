@@ -8,42 +8,22 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2018
 
-/*
+#ifndef DATABASEQTPSQL_H
+#define DATABASEQTPSQL_H
 
-#include "databasexml.h"
-#include "security.h"
-#include "user.h"
+#include "databaseqtsql.h"
 
-using namespace GrumpyIRC;
+#define GRUMPYD_SCHEMA_VERSION 1
 
-DatabaseXML::DatabaseXML()
+namespace GrumpyIRC
 {
-
+    class DatabaseQtPsql : public DatabaseQtSQL
+    {
+        public:
+            DatabaseQtPsql();
+    };
 }
 
-void DatabaseXML::LoadRoles()
-{
-    Role::Defaults();
-}
-
-void DatabaseXML::LoadUsers()
-{
-    User::UserInfo.clear();
-}
-
-QHash<QString, QVariant> DatabaseXML::GetConfiguration(user_id_t user)
-{
-    QHash<QString, QVariant> hash;
-
-    return hash;
-}
-
-void DatabaseXML::SetConfiguration(user_id_t user, QHash<QString, QVariant> data)
-{
-
-}
-
-*/
-
+#endif // DATABASEQTPSQL_H

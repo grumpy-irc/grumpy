@@ -8,30 +8,28 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2018
 
-#ifndef DATABASEXML_H
-#define DATABASEXML_H
+#ifndef DATABASEQTSQLITE_H
+#define DATABASEQTSQLITE_H
 
-/*
+#include "databaseqtsql.h"
 
-#include <QtXml>
-#include "databasebackend.h"
+#define GRUMPYD_SCHEMA_VERSION 3
 
 namespace GrumpyIRC
 {
-    class DatabaseXML : public DatabaseBackend
+    class DatabaseQtSqlite : public DatabaseQtSQL
     {
         public:
-            DatabaseXML();
-
-            void LoadRoles();
-            void LoadUsers();
-            QHash<QString, QVariant> GetConfiguration(user_id_t user);
-            void SetConfiguration(user_id_t user, QHash<QString, QVariant> data);
+            DatabaseQtSqlite();
+        protected:
+            void init();
+            bool install();
+        private:
+            void UpdateDB(unsigned int patch);
+            QString datafile;
     };
 }
 
-*/
-
-#endif // DATABASEXML_H
+#endif // DATABASEQTSQLITE_H
