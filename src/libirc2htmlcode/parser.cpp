@@ -28,7 +28,7 @@ Parser::Parser()
     this->Protocols << "http" << "https" << "ftp" << "irc" << "ircs";
     this->LinkSeparators << ' ' << ',' << '(' << ')';
     this->Separators << ' ' << ',' << ':' << ';' << '!' << '(' << ')';
-    this->SeparatorsPriv << ' ' << '(';
+    this->SeparatorsPriv << ' ' << '(' << ',';
     // We expect a dark background so black and white mixed up
     this->TextColors.insert(0,    "#000000"); // White
     this->TextColors.insert(1,    "#FFFFFF"); // Black
@@ -102,7 +102,7 @@ QString Parser::GetStyle()
 {
     return "a {\n"\
            "    color: " + this->LinkColor + ";\n"\
-                                             "}";
+           "}";
 }
 
 QString Parser::linkUrl(QString source, QString protocol)
