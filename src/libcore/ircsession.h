@@ -23,6 +23,7 @@
 #include "../libirc/libirc/serializableitem.h"
 #include "../libirc/libircclient/network.h"
 #include "networksession.h"
+#include "sniffer.h"
 #include "libcore_global.h"
 
 namespace libirc
@@ -44,17 +45,6 @@ namespace GrumpyIRC
     class Scrollback;
     class Configuration;
     class GrumpydSession;
-
-    class LIBCORESHARED_EXPORT NetworkSniffer_Item : public libirc::SerializableItem
-    {
-        public:
-            NetworkSniffer_Item(QByteArray data, bool is_outgoing);
-            QHash<QString, QVariant> ToHash();
-            void LoadHash(QHash<QString, QVariant> hash);
-            bool _outgoing;
-            QDateTime Time;
-            QString Text;
-    };
 
     class LIBCORESHARED_EXPORT IRCSession : public NetworkSession, public libirc::SerializableItem
     {

@@ -1479,29 +1479,6 @@ void IRCSession::OnNICK(libircclient::Parser *px, QString old_, QString new_)
     }
 }
 
-NetworkSniffer_Item::NetworkSniffer_Item(QByteArray data, bool is_outgoing)
-{
-    this->_outgoing = is_outgoing;
-    this->Text = QString(data);
-    this->Time = QDateTime::currentDateTime();
-}
-
-QHash<QString, QVariant> NetworkSniffer_Item::ToHash()
-{
-    QHash<QString, QVariant> hash;
-    SERIALIZE(_outgoing);
-    SERIALIZE(Text);
-    SERIALIZE(Time);
-    return hash;
-}
-
-void NetworkSniffer_Item::LoadHash(QHash<QString, QVariant> hash)
-{
-    UNSERIALIZE_STRING(Text);
-    UNSERIALIZE_BOOL(_outgoing);
-    UNSERIALIZE_DATETIME(Time);
-}
-
 QList<GrumpyIRC::NetworkSniffer_Item*> GrumpyIRC::IRCSession::GetSniffer()
 {
     return this->data;

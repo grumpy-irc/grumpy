@@ -46,3 +46,8 @@ void PacketSnifferWin::Load(IRCSession *session)
     }
     this->ui->plainTextEdit->appendPlainText(text);
 }
+
+void PacketSnifferWin::Load(GrumpydSession *session, IRCSession *network)
+{
+
+}

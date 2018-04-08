@@ -23,6 +23,7 @@ namespace Ui
 namespace GrumpyIRC
 {
     class IRCSession;
+    class GrumpydSession;
     class PacketSnifferWin : public QDialog
     {
             Q_OBJECT
@@ -31,6 +32,7 @@ namespace GrumpyIRC
             explicit PacketSnifferWin(QWidget *parent = 0);
             ~PacketSnifferWin();
             void Load(IRCSession *session);
+            void Load(GrumpydSession *session, IRCSession *network);
 
         private:
             Ui::PacketSnifferWin *ui;

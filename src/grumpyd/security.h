@@ -29,6 +29,7 @@
 #define PRIVILEGE_USE_STORAGE       "usestorage"
 #define PRIVILEGE_MANAGE_SCRIPT     "script"        // Install and remove ECMA scripts
 #define PRIVILEGE_USE_SCRIPT        "use_script"    // Enable disable installed ECMA scripts for themselves
+#define PRIVILEGE_USE_SNIFFER       "use_sniff"     // Enable usage of network sniffer
 
 #include <QString>
 #include <QHash>

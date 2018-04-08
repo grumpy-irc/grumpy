@@ -60,6 +60,11 @@ unsigned int GrumpyConf::GetMaxScrollbackSize()
     return GCFG->GetValueAsUInt("max_scrollback_size", 2000);
 }
 
+unsigned int GrumpyConf::GetMaxSnifferSize()
+{
+    return GCFG->GetValueAsUInt("max_sniffer_size", 200);
+}
+
 QString GrumpyConf::GetStorage()
 {
     if (this->StorageDummy)

@@ -47,6 +47,7 @@ namespace GrumpyIRC
             unsigned int GetMaxLoadSize();
             QString GetNick();
             unsigned int GetMaxScrollbackSize();
+            unsigned int GetMaxSnifferSize();
             QString etc = "etc";
             QString var = "var";
             bool Upgrade = false;

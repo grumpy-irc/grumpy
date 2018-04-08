@@ -17,6 +17,7 @@
 #include "../libgp/gp.h"
 #include "definitions.h"
 #include "../libirc/libirc/serveraddress.h"
+#include "sniffer.h"
 #include "networksession.h"
 #include <QMutex>
 #include <QObject>
@@ -101,6 +102,7 @@
 #define GP_CMD_SYS_INSTALL_SCRIPT          48
 #define GP_CMD_SYS_UNINST_SCRIPT           49
 #define GP_CMD_SYS_LIST_SCRIPT             50
+#define GP_CMD_GET_SNIFFER                 51
 
 // PACKET VERIFICATION
 // This system is used to verify if packet was delivered or not
@@ -178,6 +180,7 @@ namespace GrumpyIRC
             void SetAutoreconnect(Scrollback *scrollback, bool reconnect);
             void SetAway(QString reason);
             void UnsetAway();
+            void RequestSniffer(Scrollback *scrollback);
             libircclient::User *GetSelfNetworkID(Scrollback *scrollback);
             unsigned long long GetCompressedBytesRcvd();
             unsigned long long GetCompressedBytesSent();
@@ -227,8 +230,15 @@ namespace GrumpyIRC
             void processPSResync(QHash<QString, QVariant> parameters);
             void processRemove(QHash<QString, QVariant> parameters);
             void processUserList(QHash<QString, QVariant> parameters);
+            void processSniffer(QHash<QString, QVariant> parameters);
+            void processHello(QHash<QString, QVariant> parameters);
+            void processLoginOK(QHash<QString, QVariant> parameters);
+            void processInit(QHash<QString, QVariant> parameters);
+            void processQuit(QHash<QString, QVariant> parameters);
+            void processRefuse(QHash<QString, QVariant> parameters);
             void freememory();
             void closeError(QString error);
+            QList<NetworkSniffer_Item> snifferCache;
             bool AutoReconnect;
             QDateTime syncInit;
             QList<unsigned int> processedMessages;

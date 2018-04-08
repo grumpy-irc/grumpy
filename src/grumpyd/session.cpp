@@ -770,6 +770,34 @@ void Session::processAway(QHash<QString, QVariant> parameters)
     this->loggedUser->UpdateAway();
 }
 
+void Session::processSniffer(QHash<QString, QVariant> parameters)
+{
+    if (!this->IsAuthorized(PRIVILEGE_USE_SNIFFER))
+    {
+        this->PermissionDeny(GP_CMD_GET_SNIFFER);
+        return;
+    }
+
+    if (!parameters.contains("network_id"))
+    {
+        this->TransferError(GP_CMD_REQUEST_INFO, "No network provided", GP_ENOSERVER);
+        return;
+    }
+
+    SyncableIRCSession* irc = this->loggedUser->GetSIRCSession(parameters["network_id"].toUInt());
+    if (!irc)
+    {
+        this->TransferError(GP_CMD_REQUEST_INFO, "Network not found", GP_ENETWORKNOTFOUND);
+        return;
+    }
+    QList<QVariant> result;
+    QList<NetworkSniffer_Item*> items = irc->GetSniffer();
+    foreach (NetworkSniffer_Item* item, items)
+        result.append(item->ToHash());
+    parameters.insert("sniffer", result);
+    this->protocol->SendProtocolCommand(GP_CMD_GET_SNIFFER, parameters);
+}
+
 void Session::processInstallScript(QHash<QString, QVariant> parameters)
 {
     if (!this->IsAuthorized(PRIVILEGE_MANAGE_SCRIPT))
@@ -862,110 +890,119 @@ void Session::processScriptLS(QHash<QString, QVariant> parameters)
 
 void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
 {
-    if (text == GP_CMD_HELLO)
+    switch (text)
     {
-        if (parameters.contains("version"))
-            GRUMPY_DEBUG(QString("SID ") + QString::number(this->SID) + QString(" version ") + parameters["version"].toString(), 1);
-        // respond to HELLO which is a first command that is meant to be sent by a client to server and only server
-        // can respond to it
-        QHash<QString, QVariant> params;
-        params.insert("version", QVariant(QString("Grumpyd ") + GRUMPY_VERSION_STRING));
-        if (CONF->Init)
-            params.insert("initial_setup", true);
-        params.insert("authentication_required", QVariant(!CONF->Init));
-        this->protocol->SendProtocolCommand(GP_CMD_HELLO, params);
-    } else if (text == GP_CMD_UNKNOWN)
-    {
-        if (!parameters.contains("unrecognized"))
-            return;
-        GRUMPY_DEBUG(QString("SID ") + QString::number(this->SID) + QString(" doesn't understand protocol ") + parameters["unrecognized"].toString(), 2);
-    } else if (text == GP_CMD_RAW)
-    {
-        this->processCommand(parameters);
-    } else if (text == GP_CMD_LOGIN)
-    {
-        this->processLogin(parameters);
-    } else if (text == GP_CMD_IRC_QUIT)
-    {
-        this->processIrcQuit(parameters);
-    } else if (text == GP_CMD_MESSAGE)
-    {
-        this->processMessage(parameters);
-    } else if (text == GP_CMD_NETWORK_INFO)
-    {
-        this->processNetworks();
-    } else if (text == GP_CMD_SERVER)
-    {
-        this->processNew(parameters);
-    } else if (text == GP_CMD_RECONNECT)
-    {
-        this->processReconnect(parameters);
-    } else if (text == GP_CMD_SCROLLBACK_PARTIAL_RESYNC)
-    {
-        this->processResync(parameters);
-    } else if (text == GP_CMD_REQUEST_ITEMS)
-    {
-        this->processRequest(parameters);
-    } else if (text == GP_CMD_REQUEST_INFO)
-    {
-        this->processInfo(parameters);
-    } else if (text == GP_CMD_REMOVE)
-    {
-        this->processRemove(parameters);
-    } else if (text == GP_CMD_INIT)
-    {
-        this->processSetup(parameters);
-    } else if (text == GP_CMD_OPTIONS)
-    {
-        this->processOptions(parameters);
-    } else if (text == GP_CMD_SYS_LIST_USER)
-    {
-        this->processUserList(parameters);
-    } else if (text == GP_CMD_RESYNC_SCROLLBACK_PB)
-    {
-        this->processPBResync(parameters);
-    } else if (text == GP_CMD_SYS_LOCK_USER)
-    {
-        this->processLockUser(parameters);
-    } else if (text == GP_CMD_SYS_UNLOCK_USER)
-    {
-        this->processUnlockUser(parameters);
-    } else if (text == GP_CMD_SYS_CREATE_USER)
-    {
-        this->processCreateUser(parameters);
-    } else if (text == GP_CMD_SYS_REMOVE_USER)
-    {
-        this->processRemoveUser(parameters);
-    } else if (text == GP_CMD_STORAGE_DEL)
-    {
-        this->processStorageDel(parameters);
-    } else if (text == GP_CMD_STORAGE_GET)
-    {
-        this->processStorageGet(parameters);
-    } else if (text == GP_CMD_STORAGE_SET)
-    {
-        this->processStorageSet(parameters);
-    } else if (text == GP_CMD_QUERY)
-    {
-        this->processQuery(parameters);
-    } else if (text == GP_CMD_AWAY)
-    {
-        this->processAway(parameters);
-    } else if (text == GP_CMD_SYS_UNINST_SCRIPT)
-    {
-        this->processRemoveScript(parameters);
-    } else if (text == GP_CMD_SYS_INSTALL_SCRIPT)
-    {
-        this->processInstallScript(parameters);
-    } else if (text == GP_CMD_SYS_LIST_SCRIPT)
-    {
-        this->processScriptLS(parameters);
-    } else
-    {
-        // We received some unknown packet, send it back to client so that it at least knows we don't support this
-        QHash<QString, QVariant> params;
-        params.insert("unrecognized", QVariant(text));
-        this->protocol->SendProtocolCommand(GP_CMD_UNKNOWN, params);
+        case GP_CMD_HELLO:
+        {
+            if (parameters.contains("version"))
+                GRUMPY_DEBUG(QString("SID ") + QString::number(this->SID) + QString(" version ") + parameters["version"].toString(), 1);
+            // respond to HELLO which is a first command that is meant to be sent by a client to server and only server
+            // can respond to it
+            QHash<QString, QVariant> params;
+            params.insert("version", QVariant(QString("Grumpyd ") + GRUMPY_VERSION_STRING));
+            if (CONF->Init)
+                params.insert("initial_setup", true);
+            params.insert("authentication_required", QVariant(!CONF->Init));
+            this->protocol->SendProtocolCommand(GP_CMD_HELLO, params);
+        }
+            break;
+        case GP_CMD_UNKNOWN:
+            if (!parameters.contains("unrecognized"))
+                return;
+            GRUMPY_DEBUG(QString("SID ") + QString::number(this->SID) + QString(" doesn't understand protocol ") + parameters["unrecognized"].toString(), 2);
+            break;
+        case GP_CMD_RAW:
+            this->processCommand(parameters);
+            break;
+        case GP_CMD_LOGIN:
+            this->processLogin(parameters);
+            break;
+        case GP_CMD_IRC_QUIT:
+            this->processIrcQuit(parameters);
+            break;
+        case GP_CMD_MESSAGE:
+            this->processMessage(parameters);
+            break;
+        case GP_CMD_NETWORK_INFO:
+            this->processNetworks();
+            break;
+        case GP_CMD_SERVER:
+            this->processNew(parameters);
+            break;
+        case GP_CMD_RECONNECT:
+            this->processReconnect(parameters);
+            break;
+        case GP_CMD_SCROLLBACK_PARTIAL_RESYNC:
+            this->processResync(parameters);
+            break;
+        case GP_CMD_REQUEST_ITEMS:
+            this->processRequest(parameters);
+            break;
+        case GP_CMD_REQUEST_INFO:
+            this->processInfo(parameters);
+            break;
+        case GP_CMD_REMOVE:
+            this->processRemove(parameters);
+            break;
+        case GP_CMD_INIT:
+            this->processSetup(parameters);
+            break;
+        case GP_CMD_OPTIONS:
+            this->processOptions(parameters);
+            break;
+        case GP_CMD_SYS_LIST_USER:
+            this->processUserList(parameters);
+            break;
+        case GP_CMD_RESYNC_SCROLLBACK_PB:
+            this->processPBResync(parameters);
+            break;
+        case GP_CMD_SYS_LOCK_USER:
+            this->processLockUser(parameters);
+            break;
+        case GP_CMD_SYS_UNLOCK_USER:
+            this->processUnlockUser(parameters);
+            break;
+        case GP_CMD_SYS_CREATE_USER:
+            this->processCreateUser(parameters);
+            break;
+        case GP_CMD_SYS_REMOVE_USER:
+            this->processRemoveUser(parameters);
+            break;
+        case GP_CMD_STORAGE_DEL:
+            this->processStorageDel(parameters);
+            break;
+        case GP_CMD_STORAGE_GET:
+            this->processStorageGet(parameters);
+            break;
+        case GP_CMD_STORAGE_SET:
+            this->processStorageSet(parameters);
+            break;
+        case GP_CMD_QUERY:
+            this->processQuery(parameters);
+            break;
+        case GP_CMD_AWAY:
+            this->processAway(parameters);
+            break;
+        case GP_CMD_SYS_UNINST_SCRIPT:
+            this->processRemoveScript(parameters);
+            break;
+        case GP_CMD_SYS_INSTALL_SCRIPT:
+            this->processInstallScript(parameters);
+            break;
+        case GP_CMD_SYS_LIST_SCRIPT:
+            this->processScriptLS(parameters);
+            break;
+        case GP_CMD_GET_SNIFFER:
+            this->processSniffer(parameters);
+            break;
+        default:
+        {
+            // We received some unknown packet, send it back to client so that it at least knows we don't support this
+            QHash<QString, QVariant> params;
+            params.insert("unrecognized", QVariant(text));
+            this->protocol->SendProtocolCommand(GP_CMD_UNKNOWN, params);
+        }
+            break;
     }
 }
 

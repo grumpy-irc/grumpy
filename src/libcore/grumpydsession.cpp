@@ -484,6 +484,17 @@ void GrumpydSession::UnsetAway()
     NetworkSession::UnsetAway();
 }
 
+void GrumpydSession::RequestSniffer(Scrollback *scrollback)
+{
+    IRCSession *ircs = this->GetSessionFromWindow(scrollback);
+    if (!ircs)
+        return;
+
+    QHash<QString, QVariant> parameters;
+    parameters.insert("network_id", ircs->GetSID());
+    this->gp->SendProtocolCommand(GP_CMD_GET_SNIFFER, parameters);
+}
+
 libircclient::User *GrumpydSession::GetSelfNetworkID(Scrollback *scrollback)
 {
     IRCSession *ircs = this->GetSessionFromWindow(scrollback);
@@ -585,155 +596,112 @@ void GrumpydSession::OnError(QString reason, int num)
 
 void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVariant> parameters)
 {
-    if (text == GP_CMD_UNKNOWN)
+    switch (text)
     {
-        if (parameters.contains("unrecognized"))
-            this->systemWindow->InsertText(QString("Grumpyd didn't recognize this command: ") + parameters["unrecognized"].toString(), ScrollbackItemType_SystemError);
-    } else if (text == GP_CMD_HELLO)
-    {
-        if (!parameters.contains("version"))
-            return;
-        if (!parameters.contains("authentication_required"))
+        case GP_CMD_UNKNOWN:
+            if (parameters.contains("unrecognized"))
+                this->systemWindow->InsertText(QString("Grumpyd didn't recognize this command: ") + parameters["unrecognized"].toString(), ScrollbackItemType_SystemError);
+            break;
+        case GP_CMD_HELLO:
+            this->processHello(parameters);
+            break;
+        case GP_CMD_LOGIN_FAIL:
+            emit this->Event_AuthenticationFailed();
+            this->AutoReconnect = false;
+            this->closeError("Invalid username or password provided");
+            break;
+        case GP_CMD_CHANNEL_RESYNC:
+            this->processChannelResync(parameters);
+            break;
+        case GP_CMD_SCROLLBACK_RESYNC:
+            this->processSResync(parameters);
+            break;
+        case GP_CMD_REMOVE:
+            this->processRemove(parameters);
+            break;
+        case GP_CMD_NICK:
+            this->processNick(parameters);
+            break;
+        case GP_CMD_NETWORK_RESYNC:
+            this->processNetworkResync(parameters);
+            break;
+        case GP_CMD_SCROLLBACK_PARTIAL_RESYNC:
+            this->processPSResync(parameters);
+            break;
+        case GP_CMD_CHANNEL_JOIN:
+            this->processChannel(parameters);
+            break;
+        case GP_CMD_LOGIN_OK:
+            this->processLoginOK(parameters);
+            break;
+        case GP_CMD_SCROLLBACK_LOAD_NEW_ITEM:
+            this->processNewScrollbackItem(parameters);
+            break;
+        case GP_CMD_USERLIST_SYNC:
+            this->processULSync(parameters);
+            break;
+        case GP_CMD_RESYNC_MODE:
+            this->processChannelModeSync(parameters);
+            break;
+        case GP_CMD_INIT:
+            this->processInit(parameters);
+            break;
+        case GP_CMD_NETWORK_INFO:
+            this->processNetwork(parameters);
+            break;
+        case GP_CMD_REQUEST_ITEMS:
+            this->processRequest(parameters);
+            break;
+        case GP_CMD_IRC_QUIT:
+            this->processQuit(parameters);
+            break;
+        case GP_CMD_PERMDENY:
+            this->processRefuse(parameters);
+            break;
+        case GP_CMD_ERROR:
+            this->systemWindow->InsertText("Error: " + parameters["description"].toString(), ScrollbackItemType_SystemError);
+            break;
+        case GP_CMD_OPTIONS:
+            this->processPreferences(parameters);
+            break;
+        case GP_CMD_RESYNC_SCROLLBACK_PB:
+            this->processPBResync(parameters);
+            break;
+        case GP_CMD_SYS_LIST_USER:
+            this->processUserList(parameters);
+            break;
+        case GP_CMD_SYS_CREATE_USER:
+            if (parameters.contains("username"))
+            {
+                this->systemWindow->InsertText("Successfuly added user: " + parameters["username"].toString());
+            }
+            break;
+        case GP_CMD_SYS_REMOVE_USER:
+            if (parameters.contains("username"))
+            {
+                this->systemWindow->InsertText("Removed user: " + parameters["username"].toString());
+            }
+            break;
+        case GP_CMD_SYS_LOCK_USER:
+            if (parameters.contains("username"))
+            {
+                this->systemWindow->InsertText("Successfuly locked user: " + parameters["username"].toString());
+            }
+            break;
+        case GP_CMD_SYS_UNLOCK_USER:
+            if (parameters.contains("username"))
+            {
+                this->systemWindow->InsertText("Successfuly unlocked user: " + parameters["username"].toString());
+            }
+            break;
+        default:
         {
-            this->closeError("Remote doesn't support any authentication mechanism");
-            return;
+            QHash<QString, QVariant> params;
+            params.insert("source", text);
+            this->gp->SendProtocolCommand(GP_CMD_UNKNOWN, params);
+            this->systemWindow->InsertText("Unknown command from grumpyd " + QString::number(text), ScrollbackItemType_SystemError);
         }
-        bool authentication_required = parameters["authentication_required"].toBool();
-        bool initial_setup = parameters.contains("initial_setup") && parameters["initial_setup"].toBool();
-        if (authentication_required && this->username.isEmpty())
-        {
-            this->closeError("Remote require authentication, but you didn't provide any credentials needed to login");
-            return;
-        }
-        this->systemWindow->InsertText("Received HELLO from remote system, version of server is: " + parameters["version"].toString());
-        if (initial_setup)
-        {
-            this->systemWindow->InsertText("Remote server requires an initial setup, registering current user and setting up");
-            QHash<QString, QVariant> init;
-            init.insert("username", this->username);
-            init.insert("password", this->password);
-            this->SendProtocolCommand(GP_CMD_INIT, init);
-            return;
-        }
-        QHash<QString, QVariant> params;
-        params.insert("password", this->password);
-        params.insert("username", this->username);
-        this->gp->SendProtocolCommand(GP_CMD_LOGIN, params);
-    } else if (text == GP_CMD_LOGIN_FAIL)
-    {
-        emit this->Event_AuthenticationFailed();
-        this->AutoReconnect = false;
-        this->closeError("Invalid username or password provided");
-    } else if (text == GP_CMD_CHANNEL_RESYNC)
-    {
-        this->processChannelResync(parameters);
-    } else if (text == GP_CMD_SCROLLBACK_RESYNC)
-    {
-        this->processSResync(parameters);
-    } else if (text == GP_CMD_REMOVE)
-    {
-        this->processRemove(parameters);
-    } else if (text == GP_CMD_NICK)
-    {
-        this->processNick(parameters);
-    } else if (text == GP_CMD_NETWORK_RESYNC)
-    {
-        this->processNetworkResync(parameters);
-    } else if (text == GP_CMD_SCROLLBACK_PARTIAL_RESYNC)
-    {
-        this->processPSResync(parameters);
-    } else if (text == GP_CMD_CHANNEL_JOIN)
-    {
-        this->processChannel(parameters);
-    } else if (text == GP_CMD_LOGIN_OK)
-    {
-        this->syncing = true;
-        if (parameters.contains("logged"))
-        {
-            this->systemWindow->InsertText("There is " + QString::number(parameters["logged"].toInt()) + " open sessions as this user");
-        }
-        this->systemWindow->InsertText("Synchronizing networks");
-        this->gp->SendProtocolCommand(GP_CMD_NETWORK_INFO);
-        this->syncInit = QDateTime::currentDateTime();
-        this->gp->SendProtocolCommand(GP_CMD_OPTIONS);
-    } else if (text == GP_CMD_SCROLLBACK_LOAD_NEW_ITEM)
-    {
-        this->processNewScrollbackItem(parameters);
-    } else if (text == GP_CMD_USERLIST_SYNC)
-    {
-        this->processULSync(parameters);
-    } else if (text == GP_CMD_RESYNC_MODE)
-    {
-        this->processChannelModeSync(parameters);
-    } else if (text == GP_CMD_INIT)
-    {
-        QHash<QString, QVariant> params;
-        params.insert("password", this->password);
-        params.insert("username", this->username);
-        this->gp->SendProtocolCommand(GP_CMD_LOGIN, params);
-    } else if (text == GP_CMD_NETWORK_INFO)
-    {
-        this->processNetwork(parameters);
-    } else if (text == GP_CMD_REQUEST_ITEMS)
-    {
-        this->processRequest(parameters);
-    } else if (text == GP_CMD_IRC_QUIT)
-    {
-        IRCSession *session = this->GetSession(parameters["network_id"].toUInt());
-        if (!session)
-            return;
-
-        // Let's flag everything disconnected
-        foreach (Scrollback *sb, session->GetScrollbacks())
-            sb->SetDead(true);
-    } else if (text == GP_CMD_PERMDENY)
-    {
-        QString source = "unknown request";
-        if (parameters.contains("source"))
-            source = parameters["source"].toString();
-        this->systemWindow->InsertText("Permission denied: " + source, ScrollbackItemType_SystemError);
-    } else if (text == GP_CMD_ERROR)
-    {
-        this->systemWindow->InsertText("Error: " + parameters["description"].toString(), ScrollbackItemType_SystemError);
-    } else if (text == GP_CMD_OPTIONS)
-    {
-        this->processPreferences(parameters);
-    } else if (text == GP_CMD_RESYNC_SCROLLBACK_PB)
-    {
-        this->processPBResync(parameters);
-    } else if (text == GP_CMD_SYS_LIST_USER)
-    {
-        this->processUserList(parameters);
-    } else if (text == GP_CMD_SYS_CREATE_USER)
-    {
-        if (parameters.contains("username"))
-        {
-            this->systemWindow->InsertText("Successfuly added user: " + parameters["username"].toString());
-        }
-    } else if (text == GP_CMD_SYS_REMOVE_USER)
-    {
-        if (parameters.contains("username"))
-        {
-            this->systemWindow->InsertText("Removed user: " + parameters["username"].toString());
-        }
-    } else if (text == GP_CMD_SYS_LOCK_USER)
-    {
-        if (parameters.contains("username"))
-        {
-            this->systemWindow->InsertText("Successfuly locked user: " + parameters["username"].toString());
-        }
-    } else if (text == GP_CMD_SYS_UNLOCK_USER)
-    {
-        if (parameters.contains("username"))
-        {
-            this->systemWindow->InsertText("Successfuly unlocked user: " + parameters["username"].toString());
-        }
-    } else
-    {
-        QHash<QString, QVariant> params;
-        params.insert("source", text);
-        this->gp->SendProtocolCommand(GP_CMD_UNKNOWN, params);
-        this->systemWindow->InsertText("Unknown command from grumpyd " + QString::number(text), ScrollbackItemType_SystemError);
+            break;
     }
 }
 
@@ -1166,6 +1134,83 @@ void GrumpydSession::processUserList(QHash<QString, QVariant> parameters)
     {
         this->userList = parameters["list"].toList();
     }
+}
+
+void GrumpydSession::processSniffer(QHash<QString, QVariant> parameters)
+{
+
+}
+
+void GrumpydSession::processHello(QHash<QString, QVariant> parameters)
+{
+    if (!parameters.contains("version"))
+        return;
+    if (!parameters.contains("authentication_required"))
+    {
+        this->closeError("Remote doesn't support any authentication mechanism");
+        return;
+    }
+    bool authentication_required = parameters["authentication_required"].toBool();
+    bool initial_setup = parameters.contains("initial_setup") && parameters["initial_setup"].toBool();
+    if (authentication_required && this->username.isEmpty())
+    {
+        this->closeError("Remote require authentication, but you didn't provide any credentials needed to login");
+        return;
+    }
+    this->systemWindow->InsertText("Received HELLO from remote system, version of server is: " + parameters["version"].toString());
+    if (initial_setup)
+    {
+        this->systemWindow->InsertText("Remote server requires an initial setup, registering current user and setting up");
+        QHash<QString, QVariant> init;
+        init.insert("username", this->username);
+        init.insert("password", this->password);
+        this->SendProtocolCommand(GP_CMD_INIT, init);
+        return;
+    }
+    QHash<QString, QVariant> params;
+    params.insert("password", this->password);
+    params.insert("username", this->username);
+    this->gp->SendProtocolCommand(GP_CMD_LOGIN, params);
+}
+
+void GrumpydSession::processLoginOK(QHash<QString, QVariant> parameters)
+{
+    this->syncing = true;
+    if (parameters.contains("logged"))
+    {
+        this->systemWindow->InsertText("There is " + QString::number(parameters["logged"].toInt()) + " open sessions as this user");
+    }
+    this->systemWindow->InsertText("Synchronizing networks");
+    this->gp->SendProtocolCommand(GP_CMD_NETWORK_INFO);
+    this->syncInit = QDateTime::currentDateTime();
+    this->gp->SendProtocolCommand(GP_CMD_OPTIONS);
+}
+
+void GrumpydSession::processInit(QHash<QString, QVariant> parameters)
+{
+    QHash<QString, QVariant> params;
+    params.insert("password", this->password);
+    params.insert("username", this->username);
+    this->gp->SendProtocolCommand(GP_CMD_LOGIN, params);
+}
+
+void GrumpydSession::processQuit(QHash<QString, QVariant> parameters)
+{
+    IRCSession *session = this->GetSession(parameters["network_id"].toUInt());
+    if (!session)
+        return;
+
+    // Let's flag everything disconnected
+    foreach (Scrollback *sb, session->GetScrollbacks())
+        sb->SetDead(true);
+}
+
+void GrumpydSession::processRefuse(QHash<QString, QVariant> parameters)
+{
+    QString source = "unknown request";
+    if (parameters.contains("source"))
+        source = parameters["source"].toString();
+    this->systemWindow->InsertText("Permission denied: " + source, ScrollbackItemType_SystemError);
 }
 
 void GrumpydSession::freememory()

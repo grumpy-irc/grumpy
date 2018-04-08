@@ -76,6 +76,7 @@ namespace GrumpyIRC
             static QList<Session*> SessionList;
             static QMutex *sessions_lock;
 
+            void processSniffer(QHash<QString, QVariant> parameters);
             void processLogin(QHash<QString, QVariant> parameters);
             void processNetworks();
             void processIrcQuit(QHash<QString, QVariant> parameters);

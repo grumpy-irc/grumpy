@@ -42,6 +42,7 @@ void Role::Defaults()
     Role::Roles["poweruser"]->Grant(PRIVILEGE_USE_SCRIPT);
     Role::Roles["poweruser"]->Grant(PRIVILEGE_USE_STORAGE);
     Role::Roles["poweruser"]->Grant(PRIVILEGE_SEARCH_TEXT);
+    Role::Roles["poweruser"]->Grant(PRIVILEGE_USE_SNIFFER);
     Role::Roles["poweruser"]->Grant(PRIVILEGE_DOWNLOAD_TEXT);
     Role::Roles["user"]->Grant(PRIVILEGE_LOGIN);
     Role::Roles["user"]->Grant(PRIVILEGE_USE_IRC);
