@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #ifndef PACKETSNIFFERWIN_H
 #define PACKETSNIFFERWIN_H
@@ -19,6 +19,8 @@ namespace Ui
 {
     class PacketSnifferWin;
 }
+
+class QTimer;
 
 namespace GrumpyIRC
 {
@@ -34,8 +36,14 @@ namespace GrumpyIRC
             void Load(IRCSession *session);
             void Load(GrumpydSession *session, IRCSession *network);
 
+        private slots:
+            void OnRefresh();
+
         private:
+            QTimer *timer;
             Ui::PacketSnifferWin *ui;
+            GrumpydSession *grumpyd = nullptr;
+            IRCSession *irc = nullptr;
     };
 }
 

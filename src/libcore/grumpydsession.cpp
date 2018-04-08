@@ -484,14 +484,10 @@ void GrumpydSession::UnsetAway()
     NetworkSession::UnsetAway();
 }
 
-void GrumpydSession::RequestSniffer(Scrollback *scrollback)
+void GrumpydSession::RequestSniffer(IRCSession *session)
 {
-    IRCSession *ircs = this->GetSessionFromWindow(scrollback);
-    if (!ircs)
-        return;
-
     QHash<QString, QVariant> parameters;
-    parameters.insert("network_id", ircs->GetSID());
+    parameters.insert("network_id", session->GetSID());
     this->gp->SendProtocolCommand(GP_CMD_GET_SNIFFER, parameters);
 }
 
@@ -502,6 +498,20 @@ libircclient::User *GrumpydSession::GetSelfNetworkID(Scrollback *scrollback)
         return NULL;
 
     return ircs->GetSelfNetworkID(scrollback);
+}
+
+QDateTime GrumpydSession::GetLastSnifferUpdate(IRCSession *session)
+{
+    if (!this->snifferCacheLastUpdate.contains(session->GetSID()))
+        return QDateTime();
+    return this->snifferCacheLastUpdate[session->GetSID()];
+}
+
+QList<NetworkSniffer_Item> GrumpydSession::GetSniffer(IRCSession *session)
+{
+    if (!this->snifferCache.contains(session->GetSID()))
+        return QList<NetworkSniffer_Item>();
+    return this->snifferCache[session->GetSID()];
 }
 
 unsigned long long GrumpydSession::GetCompressedBytesRcvd()
@@ -667,6 +677,9 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVarian
         case GP_CMD_RESYNC_SCROLLBACK_PB:
             this->processPBResync(parameters);
             break;
+        case GP_CMD_GET_SNIFFER:
+            this->processSniffer(parameters);
+            break;
         case GP_CMD_SYS_LIST_USER:
             this->processUserList(parameters);
             break;
@@ -714,9 +727,7 @@ void GrumpydSession::kill()
         foreach (Scrollback *scrollback, session->GetScrollbacks())
             scrollback->SetDead(true);
     }
-    this->scrollbackHash.clear();
-    this->roles.clear();
-    this->userList.clear();
+    this->freememory();
 }
 
 void GrumpydSession::processNewScrollbackItem(QHash<QString, QVariant> hash)
@@ -1138,7 +1149,22 @@ void GrumpydSession::processUserList(QHash<QString, QVariant> parameters)
 
 void GrumpydSession::processSniffer(QHash<QString, QVariant> parameters)
 {
+    if (!parameters.contains("network_id"))
+        return;
+    if (!parameters.contains("sniffer"))
+        return;
 
+    unsigned int network_id = parameters["network_id"].toUInt();
+    if (this->snifferCacheLastUpdate.contains(network_id))
+        this->snifferCacheLastUpdate.remove(network_id);
+    if (this->snifferCache.contains(network_id))
+        this->snifferCache.remove(network_id);
+    QList<NetworkSniffer_Item> sniffer;
+    QList<QVariant> data = parameters["sniffer"].toList();
+    foreach(QVariant item, data)
+        sniffer.append(NetworkSniffer_Item(item.toHash()));
+    this->snifferCacheLastUpdate.insert(network_id, QDateTime::currentDateTime());
+    this->snifferCache.insert(network_id, sniffer);
 }
 
 void GrumpydSession::processHello(QHash<QString, QVariant> parameters)
@@ -1215,7 +1241,11 @@ void GrumpydSession::processRefuse(QHash<QString, QVariant> parameters)
 
 void GrumpydSession::freememory()
 {
-
+    this->snifferCacheLastUpdate.clear();
+    this->snifferCache.clear();
+    this->scrollbackHash.clear();
+    this->roles.clear();
+    this->userList.clear();
 }
 
 void GrumpydSession::closeError(QString error)

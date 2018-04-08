@@ -42,6 +42,7 @@ GrumpyIRC::Core::~Core()
     delete this->factory;
     delete this->commandProcessor;
     delete this->eventHandler;
+    GrumpyCore = nullptr;
 }
 
 GrumpyIRC::Scrollback *GrumpyIRC::Core::NewScrollback(GrumpyIRC::Scrollback *parent, QString name, ScrollbackType type)

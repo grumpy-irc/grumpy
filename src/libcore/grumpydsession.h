@@ -180,8 +180,10 @@ namespace GrumpyIRC
             void SetAutoreconnect(Scrollback *scrollback, bool reconnect);
             void SetAway(QString reason);
             void UnsetAway();
-            void RequestSniffer(Scrollback *scrollback);
+            void RequestSniffer(IRCSession *session);
             libircclient::User *GetSelfNetworkID(Scrollback *scrollback);
+            QDateTime GetLastSnifferUpdate(IRCSession *session);
+            QList<NetworkSniffer_Item> GetSniffer(IRCSession *session);
             unsigned long long GetCompressedBytesRcvd();
             unsigned long long GetCompressedBytesSent();
             unsigned long long GetBytesRcvd();
@@ -238,7 +240,8 @@ namespace GrumpyIRC
             void processRefuse(QHash<QString, QVariant> parameters);
             void freememory();
             void closeError(QString error);
-            QList<NetworkSniffer_Item> snifferCache;
+            QHash<unsigned int, QList<NetworkSniffer_Item>> snifferCache;
+            QHash<unsigned int, QDateTime> snifferCacheLastUpdate;
             bool AutoReconnect;
             QDateTime syncInit;
             QList<unsigned int> processedMessages;

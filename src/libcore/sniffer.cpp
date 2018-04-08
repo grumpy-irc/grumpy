@@ -21,6 +21,11 @@ NetworkSniffer_Item::NetworkSniffer_Item(QByteArray data, bool is_outgoing)
     this->Time = QDateTime::currentDateTime();
 }
 
+NetworkSniffer_Item::NetworkSniffer_Item(QHash<QString, QVariant> hash)
+{
+    this->LoadHash(hash);
+}
+
 QHash<QString, QVariant> NetworkSniffer_Item::ToHash()
 {
     QHash<QString, QVariant> hash;

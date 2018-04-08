@@ -8,9 +8,11 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
+#include <QTimer>
 #include <QDateTime>
+#include "../libcore/grumpydsession.h"
 #include "../libirc/libircclient/network.h"
 #include "../libcore/ircsession.h"
 #include "skin.h"
@@ -26,11 +28,13 @@ PacketSnifferWin::PacketSnifferWin(QWidget *parent) : QDialog(parent), ui(new Ui
     this->ui->plainTextEdit->setReadOnly(true);
     this->ui->plainTextEdit->setPalette(Skin::GetCurrent()->Palette());
     this->ui->plainTextEdit->setFont(Skin::GetCurrent()->TextFont);
+    this->timer = new QTimer();
 }
 
 PacketSnifferWin::~PacketSnifferWin()
 {
     delete this->ui;
+    delete this->timer;
 }
 
 void PacketSnifferWin::Load(IRCSession *session)
@@ -49,5 +53,27 @@ void PacketSnifferWin::Load(IRCSession *session)
 
 void PacketSnifferWin::Load(GrumpydSession *session, IRCSession *network)
 {
+    this->irc = network;
+    this->grumpyd = session;
+    this->ui->plainTextEdit->setPlainText("Requested data from grumpyd, please wait...");
+    connect(this->timer, SIGNAL(timeout()), this, SLOT(OnRefresh()));
+    this->timer->start(200);
+    session->RequestSniffer(network);
+}
 
+void PacketSnifferWin::OnRefresh()
+{
+    if (this->grumpyd->GetLastSnifferUpdate(this->irc).isNull())
+        return;
+    QString text;
+    QList<NetworkSniffer_Item> list = this->grumpyd->GetSniffer(this->irc);
+    foreach (NetworkSniffer_Item snif, list)
+    {
+        QString direction = " < ";
+        if (snif._outgoing)
+            direction =     " > ";
+        text += snif.Time.toString() + " " + this->irc->GetNetwork()->GetServerAddress() + direction + snif.Text;
+    }
+    this->ui->plainTextEdit->setPlainText(text);
+    this->timer->stop();
 }

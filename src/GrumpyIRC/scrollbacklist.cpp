@@ -15,7 +15,10 @@
 #include <QDebug>
 #include "mainwindow.h"
 #include "scrollbacklist.h"
+#include "grumpyeventhandler.h"
+#include "../libcore/core.h"
 #include "../libcore/exception.h"
+#include "../libcore/generic.h"
 #include "../libcore/networksession.h"
 #include "../libcore/ircsession.h"
 #include "../libcore/grumpydsession.h"
@@ -26,7 +29,6 @@
 #include "grumpydcfwin.h"
 #include "skin.h"
 #include "ui_scrollbacklist.h"
-#include "../libcore/generic.h"
 #include "scrollbackframe.h"
 #include "scrollbacksmanager.h"
 #include "scrollbacklist_node.h"
@@ -365,17 +367,28 @@ void ScrollbackList::sniffer(ScrollbackFrame *window)
     NetworkSession *session = window->GetSession();
     if (!session)
         return;
+    PacketSnifferWin *wx = new PacketSnifferWin();
+    wx->setAttribute(Qt::WA_DeleteOnClose);
     if (session->GetType() == SessionType_IRC)
     {
-        PacketSnifferWin *wx = new PacketSnifferWin();
-        wx->setAttribute(Qt::WA_DeleteOnClose);
         wx->Load((IRCSession*)session);
-        wx->show();
     }
-    else
+    else if (session->GetType() == SessionType_Grumpyd)
     {
-        MessageBox::Display("sniffer-grumpy", "Unsupported", "This protocol doesn't support this feature", MainWindow::Main);
+        GrumpydSession *gs = (GrumpydSession*)session;
+        IRCSession *is = gs->GetSessionFromWindow(window->GetScrollback());
+        if (is == nullptr)
+        {
+            GRUMPY_ERROR("NULL network");
+            delete wx;
+            return;
+        }
+        wx->Load(gs, is);
+    } else
+    {
+        GRUMPY_ERROR("Unknown session type");
     }
+    wx->show();
 }
 
 void ScrollbackList::closeWindow()

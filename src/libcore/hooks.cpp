@@ -24,6 +24,8 @@ void Hooks::OnScrollback_InsertText(Scrollback *scrollback, ScrollbackItem *item
 
 void Hooks::OnScrollback_Destroyed(Scrollback *scrollback)
 {
+    if (!Core::GrumpyCore)
+        return;
     foreach (Extension *e, Core::GrumpyCore->GetExtensions())
     {
         e->Hook_OnScrollbackDestroyed(scrollback);
