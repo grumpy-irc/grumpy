@@ -28,7 +28,7 @@ Parser::Parser()
     this->Protocols << "http" << "https" << "ftp" << "irc" << "ircs";
     this->LinkSeparators << ' ' << ',' << '(' << ')';
     this->Separators << ' ' << ',' << ':' << ';' << '!' << '(' << ')';
-    this->SeparatorsPriv << ' ' << '(' << ',';
+    this->SeparatorsPriv << ' ' << '(' << ',' << '+' << '%' << '@' << '&' << '~';
     // We expect a dark background so black and white mixed up
     this->TextColors.insert(0,    "#000000"); // White
     this->TextColors.insert(1,    "#FFFFFF"); // Black
@@ -189,7 +189,7 @@ QString Parser::linkChannels(QString source)
             source.insert(word_start, channel_link);
             current_pos = word_start + channel_link.size();
             continue;
-        } else if (this->Separators.contains(current))
+        } else
         {
             word_start = current_pos+1;
         }
