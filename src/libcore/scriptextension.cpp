@@ -912,6 +912,10 @@ void ScriptExtension::registerFunctions()
 
     this->registerHook("ext_on_shutdown", 0, "(): called on exit");
     this->registerHook("ext_on_scrollback_destroyed", 1, "(int scrollback_id): called when scrollback is deleted");
+    this->registerHook("ext_get_name", 0, "(): should return a name of this extension");
+    this->registerHook("ext_get_desc", 0, "(): should return description");
+    this->registerHook("ext_get_author", 0, "(): should contain name of creator");
+    this->registerHook("ext_desc_version", 0, "(): should return version");
 }
 
 void ScriptExtension::registerFunction(QString name, QScriptEngine::FunctionSignature function_signature, int parameters, QString help, bool is_unsafe)

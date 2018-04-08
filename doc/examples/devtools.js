@@ -32,8 +32,51 @@ function cmd_info(window_id, text)
     return 0;
 }
 
+function cmd_list(window_id, text)
+{
+    var scrollbacks = grumpy_get_scrollback_list();
+    var i, len;
+    var networks = [];
+    networks["null"] = "";
+    for (i = 0, len = scrollbacks.length; i < len; i++)
+    {
+        var id = scrollbacks[i];
+        var scrollback_type = grumpy_scrollback_get_type(id);
+        if (scrollback_type === "system")
+        {
+            if (grumpy_scrollback_has_network(id))
+            {
+                var network_name = grumpy_network_get_network_name(id);
+                if (!(network_name in networks))
+                {
+                    networks[network_name] = "";
+                }
+            } else
+            {
+                continue;
+            }
+        } else if (scrollback_type === "channel")
+        {
+            if (grumpy_scrollback_has_network(id))
+            {
+                var network_name = grumpy_network_get_network_name(id);
+                networks[network_name] += grumpy_scrollback_get_target(id) + ",";
+            } else
+            {
+                networks["null"] += grumpy_scrollback_get_target(id) + ",";
+            }
+        }
+    }
+    for (var key in networks)
+    {
+        grumpy_log(key + ": " + networks[key]);
+    }
+    return 0;
+}
+
 function cmd_help(window_id, text)
 {
+    grumpy_log("/dev.channels - show channels per network");
     grumpy_log("/dev.session.info - session info");
     grumpy_log("/dev.network.info - network info");
     grumpy_log("/dev.scrollback.id - print scrollback id");
@@ -57,6 +100,7 @@ function ext_init()
     safe_cmd_reg("dev.scrollback.id", "cmd_id");
     safe_cmd_reg("dev.network.info", "cmd_network");
     safe_cmd_reg("dev.function.help", "cmd_reference");
+    safe_cmd_reg("dev.channels", "cmd_list");
     safe_cmd_reg("dev.has", "cmd_fc");
     return true;
 }

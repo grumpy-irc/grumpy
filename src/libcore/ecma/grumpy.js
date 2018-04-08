@@ -17,7 +17,8 @@ function grumpy_ecma_print_help()
     grumpy_log("ECMA " + grumpy_ecma_version());
     var function_help = grumpy_get_function_list();
     function_help.sort();
-    for (var i = 0, len = function_help.length; i < len; i++)
+    var i, len;
+    for (i = 0, len = function_help.length; i < len; i++)
     {
         grumpy_log(function_help[i] + grumpy_get_function_help(function_help[i]));
     }
@@ -25,6 +26,13 @@ function grumpy_ecma_print_help()
     grumpy_log("grumpy_ecma_loaded(): returns true if ecma lib is present");
     grumpy_log("grumpy_ecma_version(): returns version string of ecma lib");
     grumpy_log("grumpy_ecma_print_help(): show this help");
+    function_help = grumpy_get_hook_list();
+    function_help.sort();
+    grumpy_log("Hooks:");
+    for (i = 0, len = function_help.length; i < len; i++)
+    {
+        grumpy_log(function_help[i] + grumpy_get_function_help(function_help[i]));
+    }
 }
 
 function alert(text)
