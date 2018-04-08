@@ -765,6 +765,8 @@ void IRCSession::OnKICK(libircclient::Parser *px, libircclient::Channel *channel
     this->channels[l]->InsertText(ScrollbackItem("kicked " + px->GetParameters()[1] + " from channel: " + px->GetText(), ScrollbackItemType_Kick, px->GetSourceUserInfo()));
 }
 
+#define CTCP_SEPARATOR QString((char)1)
+// https://tools.ietf.org/id/draft-oakley-irc-ctcp-01.html#rfc.appendix.A.1
 void IRCSession::OnCTCP(libircclient::Parser *px, QString ctcp, QString pars)
 {
     QString target = px->GetParameters()[0];
@@ -787,16 +789,29 @@ void IRCSession::OnCTCP(libircclient::Parser *px, QString ctcp, QString pars)
             return;
         }
     }
-    if (ctcp == "VERSION")
+    if (!px->GetSourceUserInfo())
     {
-        if (!px->GetSourceUserInfo())
-            return;
-        this->GetNetwork()->SendNotice("VERSION GrumpyChat " + QString(GRUMPY_VERSION_STRING) + " http://github.com/grumpy-irc", px->GetSourceUserInfo()->GetNick());
+        this->systemWindow->InsertText("Ignoring CTCP from unknown source for " + target + " from " + px->GetSourceInfo() + ": " + final_text);
+        return;
+    }
+    if (ctcp == "CLIENTINFO")
+    {
+        this->GetNetwork()->SendNotice(CTCP_SEPARATOR + "CLIENTINFO ACTION CLIENTINFO VERSION TIME PING SOURCE USERINFO" + CTCP_SEPARATOR, px->GetSourceUserInfo()->GetNick());
+    } else if (ctcp == "PING")
+    {
+        this->GetNetwork()->SendNotice(CTCP_SEPARATOR + "PING " + pars + CTCP_SEPARATOR, px->GetSourceUserInfo()->GetNick());
+    } else if (ctcp == "VERSION")
+    {
+        this->GetNetwork()->SendNotice(CTCP_SEPARATOR + "VERSION GrumpyChat " + QString(GRUMPY_VERSION_STRING) + " https://github.com/grumpy-irc" + CTCP_SEPARATOR, px->GetSourceUserInfo()->GetNick());
     } else if (ctcp == "TIME")
     {
-        if (!px->GetSourceUserInfo())
-            return;
-        this->GetNetwork()->SendNotice("TIME " + QDateTime::currentDateTime().toString(), px->GetSourceUserInfo()->GetNick());
+        this->GetNetwork()->SendNotice(CTCP_SEPARATOR + "TIME " + QDateTime::currentDateTime().toString() + CTCP_SEPARATOR, px->GetSourceUserInfo()->GetNick());
+    } else if (ctcp == "SOURCE")
+    {
+        this->GetNetwork()->SendNotice(CTCP_SEPARATOR + "SOURCE https://github.com/grumpy-irc" + CTCP_SEPARATOR, px->GetSourceUserInfo()->GetNick());
+    } else if (ctcp == "USERINFO")
+    {
+        this->GetNetwork()->SendNotice(CTCP_SEPARATOR + "USERINFO " + this->network->GetLocalUserInfo()->GetRealname() + CTCP_SEPARATOR, px->GetSourceUserInfo()->GetNick());
     }
     this->systemWindow->InsertText("Incoming CTCP for " + target + " from " + px->GetSourceInfo() + ": " + final_text);
 }
