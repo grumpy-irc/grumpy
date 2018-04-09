@@ -322,7 +322,16 @@ QScriptValue ScriptExtension::executeFunction(QString function, QScriptValueList
         throw new ScriptException("Call to script function of extension that isn't loaded", BOOST_CURRENT_FUNCTION, this);
 
     QScriptValue fc = this->engine->globalObject().property(function);
+    // If function doesn't exist, invalid value is returned. For most of hooks this is normal, since extensions don't use all of them,
+    // so this issue shouldn't be logged anywhere here. Let's just pass the invalid result for callee to handle it themselves.
+    if (!fc.isValid())
+        return fc;
     QScriptValue result = fc.call(QScriptValue(), parameters);
+    if (result.isError())
+    {
+        // There was some error during execution
+        GRUMPY_ERROR("JS error (" + this->GetName() + "): " + result.toString());
+    }
     return result;
 }
 
