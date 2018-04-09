@@ -326,6 +326,11 @@ QScriptValue ScriptExtension::executeFunction(QString function, QScriptValueList
     // so this issue shouldn't be logged anywhere here. Let's just pass the invalid result for callee to handle it themselves.
     if (!fc.isValid())
         return fc;
+    if (!fc.isFunction())
+    {
+        GRUMPY_ERROR("JS error (" + this->GetName() + "): " + function + " is not a function");
+        return fc;
+    }
     QScriptValue result = fc.call(QScriptValue(), parameters);
     if (result.isError())
     {
