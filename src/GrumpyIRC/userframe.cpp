@@ -100,10 +100,15 @@ void UserFrame::on_listWidget_customContextMenuRequested(const QPoint &pos)
     QMenu *menuCT = new QMenu("CTCP", &Menu);
     QAction *ctcpV = new QAction("VERSION", &Menu);
     QAction *ctcpP = new QAction("PING", &Menu);
-    //QAction *ctcpT = new QAction
-    //
+    QAction *ctcpT = new QAction("TIME", &Menu);
+    QAction *ctcpS = new QAction("SOURCE", &Menu);
+    QAction *ctcpCI = new QAction("CLIENTINFO", &Menu);
+
     menuCT->addAction(ctcpV);
     menuCT->addAction(ctcpP);
+    menuCT->addAction(ctcpS);
+    menuCT->addAction(ctcpT);
+    menuCT->addAction(ctcpCI);
     Menu.addMenu(menuCT);
 
     QAction *menuKick = new QAction(QObject::tr("Kick"), &Menu);
@@ -144,6 +149,12 @@ void UserFrame::on_listWidget_customContextMenuRequested(const QPoint &pos)
         this->ctcp("PING");
     else if (selectedItem == ctcpV)
         this->ctcp("VERSION");
+    else if (selectedItem == ctcpT)
+        this->ctcp("TIME");
+    else if (selectedItem == ctcpCI)
+        this->ctcp("CLIENTINFO");
+    else if (selectedItem == ctcpS)
+        this->ctcp("SOURCE");
     else if (selectedItem == menuKick)
         this->kick();
     else if (selectedItem == menuBan)
