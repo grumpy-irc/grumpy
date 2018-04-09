@@ -1159,12 +1159,16 @@ void IRCSession::OnWhoisIdle(libircclient::Parser *px, unsigned int seconds_idle
         return;
     int days, hours, minutes, seconds;
     Generic::SecondsToTimeSpan((int)seconds_idle, &days, &hours, &minutes, &seconds);
-    QString idle_string;
+    QString idle_string, connected_string;
     if (days > 0)
         idle_string = QString::number(days) + " days ";
     idle_string += Generic::DoubleDigit(hours) + ":" + Generic::DoubleDigit(minutes) + ":" + Generic::DoubleDigit(seconds);
+    Generic::SecondsToTimeSpan(signon_time.secsTo(QDateTime::currentDateTime()), &days, &hours, &minutes, &seconds);
+    if (days > 0)
+        connected_string = QString::number(days) + " days ";
+    connected_string += Generic::DoubleDigit(hours) + ":" + Generic::DoubleDigit(minutes) + ":" + Generic::DoubleDigit(seconds);
     this->systemWindow->InsertText("WHOIS: " + px->GetParameters()[1] + " is idle " + idle_string + ". "\
-                                   "Online since " + signon_time.toString());
+                                   "Online since " + signon_time.toString() + " " + connected_string);
 }
 
 void IRCSession::OnWhoisOperator(libircclient::Parser *px)
