@@ -110,6 +110,9 @@
    <property name="text">
     <string>&amp;Load more items from remote</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+M</string>
+   </property>
   </action>
   <action name="actionOpen_window">
    <property name="text">
