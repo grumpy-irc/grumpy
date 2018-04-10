@@ -657,6 +657,11 @@ bool ScrollbackFrame::IsDead()
     return this->scrollback->IsDead();
 }
 
+STextBox *ScrollbackFrame::GetSTextBox()
+{
+    return this->textEdit;
+}
+
 void ScrollbackFrame::RequestClose()
 {
     if (!this->IsDead() && this->GetScrollback()->GetType() != ScrollbackType_User)

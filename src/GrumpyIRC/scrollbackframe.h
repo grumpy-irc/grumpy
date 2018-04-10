@@ -92,6 +92,7 @@ namespace GrumpyIRC
             void ToggleHide();
             bool IsVisible();
             bool IsDead();
+            STextBox *GetSTextBox();
             ScrollbackFrame *GetParent();
             scrollback_id_t GetID();
             NetworkSession *GetSession();

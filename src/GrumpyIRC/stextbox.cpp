@@ -41,6 +41,11 @@ void STextBox::Clear()
     this->clear();
 }
 
+bool STextBox::SendEvent(QEvent *e)
+{
+    return QPlainTextEdit::event(e);
+}
+
 void STextBox::dropEvent(QDropEvent *e)
 {
     // do nothing!

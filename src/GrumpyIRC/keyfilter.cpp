@@ -8,14 +8,16 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #include <QKeyEvent>
 #include <QEvent>
-#include "inputbox.h"
-#include "grumpyconf.h"
 #include "keyfilter.h"
 #include "colorbox.h"
+#include "inputbox.h"
+#include "grumpyconf.h"
+#include "scrollbackframe.h"
+#include "stextbox.h"
 
 using namespace GrumpyIRC;
 
@@ -79,6 +81,11 @@ bool KeyFilter::eventFilter(QObject *obj, QEvent *event)
         {
             this->parentInput->ProcessInput();
             return true;
+        }
+        // Forward these to scrollback
+        if (keyEvent->key() == Qt::Key_PageUp || keyEvent->key() == Qt::Key_PageDown)
+        {
+            this->parentInput->GetParent()->GetSTextBox()->SendEvent(keyEvent);
         }
     }
     return QObject::eventFilter(obj, event);

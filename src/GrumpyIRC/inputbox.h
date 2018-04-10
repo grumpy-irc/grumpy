@@ -41,6 +41,7 @@ namespace GrumpyIRC
             void ClearHistory();
             //! Load data into history
             void LoadHistory(QList<QString> new_history);
+            ScrollbackFrame *GetParent();
             void Focus();
             void InsertAtCurrentPosition(QString text);
             void InsertEnter();

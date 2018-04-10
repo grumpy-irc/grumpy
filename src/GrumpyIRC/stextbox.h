@@ -26,6 +26,7 @@ namespace GrumpyIRC
             void AppendHtml(QString html);
             void SetStyleSheet(QString css);
             void Clear();
+            bool SendEvent(QEvent *e);
         signals:
             void Event_Link(QString text);
         protected:

@@ -146,6 +146,11 @@ void InputBox::LoadHistory(QList<QString> new_history)
     this->historyPosition = this->history.count();
 }
 
+ScrollbackFrame *InputBox::GetParent()
+{
+    return this->parent;
+}
+
 void InputBox::Focus()
 {
     this->ui->textEdit->setFocus();
