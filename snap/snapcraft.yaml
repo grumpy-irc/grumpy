@@ -1,0 +1,54 @@
+name: grumpy
+version: "1.0.0"
+summary: IRC client with distributed core and JS based scripting system, written in C++ 
+description: Modern, yet oldschool IRC client with distributed core and JS based scripting system, written in C++ 
+confinement: strict
+epoch: 0
+grade: stable
+
+apps:
+  huggle:
+    command: desktop-launch grumpy
+    plugs:
+        - unity7
+        - x11
+        - network
+        - home
+        - opengl
+        - pulseaudio
+        - browser-support
+
+parts:
+  application:
+    prepare: ./tools/unpack.sh
+    plugin: cmake
+    configflags:
+      - -DQT5_BUILD=true
+      - -DLINUX_SNAP=true
+    source: src/
+    stage-packages:
+      - libqt5core5a
+      - libqt5gui5
+      - libqt5concurrent5
+      - libqt5quickparticles5
+      - libqt5script5
+      - libqt5widgets5
+      - libqt5declarative5
+      - libqt5quickwidgets5
+      - libqt5network5
+      - libqt5multimediaquick-p5
+      - libqt5multimediawidgets5
+    build-packages:
+      - libgtk2.0-0
+      - libdrm-dev
+      - libegl1-mesa-dev
+      - qtbase5-dev
+      - qtscript5-dev
+      - libgl1-mesa-dev
+      - libglu1-mesa-dev
+      - libqt5opengl5-dev
+      - libwayland-dev
+      - libx11-dev
+      - qtmultimedia5-dev
+      - unzip
+    after: [desktop-qt5]

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=GrumpyChat
+GenericName=GrumpyChat
+Comment=IRC client that makes IRC great again!
+Exec=grumpy
+Icon=${SNAP}/meta/gui/icon.png
+StartupNotify=true
+Terminal=false
+Type=Application
+Categories=Network;
+

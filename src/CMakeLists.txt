@@ -15,6 +15,7 @@ else()
 endif()
 
 # Settings
+option(LINUX_SNAP "Build using snap" false)
 option(QT5_BUILD "Build with Qt5" true)
 option(EXTREME_DEBUG "Enable some resource expensive and slowing debug info" false)
 option(UNIT_TESTS "Enable unit tests" false)
