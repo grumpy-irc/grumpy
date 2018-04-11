@@ -57,10 +57,10 @@ void InputBox::ProcessInput()
         if (response != MessageBoxResponse_Yes)
             return;
     }
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->ProcessText(text, this->parent->GetScrollback());
     this->insertToHistory();
     this->historyPosition = this->history.count();
     this->ui->textEdit->setText("");
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->ProcessText(text, this->parent->GetScrollback());
 }
 
 void InputBox::Secure()
@@ -215,6 +215,7 @@ void InputBox::insertToHistory()
 void GrumpyIRC::InputBox::on_lineEdit_returnPressed()
 {
     UiHooks::OnInput();
-    CoreWrapper::GrumpyCore->GetCommandProcessor()->ProcessText(this->ui->lineEdit->text(), this->parent->GetScrollback());
+    QString text = this->ui->lineEdit->text();
     this->ui->lineEdit->setText("");
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->ProcessText(text, this->parent->GetScrollback());
 }

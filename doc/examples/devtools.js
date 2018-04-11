@@ -74,12 +74,26 @@ function cmd_list(window_id, text)
     return 0;
 }
 
+function cmd_scrollback_mk(window_id, text)
+{
+    if (text === "")
+        text = "Test";
+    grumpy_scrollback_new(0, text);
+}
+
+function cmd_scrollback_rm(window_id, text)
+{
+    grumpy_scrollback_delete(text);
+}
+
 function cmd_help(window_id, text)
 {
     grumpy_log("/dev.channels - show channels per network");
     grumpy_log("/dev.session.info - session info");
     grumpy_log("/dev.network.info - network info");
     grumpy_log("/dev.scrollback.id - print scrollback id");
+    grumpy_log("/dev.scrollback.make - creates a new scrollback");
+    grumpy_log("/dev.scrollback.remove - deletes a scrollback");
     grumpy_log("/dev.function.help - print help for all functions");
     grumpy_log("/dev.has <function name> - check if this version has ECMA function");
     return 0;
@@ -101,6 +115,8 @@ function ext_init()
     safe_cmd_reg("dev.network.info", "cmd_network");
     safe_cmd_reg("dev.function.help", "cmd_reference");
     safe_cmd_reg("dev.channels", "cmd_list");
+    safe_cmd_reg("dev.scrollback.make", "cmd_scrollback_mk");
+    safe_cmd_reg("dev.scrollback.remove", "cmd_scrollback_rm");
     safe_cmd_reg("dev.has", "cmd_fc");
     return true;
 }

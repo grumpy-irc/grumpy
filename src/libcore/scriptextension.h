@@ -52,6 +52,9 @@ namespace GrumpyIRC
             QList<QString> GetFunctions();
             void Hook_Shutdown();
             void Hook_OnScrollbackDestroyed(Scrollback *scrollback);
+            virtual void RegisterScrollback(Scrollback *sc);
+            virtual void DestroyScrollback(Scrollback *sc);
+            virtual bool HasScrollback(Scrollback *sc);
 
         private slots:
             void OnError(QScriptValue e);
@@ -84,6 +87,7 @@ namespace GrumpyIRC
             bool isWorking;
             bool isLoaded;
             bool isUnsafe;
+            QList<Scrollback*> scriptScbs;
             QList<ScriptCommand*> scriptCmds;
             friend class ScriptCommand;
     };

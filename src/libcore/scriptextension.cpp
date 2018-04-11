@@ -78,6 +78,10 @@ ScriptExtension::ScriptExtension()
 
 ScriptExtension::~ScriptExtension()
 {
+    // Delete all windows that belong to this extension
+    while (!this->scriptScbs.isEmpty())
+        delete this->scriptScbs.first();
+
     // Delete all registered script commands
     while (!this->scriptCmds.isEmpty())
         delete this->scriptCmds.first();
@@ -226,6 +230,26 @@ void ScriptExtension::Hook_OnScrollbackDestroyed(Scrollback *scrollback)
     QScriptValueList params;
     params.append(QScriptValue(this->engine, scrollback->GetID()));
     this->executeFunction("ext_on_scrollback_destroyed", params);
+    if (this->scriptScbs.contains(scrollback))
+        this->scriptScbs.removeAll(scrollback);
+}
+
+void ScriptExtension::RegisterScrollback(Scrollback *sc)
+{
+    this->scriptScbs.append(sc);
+}
+
+void ScriptExtension::DestroyScrollback(Scrollback *sc)
+{
+    if (!this->scriptScbs.contains(sc))
+        return;
+    this->scriptScbs.removeAll(sc);
+    sc->Close();
+}
+
+bool ScriptExtension::HasScrollback(Scrollback *sc)
+{
+    return this->scriptScbs.contains(sc);
 }
 
 void ScriptExtension::OnError(QScriptValue e)
@@ -689,6 +713,71 @@ static QScriptValue scrollback_get_target(QScriptContext *context, QScriptEngine
     return QScriptValue(engine, w->GetTarget());
 }
 
+static QScriptValue scrollback_new(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
+    if (context->argumentCount() < 2)
+    {
+        // Wrong number of parameters
+        GRUMPY_ERROR(extension->GetName() + ": scrollback_new(parent, name): requires 2 parameters");
+        return QScriptValue(engine, false);
+    }
+    unsigned int parent_id = context->argument(0).toUInt32();
+    Scrollback *parent;
+    if (!parent_id)
+        parent = nullptr;
+    else
+        parent = Scrollback::GetScrollbackByID(parent_id);
+    if (parent_id && !parent)
+    {
+        GRUMPY_ERROR(extension->GetName() + ": scrollback_new(parent, name): parent scrollback not found");
+        return QScriptValue(engine, false);
+    }
+    QString name = context->argument(1).toString();
+    Scrollback *w = Core::GrumpyCore->NewScrollback(parent, name, ScrollbackType_System);
+
+    if (!w)
+    {
+        GRUMPY_ERROR(extension->GetName() + ": scrollback_new(parent, name): unknown error");
+        return QScriptValue(engine, false);
+    }
+
+    extension->RegisterScrollback(w);
+
+    return QScriptValue(engine, w->GetID());
+}
+
+static QScriptValue scrollback_delete(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
+    if (context->argumentCount() < 1)
+    {
+        // Wrong number of parameters
+        GRUMPY_ERROR(extension->GetName() + ": scrollback_delete(parent, name): requires 1 parameter");
+        return QScriptValue(engine, false);
+    }
+    unsigned int id = context->argument(0).toUInt32();
+    Scrollback *w = Scrollback::GetScrollbackByID(id);
+    if (!w)
+    {
+        GRUMPY_ERROR(extension->GetName() + ": scrollback_delete(parent, name): scrollback not found");
+        return QScriptValue(engine, false);
+    }
+
+    if (!extension->HasScrollback(w))
+    {
+        GRUMPY_ERROR(extension->GetName() + ": scrollback_delete(parent, name): scrollback doesn't belong to extension");
+        return QScriptValue(engine, false);
+    }
+
+    extension->DestroyScrollback(w);
+    return QScriptValue(engine, true);
+}
+
 static QScriptValue get_scrollback_list(QScriptContext *context, QScriptEngine *engine)
 {
     ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
@@ -911,6 +1000,9 @@ void ScriptExtension::registerFunctions()
     this->registerFunction("grumpy_error_log", error_log, 1, "(text): prints to log");
     this->registerFunction("grumpy_log", log, 1, "(text): prints to log");
     this->registerFunction("grumpy_get_scrollback_list", get_scrollback_list, 0, "(): returns a list of all scrollback IDs");
+    this->registerFunction("grumpy_scrollback_new", scrollback_new, 2, "(parent, name): creates a new scrollback, parent can be 0 if this should be root scrollback, "\
+                                                                       "returns false on error otherwise scrollback_id");
+    this->registerFunction("grumpy_scrollback_delete", scrollback_delete, 1, "(scrollback_id): destroy scrollback, can be only used for scrollbacks created with this script");
     this->registerFunction("grumpy_scrollback_write", scrollback_write, 2, "(scrollback_id, text): write text");
     this->registerFunction("grumpy_scrollback_get_type", scrollback_get_type, 1, "(scrollback_id): return type of scrollback; system, channel, user");
     this->registerFunction("grumpy_scrollback_get_target", scrollback_get_target, 1, "(scrollback_id): return target name of scrollback (channel name, user name)");
