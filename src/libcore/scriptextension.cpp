@@ -906,6 +906,7 @@ static QScriptValue get_version(QScriptContext *context, QScriptEngine *engine)
 
 static QScriptValue get_context(QScriptContext *context, QScriptEngine *engine)
 {
+    Q_UNUSED(context);
     ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
     if (!extension)
         return QScriptValue(engine, false);
@@ -945,6 +946,7 @@ static QScriptValue get_function_help(QScriptContext *context, QScriptEngine *en
 
 static QScriptValue get_function_list(QScriptContext *context, QScriptEngine *engine)
 {
+    Q_UNUSED(context);
     ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
     if (!extension)
         return QScriptValue(engine, false);
@@ -977,11 +979,22 @@ static QScriptValue process(QScriptContext *context, QScriptEngine *engine)
 
 static QScriptValue get_hook_list(QScriptContext *context, QScriptEngine *engine)
 {
+    Q_UNUSED(context);
     ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
     if (!extension)
         return QScriptValue(engine, false);
 
     return qScriptValueFromSequence(engine, extension->GetHooks());
+}
+
+static QScriptValue is_unsafe(QScriptContext *context, QScriptEngine *engine)
+{
+    Q_UNUSED(context);
+    ScriptExtension *extension = ScriptExtension::GetExtensionByEngine(engine);
+    if (!extension)
+        return QScriptValue(engine, false);
+
+    return QScriptValue(engine, extension->IsUnsafe());
 }
 
 void ScriptExtension::registerFunctions()
@@ -990,6 +1003,7 @@ void ScriptExtension::registerFunctions()
     this->registerFunction("grumpy_get_function_list", get_function_list, 0, "(): returns array with list of functions");
     this->registerFunction("grumpy_get_hook_list", get_hook_list, 0, "(): returns a list of all hooks");
     this->registerFunction("grumpy_get_version", get_version, 0, "(): returns version object with properties: Major, Minor, Revision, String");
+    this->registerFunction("grumpy_is_unsafe", is_unsafe, 0, "(): returns true if script has access to unsafe functions");
     this->registerFunction("grumpy_set_cfg", set_cfg, 2, "(key, value): stores value as key in settings");
     this->registerFunction("grumpy_get_cfg", get_cfg, 2, "(key, default): returns stored value from ini file");
     this->registerFunction("grumpy_has_function", has_function, 1, "(function_name): return true or false whether function is present");
@@ -1017,12 +1031,15 @@ void ScriptExtension::registerFunctions()
     this->registerFunction("grumpy_network_send_raw", network_send_raw, 2, "(scrollback_id, text): sends RAW data to network of scrollback");
     this->registerFunction("grumpy_process", process, 2, "(window_id, text): !unsafe! sends input to command processor, esentially same as entering text to input box in program", true);
 
+    this->registerHook("ext_init", 0, "(): called on start, must return true, otherwise load of extension is considered as failure");
     this->registerHook("ext_on_shutdown", 0, "(): called on exit");
     this->registerHook("ext_on_scrollback_destroyed", 1, "(int scrollback_id): called when scrollback is deleted");
     this->registerHook("ext_get_name", 0, "(): should return a name of this extension");
     this->registerHook("ext_get_desc", 0, "(): should return description");
     this->registerHook("ext_get_author", 0, "(): should contain name of creator");
     this->registerHook("ext_desc_version", 0, "(): should return version");
+    this->registerHook("ext_unload", 0, "(): called when extension is being unloaded from system");
+    this->registerHook("ext_is_working", 0, "(): must exist and must return true, if returns false, extension is considered crashed");
 }
 
 void ScriptExtension::registerFunction(QString name, QScriptEngine::FunctionSignature function_signature, int parameters, QString help, bool is_unsafe)
