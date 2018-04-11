@@ -335,7 +335,8 @@ QScriptValue ScriptExtension::executeFunction(QString function, QScriptValueList
     if (result.isError())
     {
         // There was some error during execution
-        GRUMPY_ERROR("JS error (" + this->GetName() + "): " + result.toString());
+        qint32 line = result.property("lineNumber").toInt32();
+        GRUMPY_ERROR("JS error, line " + QString::number(line) + " (" + this->GetName() + "): " + result.toString());
     }
     return result;
 }
