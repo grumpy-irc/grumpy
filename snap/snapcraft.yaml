@@ -7,7 +7,7 @@ epoch: 0
 grade: stable
 
 apps:
-  huggle:
+  grumpy:
     command: desktop-launch grumpy
     plugs:
         - unity7
