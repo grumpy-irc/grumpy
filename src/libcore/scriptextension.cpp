@@ -80,7 +80,7 @@ ScriptExtension::~ScriptExtension()
 {
     // Delete all windows that belong to this extension
     while (!this->scriptScbs.isEmpty())
-        delete this->scriptScbs.first();
+        this->DestroyScrollback(this->scriptScbs.first());
 
     // Delete all registered script commands
     while (!this->scriptCmds.isEmpty())
