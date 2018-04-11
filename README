@@ -26,6 +26,11 @@ Inspired by:
 * KVirc
 * Pidgeon
 
+GrumpyChat is available in Canonical snapcraft store as "grumpy", so you can
+easily install it on compatible OS (like Ubuntu) using:
+
+sudo snap install grumpy
+
 How to build
 ==========================
 
