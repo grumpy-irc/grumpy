@@ -22,7 +22,6 @@ AboutWin::AboutWin(QWidget *parent) : QDialog(parent), ui(new Ui::AboutWin)
     this->ui->label_3->setText(QString("Version: ") + GRUMPY_VERSION_STRING + " Qt: " + QString(QT_VERSION_STR) + "/" + QString(qVersion()) + "\n\n"\
                                "This program is licensed under GNU Lesser GPL v3.\n\n"\
                                "Copyright 2015 - 2018, Petr Bena");
-    //this->ui->label->setPixmap(QPixmap(":/icons/img/exclamation-mark-s.png"));
 }
 
 AboutWin::~AboutWin()

@@ -10,14 +10,14 @@
 
 // Copyright (c) Petr Bena 2015 - 2018
 
-#include <QKeyEvent>
-#include <QEvent>
 #include "keyfilter.h"
 #include "colorbox.h"
 #include "inputbox.h"
 #include "grumpyconf.h"
 #include "scrollbackframe.h"
 #include "stextbox.h"
+#include <QKeyEvent>
+#include <QEvent>
 
 using namespace GrumpyIRC;
 

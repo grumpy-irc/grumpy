@@ -12,8 +12,8 @@
 
 #include "proxy.h"
 #include "grumpyconf.h"
-#include <QNetworkProxy>
 #include "ui_proxy.h"
+#include <QNetworkProxy>
 
 using namespace GrumpyIRC;
 

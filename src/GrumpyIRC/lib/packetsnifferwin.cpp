@@ -10,14 +10,14 @@
 
 // Copyright (c) Petr Bena 2015 - 2018
 
+#include "skin.h"
+#include "packetsnifferwin.h"
+#include "ui_packetsnifferwin.h"
 #include <QTimer>
 #include <QDateTime>
 #include <libcore/grumpydsession.h>
 #include <libirc/libircclient/network.h>
 #include <libcore/ircsession.h>
-#include "skin.h"
-#include "packetsnifferwin.h"
-#include "ui_packetsnifferwin.h"
 
 using namespace GrumpyIRC;
 

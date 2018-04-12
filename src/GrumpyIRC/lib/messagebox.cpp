@@ -10,11 +10,11 @@
 
 // Copyright (c) Petr Bena 2015 - 2018
 
-#include <libcore/definitions.h>
-#include <QStyle>
 #include "messagebox.h"
 #include "grumpyconf.h"
 #include "ui_messagebox.h"
+#include <libcore/definitions.h>
+#include <QStyle>
 
 using namespace GrumpyIRC;
 
@@ -53,9 +53,9 @@ static QPixmap standardIcon(MessageBoxType mt, QWidget *mb)
     case MessageBoxType_Normal:
         tmpIcon = style->standardIcon(QStyle::SP_MessageBoxInformation, 0, mb);
         break;
-    //case QMessageBox::Warning:
-    //    tmpIcon = style->standardIcon(QStyle::SP_MessageBoxWarning, 0, mb);
-    //    break;
+    case MessageBoxType_Warning:
+        tmpIcon = style->standardIcon(QStyle::SP_MessageBoxWarning, 0, mb);
+        break;
     case MessageBoxType_Error:
         tmpIcon = style->standardIcon(QStyle::SP_MessageBoxCritical, 0, mb);
         break;
@@ -79,7 +79,6 @@ MessageBoxResponse MessageBox::Exec(MessageBoxType type)
     switch (type)
     {
         case MessageBoxType_Normal:
-            //this->ui->label->setPixmap();
             this->ui->pushOK->setVisible(true);
             break;
         case MessageBoxType_Error:

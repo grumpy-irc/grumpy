@@ -10,10 +10,7 @@
 
 // Copyright (c) Petr Bena 2015 - 2018
 
-#include <libcore/autocompletionengine.h>
-#include <libcore/commandprocessor.h>
 #include "corewrapper.h"
-#include <libcore/core.h>
 #include "inputbox.h"
 #include "hooks.h"
 #include "messagebox.h"
@@ -21,6 +18,9 @@
 #include "keyfilter.h"
 #include "ui_inputbox.h"
 #include "scrollbackframe.h"
+#include <libcore/core.h>
+#include <libcore/autocompletionengine.h>
+#include <libcore/commandprocessor.h>
 
 using namespace GrumpyIRC;
 

@@ -10,18 +10,10 @@
 
 // Copyright (c) Petr Bena 2015 - 2018
 
-#include <QAction>
-#include <QMenu>
-#include <QDebug>
+
 #include "mainwindow.h"
 #include "scrollbacklist.h"
 #include "grumpyeventhandler.h"
-#include <libcore/core.h>
-#include <libcore/exception.h>
-#include <libcore/generic.h>
-#include <libcore/networksession.h>
-#include <libcore/ircsession.h>
-#include <libcore/grumpydsession.h>
 #include "grumpyconf.h"
 #include "packetsnifferwin.h"
 #include "hooks.h"
@@ -32,6 +24,15 @@
 #include "scrollbackframe.h"
 #include "scrollbacksmanager.h"
 #include "scrollbacklist_node.h"
+#include <QAction>
+#include <QMenu>
+#include <QDebug>
+#include <libcore/core.h>
+#include <libcore/exception.h>
+#include <libcore/generic.h>
+#include <libcore/networksession.h>
+#include <libcore/ircsession.h>
+#include <libcore/grumpydsession.h>
 
 using namespace GrumpyIRC;
 

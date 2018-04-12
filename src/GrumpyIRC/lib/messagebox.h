@@ -31,6 +31,7 @@ namespace GrumpyIRC
     {
         MessageBoxType_Normal,
         MessageBoxType_Error,
+        MessageBoxType_Warning,
         MessageBoxType_Question,
         MessageBoxType_QuestionCancel
     };

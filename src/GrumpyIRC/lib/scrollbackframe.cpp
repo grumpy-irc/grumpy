@@ -940,10 +940,8 @@ void ScrollbackFrame_WorkerThread::run()
 {
     while (this->IsRunning)
     {
-        QList<ScrollbackFrame*> list;
         ScrollbackFrame::ScrollbackFrames_m.lock();
-        list.append(ScrollbackFrame::ScrollbackFrames);
-        foreach (ScrollbackFrame *s, list)
+        foreach (ScrollbackFrame *s, ScrollbackFrame::ScrollbackFrames)
         {
             if (s->unwritten.isEmpty())
                 continue;

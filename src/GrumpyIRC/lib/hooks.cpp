@@ -12,10 +12,10 @@
 
 #include "hooks.h"
 #include "uiscript.h"
-#include <libcore/core.h>
-#include <libcore/scrollback.h>
 #include "scrollbackframe.h"
 #include "mainwindow.h"
+#include <libcore/core.h>
+#include <libcore/scrollback.h>
 
 using namespace GrumpyIRC;
 

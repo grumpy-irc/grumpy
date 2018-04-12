@@ -10,13 +10,13 @@
 
 // Copyright (c) Petr Bena 2015 - 2018
 
-#include <libcore/core.h>
-#include <libcore/configuration.h>
-#include "grumpyconf.h"
-#include <QDebug>
 #include "corewrapper.h"
 #include "mainwindow.h"
+#include "grumpyconf.h"
 #include "grumpyeventhandler.h"
+#include <libcore/core.h>
+#include <libcore/configuration.h>
+#include <QDebug>
 
 using namespace GrumpyIRC;
 

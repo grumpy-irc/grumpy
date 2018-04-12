@@ -10,19 +10,6 @@
 
 // Copyright (c) Petr Bena 2015 - 2018
 
-#include <libirc/libircclient/channel.h>
-#include <libirc/libircclient/network.h>
-#include <libirc/libirc/serveraddress.h>
-#include <libgp/gp.h>
-#include <libcore/core.h>
-#include <libcore/configuration.h>
-#include <libcore/eventhandler.h>
-#include <libcore/exception.h>
-#include <libcore/generic.h>
-#include <libcore/grumpydsession.h>
-#include <libcore/highlighter.h>
-#include <libcore/grumpyscript.h>
-#include <libcore/ircsession.h>
 #include "aboutwin.h"
 #include "corewrapper.h"
 #include "mainwindow.h"
@@ -40,9 +27,22 @@
 #include "hooks.h"
 #include "scrollbackframe.h"
 #include "scrollbacksmanager.h"
+#include "skin.h"
 #include <QProgressBar>
 #include <QFileDialog>
-#include "skin.h"
+#include <libirc/libircclient/channel.h>
+#include <libirc/libircclient/network.h>
+#include <libirc/libirc/serveraddress.h>
+#include <libgp/gp.h>
+#include <libcore/core.h>
+#include <libcore/configuration.h>
+#include <libcore/eventhandler.h>
+#include <libcore/exception.h>
+#include <libcore/generic.h>
+#include <libcore/grumpydsession.h>
+#include <libcore/highlighter.h>
+#include <libcore/grumpyscript.h>
+#include <libcore/ircsession.h>
 
 using namespace GrumpyIRC;
 

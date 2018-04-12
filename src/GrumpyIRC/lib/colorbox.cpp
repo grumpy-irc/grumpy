@@ -34,7 +34,6 @@ ColorBox::ColorBox(InputBox *in, QWidget *parent) : QDialog(parent),
     QPoint target_position = in->parentWidget()->mapToGlobal(in->geometry().topLeft());
     target_position.setY(target_position.y() - 80);
     this->move(target_position);
-    //this->move(this->mapFrom(this->input->parentWidget(), this->input->pos()));
     this->ui->setupUi(this);
     this->ui->label_1->setPalette(Skin::Current->Colors[1]);
     this->ui->label_2->setPalette(Skin::Current->Colors[2]);
@@ -78,7 +77,5 @@ void ColorBox::keyPressEvent(QKeyEvent *e)
         this->input->InsertAtCurrentPosition("8");
     else if (e->key() == Qt::Key_9)
         this->input->InsertAtCurrentPosition("9");
-
-
     this->close();
 }

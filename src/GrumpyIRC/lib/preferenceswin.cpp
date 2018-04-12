@@ -12,6 +12,13 @@
 
 #include <libcore/definitions.h>
 
+#include "preferenceswin.h"
+#include "skin.h"
+#include "ui_preferenceswin.h"
+#include "scrollbackframe.h"
+#include "mainwindow.h"
+#include "corewrapper.h"
+#include "grumpyconf.h"
 #include <QMenu>
 #include <QColorDialog>
 #include <libcore/autocompletionengine.h>
@@ -21,13 +28,6 @@
 #include <libcore/core.h>
 #include <libcore/highlighter.h>
 #include <libcore/generic.h>
-#include "preferenceswin.h"
-#include "skin.h"
-#include "ui_preferenceswin.h"
-#include "scrollbackframe.h"
-#include "mainwindow.h"
-#include "corewrapper.h"
-#include "grumpyconf.h"
 
 using namespace GrumpyIRC;
 
