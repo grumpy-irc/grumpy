@@ -1,0 +1,10 @@
+GrumpyChat is divided to 2 parts
+
+lib
+********
+Contains all code of the GrumpyChat client, compiled as a library. That is necessary for extensions to work, since extensions
+need to be linked against the client itself so that they can connect and alter its interface.
+
+bin
+********
+Simple library wrapper which only contains the entry point to start the program, which is actually located in library
