@@ -38,7 +38,7 @@ VIAddVersionKey "FileVersion"  "${VERSION}"
 SetCompressor ZLIB
 Name "${APP_NAME}"
 Caption "${APP_NAME}"
-Icon "../src/GrumpyIRC/img/grumpy_logo.ico"
+Icon "../src/GrumpyIRC/lib/img/grumpy_logo.ico"
 OutFile "${INSTALLER_NAME}"
 BrandingText "${APP_NAME}"
 XPStyle on
