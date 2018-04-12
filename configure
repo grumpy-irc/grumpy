@@ -275,7 +275,7 @@ else
   mkdir "$BUILD" || exit 1
 fi
 cd "$BUILD" || exit 1
-cmake ../src $CMAKE_ARGS $UNIT_TESTS || exit 1
+cmake ../src $CMAKE_ARGS $UNIT_TESTS -Wno-dev || exit 1
 echo "Everything is ready, you can build grumpy by entering "$BUILD" and typing"
 echo "make"
 
