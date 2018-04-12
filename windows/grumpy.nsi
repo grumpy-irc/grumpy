@@ -4,8 +4,8 @@
 #              by Vlasis K. Barkas aka Red Wine red_wine@freemail.gr Sep 2006               
 ############################################################################################
 
-!define MUI_ICON "../src/GrumpyIRC/img/grumpy_logo.ico"
-!define MUI_UNICON "../src/GrumpyIRC/img/grumpy_logo.ico"
+!define MUI_ICON "../src/GrumpyIRC/lib/img/grumpy_logo.ico"
+!define MUI_UNICON "../src/GrumpyIRC/lib/img/grumpy_logo.ico"
 !define APP_NAME "GrumpyChat"
 !define COMP_NAME "Petr Bena"
 !define WEB_SITE "http://github.com/grumpy-irc/grumpy"

@@ -153,8 +153,8 @@ cp .\build\bin\Release\*.dll release
 #cp .\build\Release\extensions\*.dll release\extensions
 cp .\build\bin\Release\*.exe release
 # get the qt
-cp ..\src\GrumpyIRC\img\grumpy_logo.ico grumpy.ico
-cp ..\src\GrumpyIRC\img\grumpy_logo.ico release\grumpy.ico
+cp ..\src\GrumpyIRC\lib\img\grumpy_logo.ico grumpy.ico
+cp ..\src\GrumpyIRC\lib\img\grumpy_logo.ico release\grumpy.ico
 cp $openssl_path\bin\ssleay32.dll release
 cp $openssl_path\bin\libeay32.dll release
 
