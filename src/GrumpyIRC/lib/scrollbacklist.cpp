@@ -412,5 +412,6 @@ ScrollbackFrame *ScrollbackList::selectedWindow()
 
 void GrumpyIRC::ScrollbackList::on_treeView_clicked(const QModelIndex &index)
 {
+    UiHooks::OnInput();
     this->switchWindow(index);
 }
