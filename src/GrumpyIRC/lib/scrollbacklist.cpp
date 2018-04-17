@@ -136,9 +136,6 @@ void ScrollbackList::OnUpdate()
 {
     foreach (ScrollbackList_Node *node, ScrollbackList_Node::NodesList)
     {
-        // yes this is retarded bug in Qt and freaky fix
-        if ((uintptr_t)node->GetScrollback() == 0xdddddddddddddddd)
-            continue;
         if ((node->GetScrollback()->LastMenuTooltipUpdate.secsTo(QDateTime::currentDateTime())) > 20)
         {
             Scrollback *scrollback = node->GetScrollback()->GetScrollback();
@@ -153,7 +150,16 @@ void ScrollbackList::OnUpdate()
                     return;
                 // Reconnect the network if we want to do that
                 if (scrollback->GetSession()->IsAutoreconnect(scrollback))
+                {
                     scrollback->GetSession()->RequestReconnect(scrollback);
+                    if (scrollback->GetSession()->GetType() == SessionType_Grumpyd)
+                    {
+                        // This function will start immediately destroying scrollbacks
+                        // if we stay in the loop we will get in troubles as next windows
+                        // may be already deleted by then
+                        return;
+                    }
+                }
             }
         }
     }
