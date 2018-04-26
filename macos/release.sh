@@ -57,7 +57,7 @@ echo "Copying the binaries to package"
 cp info.plist package/grumpychat.app/Contents || exit 1
 cp release/bin/* package/grumpychat.app/Contents/MacOS || exit 1
 mkdir package/grumpychat.app/Contents/MacOS/scripts
-cp -r ../doc/examples/ package/grumpychat.app/Contents/MacOS/scripts || exit 1
+cp -r ../doc/examples/ package/grumpychat.app/Contents/MacOS/scripts/examples/ || exit 1
 cp grumpy.icns package/grumpychat.app/Contents/Resources || exit 1
 cd package
 $QTDIR/bin/macdeployqt grumpychat.app -dmg
