@@ -112,7 +112,7 @@ bool ScriptExtension::Load(QString path, QString *error)
     QFile file(path);
     if (!file.open(QFile::ReadOnly))
     {
-        *error = "Unable to read file";
+        *error = "Unable to read file: " + path;
         return false;
     }
     QTextStream stream(&file);
