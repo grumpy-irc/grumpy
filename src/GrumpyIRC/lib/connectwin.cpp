@@ -14,6 +14,7 @@
 #include "grumpyconf.h"
 #include "mainwindow.h"
 #include "ui_connectwin.h"
+#include "messagebox.h"
 #include <libirc/libirc/serveraddress.h>
 #include <libirc/libirc/irc_standards.h>
 #include <libgp/gp.h>
@@ -26,7 +27,7 @@ ConnectWin::ConnectWin(QWidget *parent) : QDialog(parent), ui(new Ui::ConnectWin
     this->ui->comboBox->addItem("IRC");
     this->ui->comboBox->addItem("Grumpyd");
     this->ui->comboBox->setCurrentIndex(0);
-    this->ui->lineEdit_2->setText(CONF->GetNick());
+    this->ui->l_nick->setText(CONF->GetNick());
     this->setAttribute(Qt::WA_DeleteOnClose);
 }
 
@@ -37,21 +38,37 @@ ConnectWin::~ConnectWin()
 
 void GrumpyIRC::ConnectWin::on_pushButton_clicked()
 {
+    if (this->ui->cb_server->currentText().isEmpty())
+    {
+        MessageBox::Error("Error", "You must provide server name", this);
+        return;
+    }
+    if (this->ui->l_nick->text().isEmpty())
+    {
+        MessageBox::Error("Error", "You must provide nick", this);
+        return;
+    }
+    if (this->ui->l_port->text().isEmpty())
+    {
+        MessageBox::Error("Error", "You must provide port", this);
+        return;
+    }
     if (this->ui->comboBox->currentIndex() == 0)
     {
         // Connect to IRC
-        libirc::ServerAddress server(this->ui->comboBox_2->currentText());
-        server.SetNick(this->ui->lineEdit_2->text());
-        server.SetPassword(this->ui->lineEdit_3->text());
-        server.SetPort(this->ui->lineEdit->text().toUInt());
+        libirc::ServerAddress server(this->ui->cb_server->currentText());
+        server.SetNick(this->ui->l_nick->text());
+        server.SetPassword(this->ui->l_pass->text());
+        server.SetPort(this->ui->l_port->text().toUInt());
         server.SetSSL(this->ui->checkBox->isChecked());
         MainWindow::Main->OpenServer(server);
     } else
     {
         // Connect to grumpy
-        MainWindow::Main->OpenGrumpy(this->ui->comboBox_2->currentText(),
-                                     this->ui->lineEdit->text().toInt(),
-                                     this->ui->lineEdit_2->text(), this->ui->lineEdit_3->text(),
+        MainWindow::Main->OpenGrumpy(this->ui->cb_server->currentText(),
+                                     this->ui->l_port->text().toInt(),
+                                     this->ui->l_nick->text(),
+                                     this->ui->l_pass->text(),
                                      this->ui->checkBox->isChecked());
     }
     this->close();
@@ -59,10 +76,10 @@ void GrumpyIRC::ConnectWin::on_pushButton_clicked()
 
 void GrumpyIRC::ConnectWin::on_comboBox_currentIndexChanged(int index)
 {
-    if (!this->ui->lineEdit->text().isEmpty())
+    if (!this->ui->l_port->text().isEmpty())
     {
         // Don't change the text if user inserted their own port
-        switch (this->ui->lineEdit->text().toInt())
+        switch (this->ui->l_port->text().toInt())
         {
             case IRC_STANDARD_PORT:
             case IRC_STANDARD_PORT_SSL:
@@ -76,15 +93,15 @@ void GrumpyIRC::ConnectWin::on_comboBox_currentIndexChanged(int index)
     if (this->ui->checkBox->isChecked())
     {
         if (index == 0)
-            this->ui->lineEdit->setText(QString::number(IRC_STANDARD_PORT_SSL));
+            this->ui->l_port->setText(QString::number(IRC_STANDARD_PORT_SSL));
         else
-            this->ui->lineEdit->setText(QString::number(GP_DEFAULT_SSL_PORT));
+            this->ui->l_port->setText(QString::number(GP_DEFAULT_SSL_PORT));
     } else
     {
         if (index == 0)
-            this->ui->lineEdit->setText(QString::number(IRC_STANDARD_PORT));
+            this->ui->l_port->setText(QString::number(IRC_STANDARD_PORT));
         else
-            this->ui->lineEdit->setText(QString::number(GP_DEFAULT_PORT));
+            this->ui->l_port->setText(QString::number(GP_DEFAULT_PORT));
     }
 }
 

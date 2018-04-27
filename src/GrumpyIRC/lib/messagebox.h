@@ -50,6 +50,7 @@ namespace GrumpyIRC
 
         public:
             static void Display(QString id, QString title, QString message, QWidget *parent = 0);
+            static void Error(QString title, QString message, QWidget *parent = 0);
             static MessageBoxResponse Question(QString id, QString title, QString message, QWidget *parent = 0);
 
             explicit MessageBox(QString id, QString title, QString message, QWidget *parent = 0);
