@@ -22,6 +22,7 @@ Parser::Parser()
     this->ChannelSymbol = '#';
     this->resolveCacheSize = 2000;
     this->cacheHits = 0;
+    this->SeparateOnTrailingPunctuation = true;
     this->SeparateOnDotSpace = true;
     this->LinkColor = "#94D7F2";
     this->cacheMiss = 0;
@@ -117,7 +118,11 @@ QString Parser::linkUrl(QString source, QString protocol)
         while (++end < source.size())
         {
             char current_symbol = source[end].toLatin1();
-            if (this->SeparateOnDotSpace && current_symbol == '.')
+            if ((this->SeparateOnDotSpace && current_symbol == '.') || (this->SeparateOnTrailingPunctuation && (current_symbol == '!' ||
+                                                                                                                current_symbol == '?' ||
+                                                                                                                current_symbol == ':' ||
+                                                                                                                current_symbol == ',' ||
+                                                                                                                current_symbol == ';')))
             {
                 // If dot is last symbol in text
                 if (end + 1 == source.size())
@@ -168,7 +173,11 @@ QString Parser::linkChannels(QString source)
             while (++channel_end < source.size())
             {
                 char current_symbol = source[channel_end].toLatin1();
-                if (this->SeparateOnDotSpace && current_symbol == '.')
+                if ((this->SeparateOnDotSpace && current_symbol == '.') || (this->SeparateOnTrailingPunctuation && (current_symbol == '!' ||
+                                                                                                                    current_symbol == '?' ||
+                                                                                                                    current_symbol == ':' ||
+                                                                                                                    current_symbol == ',' ||
+                                                                                                                    current_symbol == ';')))
                 {
                     // If dot is last symbol in text
                     if (channel_end + 1 == source.size())
