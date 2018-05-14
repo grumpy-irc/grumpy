@@ -26,6 +26,12 @@ void MessageBox::Display(QString id, QString title, QString message, QWidget *pa
     mb.Exec(MessageBoxType_Normal);
 }
 
+void MessageBox::Error(QString title, QString message, QWidget *parent)
+{
+    MessageBox mb("error", title, message, parent);
+    mb.Exec(MessageBoxType_Error);
+}
+
 MessageBoxResponse MessageBox::Question(QString id, QString title, QString message, QWidget *parent)
 {
     if (CONF->IsDisabledMessage(id))
@@ -83,6 +89,7 @@ MessageBoxResponse MessageBox::Exec(MessageBoxType type)
             break;
         case MessageBoxType_Error:
             this->ui->pushOK->setVisible(true);
+            this->ui->checkBox->setEnabled(false);
             break;
         case MessageBoxType_Warning:
             this->ui->pushOK->setVisible(true);
