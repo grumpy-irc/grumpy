@@ -279,10 +279,10 @@ fi
 #ok
 
 if [ x"$PREFIX" != "x" ];then
-    CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=\"$PREFIX\""
+    CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=$PREFIX"
 fi
 if [ x"$QTPATH" != "x" ];then
-    CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_PREFIX_PATH:PATH=\"$QTPATH\""
+    CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_PREFIX_PATH:PATH=$QTPATH"
 fi
 if [ -d "$BUILD" ];then
   echo $WARN"WARNING: build directory already exist make sure it's clean"$NORMAL
@@ -290,6 +290,7 @@ else
   mkdir "$BUILD" || exit 1
 fi
 cd "$BUILD" || exit 1
+echo "CMake args: $CMAKE_ARGS $UNIT_TESTS -Wno-dev"
 cmake ../src $CMAKE_ARGS $UNIT_TESTS -Wno-dev || exit 1
 echo "Everything is ready, you can build grumpy by entering "$BUILD" and typing"
 echo "make"
