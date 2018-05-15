@@ -791,9 +791,9 @@ void Session::processSniffer(QHash<QString, QVariant> parameters)
         return;
     }
     QList<QVariant> result;
-    QList<NetworkSniffer_Item*> items = irc->GetSniffer();
-    foreach (NetworkSniffer_Item* item, items)
-        result.append(item->ToHash());
+    QList<NetworkSniffer_Item> items = irc->GetSniffer();
+    foreach (NetworkSniffer_Item item, items)
+        result.append(item.ToHash());
     parameters.insert("sniffer", result);
     this->protocol->SendProtocolCommand(GP_CMD_GET_SNIFFER, parameters);
 }

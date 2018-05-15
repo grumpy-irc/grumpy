@@ -90,7 +90,7 @@ namespace GrumpyIRC
             virtual bool IsConnected() const;
             virtual void SetNetwork(libircclient::Network *nt);
             void SendNotice(Scrollback *scrollback, QString text);
-            virtual QList<NetworkSniffer_Item*> GetSniffer();
+            virtual QList<NetworkSniffer_Item> GetSniffer();
             SessionType GetType();
             QList<QString> GetChannels(Scrollback *scrollback);
             QHash<QString, QVariant> ToHash(int max_items = 2000);
@@ -217,17 +217,16 @@ namespace GrumpyIRC
             QString _nick;
             QString _password;
             bool _autoReconnect;
-            QList<NetworkSniffer_Item*> data;
+            QList<NetworkSniffer_Item> snifferData;
             QList<QString> ignoringWho;
             QList<QString> ignoringBans;
             QList<QString> ignoringExceptions;
             QList<QString> ignoringInvites;
             QHash<QString, Scrollback*> channels;
             bool snifferEnabled;
-            int snifferSize = 2000;
             Scrollback *highlightCollector;
             int ulistUpdateTime;
-            unsigned int maxSnifferBufferSize;
+            int maxSnifferBufferSize;
             libircclient::Network *network;
             QHash<QString, Scrollback*> users;
             Scrollback *systemWindow;

@@ -16,7 +16,7 @@ using namespace GrumpyIRC;
 
 NetworkSniffer_Item::NetworkSniffer_Item(QByteArray data, bool is_outgoing)
 {
-    this->_outgoing = is_outgoing;
+    this->IsOutgoing = is_outgoing;
     this->Text = QString(data);
     this->Time = QDateTime::currentDateTime();
 }
@@ -29,7 +29,7 @@ NetworkSniffer_Item::NetworkSniffer_Item(QHash<QString, QVariant> hash)
 QHash<QString, QVariant> NetworkSniffer_Item::ToHash()
 {
     QHash<QString, QVariant> hash;
-    SERIALIZE(_outgoing);
+    SERIALIZE(IsOutgoing);
     SERIALIZE(Text);
     SERIALIZE(Time);
     return hash;
@@ -38,6 +38,6 @@ QHash<QString, QVariant> NetworkSniffer_Item::ToHash()
 void NetworkSniffer_Item::LoadHash(QHash<QString, QVariant> hash)
 {
     UNSERIALIZE_STRING(Text);
-    UNSERIALIZE_BOOL(_outgoing);
+    UNSERIALIZE_BOOL(IsOutgoing);
     UNSERIALIZE_DATETIME(Time);
 }

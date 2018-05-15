@@ -40,13 +40,13 @@ PacketSnifferWin::~PacketSnifferWin()
 void PacketSnifferWin::Load(IRCSession *session)
 {
     QString text;
-    QList<NetworkSniffer_Item*> list = session->GetSniffer();
-    foreach (NetworkSniffer_Item *snif, list)
+    QList<NetworkSniffer_Item> list = session->GetSniffer();
+    foreach (NetworkSniffer_Item snif, list)
     {
         QString direction = " < ";
-        if (snif->_outgoing)
+        if (snif.IsOutgoing)
             direction =     " > ";
-        text += snif->Time.toString() + " " + session->GetNetwork()->GetServerAddress() + direction + snif->Text;
+        text += snif.Time.toString() + " " + session->GetNetwork()->GetServerAddress() + direction + snif.Text;
     }
     this->ui->plainTextEdit->appendPlainText(text);
 }
@@ -70,7 +70,7 @@ void PacketSnifferWin::OnRefresh()
     foreach (NetworkSniffer_Item snif, list)
     {
         QString direction = " < ";
-        if (snif._outgoing)
+        if (snif.IsOutgoing)
             direction =     " > ";
         text += snif.Time.toString() + " " + this->irc->GetNetwork()->GetServerAddress() + direction + snif.Text;
     }

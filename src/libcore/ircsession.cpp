@@ -86,8 +86,7 @@ IRCSession::~IRCSession()
     IRCSession::Sessions_Lock.lock();
     IRCSession::Sessions.removeOne(this);
     IRCSession::Sessions_Lock.unlock();
-    qDeleteAll(this->data);
-    this->data.clear();
+    this->snifferData.clear();
     delete this->network;
 }
 
@@ -685,18 +684,16 @@ void IRCSession::SetAutoreconnect(Scrollback *scrollback, bool reconnect)
 void IRCSession::SetSniffer(bool enabled, int size)
 {
     this->snifferEnabled = enabled;
-    this->snifferSize = size;
+    this->maxSnifferBufferSize = size;
 }
 
 void IRCSession::OnOutgoingRawMessage(QByteArray message)
 {
     if (!this->snifferEnabled)
         return;
-    while(this->data.size() > this->snifferSize)
-        this->data.removeFirst();
-    this->data.append(new NetworkSniffer_Item(message, true));
-    while ((unsigned int)this->data.size() > this->maxSnifferBufferSize)
-        this->data.removeFirst();
+    this->snifferData.append(NetworkSniffer_Item(message, true));
+    while (this->snifferData.size() > this->maxSnifferBufferSize)
+        this->snifferData.removeFirst();
 }
 
 void IRCSession::SendMessage(Scrollback *scrollback, QString text)
@@ -1413,11 +1410,9 @@ void IRCSession::OnIncomingRawMessage(QByteArray message)
 {
     if (!this->snifferEnabled)
         return;
-    while(this->data.size() > this->snifferSize)
-        this->data.removeFirst();
-    this->data.append(new NetworkSniffer_Item(message, false));
-    while (((unsigned int)this->data.size()) > this->maxSnifferBufferSize)
-        this->data.removeFirst();
+    this->snifferData.append(NetworkSniffer_Item(message, false));
+    while (((unsigned int)this->snifferData.size()) > this->maxSnifferBufferSize)
+        this->snifferData.removeFirst();
 }
 
 void IRCSession::OnConnectionFail(QAbstractSocket::SocketError er)
@@ -1498,7 +1493,7 @@ void IRCSession::OnNICK(libircclient::Parser *px, QString old_, QString new_)
     }
 }
 
-QList<GrumpyIRC::NetworkSniffer_Item*> GrumpyIRC::IRCSession::GetSniffer()
+QList<GrumpyIRC::NetworkSniffer_Item> GrumpyIRC::IRCSession::GetSniffer()
 {
-    return this->data;
+    return this->snifferData;
 }

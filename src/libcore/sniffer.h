@@ -28,7 +28,7 @@ namespace GrumpyIRC
             NetworkSniffer_Item(QHash<QString, QVariant> hash);
             QHash<QString, QVariant> ToHash();
             void LoadHash(QHash<QString, QVariant> hash);
-            bool _outgoing;
+            bool IsOutgoing;
             QDateTime Time;
             QString Text;
     };
