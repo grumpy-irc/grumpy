@@ -42,6 +42,8 @@ _BUILD=0
 _Q=0
 QTPATH=''
 BUILD=release
+HAS_PREFIX=0
+PREFIX=""
 if [ x"$*" != x ];then
     echo "Options used: $*"
 fi
@@ -57,6 +59,7 @@ do
         echo " --qtpath: path to Qt (for example C:\\Qt\\5.4\\mingw\\"
         echo " --qt4: execute QT4 checks"
         echo " --qt5: execute QT5 checks"
+        echo " --prefix: specify prefix for installation path"
         echo " --python: will build grumpy with p engine"
         echo " --folder <folder>: change the default build folder"
         echo " --no-colors: suppress colors"
@@ -65,22 +68,31 @@ do
         echo "Copyright (c) 2013 - 2015 Petr Bena. This script is licensed under the BSD license."
         exit 0
     fi
-    if [ "$var" = "--extension" ];then
-        modules=1
-        continue
-    fi
-    if [ "$var" = "--unit-test" ];then
-        UNIT_TESTS=' -DUNIT_TESTS=true'
-        continue
-    fi
     if [ "$_BUILD" = "1" ];then
-	BUILD="$var"
+        BUILD="$var"
         _BUILD=0
         continue
     fi
     if [ "$_Q" = "1" ];then
         _Q=0
         QTPATH=$var
+        continue
+    fi
+    if [ "$_PREFIX" = "1" ];then
+        _PREFIX=0
+        PREFIX=$var
+        continue
+    fi
+    if [ "$var" = "--extension" ];then
+        modules=1
+        continue
+    fi
+    if [ "$var" = "--prefix" ];then
+        _PREFIX=1
+        continue
+    fi
+    if [ "$var" = "--unit-test" ];then
+        UNIT_TESTS=' -DUNIT_TESTS=true'
         continue
     fi
     if [ "$var" = "--qtpath" ];then
@@ -266,8 +278,11 @@ fi
 #fi
 #ok
 
+if [ x"$PREFIX" != "x" ];then
+    CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=\"$PREFIX\""
+fi
 if [ x"$QTPATH" != "x" ];then
-    CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_PREFIX_PATH=$QTPATH"
+    CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_PREFIX_PATH:PATH=\"$QTPATH\""
 fi
 if [ -d "$BUILD" ];then
   echo $WARN"WARNING: build directory already exist make sure it's clean"$NORMAL
