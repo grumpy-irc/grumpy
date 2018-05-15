@@ -78,8 +78,8 @@ do
         QTPATH=$var
         continue
     fi
-    if [ "$_PREFIX" = "1" ];then
-        _PREFIX=0
+    if [ "$HAS_PREFIX" = "1" ];then
+        HAS_PREFIX=0
         PREFIX=$var
         continue
     fi
@@ -88,7 +88,7 @@ do
         continue
     fi
     if [ "$var" = "--prefix" ];then
-        _PREFIX=1
+        HAS_PREFIX=1
         continue
     fi
     if [ "$var" = "--unit-test" ];then
