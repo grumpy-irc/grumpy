@@ -46,3 +46,9 @@ function alert(text)
     }
 }
 
+function console() {}
+console.assert = function(eval, txt) { if (eval) { grumpy_log(txt); } }
+console.log = function(txt) { grumpy_log(txt); }
+console.error = function(txt) { grumpy_error_log(txt); }
+console.debug = function(txt) { grumpy_debug_log(txt, 1); }
+console.warn = function(txt) { grumpy_log("WARNING: " + txt); }
