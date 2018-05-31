@@ -41,7 +41,7 @@ ADD_DEFINITIONS( -DQT_USE_QSTRINGBUILDER )
 
 ADD_EXECUTABLE(grumpy ${src} ${grumpy_HEADERS_MOC} ${headers} ${grumpy_RESOURCES_RCC} ${grumpy_FORMS_HEADERS})
 if (QT5_BUILD)
-    qt5_use_modules(grumpy Core Multimedia Gui Script Widgets Xml)
+    target_link_libraries(grumpy Qt5::Core Qt5::Multimedia Qt5::Gui Qt5::Script Qt5::Widgets Qt5::Xml)
 endif()
 TARGET_LINK_LIBRARIES(grumpy grumpy_lib grumpycore irc2htmlcode ${QT_LIBRARIES})
 if (NOT WIN32)
