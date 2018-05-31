@@ -31,7 +31,7 @@ ADD_DEFINITIONS( -DLIBIRC2HTMLCODE_LIBRARY -DQT_USE_QSTRINGBUILDER )
 ADD_LIBRARY(irc2htmlcode SHARED ${src} ${headers})
 
 if (QT5_BUILD)
-  qt5_use_modules(irc2htmlcode Core)
+  target_link_libraries(irc2htmlcode Qt5::Core)
 endif()
 
 TARGET_LINK_LIBRARIES(irc2htmlcode ${QT_LIBRARIES})

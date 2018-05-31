@@ -40,7 +40,7 @@ ADD_DEFINITIONS( -DQT_USE_QSTRINGBUILDER )
 
 ADD_EXECUTABLE(grumpyd_ut ${src} ${grumpyd_ut_HEADERS_MOC} ${grumpyd_ut_RESOURCES_RCC} ${headers} ${grumpyd_ut_FORMS_HEADERS})
 if (QT5_BUILD)
-    qt5_use_modules(grumpyd_ut Core Test)
+    target_link_libraries(grumpyd_ut Qt5::Core Qt5::Test)
 endif()
 TARGET_LINK_LIBRARIES(grumpyd_ut grumpycore ${QT_LIBRARIES})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
