@@ -95,6 +95,7 @@ namespace GrumpyIRC
             void OnAutoAway();
             void on_actionExport_to_html_triggered();
             void on_actionExport_to_plain_text_triggered();
+            void on_actionScript_manager_triggered();
 
         private:
             void closeEvent(QCloseEvent *event);

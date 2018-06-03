@@ -26,6 +26,7 @@
 #include "preferenceswin.h"
 #include "hooks.h"
 #include "scrollbackframe.h"
+#include "scriptingmanager.h"
 #include "scrollbacksmanager.h"
 #include "skin.h"
 #include <QProgressBar>
@@ -467,54 +468,54 @@ void MainWindow::closeEvent(QCloseEvent *event)
     Exit();
 }
 
-void GrumpyIRC::MainWindow::on_actionConnect_triggered()
+void MainWindow::on_actionConnect_triggered()
 {
     ConnectWin *wx = new ConnectWin(this);
     wx->show();
 }
 
-void GrumpyIRC::MainWindow::on_actionAbout_triggered()
+void MainWindow::on_actionAbout_triggered()
 {
     AboutWin *wx = new AboutWin(this);
     wx->show();
 }
 
-void GrumpyIRC::MainWindow::on_actionLoad_more_items_from_remote_triggered()
+void MainWindow::on_actionLoad_more_items_from_remote_triggered()
 {
     this->GetScrollbackManager()->GetCurrentScrollback()->RequestMore(1200);
 }
 
-void GrumpyIRC::MainWindow::on_actionPreferences_triggered()
+void MainWindow::on_actionPreferences_triggered()
 {
     PreferencesWin *wx = new PreferencesWin(this);
     wx->setAttribute(Qt::WA_DeleteOnClose);
     wx->show();
 }
 
-void GrumpyIRC::MainWindow::on_actionOpen_window_triggered()
+void MainWindow::on_actionOpen_window_triggered()
 {
     this->Fork();
 }
 
-void GrumpyIRC::MainWindow::on_actionFavorites_triggered()
+void MainWindow::on_actionFavorites_triggered()
 {
     FavoritesWin *favorites = new FavoritesWin(this);
     favorites->setAttribute(Qt::WA_DeleteOnClose);
     favorites->show();
 }
 
-void GrumpyIRC::MainWindow::on_actionToggle_secret_triggered()
+void MainWindow::on_actionToggle_secret_triggered()
 {
     this->GetCurrentScrollbackFrame()->ToggleSecure();
 }
 
-void GrumpyIRC::MainWindow::on_actionProxy_triggered()
+void MainWindow::on_actionProxy_triggered()
 {
     Proxy p;
     p.exec();
 }
 
-void GrumpyIRC::MainWindow::on_actionEnable_proxy_toggled(bool arg1)
+void MainWindow::on_actionEnable_proxy_toggled(bool arg1)
 {
     Proxy p;
     p.Enable(arg1);
@@ -542,7 +543,7 @@ void MainWindow::OnAutoAway()
     IRCSession::Sessions_Lock.unlock();
 }
 
-void GrumpyIRC::MainWindow::on_actionExport_to_html_triggered()
+void MainWindow::on_actionExport_to_html_triggered()
 {
     QString file = QFileDialog::getSaveFileName(this, "Export to html", CONF->GetLastSavePath(), "HTML (*.htm *.html);;All files (*.*)");
     if (file.isEmpty())
@@ -560,7 +561,7 @@ void GrumpyIRC::MainWindow::on_actionExport_to_html_triggered()
     f.close();
 }
 
-void GrumpyIRC::MainWindow::on_actionExport_to_plain_text_triggered()
+void MainWindow::on_actionExport_to_plain_text_triggered()
 {
     QString file = QFileDialog::getSaveFileName(this, "Export to plain text", CONF->GetLastSavePath(), "Text (*.txt);;All files (*.*)");
     if (file.isEmpty())
@@ -576,4 +577,10 @@ void GrumpyIRC::MainWindow::on_actionExport_to_plain_text_triggered()
     QTextStream s(&f);
     s << this->GetCurrentScrollbackFrame()->ToString();
     f.close();
+}
+
+void MainWindow::on_actionScript_manager_triggered()
+{
+    ScriptingManager script;
+    script.exec();
 }

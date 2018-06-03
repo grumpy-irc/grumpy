@@ -24,7 +24,7 @@
      <x>0</x>
      <y>0</y>
      <width>1129</width>
-     <height>19</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -56,9 +56,16 @@
     <addaction name="actionExport_to_html"/>
     <addaction name="actionExport_to_plain_text"/>
    </widget>
+   <widget class="QMenu" name="menuScripts">
+    <property name="title">
+     <string>Scripts</string>
+    </property>
+    <addaction name="actionScript_manager"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuScrollback"/>
    <addaction name="menuHelp"/>
+   <addaction name="menuScripts"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -159,6 +166,11 @@
   <action name="actionExport_to_plain_text">
    <property name="text">
     <string>Export to plain text</string>
+   </property>
+  </action>
+  <action name="actionScript_manager">
+   <property name="text">
+    <string>Script manager</string>
    </property>
   </action>
  </widget>
