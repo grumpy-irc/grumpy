@@ -1050,7 +1050,7 @@ void ScriptExtension::registerFunction(QString name, QScriptEngine::FunctionSign
 
     this->functionsExported.append(name);
     this->functionsHelp.insert(name, help);
-    this->engine->globalObject().setProperty(name, this->engine->newFunction(function_signature, parameters));
+    this->engine->globalObject().setProperty(name, this->engine->newFunction(function_signature, parameters), QScriptValue::ReadOnly | QScriptValue::Undeletable);
 }
 
 void ScriptExtension::registerHook(QString name, int parameters, QString help, bool is_unsafe)

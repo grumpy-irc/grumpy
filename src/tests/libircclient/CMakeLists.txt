@@ -37,7 +37,7 @@ ADD_DEFINITIONS( -DQT_USE_QSTRINGBUILDER )
 
 ADD_EXECUTABLE(libircclient_ut ${src} ${libircclient_ut_HEADERS_MOC} ${libircclient_ut_RESOURCES_RCC} ${headers} ${libircclient_ut_FORMS_HEADERS})
 if (QT5_BUILD)
-    qt5_use_modules(libircclient_ut Core Test)
+    TARGET_LINK_LIBRARIES(libircclient_ut Qt5::Core Qt5::Test)
 endif()
 TARGET_LINK_LIBRARIES(libircclient_ut ircclient ${QT_LIBRARIES})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})

@@ -35,6 +35,7 @@ WARN=$(tput setaf 3)
 GREEN=$(tput setaf 2)
 NORMAL=$(tput sgr0)
 QT5=10
+USEDEBUG=0
 UNIT_TESTS=''
 CMAKE_ARGS=''
 PYTHON=0
@@ -44,6 +45,7 @@ QTPATH=''
 BUILD=release
 HAS_PREFIX=0
 PREFIX=""
+BUILD_CHANGED=0
 if [ x"$*" != x ];then
     echo "Options used: $*"
 fi
@@ -53,6 +55,7 @@ do
     if [ "$var" = "--help" ] || [ "$var" = "-h" ];then
         echo "Configure script for grumpy, parameters:"
         echo "=========================================="
+        echo " --debug: build a debuggable grumpy"
         echo " --disable-dependency-tracking: skip all package checks"
         echo " --extension: will build all extensions as well"
         echo " --unit-test: will build unit tests"
@@ -119,6 +122,10 @@ do
     fi
     if [ "$var" = "--folder" ];then
         _BUILD=1
+        continue
+    fi
+    if [ "$var" = "--debug" ];then
+        USEDEBUG=1
         continue
     fi
     if [ "$var" = "--version" ];then
@@ -211,6 +218,15 @@ checkpkg()
     echo "or execute apt-get install $1 as root"
     exit 1
 }
+
+if [ "$USEDEBUG" -eq 1 ];then
+    CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_BUILD_TYPE=Debug"
+    if [ "$BUILD_CHANGED" = "0" ];then
+        BUILD='debug'
+    fi
+else
+    CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_BUILD_TYPE=Release"
+fi
 
 echo "Checking all required packages..."
 text "Checking for cmake... "

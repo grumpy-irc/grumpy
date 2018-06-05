@@ -44,7 +44,7 @@ ADD_DEFINITIONS( -DQT_USE_QSTRINGBUILDER )
 
 ADD_EXECUTABLE(grumpyd ${src} ${grumpyd_HEADERS_MOC} ${grumpyd_RESOURCES_RCC} ${headers} ${grumpyd_FORMS_HEADERS})
 if (QT5_BUILD)
-    qt5_use_modules(grumpyd Core Sql Network Xml Script)
+    TARGET_LINK_LIBRARIES(grumpyd Qt5::Core Qt5::Sql Qt5::Network Qt5::Xml Qt5::Script)
 endif()
 TARGET_LINK_LIBRARIES(grumpyd grumpycore ${QT_LIBRARIES})
 if (NOT WIN32)

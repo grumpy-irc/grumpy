@@ -38,10 +38,9 @@ endif()
 
 ADD_DEFINITIONS( -DLIBCORE_LIBRARY -DQT_USE_QSTRINGBUILDER )
 
-
 ADD_LIBRARY(grumpycore SHARED ${src} ${grumpycore_RESOURCES_RCC} ${headers})
 if (QT5_BUILD)
-    qt5_use_modules(grumpycore Core Network Script)
+    TARGET_LINK_LIBRARIES(grumpycore Qt5::Core Qt5::Network Qt5::Script)
 endif()
 TARGET_LINK_LIBRARIES(grumpycore gp ircclient ${QT_LIBRARIES})
 if (NOT WIN32)

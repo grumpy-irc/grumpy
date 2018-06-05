@@ -41,7 +41,7 @@ ADD_DEFINITIONS( -DGRUMPY_LIBRARY -DQT_USE_QSTRINGBUILDER )
 
 ADD_LIBRARY(grumpy_lib SHARED ${src} ${grumpy_lib_HEADERS_MOC} ${headers} ${grumpy_lib_RESOURCES_RCC} ${grumpy_lib_FORMS_HEADERS})
 if (QT5_BUILD)
-    qt5_use_modules(grumpy_lib Core Multimedia Gui Script Widgets Xml)
+    TARGET_LINK_LIBRARIES(grumpy_lib Qt5::Core Qt5::Multimedia Qt5::Gui Qt5::Script Qt5::Widgets Qt5::Xml)
 endif()
 TARGET_LINK_LIBRARIES(grumpy_lib grumpycore irc2htmlcode ${QT_LIBRARIES})
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "grumpy")
