@@ -91,6 +91,10 @@ int main(int argc, char *argv[])
     int ReturnCode = 0;
     try
     {
+#if QT_VERSION >= 0x050600
+        // This should make fonts look normal on high DPI screens
+        QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
         CONF = new GrumpyConf();
         QApplication a(argc, argv);
         a.setApplicationName("GrumpyChat");
