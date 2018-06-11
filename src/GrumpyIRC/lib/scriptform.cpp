@@ -30,7 +30,7 @@ using namespace GrumpyIRC;
 ScriptForm::ScriptForm(QWidget *parent) : QDialog(parent), ui(new Ui::ScriptForm)
 {
     this->ui->setupUi(this);
-    this->ui->textEdit->setText(Resources::GetSource("/grumpy_core/ecma/template"));
+    this->ui->textEdit->setText(Resources::GetSource("/grumpy_core/ecma/example.js"));
     this->ui->textEdit->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
     QString file_name = Core::GrumpyCore->GetConfiguration()->GetHomeScriptPath() + "new_script.js";
     int file_id = 1;
