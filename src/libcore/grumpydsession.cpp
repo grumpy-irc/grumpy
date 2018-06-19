@@ -1184,6 +1184,8 @@ void GrumpydSession::processHello(QHash<QString, QVariant> parameters)
         return;
     }
     this->systemWindow->InsertText("Received HELLO from remote system, version of server is: " + parameters["version"].toString());
+    if (parameters.contains("uptime"))
+        this->systemWindow->InsertText("Uptime: " + parameters["uptime"].toString());
     if (initial_setup)
     {
         this->systemWindow->InsertText("Remote server requires an initial setup, registering current user and setting up");

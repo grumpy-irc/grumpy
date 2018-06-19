@@ -903,6 +903,13 @@ void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
             if (CONF->Init)
                 params.insert("initial_setup", true);
             params.insert("authentication_required", QVariant(!CONF->Init));
+            // For now we show uptime to everyone who connects, maybe limit this to admins only in future
+            QDateTime uptime = CONF->GetConfiguration()->GetStartupDateTime();
+            int days, hours, minutes, seconds;
+            Generic::SecondsToTimeSpan(uptime.secsTo(QDateTime::currentDateTime()), &days, &hours, &minutes, &seconds);
+            QString uptime_str = "Since " + uptime.toString() + ": " + QString::number(days) + " days " + Generic::DoubleDigit(hours) + ":" +
+                                 Generic::DoubleDigit(minutes) + ":" + Generic::DoubleDigit(seconds);
+            params.insert("uptime", uptime_str);
             this->protocol->SendProtocolCommand(GP_CMD_HELLO, params);
         }
             break;
