@@ -49,6 +49,7 @@ PreferencesWin::PreferencesWin(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
     this->ui->lineEdit_LabeledH->setText(CONF->GetLabeledHeader());
     this->ui->lineEdit_StandardH->setText(CONF->GetStandardHeader());
     this->ui->le_Mask->setText(CONF->GetDefaultBanMask());
+    this->ui->lineEdit_Kick->setText(CONF->GetDefaultKickReason());
     this->ui->lineEdit_AutoAway->setText(QString::number(CONF->GetAutoAwayTime()));
     this->ui->lineEdit_Away->setText(CONF->GetAutoAwayMsg());
     this->ui->checkBox_AutoAway->setChecked(CONF->GetAutoAway());
@@ -144,6 +145,7 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
     CONF->SetLineFormat(this->ui->lineEdit_FormatText->text());
     CONF->SetColorBoxShow(this->ui->checkBox_Colors->isChecked());
     CONF->SetDefaultBanMask(this->ui->le_Mask->text());
+    CONF->SetDefaultKickReason(this->ui->lineEdit_Kick->text());
     CONF->SetAutoAwayMsg(this->ui->lineEdit_Away->text());
     CONF->SetAutoAway(this->ui->checkBox_AutoAway->isChecked());
     CONF->SetAutoAwayTime(this->ui->lineEdit_AutoAway->text().toInt());

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>827</width>
-    <height>583</height>
+    <height>640</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -162,6 +162,16 @@
        </item>
        <item>
         <widget class="QLineEdit" name="le_Mask"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_31">
+         <property name="text">
+          <string>Default kick reason:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_Kick"/>
        </item>
        <item>
         <layout class="QFormLayout" name="formLayout_5">
