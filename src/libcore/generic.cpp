@@ -289,7 +289,7 @@ QString Generic::DoubleDigit(int digit)
 {
     if (digit < 0)
         return QString::number(digit);
-    if (digit > 10)
+    if (digit >= 10)
         return QString::number(digit);
     return "0" + QString::number(digit);
 }
