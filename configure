@@ -34,11 +34,10 @@ RED=$(tput setaf 1)
 WARN=$(tput setaf 3)
 GREEN=$(tput setaf 2)
 NORMAL=$(tput sgr0)
-QT5=10
+QT5=1
 USEDEBUG=0
 UNIT_TESTS=''
 CMAKE_ARGS=''
-PYTHON=0
 _BUILD=0
 _Q=0
 QTPATH=''
@@ -60,10 +59,7 @@ do
         echo " --extension: will build all extensions as well"
         echo " --unit-test: will build unit tests"
         echo " --qtpath: path to Qt (for example C:\\Qt\\5.4\\mingw\\"
-        echo " --qt4: execute QT4 checks"
-        echo " --qt5: execute QT5 checks"
         echo " --prefix: specify prefix for installation path"
-        echo " --python: will build grumpy with p engine"
         echo " --folder <folder>: change the default build folder"
         echo " --no-colors: suppress colors"
         echo " --version: show version"
@@ -107,14 +103,6 @@ do
         WARN=""
         GREEN=""
         NORMAL=""
-    fi
-    if [ "$var" = "--python" ];then
-        PYTHON=1
-        continue
-    fi
-    if [ "$var" = "--qt4" ];then
-        QT5=0
-        continue
     fi
     if [ "$var" = "--qt5" ];then
         QT5=1
@@ -270,10 +258,6 @@ if [ "$QT5" -eq 1 ];then
     CMAKE_ARGS="$CMAKE_ARGS -DQT5_BUILD=true"
 else
     CMAKE_ARGS="$CMAKE_ARGS -DQT5_BUILD=false"
-fi
-
-if [ "$PYTHON" -eq 1 ];then
-    CMAKE_ARGS="$CMAKE_ARGS -DPYTHON_BUILD=true"
 fi
 
 #text "Executing update.sh... "
