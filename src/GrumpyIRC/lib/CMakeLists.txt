@@ -19,9 +19,9 @@ else()
   find_package(Qt4 REQUIRED)
 endif()
 
-file (GLOB ui "*.ui")
-file (GLOB headers "*.h")
-file (GLOB src "*.cpp")
+file (GLOB ui "script_engine/*.ui" "*.ui")
+file (GLOB headers "script_engine/*.h" "*.h")
+file (GLOB src "script_engine/*.cpp" "*.cpp")
 file (GLOB resources "*.qrc")
 
 if(QT5_BUILD)

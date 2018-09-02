@@ -11,7 +11,7 @@
 // Copyright (c) Petr Bena 2015 - 2018
 
 #include "hooks.h"
-#include "uiscript.h"
+#include "script_engine/uiscript.h"
 #include "scrollbackframe.h"
 #include "mainwindow.h"
 #include <libcore/core.h>

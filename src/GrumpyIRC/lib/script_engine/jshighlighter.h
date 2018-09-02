@@ -13,7 +13,7 @@
 #ifndef JSHIGHLIGHTER_HPP
 #define JSHIGHLIGHTER_HPP
 
-#include "grumpy_global.h"
+#include "../grumpy_global.h"
 #include <QRegularExpression>
 #include <QSyntaxHighlighter>
 

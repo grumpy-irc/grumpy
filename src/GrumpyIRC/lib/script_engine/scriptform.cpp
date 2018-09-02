@@ -10,15 +10,15 @@
 
 // Copyright (c) Petr Bena 2018
 
-#include "messagebox.h"
-#include "grumpyconf.h"
+#include "../messagebox.h"
+#include "../grumpyconf.h"
 #include "scriptform.h"
 #include "uiscript.h"
 #include "ui_scriptform.h"
 #include "jshighlighter.h"
 #include <libcore/configuration.h>
 #include <libcore/core.h>
-#include <libcore/scriptextension.h>
+#include <libcore/scripting/scriptextension.h>
 #include <libcore/resources.h>
 #include <QFontDatabase>
 #include <QHash>

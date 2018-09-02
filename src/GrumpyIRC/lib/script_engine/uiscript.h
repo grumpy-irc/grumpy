@@ -13,8 +13,14 @@
 #ifndef UISCRIPT_H
 #define UISCRIPT_H
 
-#include "grumpy_global.h"
-#include <libcore/scriptextension.h>
+#include "../grumpy_global.h"
+#include <libcore/scripting/scriptextension.h>
+
+#define GRUMPY_SCRIPT_HOOK_UI_SCROLLBACK_CREATED    100000
+#define GRUMPY_SCRIPT_HOOK_UI_MAIN_LOAD             100001
+#define GRUMPY_SCRIPT_HOOK_UI_EXIT                  100002
+#define GRUMPY_SCRIPT_HOOK_UI_HISTORY               100003
+#define GRUMPY_SCRIPT_HOOK_UI_WINDOW_SWITCH         100004
 
 namespace GrumpyIRC
 {
@@ -32,8 +38,11 @@ namespace GrumpyIRC
             void Hook_WindowSwitch(Scrollback *window);
             void Hook_OnMainWindowStart();
             void Hook_OnScrollbackFrameCreated(Scrollback *window);
+            int GetHookID(QString hook);
+
         protected:
             void registerFunctions();
+            void registerClasses();
     };
 }
 

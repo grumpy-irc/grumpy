@@ -13,7 +13,7 @@
 #ifndef SCRIPTINGMANAGER_HPP
 #define SCRIPTINGMANAGER_HPP
 
-#include "grumpy_global.h"
+#include "../grumpy_global.h"
 #include <QDialog>
 
 namespace Ui

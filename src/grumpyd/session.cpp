@@ -19,7 +19,7 @@
 #include "../libcore/grumpydsession.h"
 #include "../libcore/eventhandler.h"
 #include "../libcore/generic.h"
-#include "../libcore/scriptextension.h"
+#include "../libcore/scripting/scriptextension.h"
 #include "databasebackend.h"
 #include "grumpyconf.h"
 #include "corewrapper.h"
