@@ -16,7 +16,7 @@
 #include "scrollbacksmanager.h"
 #include "scrollbackframe.h"
 #include "corewrapper.h"
-#include "uiscript.h"
+#include "script_engine/uiscript.h"
 #include <libirc/libircclient/channel.h>
 #include <libirc/libircclient/network.h>
 #include <libirc/libirc/serveraddress.h>
@@ -28,7 +28,7 @@
 #include <libcore/generic.h>
 #include <libcore/grumpydsession.h>
 #include <libcore/ircsession.h>
-#include <libcore/scriptextension.h>
+#include <libcore/scripting/scriptextension.h>
 
 using namespace GrumpyIRC;
 

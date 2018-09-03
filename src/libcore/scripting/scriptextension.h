@@ -13,21 +13,23 @@
 #ifndef SCRIPTEXTENSION_H
 #define SCRIPTEXTENSION_H
 
-#include "extension.h"
-#include "exception.h"
-#include "commandprocessor.h"
-#include <QtScript>
+#include "../extension.h"
+#include <QJSEngine>
 #include <QHash>
+
+#define GRUMPY_SCRIPT_HOOK_SHUTDOWN                     0
+#define GRUMPY_SCRIPT_HOOK_SCROLLBACK_DESTROYED         1
 
 namespace GrumpyIRC
 {
     class ScriptCommand;
+    class GenericJSClass;
     class LIBCORESHARED_EXPORT ScriptExtension : public Extension
     {
             Q_OBJECT
         public:
             static ScriptExtension *GetExtensionByPath(QString path);
-            static ScriptExtension *GetExtensionByEngine(QScriptEngine *e);
+            static ScriptExtension *GetExtensionByEngine(QJSEngine *e);
             static ScriptExtension *GetExtensionByName(QString extension_name);
             static QList<ScriptExtension*> GetExtensions();
 
@@ -42,7 +44,7 @@ namespace GrumpyIRC
             QString GetPath();
             QString GetAuthor();
             bool IsWorking();
-            QScriptValue ExecuteFunction(QString function, QScriptValueList parameters);
+            QJSValue ExecuteFunction(QString function, QJSValueList parameters);
             virtual unsigned int GetContextID();
             virtual QString GetContext();
             bool IsUnsafe();
@@ -55,26 +57,29 @@ namespace GrumpyIRC
             virtual void RegisterScrollback(Scrollback *sc);
             virtual void DestroyScrollback(Scrollback *sc);
             virtual bool HasScrollback(Scrollback *sc);
-
-        private slots:
-            void OnError(QScriptValue e);
+            void SubscribeHook(int hook, QString function_name);
+            void UnsubscribeHook(int hook);
+            bool HookSubscribed(int hook);
+            virtual int GetHookID(QString hook);
 
         protected:
             static QList<QString> loadedPaths;
             static QHash<QString, ScriptExtension*> extensions;
             bool loadSource(QString source, QString *error);
-            bool executeFunctionAsBool(QString function, QScriptValueList parameters);
+            bool executeFunctionAsBool(QString function, QJSValueList parameters);
             bool executeFunctionAsBool(QString function);
             QString executeFunctionAsString(QString function);
-            QString executeFunctionAsString(QString function, QScriptValueList parameters);
-            QScriptValue executeFunction(QString function, QScriptValueList parameters);
-            QScriptValue executeFunction(QString function);
-            virtual void registerFunction(QString name, QScriptEngine::FunctionSignature function_signature, int parameters, QString help = "", bool is_unsafe = false);
+            QString executeFunctionAsString(QString function, QJSValueList parameters);
+            QJSValue executeFunction(QString function, QJSValueList parameters);
+            QJSValue executeFunction(QString function);
+            virtual void registerFunction(QString name, QString help = "", bool is_unsafe = false);
+            virtual void registerClass(QString name, GenericJSClass *c);
+            virtual void registerClasses();
             virtual void registerHook(QString name, int parameters, QString help = "", bool is_unsafe = false);
             //! Makes all functions available to ECMA
             virtual void registerFunctions();
-            QScriptEngine *engine;
-            QScriptValue script_ptr;
+            QJSEngine *engine;
+            QJSValue script_ptr;
             QList<QString> hooksExported;
             QList<QString> functionsExported;
             QHash<QString, QString> functionsHelp;
@@ -87,31 +92,11 @@ namespace GrumpyIRC
             bool isWorking;
             bool isLoaded;
             bool isUnsafe;
+            QList<QString> externalCallbacks;
+            QList<GenericJSClass*> classes;
+            QHash<int, QString> attachedHooks;
             QList<Scrollback*> scriptScbs;
-            QList<ScriptCommand*> scriptCmds;
             friend class ScriptCommand;
-    };
-
-    class LIBCORESHARED_EXPORT ScriptException : public Exception
-    {
-        public:
-            ScriptException(QString Message, QString function_id, ScriptExtension *extension);
-            ~ScriptException();
-    };
-
-    class LIBCORESHARED_EXPORT ScriptCommand : public SystemCommand
-    {
-        public:
-            ScriptCommand(QString name, ScriptExtension *e, QString function);
-            ~ScriptCommand();
-            ScriptExtension *GetScript();
-            QString GetFN();
-            QScriptEngine *GetEngine();
-            int Run(CommandArgs args);
-
-        private:
-            ScriptExtension *script;
-            QString fn;
     };
 }
 

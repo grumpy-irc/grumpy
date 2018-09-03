@@ -11,7 +11,7 @@
 // Copyright (c) Petr Bena 2018
 
 #include "scriptingmanager.h"
-#include "messagebox.h"
+#include "../messagebox.h"
 #include "scriptform.h"
 #include "ui_scriptingmanager.h"
 #include "uiscript.h"
@@ -20,7 +20,7 @@
 #include <QFileDialog>
 #include <QMenu>
 #include <libcore/generic.h>
-#include <libcore/scriptextension.h>
+#include <libcore/scripting/scriptextension.h>
 
 using namespace GrumpyIRC;
 

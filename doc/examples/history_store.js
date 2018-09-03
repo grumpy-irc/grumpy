@@ -20,18 +20,18 @@ var global_history = [];
 function debug(text)
 {
     if (debugging_on)
-        grumpy_scrollback_write(grumpy_system_window_id, "DEBUG: " + text);
+        grumpy_scrollback.write(grumpy_system_window_id, "DEBUG: " + text);
 }
 
 function get_win(id)
 {
     // Here we construct the name of key, because there might be multiple same channels on different networks we prefix each window with network
     var name = "history_";
-    if (grumpy_scrollback_has_network(id))
+    if (grumpy_scrollback.has_network(id))
     {
-        name += grumpy_network_get_network_name(id) + "_";
+        name += grumpy_network.get_network_name(id) + "_";
     }
-    var target = grumpy_scrollback_get_target(id);
+    var target = grumpy_scrollback.get_target(id);
     if (target == "")
         target = "system";
     name += target;
@@ -53,7 +53,7 @@ function save_hist(key)
         temp += list[i] + "\n";
     // Remove the extra newline
     temp = temp.substring(0, temp.length - 1);
-    grumpy_set_cfg(key, temp);
+    grumpy.set_cfg(key, temp);
 }
 
 function ext_on_scrollback_destroyed(scrollback_id)
@@ -72,13 +72,13 @@ function cmd_history_list(window_id, text)
     var name = get_win(window_id);
     if (!(name in global_history))
     {
-        grumpy_error_log("No history found for this window");
+        grumpy.error_log("No history found for this window");
         return 2;
     }
     list = global_history[name].split("\n");
 
     for (var i = 0, len = list.length; i < len; i++)
-        grumpy_scrollback_write(window_id, list[i]);
+        grumpy.scrollback_write(window_id, list[i]);
 
     return 0;
 }
@@ -89,12 +89,12 @@ function cmd_history_search(window_id, text)
     var search_string = text.toLowerCase();
     if (search_string.length == 0)
     {
-        grumpy_error_log("This command requires a parameter to search");
+        grumpy.error_log("This command requires a parameter to search");
         return 1;
     }
     if (!(name in global_history))
     {
-        grumpy_error_log("No history found for this window");
+        grumpy.error_log("No history found for this window");
         return 2;
     }
 
@@ -108,12 +108,12 @@ function cmd_history_search(window_id, text)
         {
             // We got a result, let's print it
             something_found = true;
-            grumpy_scrollback_write(window_id, list[i]);
+            grumpy_scrollback.write(window_id, list[i]);
         }
     }
 
     if (!something_found)
-        grumpy_scrollback_write(window_id, "Nothing found");
+        grumpy_scrollback.write(window_id, "Nothing found");
 
     return 0;
 }
@@ -121,16 +121,20 @@ function cmd_history_search(window_id, text)
 // This function try to register a command in grumpy and print error if it fails
 function safe_cmd_reg(command_name, callback)
 {
-    if (!grumpy_register_cmd(command_name, callback))
-        grumpy_error_log("Unable to register command: " + command_name);
+    if (!grumpy.register_cmd(command_name, callback))
+        grumpy.error_log("Unable to register command: " + command_name);
 }
 
 function ext_init()
 {
     safe_cmd_reg("history.list", "cmd_history_list");
     safe_cmd_reg("history.search", "cmd_history_search");
-    history_max = grumpy_get_cfg("history_max", history_max);
-    only_command = grumpy_get_cfg("only_command", only_command);
+    history_max = grumpy.get_cfg("history_max", history_max);
+    only_command = grumpy.get_cfg("only_command", only_command);
+    grumpy.register_hook("ui_exit", "ext_ui_on_exit");
+    grumpy.register_hook("ui_history", "ext_ui_on_history");
+    grumpy.register_hook("ui_main", "ext_ui_on_main_window_start");
+    grumpy.register_hook("ui_window_switch", "ext_ui_on_window_switch");
     return true;
 }
 
@@ -139,24 +143,14 @@ function ext_is_working()
     return true;
 }
 
-function ext_get_name()
+function ext_get_info()
 {
-    return "history_store";
-}
-
-function ext_get_desc()
-{
-    return "Preserves the history of windows by their name";
-}
-
-function ext_get_version()
-{
-    return "1.0.0";
-}
-
-function ext_get_author()
-{
-    return "Petr Bena";
+    var info = {};
+    info["name"] = "history_store";
+    info["description"] = "Preserves the history of windows by their name";
+    info["version"] = "1.0.0";
+    info["author"] = "Petr Bena";
+    return info;
 }
 
 function ext_ui_on_exit()
@@ -185,13 +179,13 @@ function refresh_hist(window_id)
     if (window_name in global_history)
         return;
     // try to get a history for that window
-    hist = grumpy_get_cfg(window_name, "");
+    hist = grumpy.get_cfg(window_name, "");
     if (hist == "")
         return;
     // store to memory
     debug("loading history for " + window_name);
     ext_ui_on_history(window_id, hist);  
-    grumpy_ui_load_history(window_id, hist);
+    grumpy_ui.load_history(window_id, hist);
 }
 
 function ext_ui_on_window_switch(window_id)
@@ -205,21 +199,3 @@ function ext_ui_on_main_window_start()
     refresh_hist(1);
 }
 
-// function reference
-//
-// bool grumpy_register_cmd(name, fc)               // register new command
-// bool grumpy_debug_log(text, verbosity)           // writes to debug log
-// bool grumpy_error_log(text)                      // writes to error log
-// bool grumpy_log(text)                            // writes to current scrollback
-// bool grumpy_network_send_raw(window_id, text)    // sends RAW data to IRC
-// bool grumpy_network_send_message(window_id, target, text) // sends IRC message to channel or user
-// bool grumpy_network_get_network_name(window_id)  // Network name
-// bool grumpy_network_get_server_host(window_id)   // 
-// bool grumpy_network_get_nick(window_id)          // Your nick
-// bool grumpy_network_get_ident(window_id)         // Your ident
-// bool grumpy_network_get_host(window_id)          // Your host
-// bool grumpy_scrollback_has_network_session(window_id) // true if scrollback belongs to some network, if not you can't use any functions that are related to IRC or grumpyd on it
-// bool grumpy_scrollback_has_network(window_id)    // true if scrollback belongs to some IRC network, if not you can't use any functions that are related to IRC on it
-// bool grumpy_scrollback_get_type(window_id)       // returns channel / system / user
-// bool grumpy_scrollback_get_target(window_id)     // returns target name
-// bool grumpy_scrollback_write(window_id, text)    // writes to scrollback

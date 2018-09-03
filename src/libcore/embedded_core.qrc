@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/grumpy_core">
-        <file>ecma/libirc.js</file>
-        <file>ecma/example.js</file>
-        <file>ecma/grumpy.js</file>
+        <file>scripting/ecma/libirc.js</file>
+        <file>scripting/ecma/example.js</file>
+        <file>scripting/ecma/grumpy.js</file>
     </qresource>
 </RCC>

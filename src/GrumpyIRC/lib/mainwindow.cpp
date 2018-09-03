@@ -26,7 +26,7 @@
 #include "preferenceswin.h"
 #include "hooks.h"
 #include "scrollbackframe.h"
-#include "scriptingmanager.h"
+#include "script_engine/scriptingmanager.h"
 #include "scrollbacksmanager.h"
 #include "skin.h"
 #include <QProgressBar>
