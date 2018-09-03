@@ -30,7 +30,7 @@ GrumpyUIJS::GrumpyUIJS(ScriptExtension *s) : GenericJSClass(s)
 QHash<QString, QString> GrumpyUIJS::GetFunctions()
 {
     QHash<QString, QString> fh;
-    fh.insert("load_history", "(scrollback_id)");
+    fh.insert("load_history", "(scrollback_id, text)");
     fh.insert("clear_history", "(scrollback_id)");
     fh.insert("message_box", "(id, title, text)");
     return fh;

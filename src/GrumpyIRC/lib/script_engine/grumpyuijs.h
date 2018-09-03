@@ -20,6 +20,7 @@ namespace GrumpyIRC
 {
     class GrumpyUIJS : public GenericJSClass
     {
+            Q_OBJECT
         public:
             GrumpyUIJS(ScriptExtension *s);
             QHash<QString, QString> GetFunctions();

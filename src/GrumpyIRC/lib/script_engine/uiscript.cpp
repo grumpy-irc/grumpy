@@ -96,6 +96,11 @@ int UiScript::GetHookID(QString hook)
 
 void UiScript::registerFunctions()
 {
+    this->registerHook("ui_main", 0, "(): Called when main window is loaded");
+    this->registerHook("ui_scrollback_frame_created", 0, "(scrollback): When scrollback is created");
+    this->registerHook("ui_exit", 0, "(): Called on exit");
+    this->registerHook("ui_history", 0, "(scrollback, text): when a command is being stored to history");
+    this->registerHook("ui_window_switch", 1, "(scrollback): Called when window is being switched to");
     ScriptExtension::registerFunctions();
 }
 
