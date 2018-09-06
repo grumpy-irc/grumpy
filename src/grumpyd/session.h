@@ -66,6 +66,7 @@ namespace GrumpyIRC
         private slots:
             void OnDisconnected();
             void OnCommand(gp_command_t text, QHash<QString, QVariant> parameters);
+            void OnGPError(QString text, int code);
 
         signals:
             void OnError(int error, QString text);

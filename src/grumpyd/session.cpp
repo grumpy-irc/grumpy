@@ -87,6 +87,7 @@ Session::Session(qintptr socket_ptr, bool ssl)
     this->SessionState = State_Login;
     connect(this->protocol, SIGNAL(Event_IncomingCommand(gp_command_t,QHash<QString,QVariant>)), this, SLOT(OnCommand(gp_command_t,QHash<QString,QVariant>)));
     connect(this->protocol, SIGNAL(Event_Disconnected()), this, SLOT(OnDisconnected()));
+    connect(this->protocol, SIGNAL(Event_ConnectionFailed(QString,int)), this, SLOT(OnGPError(QString,int)));
     this->protocol->ResolveSignals();
     GRUMPY_LOG("New session (" + QString::number(this->SID) + ") from " + this->peer);
     return;
@@ -102,7 +103,7 @@ Session::~Session()
     SessionList.removeOne(this);
     sessions_lock->unlock();
     // deletion of socket is performed by destructor of protocol
-    GRUMPY_LOG("Session for " + this->peer + " destroyed");
+    GRUMPY_LOG("Session " + QString::number(this->SID) + " for " + this->peer + " destroyed");
     delete this->protocol;
     if (this->loggedUser)
     {
@@ -209,12 +210,14 @@ void Session::Disconnect()
     this->SessionState = State_Killing;
     this->IsRunning = false;
     this->protocol->Disconnect();
+    this->socket = nullptr;
 }
 
 void Session::OnDisconnected()
 {
     this->SessionState = State_Exiting;
     this->IsRunning = false;
+    this->socket = nullptr;
 }
 
 void Session::processNetworks()
@@ -1011,6 +1014,14 @@ void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
         }
             break;
     }
+}
+
+void Session::OnGPError(QString text, int code)
+{
+    GRUMPY_LOG("SID " + QString::number(this->SID) + " connection terminated. Failure code " + QString::number(code) + ": " + text);
+    this->SessionState = State_Offline;
+    this->IsRunning = false;
+    this->socket = nullptr;
 }
 
 void Session::processLogin(QHash<QString, QVariant> parameters)
