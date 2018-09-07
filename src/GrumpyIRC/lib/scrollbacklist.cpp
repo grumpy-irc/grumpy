@@ -404,6 +404,14 @@ void ScrollbackList::closeWindow()
     ScrollbackList_Node *node = (ScrollbackList_Node*)this->model->itemFromIndex(index);
     if (!node)
         return;
+    if (node->GetScrollback()->IsGrumpy() && node->GetScrollback()->GetScrollback() != node->GetScrollback()->GetSession()->GetSystemWindow() && node->GetScrollback()->IsSystem)
+    {
+        // User wants to close a network on remote Grumpyd, which is dangerous, slow and irreversible
+        if (!MessageBox::Question("grumpyd-network-close", "Close window", "Closing a network window on remote bouncer, will delete all history and all channels"\
+                                  " permanently from the database. This is not reversible. For large networks, this may take long time."\
+                                  " Are you sure you want to do that?") != MessageBoxResponse_Yes)
+            return;
+    }
     node->GetScrollback()->RequestClose();
 }
 
