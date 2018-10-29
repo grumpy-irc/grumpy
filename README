@@ -37,7 +37,7 @@ How to build
 You need to have CMake in order to build grumpy in most easy way. If you have it
 just use it for src folder.
 
-Grumpy requires Qt4 or Qt5. It doesn't depend on any other libraries, except for
+Grumpy requires Qt5. It doesn't depend on any other libraries, except for
 its own libraries and sqlite, which are all embedded within the project tree.
 
 Note: sqlite source codes are gzipped. If you enable support for sqlite you will

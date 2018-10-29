@@ -64,7 +64,7 @@ do
         echo " --no-colors: suppress colors"
         echo " --version: show version"
         echo
-        echo "Copyright (c) 2013 - 2015 Petr Bena. This script is licensed under the BSD license."
+        echo "Copyright (c) 2013 - 2018 Petr Bena. This script is licensed under the BSD license."
         exit 0
     fi
     if [ "$_BUILD" = "1" ];then
