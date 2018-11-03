@@ -1,3 +1,6 @@
+# So that MacOS builds are working on older versions as well
+set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
+
 project(GrumpyIRC)
 cmake_minimum_required (VERSION 2.8.0)
 if(WIN32)
