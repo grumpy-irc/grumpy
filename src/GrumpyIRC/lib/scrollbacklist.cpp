@@ -54,10 +54,10 @@ ScrollbackList::ScrollbackList(QWidget *parent) : QDockWidget(parent), ui(new Ui
     connect (this->timer, SIGNAL(timeout()), this, SLOT(OnUpdate()));
     this->ui->setupUi(this);
     this->ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
-    this->model = new QStandardItemModel(0, 2, this);
+    this->model = new QStandardItemModel(0, 1, this);
     this->root = this->model->invisibleRootItem();
     this->ui->treeView->setModel(this->model);
-    this->ui->treeView->setColumnHidden(1, true);
+    //this->ui->treeView->setColumnHidden(1, true);
     this->ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     this->ui->treeView->setHeaderHidden(true);
     this->ui->treeView->setPalette(Skin::GetCurrent()->Palette());
