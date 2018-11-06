@@ -10,7 +10,6 @@
 
 // Copyright (c) Petr Bena 2015 - 2018
 
-
 #include "mainwindow.h"
 #include "scrollbacklist.h"
 #include "grumpyeventhandler.h"
