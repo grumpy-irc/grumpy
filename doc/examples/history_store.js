@@ -78,7 +78,7 @@ function cmd_history_list(window_id, text)
     list = global_history[name].split("\n");
 
     for (var i = 0, len = list.length; i < len; i++)
-        grumpy.scrollback_write(window_id, list[i]);
+        grumpy_scrollback.write(window_id, list[i]);
 
     return 0;
 }
