@@ -23,6 +23,7 @@
 #include "sleeper.h"
 #include "listener.h"
 #include "databaseqtsql.h"
+#include "databasebin.h"
 #include "../libcore/core.h"
 #include "../libcore/configuration.h"
 #include "../libcore/eventhandler.h"
@@ -30,7 +31,7 @@
 
 using namespace GrumpyIRC;
 
-Grumpyd *Grumpyd::grumpyd = NULL;
+Grumpyd *Grumpyd::grumpyd = nullptr;
 
 QString Grumpyd::GetCFPath()
 {
@@ -105,6 +106,8 @@ static DatabaseBackend *InstantiateStorage(QString type)
     else if (type == "DatabaseLite")
         return new DatabaseLite();
 #endif
+    else if (type == "DatabaseBin")
+        return new DatabaseBin();
     else
         throw new Exception("Unknown database: " + type, BOOST_CURRENT_FUNCTION);
 }

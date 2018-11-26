@@ -50,7 +50,7 @@ namespace GrumpyIRC
             static void Exit();
             static MainWindow *Main;
 
-            explicit MainWindow(QWidget *parent = 0);
+            explicit MainWindow(QWidget *parent = nullptr);
             MainWindow(bool fork, MainWindow *parent);
             ~MainWindow();
             ScrollbacksManager *GetScrollbackManager();

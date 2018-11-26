@@ -49,11 +49,11 @@ namespace GrumpyIRC
             Q_OBJECT
 
         public:
-            static void Display(QString id, QString title, QString message, QWidget *parent = 0);
-            static void Error(QString title, QString message, QWidget *parent = 0);
-            static MessageBoxResponse Question(QString id, QString title, QString message, QWidget *parent = 0);
+            static void Display(QString id, QString title, QString message, QWidget *parent = nullptr);
+            static void Error(QString title, QString message, QWidget *parent = nullptr);
+            static MessageBoxResponse Question(QString id, QString title, QString message, QWidget *parent = nullptr);
 
-            explicit MessageBox(QString id, QString title, QString message, QWidget *parent = 0);
+            explicit MessageBox(QString id, QString title, QString message, QWidget *parent = nullptr);
             MessageBoxResponse Exec(MessageBoxType type);
             ~MessageBox();
 

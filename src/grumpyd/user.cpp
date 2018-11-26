@@ -43,13 +43,13 @@ User *User::Login(QString user, QString pw)
         if (ux->username.toLower() == user)
         {
             if (ux->password != pw)
-                return NULL;
+                return nullptr;
             else
                 return ux;
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 User *User::GetUser(user_id_t uid)
@@ -60,7 +60,7 @@ User *User::GetUser(user_id_t uid)
             return user;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 User *User::CreateUser(QString name, QString pass, Role *role)
@@ -110,7 +110,7 @@ User::User(QString Name, QString Password, user_id_t User_ID, bool is_locked)
     this->username = Name;
     this->locked = is_locked;
     this->DefaultNick = "Grumpyd user";
-    this->role = NULL;
+    this->role = nullptr;
     this->id = User_ID;
     this->conf = new UserConf(User_ID);
     this->conf->Load();
@@ -197,7 +197,7 @@ void User::DisconnectAllGrumpySessions()
 void User::DisconnectAllIRCSessions()
 {
     foreach (SyncableIRCSession *session, this->sessions)
-        session->RequestDisconnect(NULL, this->GetConfiguration()->GetValueAsString("quit_message"), false);
+        session->RequestDisconnect(nullptr, this->GetConfiguration()->GetValueAsString("quit_message"), false);
 }
 
 void User::SetRole(Role *rx)
@@ -434,13 +434,13 @@ SyncableIRCSession *User::GetSIRCSession(unsigned int sid)
             return xx;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 Session *User::GetAnyGPSession()
 {
     if (!this->sessions_gp.count())
-        return NULL;
+        return nullptr;
 
     // Return first session
     return this->sessions_gp.at(0);
@@ -462,6 +462,6 @@ VirtualScrollback *User::GetScrollback(scrollback_id_t id)
         return this->scrollbacks[id];
 
     // There is no such a scrollback with this id
-    return NULL;
+    return nullptr;
 }
 

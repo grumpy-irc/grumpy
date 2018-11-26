@@ -51,13 +51,17 @@ GrumpyObject::~GrumpyObject()
 
 void GrumpyObject::grumpyObjectIncrementCount()
 {
+#ifdef GRUMPY_PROFILER
     if (!grumpyObjectTotalCount.contains(this->grumpyObjectName))
         grumpyObjectTotalCount.insert(this->grumpyObjectName, 1);
     else
         grumpyObjectTotalCount[this->grumpyObjectName]++;
+#endif
 }
 
 void GrumpyObject::setGrumpyObjectName(QString name)
 {
+#ifdef GRUMPY_PROFILER
     this->grumpyObjectName = name;
+#endif
 }

@@ -32,7 +32,7 @@ namespace GrumpyIRC
             Q_OBJECT
 
         public:
-            explicit PacketSnifferWin(QWidget *parent = 0);
+            explicit PacketSnifferWin(QWidget *parent = nullptr);
             ~PacketSnifferWin();
             void Load(IRCSession *session);
             void Load(GrumpydSession *session, IRCSession *network);

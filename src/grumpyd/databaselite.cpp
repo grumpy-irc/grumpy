@@ -124,7 +124,7 @@ DatabaseLite::DatabaseLite()
 DatabaseLite::~DatabaseLite()
 {
     delete this->database;
-    this->database = NULL;
+    this->database = nullptr;
 }
 
 void DatabaseLite::LoadRoles()
