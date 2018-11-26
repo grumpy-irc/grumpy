@@ -40,6 +40,7 @@ UNIT_TESTS=''
 CMAKE_ARGS=''
 _BUILD=0
 _Q=0
+PROFILER=''
 QTPATH=''
 BUILD=release
 HAS_PREFIX=0
@@ -59,6 +60,7 @@ do
         echo " --extension: will build all extensions as well"
         echo " --unit-test: will build unit tests"
         echo " --qtpath: path to Qt (for example C:\\Qt\\5.4\\mingw\\"
+        echo " --profiler: enable profiler"
         echo " --prefix: specify prefix for installation path"
         echo " --folder <folder>: change the default build folder"
         echo " --no-colors: suppress colors"
@@ -122,6 +124,10 @@ do
     fi
     if [ "$var" = "--disable-dependency-tracking" ];then
         SKIPCHECKS=1
+        continue
+    fi
+    if [ "$var" = "--profiler" ];then
+        PROFILER=' -DGRUMPY_PROFILER=true'
         continue
     fi
 done
@@ -289,6 +295,7 @@ if [ -d "$BUILD" ];then
 else
   mkdir "$BUILD" || exit 1
 fi
+CMAKE_ARGS="$CMAKE_ARGS"$PROFILER
 cd "$BUILD" || exit 1
 echo "CMake args: $CMAKE_ARGS $UNIT_TESTS -Wno-dev"
 cmake ../src $CMAKE_ARGS $UNIT_TESTS -Wno-dev || exit 1

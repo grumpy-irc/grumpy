@@ -14,6 +14,7 @@
 #define SCROLLBACKLIST_NODE_H
 
 #include "grumpy_global.h"
+#include <libcore/grumpyobject.h>
 #include <QStandardItem>
 #include <QStandardItemModel>
 #include <QBrush>
@@ -23,7 +24,7 @@
 namespace GrumpyIRC
 {
     class ScrollbackFrame;
-    class LIBGRUMPYSHARED_EXPORT ScrollbackList_Node : public QStandardItem
+    class LIBGRUMPYSHARED_EXPORT ScrollbackList_Node : public QStandardItem, public GrumpyObject
     {
         public:
             static QList<ScrollbackList_Node*> NodesList;

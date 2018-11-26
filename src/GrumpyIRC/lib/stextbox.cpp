@@ -14,7 +14,7 @@
 
 using namespace GrumpyIRC;
 
-STextBox::STextBox(QWidget *parent) : QPlainTextEdit(parent)
+STextBox::STextBox(QWidget *parent) : QPlainTextEdit(parent), GrumpyObject("STextBox")
 {
     this->setReadOnly(true);
     this->setUndoRedoEnabled(false);

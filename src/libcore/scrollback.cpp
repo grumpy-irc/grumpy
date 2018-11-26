@@ -37,6 +37,10 @@ Scrollback *Scrollback::GetScrollbackByID(scrollback_id_t id)
 
 Scrollback::Scrollback(ScrollbackType Type, Scrollback *parent, bool scrollback_hidden)
 {
+#ifdef GRUMPY_PROFILER
+    this->setGrumpyObjectName("Scrollback");
+    this->grumpyObjectIncrementCount();
+#endif
     this->_maxItems = 800000;
     this->_totalItems = 0;
     this->scrollbackState = ScrollbackState_Normal;
@@ -533,6 +537,10 @@ void Scrollback::InsertText(QString text, ScrollbackItemType type)
 
 ScrollbackItem::ScrollbackItem(QHash<QString, QVariant> hash)
 {
+#ifdef GRUMPY_PROFILER
+    this->setGrumpyObjectName("ScrollbackItem");
+    this->grumpyObjectIncrementCount();
+#endif
 #ifdef GRUMPY_EXTREME
     ScrollbackItem::TotalIC++;
 #endif
@@ -543,6 +551,10 @@ ScrollbackItem::ScrollbackItem(QHash<QString, QVariant> hash)
 
 ScrollbackItem::ScrollbackItem(QString text, scrollback_id_t id, bool self)
 {
+#ifdef GRUMPY_PROFILER
+    this->setGrumpyObjectName("ScrollbackItem");
+    this->grumpyObjectIncrementCount();
+#endif
 #ifdef GRUMPY_EXTREME
     ScrollbackItem::TotalIC++;
 #endif
@@ -555,6 +567,10 @@ ScrollbackItem::ScrollbackItem(QString text, scrollback_id_t id, bool self)
 
 ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User *user, scrollback_id_t id, bool self)
 {
+#ifdef GRUMPY_PROFILER
+    this->setGrumpyObjectName("ScrollbackItem");
+    this->grumpyObjectIncrementCount();
+#endif
 #ifdef GRUMPY_EXTREME
     ScrollbackItem::TotalIC++;
 #endif
@@ -571,6 +587,10 @@ ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclie
 
 ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User user, scrollback_id_t id, bool self)
 {
+#ifdef GRUMPY_PROFILER
+    this->setGrumpyObjectName("ScrollbackItem");
+    this->grumpyObjectIncrementCount();
+#endif
 #ifdef GRUMPY_EXTREME
     ScrollbackItem::TotalIC++;
 #endif
@@ -584,6 +604,10 @@ ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclie
 
 ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User user, QDateTime date, scrollback_id_t id, bool self)
 {
+#ifdef GRUMPY_PROFILER
+    this->setGrumpyObjectName("ScrollbackItem");
+    this->grumpyObjectIncrementCount();
+#endif
 #ifdef GRUMPY_EXTREME
     ScrollbackItem::TotalIC++;
 #endif
@@ -593,6 +617,40 @@ ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclie
     this->_text = text;
     this->_datetime = date;
     this->_user = user;
+}
+
+ScrollbackItem::ScrollbackItem(ScrollbackItem *i)
+{
+#ifdef GRUMPY_PROFILER
+    this->setGrumpyObjectName("ScrollbackItem");
+    this->grumpyObjectIncrementCount();
+#endif
+#ifdef GRUMPY_EXTREME
+    ScrollbackItem::TotalIC++;
+#endif
+    this->_datetime = i->_datetime;
+    this->_id = i->_id;
+    this->_self = i->_self;
+    this->_text = i->_text;
+    this->_type = i->_type;
+    this->_user = i->_user;
+}
+
+ScrollbackItem::ScrollbackItem(const ScrollbackItem &i)
+{
+#ifdef GRUMPY_PROFILER
+    this->setGrumpyObjectName("ScrollbackItem");
+    this->grumpyObjectIncrementCount();
+#endif
+#ifdef GRUMPY_EXTREME
+    ScrollbackItem::TotalIC++;
+#endif
+    this->_datetime = i._datetime;
+    this->_id = i._id;
+    this->_self = i._self;
+    this->_text = i._text;
+    this->_type = i._type;
+    this->_user = i._user;
 }
 
 void ScrollbackItem::SetID(scrollback_id_t id)

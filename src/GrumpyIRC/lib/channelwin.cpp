@@ -26,7 +26,7 @@
 
 using namespace GrumpyIRC;
 
-ChannelWin::ChannelWin(NetworkSession *session, libircclient::Network *network, libircclient::Channel *channel, ScrollbackFrame *parent) : QDialog(parent), ui(new Ui::ChannelWin)
+ChannelWin::ChannelWin(NetworkSession *session, libircclient::Network *network, libircclient::Channel *channel, ScrollbackFrame *parent) : QDialog(parent), ui(new Ui::ChannelWin), GrumpyObject("ChannelWin")
 {
     this->chanmode = new libircclient::Mode();
     this->ui->setupUi(this);

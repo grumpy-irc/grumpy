@@ -14,6 +14,7 @@
 #define USERFRAMEITEM_H
 
 #include "grumpy_global.h"
+#include <libcore/grumpyobject.h>
 #include <QListWidgetItem>
 
 namespace libircclient
@@ -23,7 +24,7 @@ namespace libircclient
 
 namespace GrumpyIRC
 {
-    class LIBGRUMPYSHARED_EXPORT UserFrameItem : public QListWidgetItem
+    class LIBGRUMPYSHARED_EXPORT UserFrameItem : public QListWidgetItem, public GrumpyObject
     {
         public:
             UserFrameItem(QString text, libircclient::Network *nt);

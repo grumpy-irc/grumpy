@@ -14,6 +14,7 @@
 #define KEYFILTER_H
 
 #include "grumpy_global.h"
+#include <libcore/grumpyobject.h>
 #include <QObject>
 #include <QString>
 

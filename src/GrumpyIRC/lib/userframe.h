@@ -18,6 +18,7 @@
 #include <QHash>
 #include <QListWidgetItem>
 #include "userframeitem.h"
+#include <libcore/grumpyobject.h>
 #include <libirc/libircclient/user.h>
 
 namespace libircclient { class Network; }
@@ -31,7 +32,7 @@ namespace GrumpyIRC
 {
     class ScrollbackFrame;
 
-    class LIBGRUMPYSHARED_EXPORT UserFrame : public QFrame
+    class LIBGRUMPYSHARED_EXPORT UserFrame : public QFrame, public GrumpyObject
     {
             Q_OBJECT
         public:

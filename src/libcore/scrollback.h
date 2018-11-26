@@ -15,6 +15,7 @@
 
 #include "libcore_global.h"
 #include "definitions.h"
+#include "grumpyobject.h"
 #include "../libirc/libircclient/user.h"
 #include <QString>
 #include <QObject>
@@ -66,7 +67,7 @@ namespace GrumpyIRC
     /*!
      * \brief The ScrollbackItem class is a one item in scrollback buffer
      */
-    class LIBCORESHARED_EXPORT ScrollbackItem : public libirc::SerializableItem
+    class LIBCORESHARED_EXPORT ScrollbackItem : public libirc::SerializableItem, public GrumpyObject
     {
         public:
 #ifdef GRUMPY_EXTREME
@@ -77,6 +78,8 @@ namespace GrumpyIRC
             ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User *user = NULL, scrollback_id_t id=0, bool self = false);
             ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User user, scrollback_id_t id=0, bool self = false);
             ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User user, QDateTime date, scrollback_id_t id=0, bool self = false);
+            ScrollbackItem(ScrollbackItem *i);
+            ScrollbackItem(const ScrollbackItem &i);
             virtual ~ScrollbackItem();
             virtual void SetID(scrollback_id_t id);
             virtual QString GetText() const;
@@ -119,7 +122,7 @@ namespace GrumpyIRC
 
               Scrollback can be a system window, channel window or any other text buffer used in program
      */
-    class LIBCORESHARED_EXPORT Scrollback : public QObject, public libirc::SerializableItem
+    class LIBCORESHARED_EXPORT Scrollback : public QObject, public libirc::SerializableItem, public GrumpyObject
     {
             Q_OBJECT
         public:

@@ -14,6 +14,7 @@
 #define CHANNELWIN_H
 
 #include "grumpy_global.h"
+#include <libcore/grumpyobject.h>
 #include <libcore/definitions.h>
 
 #include <QList>
@@ -38,7 +39,7 @@ namespace GrumpyIRC
     class ScrollbackFrame;
     class NetworkSession;
 
-    class LIBGRUMPYSHARED_EXPORT ChannelWin : public QDialog
+    class LIBGRUMPYSHARED_EXPORT ChannelWin : public QDialog, public GrumpyObject
     {
             Q_OBJECT
 

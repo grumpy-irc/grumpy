@@ -16,7 +16,7 @@
 
 using namespace GrumpyIRC;
 
-UserFrameItem::UserFrameItem(QString text, libircclient::Network *nt) : QListWidgetItem(text)
+UserFrameItem::UserFrameItem(QString text, libircclient::Network *nt) : QListWidgetItem(text), GrumpyObject("UserFrameItem")
 {
     if (nt == NULL)
         throw new NullPointerException("local libircclient::Network *nt", BOOST_CURRENT_FUNCTION);

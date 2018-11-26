@@ -24,6 +24,7 @@
 #include "stextbox.h"
 #include <libirc2htmlcode/parser.h>
 #include <libcore/scrollback.h>
+#include <libcore/grumpyobject.h>
 
 #define GRUMPY_H_UNKNOWN 0
 #define GRUMPY_H_YES     1
@@ -55,7 +56,7 @@ namespace GrumpyIRC
     /*!
      * \brief The ScrollbackFrame_WorkerThread class processes CPU intensive items on background in order to speed up grumpy
      */
-    class ScrollbackFrame_WorkerThread : public QThread
+    class ScrollbackFrame_WorkerThread : public QThread, public GrumpyObject
     {
             Q_OBJECT
         public:
@@ -67,7 +68,7 @@ namespace GrumpyIRC
             void run();
     };
 
-    class LIBGRUMPYSHARED_EXPORT ScrollbackFrame : public QFrame
+    class LIBGRUMPYSHARED_EXPORT ScrollbackFrame : public QFrame, public GrumpyObject
     {
             Q_OBJECT
 

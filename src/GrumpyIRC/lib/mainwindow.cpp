@@ -118,6 +118,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.script.list",         (SC_Callback)SystemCmds::ScriptList));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.script.reload",       (SC_Callback)SystemCmds::ScriptReload));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.script.reload.all",   (SC_Callback)SystemCmds::ScriptReloadAll));
+#ifdef GRUMPY_PROFILER
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.profiler",            (SC_Callback)SystemCmds::Profiler));
+#endif
 
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("server",                     (SC_Callback)SystemCmds::Server));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("nick",                       (SC_Callback)SystemCmds::Nick));

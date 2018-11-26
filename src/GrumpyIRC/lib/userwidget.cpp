@@ -17,7 +17,7 @@ using namespace GrumpyIRC;
 
 QFrame *currentWidget = NULL;
 
-UserWidget::UserWidget(QWidget *parent) : QDockWidget(parent), ui(new Ui::UserWidget)
+UserWidget::UserWidget(QWidget *parent) : QDockWidget(parent), ui(new Ui::UserWidget), GrumpyObject("UserWidget")
 {
     this->ui->setupUi(this);
 }

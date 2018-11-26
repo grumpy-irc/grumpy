@@ -14,11 +14,12 @@
 #define STEXTBOX_H
 
 #include "grumpy_global.h"
+#include <libcore/grumpyobject.h>
 #include <QPlainTextEdit>
 
 namespace GrumpyIRC
 {
-    class LIBGRUMPYSHARED_EXPORT STextBox : public QPlainTextEdit
+    class LIBGRUMPYSHARED_EXPORT STextBox : public QPlainTextEdit, public GrumpyObject
     {
             Q_OBJECT
         public:

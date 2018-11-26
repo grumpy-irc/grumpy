@@ -26,6 +26,7 @@
 #include <libcore/eventhandler.h>
 #include <libcore/exception.h>
 #include <libcore/generic.h>
+#include <libcore/grumpyobject.h>
 #include <libcore/grumpydsession.h>
 #include <libcore/ircsession.h>
 #include <libcore/scripting/scriptextension.h>
@@ -715,5 +716,20 @@ int SystemCmds::ScriptReloadAll(SystemCommand *command, CommandArgs command_args
     foreach (QString name, el)
         ReloadExtension(name);
 
+    return 0;
+}
+
+int SystemCmds::Profiler(SystemCommand *command, CommandArgs command_args)
+{
+    (void)command_args;
+    (void)command;
+    Scrollback *sx = MainWindow::Main->GetCurrentScrollbackFrame()->GetScrollback();
+    QHash<QString, quint64> memory_cx = GrumpyObject::GetClassInstanceCounts();
+    sx->InsertText("Name                                    | Count");
+    sx->InsertText("----------------------------------------+----------------------");
+    foreach (QString cx, memory_cx.keys())
+    {
+        sx->InsertText(Generic::ExpandedString(cx, 40, 40) + "| " + Generic::ExpandedString(QString::number(memory_cx[cx]), 22, 22));
+    }
     return 0;
 }

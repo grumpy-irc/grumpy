@@ -50,6 +50,7 @@ namespace GrumpyIRC
         int ScriptReloadAll(SystemCommand *command, CommandArgs command_args);
         int RemoveScript(SystemCommand *command, CommandArgs command_args);
         int ScriptList(SystemCommand *command, CommandArgs command_args);
+        int Profiler(SystemCommand *command, CommandArgs command_args);
     }
 }
 

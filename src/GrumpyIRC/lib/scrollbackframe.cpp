@@ -78,7 +78,7 @@ void ScrollbackFrame::InitializeThread()
     WorkerThread->start();
 }
 
-ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent, Scrollback *_scrollback, bool is_system) : QFrame(parent), ui(new Ui::ScrollbackFrame)
+ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent, Scrollback *_scrollback, bool is_system) : QFrame(parent), ui(new Ui::ScrollbackFrame), GrumpyObject("ScrollbackFrame")
 {
     ScrollbackFrames_m.lock();
     ScrollbackFrames.append(this);
@@ -925,7 +925,7 @@ void ScrollbackFrame::SetVisible(bool is_visible)
 }
 
 
-ScrollbackFrame_WorkerThread::ScrollbackFrame_WorkerThread()
+ScrollbackFrame_WorkerThread::ScrollbackFrame_WorkerThread(): GrumpyObject("ScrollbackFrame_WorkerThread")
 {
     this->IsRunning = true;
     this->IsFinished = false;

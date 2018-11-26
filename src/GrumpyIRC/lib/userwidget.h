@@ -14,6 +14,7 @@
 #define USERWIDGET_H
 
 #include "grumpy_global.h"
+#include <libcore/grumpyobject.h>
 #include <QDockWidget>
 #include <QFrame>
 
@@ -24,10 +25,9 @@ namespace Ui
 
 namespace GrumpyIRC
 {
-    class LIBGRUMPYSHARED_EXPORT UserWidget : public QDockWidget
+    class LIBGRUMPYSHARED_EXPORT UserWidget : public QDockWidget, public GrumpyObject
     {
             Q_OBJECT
-
         public:
             explicit UserWidget(QWidget *parent = 0);
             ~UserWidget();

@@ -14,6 +14,7 @@
 #define INPUTBOX_H
 
 #include "grumpy_global.h"
+#include <libcore/grumpyobject.h>
 #include <QFrame>
 #include <QList>
 #include <QString>
@@ -27,7 +28,7 @@ namespace GrumpyIRC
 {
     class AutocompletionEngine;
     class ScrollbackFrame;
-    class LIBGRUMPYSHARED_EXPORT InputBox : public QFrame
+    class LIBGRUMPYSHARED_EXPORT InputBox : public QFrame, public GrumpyObject
     {
             Q_OBJECT
 

@@ -23,8 +23,12 @@ option(QT5_BUILD "Build with Qt5" true)
 option(EXTREME_DEBUG "Enable some resource expensive and slowing debug info" false)
 option(UNIT_TESTS "Enable unit tests" false)
 option(SQLITE "Support sqlite backend storage" true)
+option(GRUMPY_PROFILER "Build internal profiler (extreme slowdown)" false)
 
 # Configuration
+if (GRUMPY_PROFILER)
+    ADD_DEFINITIONS(-DGRUMPY_PROFILER)
+endif()
 if (UNIT_TESTS)
     SET(QT_USE_QTTEST TRUE)
 endif()

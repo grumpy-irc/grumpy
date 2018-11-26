@@ -26,7 +26,7 @@
 
 using namespace GrumpyIRC;
 
-UserFrame::UserFrame(ScrollbackFrame *parent) : QFrame(parent), ui(new Ui::UserFrame)
+UserFrame::UserFrame(ScrollbackFrame *parent) : QFrame(parent), ui(new Ui::UserFrame), GrumpyObject("UserFrame")
 {
     this->ui->setupUi(this);
     this->parentFrame = parent;
