@@ -31,6 +31,7 @@
 #include <libcore/exception.h>
 #include <libcore/configuration.h>
 #include <libcore/generic.h>
+#include <libcore/profiler.h>
 #include <libcore/highlighter.h>
 #include <libcore/ircsession.h>
 #include <libcore/grumpydsession.h>
@@ -42,7 +43,7 @@ using namespace GrumpyIRC;
 
 QList<ScrollbackFrame*> ScrollbackFrame::ScrollbackFrames;
 QMutex ScrollbackFrame::ScrollbackFrames_m;
-ScrollbackFrame_WorkerThread *ScrollbackFrame::WorkerThread = NULL;
+ScrollbackFrame_WorkerThread *ScrollbackFrame::WorkerThread = nullptr;
 irc2htmlcode::Parser ScrollbackFrame::parser;
 
 void ScrollbackFrame::UpdateSkins()
@@ -78,7 +79,7 @@ void ScrollbackFrame::InitializeThread()
     WorkerThread->start();
 }
 
-ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent, Scrollback *_scrollback, bool is_system) : QFrame(parent), ui(new Ui::ScrollbackFrame), GrumpyObject("ScrollbackFrame")
+ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent, Scrollback *_scrollback, bool is_system) : QFrame(parent), GrumpyObject("ScrollbackFrame"), ui(new Ui::ScrollbackFrame)
 {
     ScrollbackFrames_m.lock();
     ScrollbackFrames.append(this);
@@ -92,11 +93,11 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     this->ui->splitter->addWidget(this->inputBox);
     this->LastMenuTooltipUpdate = QDateTime::currentDateTime().addSecs(-50);
     this->_parent = parentWindow;
-    this->TreeNode = NULL;
+    this->TreeNode = nullptr;
     this->needsRefresh = false;
     this->isClean = true;
     connect(this->textEdit, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(Menu(QPoint)));
-    if (_scrollback == NULL)
+    if (_scrollback == nullptr)
         this->scrollback = new Scrollback();
     else
         this->scrollback = _scrollback;
@@ -121,7 +122,7 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     this->maxItems = 200;
     this->userFrame = new UserFrame(this);
     this->Muted = false;
-    this->precachedNetwork = NULL;
+    this->precachedNetwork = nullptr;
     this->isVisible = false;
     this->currentScrollbar = 0;
 
@@ -162,6 +163,7 @@ void ScrollbackFrame::InsertText(ScrollbackItem item)
 
 static QString FormatAction(libircclient::User user, QString action, bool full_user)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     QString result = CONF->GetActionFormat();
     QString name;
     // we don't want to display full user information for simple actions and so on
@@ -176,6 +178,7 @@ static QString FormatAction(libircclient::User user, QString action, bool full_u
 
 static QString ItemToString(ScrollbackItem item, bool highlighted)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     // Render the text according to our formatting
     //! \todo This needs to be precached otherwise we need to build this string every fucking time
     QString format_string = CONF->GetLineFormat();
@@ -279,6 +282,7 @@ static QString ItemToPlainText(ScrollbackItem item)
 
 void ScrollbackFrame::_insertText_(ScrollbackItem item)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     if (!this->ShowJQP)
     {
         switch(item.GetType())
@@ -416,9 +420,9 @@ void ScrollbackFrame::Menu(QPoint pn)
     // Items
     QAction *menuCopy = new QAction(QObject::tr("Copy"), &Menu);
     Menu.addAction(menuCopy);
-    QAction *menuRetrieveTopic = NULL;
-    QAction *menuChanSet = NULL;
-    QAction *menuViewJQP = NULL;
+    QAction *menuRetrieveTopic = nullptr;
+    QAction *menuChanSet = nullptr;
+    QAction *menuViewJQP = nullptr;
     if (this->IsChannel())
     {
         menuRetrieveTopic = new QAction(QObject::tr("Retrieve topic"), &Menu);
@@ -472,7 +476,7 @@ void ScrollbackFrame::OnClosed()
     // of this class naturally tries to delete the scrollback, which would fail as it
     // would already be deleted by then, this event is called from destructor of scrollback,
     // so calling delete on it would have unexpectable results
-    this->scrollback = NULL;
+    this->scrollback = nullptr;
     ScrollbacksManager::Global->DestroyWindow(this);
 }
 
@@ -631,11 +635,11 @@ void ScrollbackFrame::ToggleHide()
         // Remove from tree list
         if (!ScrollbackList::GetScrollbackList()->ShowHidden && this->TreeNode)
         {
-            ScrollbackList_Node *parent = NULL;
+            ScrollbackList_Node *parent = nullptr;
             if (this->GetParent())
                 parent = this->GetParent()->TreeNode;
             ScrollbackList::GetScrollbackList()->UnregisterWindow(this->TreeNode, parent);
-            this->TreeNode = NULL;
+            this->TreeNode = nullptr;
         }
         this->scrollback->Hide();
     }
@@ -643,7 +647,7 @@ void ScrollbackFrame::ToggleHide()
     {
         if (!ScrollbackList::GetScrollbackList()->ShowHidden)
         {
-            ScrollbackList_Node *parent_tree = NULL;
+            ScrollbackList_Node *parent_tree = nullptr;
             if (this->GetParent())
                 parent_tree = this->GetParent()->TreeNode;
             ScrollbackList::GetScrollbackList()->RegisterWindow(this, parent_tree);
@@ -670,7 +674,7 @@ void ScrollbackFrame::RequestClose()
     }
     // We need to figure out if we are closing the system window, in that case we need to also delete the corresponding network session that it belonged to
     // the check for system window needs to be done before we request it to be closed as that might remove the reference to it
-    NetworkSession *session = NULL;
+    NetworkSession *session = nullptr;
     if (this->GetSession())
     {
         if (this->GetSession()->GetSystemWindow() == this->GetScrollback())
@@ -690,6 +694,7 @@ void ScrollbackFrame::UpdateIcon()
 
 void ScrollbackFrame::EnableState(bool enable)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     if (!this->scrollback)
         return;
 
@@ -771,6 +776,7 @@ void ScrollbackFrame::RequestMore(unsigned int count)
 
 void ScrollbackFrame::RefreshHtml()
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     this->needsRefresh = false;
     QString string = "";
     this->unwritten_m.lock();
@@ -794,6 +800,7 @@ void ScrollbackFrame::RefreshHtml()
 
 QString ScrollbackFrame::ToHtml()
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     QString text = this->textEdit->document()->toHtml();
     // Ugly hack to change the background, for some reason Qt doesn't export it
     text.replace("<body style=\"", "<body style=\"background-color: " + Skin::GetCurrent()->BackgroundColor.name() + "; color: " +
@@ -856,7 +863,7 @@ void ScrollbackFrame::TransferRaw(QString data, libircclient::Priority priority)
 libircclient::User *ScrollbackFrame::GetIdentity()
 {
     if (!this->GetSession())
-        return NULL;
+        return nullptr;
 
     // Return a self identity information for the current network
     return this->GetSession()->GetSelfNetworkID(this->GetScrollback());

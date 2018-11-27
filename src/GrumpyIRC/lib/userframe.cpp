@@ -14,6 +14,7 @@
 #include "scrollbackframe.h"
 #include "grumpyconf.h"
 #include <libcore/exception.h>
+#include <libcore/profiler.h>
 #include <libcore/networksession.h>
 #include "hooks.h"
 #include "userframe.h"
@@ -26,11 +27,11 @@
 
 using namespace GrumpyIRC;
 
-UserFrame::UserFrame(ScrollbackFrame *parent) : QFrame(parent), ui(new Ui::UserFrame), GrumpyObject("UserFrame")
+UserFrame::UserFrame(ScrollbackFrame *parent) : QFrame(parent), GrumpyObject("UserFrame"), ui(new Ui::UserFrame)
 {
     this->ui->setupUi(this);
     this->parentFrame = parent;
-    this->network = NULL;
+    this->network = nullptr;
     this->IsVisible = false;
     this->NeedsUpdate = false;
     this->ui->label->setPalette(Skin::GetCurrent()->Palette());
@@ -278,6 +279,7 @@ void UserFrame::ban()
 
 QString UserFrame::GenerateTip(libircclient::User *ux)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     QString text = ux->ToString();
     if (ux->GetRealname().length())
         text += "\n" + ux->GetRealname();
@@ -302,6 +304,7 @@ static QColor getColor(libircclient::User *ux)
 
 void UserFrame::InsertUser(libircclient::User *user, bool bulk)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     if (!this->network)
         return;
     if (this->userCounts.contains(user->GetHighestCUMode()))
@@ -341,6 +344,7 @@ void UserFrame::InsertUser(libircclient::User *user, bool bulk)
 
 void UserFrame::RemoveUser(QString user)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     // Lowercase
     user = user.toLower();
     if (!this->users.contains(user))
@@ -357,6 +361,7 @@ void UserFrame::RemoveUser(QString user)
 
 void UserFrame::RefreshUser(libircclient::User *user)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     //! \todo Optimize
     this->RemoveUser(user->GetNick());
     this->InsertUser(user, false);
@@ -369,6 +374,7 @@ void UserFrame::Sort()
 
 void UserFrame::ChangeNick(QString new_nick, QString old_nick)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     old_nick = old_nick.toLower();
     if (!this->users.contains(old_nick))
         return;
@@ -380,6 +386,7 @@ void UserFrame::ChangeNick(QString new_nick, QString old_nick)
 
 void UserFrame::SetNetwork(libircclient::Network *Network)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     if (!Network)
         return;
     this->network = Network;
@@ -444,6 +451,7 @@ void UserFrame::Whois()
 
 void UserFrame::UpdateInfo()
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     if (!this->IsVisible)
     {
         this->NeedsUpdate = true;

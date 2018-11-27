@@ -29,7 +29,7 @@ namespace GrumpyIRC
             Q_OBJECT
 
         public:
-            explicit AboutWin(QWidget *parent = 0);
+            explicit AboutWin(QWidget *parent = nullptr);
             ~AboutWin();
 
         private:

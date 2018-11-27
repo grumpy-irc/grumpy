@@ -15,9 +15,9 @@
 
 using namespace GrumpyIRC;
 
-QFrame *currentWidget = NULL;
+QFrame *currentWidget = nullptr;
 
-UserWidget::UserWidget(QWidget *parent) : QDockWidget(parent), ui(new Ui::UserWidget), GrumpyObject("UserWidget")
+UserWidget::UserWidget(QWidget *parent) : QDockWidget(parent), GrumpyObject("UserWidget"), ui(new Ui::UserWidget)
 {
     this->ui->setupUi(this);
 }
@@ -29,7 +29,7 @@ UserWidget::~UserWidget()
 
 void UserWidget::SetFrame(QFrame *frame)
 {
-    if (currentWidget != NULL)
+    if (currentWidget != nullptr)
     {
         QLayoutItem *container = this->ui->verticalLayout_2->itemAt(0);
         this->ui->verticalLayout_2->removeItem(this->ui->verticalLayout_2->itemAt(0));

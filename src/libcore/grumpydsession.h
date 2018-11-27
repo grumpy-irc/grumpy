@@ -15,6 +15,7 @@
 
 #include "libcore_global.h"
 #include "../libgp/gp.h"
+#include "grumpyobject.h"
 #include "definitions.h"
 #include "../libirc/libirc/serveraddress.h"
 #include "sniffer.h"
@@ -136,7 +137,7 @@ namespace GrumpyIRC
     class Scrollback;
     class IRCSession;
 
-    class LIBCORESHARED_EXPORT GrumpydSession : public NetworkSession
+    class LIBCORESHARED_EXPORT GrumpydSession : public NetworkSession, public GrumpyObject
     {
             Q_OBJECT
         public:

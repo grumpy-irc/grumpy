@@ -28,6 +28,7 @@
 #include <libcore/generic.h>
 #include <libcore/grumpyobject.h>
 #include <libcore/grumpydsession.h>
+#include <libcore/profiler.h>
 #include <libcore/ircsession.h>
 #include <libcore/scripting/scriptextension.h>
 
@@ -725,11 +726,23 @@ int SystemCmds::Profiler(SystemCommand *command, CommandArgs command_args)
     (void)command;
     Scrollback *sx = MainWindow::Main->GetCurrentScrollbackFrame()->GetScrollback();
     QHash<QString, quint64> memory_cx = GrumpyObject::GetClassInstanceCounts();
+    sx->InsertText("Memory usage (instance counts)");
     sx->InsertText("Name                                    | Count");
     sx->InsertText("----------------------------------------+----------------------");
     foreach (QString cx, memory_cx.keys())
     {
         sx->InsertText(Generic::ExpandedString(cx, 40, 40) + "| " + Generic::ExpandedString(QString::number(memory_cx[cx]), 22, 22));
     }
+#ifdef GRUMPY_PROFILER
+    sx->InsertText("---------------------------------------------------------------");
+    sx->InsertText("Function calls");
+    sx->InsertText("Name                                    | Count");
+    sx->InsertText("----------------------------------------+----------------------");
+    foreach (QString function, GrumpyIRC::Profiler::GetRegisteredCounterFunctions())
+    {
+        sx->InsertText(Generic::ExpandedString(function, 40, 40) + "| " + Generic::ExpandedString(QString::number(GrumpyIRC::Profiler::GetCallsForFunction(function)), 22, 22));
+    }
+    sx->InsertText("---------------------------------------------------------------");
+#endif
     return 0;
 }

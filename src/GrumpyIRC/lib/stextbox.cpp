@@ -11,6 +11,8 @@
 // Copyright (c) Petr Bena 2015 - 2018
 
 #include "stextbox.h"
+#include <libcore/exception.h>
+#include <libcore/profiler.h>
 
 using namespace GrumpyIRC;
 
@@ -28,6 +30,7 @@ STextBox::~STextBox()
 
 void STextBox::AppendHtml(QString html)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     this->appendHtml(html);
 }
 

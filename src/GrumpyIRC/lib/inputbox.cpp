@@ -24,7 +24,7 @@
 
 using namespace GrumpyIRC;
 
-AutocompletionEngine *InputBox::AE = NULL;
+AutocompletionEngine *InputBox::AE = nullptr;
 
 InputBox::InputBox(ScrollbackFrame *parent) : QFrame(parent), ui(new Ui::InputBox), GrumpyObject("InputBox")
 {

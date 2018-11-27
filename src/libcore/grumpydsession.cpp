@@ -29,9 +29,9 @@ using namespace GrumpyIRC;
 QMutex GrumpydSession::Sessions_Lock;
 QList<GrumpydSession*> GrumpydSession::Sessions;
 
-GrumpydSession::GrumpydSession(Scrollback *System, QString Hostname, QString UserName, QString Pass, int Port, bool ssl)
+GrumpydSession::GrumpydSession(Scrollback *System, QString Hostname, QString UserName, QString Pass, int Port, bool ssl) : GrumpyObject("GrumpydSession")
 {
-    this->gp = NULL;
+    this->gp = nullptr;
     this->systemWindow = System;
     this->AutoReconnect = true;
     this->hostname = Hostname;
