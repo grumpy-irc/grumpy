@@ -441,7 +441,7 @@ void GrumpyIRC::PreferencesWin::on_pushButton_3_clicked()
         return;
 
     delete this->highlighted_skin;
-    this->highlighted_skin = NULL;
+    this->highlighted_skin = nullptr;
     this->updateSkin();
 }
 
@@ -457,7 +457,7 @@ void GrumpyIRC::PreferencesWin::on_pushButton_2_clicked()
 static QColor GetColorUsingPicker(QColor color)
 {
     QColor original = color;
-    QColorDialog *picker = new QColorDialog(color, NULL);
+    QColorDialog *picker = new QColorDialog(color, nullptr);
     picker->exec();
     color = picker->selectedColor();
     delete picker;

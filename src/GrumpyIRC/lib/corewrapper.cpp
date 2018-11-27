@@ -15,6 +15,6 @@
 
 using namespace GrumpyIRC;
 
-Core *CoreWrapper::GrumpyCore = NULL;
+Core *CoreWrapper::GrumpyCore = nullptr;
 
 

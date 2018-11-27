@@ -15,13 +15,13 @@
 
 using namespace GrumpyIRC;
 
-Skin *Skin::Default = NULL;
-Skin *Skin::Current = NULL;
+Skin *Skin::Default = nullptr;
+Skin *Skin::Current = nullptr;
 QList<Skin*> Skin::SkinList;
 
 Skin *Skin::GetDefault()
 {
-    if (Skin::Default == NULL)
+    if (Skin::Default == nullptr)
         Skin::Default = new Skin();
     return Skin::Default;
 }
@@ -40,7 +40,7 @@ void Skin::Clear()
 
 Skin *Skin::GetCurrent()
 {
-    if (Skin::Current == NULL)
+    if (Skin::Current == nullptr)
         Skin::Current = Skin::GetDefault();
 
     return Skin::Current;

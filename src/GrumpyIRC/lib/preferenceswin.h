@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #ifndef PREFERENCESWIN_H
 #define PREFERENCESWIN_H
@@ -37,7 +37,7 @@ namespace GrumpyIRC
             Q_OBJECT
 
         public:
-            explicit PreferencesWin(QWidget *parent = 0);
+            explicit PreferencesWin(QWidget *parent = nullptr);
             ~PreferencesWin();
         private slots:
             void on_buttonBox_rejected();

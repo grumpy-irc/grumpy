@@ -28,6 +28,7 @@
 #include <QDebug>
 #include <libcore/core.h>
 #include <libcore/exception.h>
+#include <libcore/profiler.h>
 #include <libcore/generic.h>
 #include <libcore/networksession.h>
 #include <libcore/ircsession.h>
@@ -35,7 +36,7 @@
 
 using namespace GrumpyIRC;
 
-ScrollbackList *ScrollbackList::scrollbackList = NULL;
+ScrollbackList *ScrollbackList::scrollbackList = nullptr;
 
 ScrollbackList *ScrollbackList::GetScrollbackList()
 {
@@ -68,7 +69,7 @@ ScrollbackList::~ScrollbackList()
 {
     delete this->timer;
     delete this->ui;
-    scrollbackList = NULL;
+    scrollbackList = nullptr;
 }
 
 void GrumpyIRC::ScrollbackList::RegisterHidden()
@@ -77,7 +78,7 @@ void GrumpyIRC::ScrollbackList::RegisterHidden()
     {
         if (scrollback->IsHidden())
         {
-            ScrollbackList_Node *parent = NULL;
+            ScrollbackList_Node *parent = nullptr;
             if (scrollback->GetParent())
                 parent = scrollback->GetParent()->TreeNode;
 
@@ -89,7 +90,7 @@ void GrumpyIRC::ScrollbackList::RegisterHidden()
 void ScrollbackList::RegisterWindow(ScrollbackFrame *scrollback, ScrollbackList_Node *parent_node)
 {
     QStandardItem *root;
-    if (parent_node != NULL)
+    if (parent_node != nullptr)
         root = parent_node;
     else
         root = this->GetRootTreeItem();
@@ -113,11 +114,11 @@ void ScrollbackList::UnregisterHidden()
     {
         if (scrollback->IsHidden())
         {
-            ScrollbackList_Node *parent = NULL;
+            ScrollbackList_Node *parent = nullptr;
             if (scrollback->GetParent())
                 parent = scrollback->GetParent()->TreeNode;
             this->UnregisterWindow(scrollback->TreeNode, parent);
-            scrollback->TreeNode = NULL;
+            scrollback->TreeNode = nullptr;
         }
     }
 }
@@ -126,7 +127,7 @@ void ScrollbackList::UnregisterWindow(ScrollbackList_Node *node, ScrollbackList_
 {
     QModelIndex index = this->model->indexFromItem(node);
     QModelIndex parent;
-    if (parent_n != NULL)
+    if (parent_n != nullptr)
         parent = this->model->indexFromItem(parent_n);
     this->model->removeRow(index.row(), parent);
 }
@@ -178,22 +179,22 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     QPoint globalPos = this->ui->treeView->viewport()->mapToGlobal(pos);
     QMenu Menu;
     // Items
-    QAction *menuClose = NULL;
-    QAction *menuInsrFavorites = NULL;
-    QAction *menuAuto = NULL;
-    QAction *menuAway_Set = NULL;
-    QAction *menuAway_Uns = NULL;
-    QAction *menuSettings = NULL;
-    QAction *menuPart = NULL;
-    QAction *menuJoin = NULL;
-    QAction *menuHide = NULL;
-    QAction *menuReconnect = NULL;
-    QAction *menuDisconnect = NULL;
-    QAction *menuSniffer = NULL;
-    QAction *menuJoinAll = NULL;
-    QAction *menuSound = NULL;
-    QAction *menuNotify = NULL;
-    QAction *menuDeaf = NULL;
+    QAction *menuClose = nullptr;
+    QAction *menuInsrFavorites = nullptr;
+    QAction *menuAuto = nullptr;
+    QAction *menuAway_Set = nullptr;
+    QAction *menuAway_Uns = nullptr;
+    QAction *menuSettings = nullptr;
+    QAction *menuPart = nullptr;
+    QAction *menuJoin = nullptr;
+    QAction *menuHide = nullptr;
+    QAction *menuReconnect = nullptr;
+    QAction *menuDisconnect = nullptr;
+    QAction *menuSniffer = nullptr;
+    QAction *menuJoinAll = nullptr;
+    QAction *menuSound = nullptr;
+    QAction *menuNotify = nullptr;
+    QAction *menuDeaf = nullptr;
 
     if (wx)
     {
@@ -322,7 +323,7 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
         wx->ToggleHide();
     } else if (selectedItem == menuJoinAll)
     {
-        IRCSession *irc_session = NULL;
+        IRCSession *irc_session = nullptr;
         if (wx->GetSession()->GetType() == SessionType_Grumpyd)
         {
             GrumpydSession *session = (GrumpydSession*)wx->GetSession();
@@ -360,6 +361,7 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
 
 void ScrollbackList::switchWindow(const QModelIndex &index)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     if (this->model->itemFromIndex(index) == this->root)
         return;
     ScrollbackList_Node *node = (ScrollbackList_Node*)this->model->itemFromIndex(index);
@@ -418,13 +420,14 @@ ScrollbackFrame *ScrollbackList::selectedWindow()
 {
     QModelIndex index = this->ui->treeView->currentIndex();
     ScrollbackList_Node *node = (ScrollbackList_Node*)this->model->itemFromIndex(index);
-    if (node == 0)
-        return NULL;
+    if (node == nullptr)
+        return nullptr;
     return node->GetScrollback();
 }
 
 void GrumpyIRC::ScrollbackList::on_treeView_clicked(const QModelIndex &index)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     UiHooks::OnInput();
     this->switchWindow(index);
 }

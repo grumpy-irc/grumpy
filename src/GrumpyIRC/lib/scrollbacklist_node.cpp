@@ -14,6 +14,8 @@
 #include "skin.h"
 #include <libirc/libircclient/network.h>
 #include <libirc/libircclient/channel.h>
+#include <libcore/profiler.h>
+#include <libcore/exception.h>
 #include <libcore/scrollback.h>
 #include <libcore/networksession.h>
 #include "scrollbackframe.h"
@@ -45,6 +47,7 @@ ScrollbackFrame *ScrollbackList_Node::GetScrollback()
 
 void ScrollbackList_Node::RebuildCache()
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     this->unreadBrush = this->foreground();
     this->standardBrush = this->foreground();
     this->highlighterBrush = this->foreground();
@@ -57,6 +60,7 @@ void ScrollbackList_Node::RebuildCache()
 
 void ScrollbackList_Node::UpdateIcon()
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     if (!this->scrollback->IsDeletable)
     {
         this->setIcon(QIcon(":/icons/img/system.png"));
@@ -95,6 +99,7 @@ void ScrollbackList_Node::UpdateIcon()
 
 void ScrollbackList_Node::UpdateToolTip()
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     QString tool_tip = "<b>" + this->text() + "</b>";
     if (this->scrollback->IsChannel() && this->scrollback->GetSession())
     {
@@ -124,6 +129,7 @@ void ScrollbackList_Node::UpdateToolTip()
 
 void ScrollbackList_Node::UpdateColor()
 {
+
     switch (this->scrollback->GetScrollback()->GetState())
     {
         case ScrollbackState_UnreadMessages:

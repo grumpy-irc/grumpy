@@ -23,7 +23,7 @@
 
 using namespace GrumpyIRC;
 
-GrumpyConf *GrumpyConf::Conf = NULL;
+GrumpyConf *GrumpyConf::Conf = nullptr;
 
 GrumpyConf::GrumpyConf()
 {

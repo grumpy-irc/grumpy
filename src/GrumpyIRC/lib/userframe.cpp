@@ -420,6 +420,7 @@ QList<libircclient::User> UserFrame::SelectedUsers()
 
 QList<QString> UserFrame::GetUsers()
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     QList<QString> ul;
 
     foreach (libircclient::User user, this->users.values())
@@ -470,7 +471,7 @@ void UserFrame::UpdateInfo()
     bool extras_found = false;
     foreach (char mode, this->userCounts.keys())
     {
-        int count = this->userCounts[mode];
+        unsigned int count = this->userCounts[mode];
         if (!count)
             continue;
         QString info = QString(QChar(mode)) + ": ";

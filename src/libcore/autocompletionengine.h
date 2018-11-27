@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #ifndef AUTOCOMPLETIONENGINE_H
 #define AUTOCOMPLETIONENGINE_H
@@ -25,7 +25,7 @@ namespace GrumpyIRC
         public:
             AutocompletionInformation();
             QString FullText;
-            unsigned int Position;
+            int Position;
             QList<QString> Suggestions;
             bool Success;
     };

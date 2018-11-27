@@ -96,7 +96,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->tray.show();
     this->tray.setToolTip("GrumpyChat");
     // Create a system scrollback
-    this->systemWindow = this->scrollbackWindow->CreateWindow("System Window", NULL, true, false, NULL, true);
+    this->systemWindow = this->scrollbackWindow->CreateWindow("System Window", nullptr, true, false, nullptr, true);
     // Register built-in commands
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.netstat",             (SC_Callback)SystemCmds::Netstat));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.next_session_nick",   (SC_Callback)SystemCmds::NextSessionNick));
@@ -181,7 +181,7 @@ MainWindow::MainWindow(bool fork, MainWindow *parent)
 
 MainWindow::~MainWindow()
 {
-    ScrollbacksManager::Global = NULL;
+    ScrollbacksManager::Global = nullptr;
     delete this->ui;
     delete this->handler;
     delete this->timerAway;
@@ -254,7 +254,7 @@ void MainWindow::UpdateStatus()
     this->windowCount->setText(QString::number(Scrollback::ScrollbackList.count()) + " scrollbacks");
     ScrollbackFrame *current_scrollback = this->GetScrollbackManager()->GetCurrentScrollback();
     int synced = current_scrollback->GetSynced();
-    int total = current_scrollback->GetItems();
+    unsigned int total = current_scrollback->GetItems();
     this->statusFrame->setText("Items (synced/total): " + QString::number(synced) + " / " + QString::number(total));
     libircclient::User *self_ident = current_scrollback->GetIdentity();
     QString mode = current_scrollback->GetLocalUserMode();
@@ -316,7 +316,7 @@ void MainWindow::OpenUrl(QString url)
 void MainWindow::UpdateSkin()
 {
     ScrollbackFrame::UpdateSkins();
-    float opacity = Skin::GetCurrent()->Opacity;
+    double opacity = static_cast<double>(Skin::GetCurrent()->Opacity);
     opacity = opacity / 100;
     this->setWindowOpacity(opacity);
 }
@@ -363,7 +363,7 @@ void MainWindow::OpenGrumpy(QString hostname, int port, QString username, QStrin
         GRUMPY_ERROR("SSL is not available, can't connect.");
         return;
     }
-    ScrollbackFrame *system = this->GetScrollbackManager()->CreateWindow(hostname, NULL, true);
+    ScrollbackFrame *system = this->GetScrollbackManager()->CreateWindow(hostname, nullptr, true);
     GrumpydSession *session = new GrumpydSession(system->GetScrollback(), hostname, username, password, port, ssl);
     session->Connect();
 }
@@ -399,7 +399,7 @@ void MainWindow::OpenServer(libirc::ServerAddress server)
     }
     QString network_name = server.GetHost();
     // We need to create a new scrollback for system window
-    ScrollbackFrame *system = this->GetScrollbackManager()->CreateWindow(network_name, NULL, true);
+    ScrollbackFrame *system = this->GetScrollbackManager()->CreateWindow(network_name, nullptr, true);
     // Nick override is empty here as it's obtained from server info
     IRCSession *sx = IRCSession::Open(system->GetScrollback(), server, network_name, "", CONF->GetIdent(), CONF->GetName(), CONF->GetEncoding());
     sx->IgnoredNums = CONF->IgnoredNums();

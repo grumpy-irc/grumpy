@@ -26,7 +26,7 @@ using namespace GrumpyIRC;
 
 AutocompletionEngine *InputBox::AE = nullptr;
 
-InputBox::InputBox(ScrollbackFrame *parent) : QFrame(parent), ui(new Ui::InputBox), GrumpyObject("InputBox")
+InputBox::InputBox(ScrollbackFrame *parent) : QFrame(parent), GrumpyObject("InputBox"), ui(new Ui::InputBox)
 {
     this->ui->setupUi(this);
     this->ui->lineEdit->setVisible(false);

@@ -35,7 +35,7 @@ namespace GrumpyIRC
         public:
             static AutocompletionEngine *AE;
 
-            explicit InputBox(ScrollbackFrame *parent = 0);
+            explicit InputBox(ScrollbackFrame *parent = nullptr);
             ~InputBox();
             void ProcessInput();
             void Secure();

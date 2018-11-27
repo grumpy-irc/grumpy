@@ -20,17 +20,18 @@
 #include "mainwindow.h"
 #include "ui_scrollbacksmanager.h"
 #include <libcore/networksession.h>
+#include <libcore/profiler.h>
 #include <libirc/libircclient/channel.h>
 #include <libcore/exception.h>
 #include <libcore/definitions.h>
 
 using namespace GrumpyIRC;
 
-ScrollbacksManager *ScrollbacksManager::Global = NULL;
+ScrollbacksManager *ScrollbacksManager::Global = nullptr;
 
 ScrollbacksManager::ScrollbacksManager(QWidget *parent) : QFrame(parent), ui(new Ui::ScrollbacksManager)
 {
-    this->currentWidget = NULL;
+    this->currentWidget = nullptr;
     this->ui->setupUi(this);
 }
 
@@ -43,14 +44,15 @@ ScrollbacksManager::~ScrollbacksManager()
 
 ScrollbackFrame *ScrollbacksManager::CreateWindow(QString name, ScrollbackFrame *parent, bool focus, bool is_deletable, Scrollback *scrollback, bool is_system)
 {
-    ScrollbackFrame *window = new ScrollbackFrame(parent, NULL, scrollback, is_system);
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
+    ScrollbackFrame *window = new ScrollbackFrame(parent, nullptr, scrollback, is_system);
     window->SetWindowName(name);
     this->Scrollbacks.append(window);
     window->IsDeletable = is_deletable;
     if (focus)
         this->SwitchWindow(window);
     ScrollbackList *scrollbacks = MainWindow::Main->GetScrollbackList();
-    ScrollbackList_Node *parent_tree = NULL;
+    ScrollbackList_Node *parent_tree = nullptr;
     if (parent)
         parent_tree = parent->TreeNode;
     if (scrollbacks)
@@ -61,39 +63,42 @@ ScrollbackFrame *ScrollbacksManager::CreateWindow(QString name, ScrollbackFrame 
 
 ScrollbackFrame *ScrollbacksManager::GetWindowFromID(scrollback_id_t id)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     foreach (ScrollbackFrame *sb, this->Scrollbacks)
     {
         if (sb->GetID() == id)
             return sb;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 ScrollbackFrame *ScrollbacksManager::GetWindowFromScrollback(Scrollback *scrollback)
 {
-    if (scrollback == NULL)
-        return NULL;
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
+    if (scrollback == nullptr)
+        return nullptr;
     foreach (ScrollbackFrame *xx, this->Scrollbacks)
     {
         if (xx->GetScrollback() == scrollback)
             return xx;
     }
-    return NULL;
+    return nullptr;
 }
 
 void ScrollbacksManager::DestroyWindow(ScrollbackFrame *window)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     if (!window->IsDeletable)
         return;
     this->SwitchWindow(MainWindow::Main->GetSystem());
     if (window->TreeNode)
     {
-        ScrollbackList_Node *parent = NULL;
+        ScrollbackList_Node *parent = nullptr;
         if (window->GetParent())
             parent = window->GetParent()->TreeNode;
         ScrollbackList::GetScrollbackList()->UnregisterWindow(window->TreeNode, parent);
-        window->TreeNode = NULL;
+        window->TreeNode = nullptr;
     }
     this->Scrollbacks.removeOne(window);
     delete window;
@@ -108,10 +113,11 @@ void ScrollbacksManager::SwitchWindow(scrollback_id_t id)
 
 void ScrollbacksManager::SwitchWindow(ScrollbackFrame *window)
 {   
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     if (this->currentWidget == window)
         return;
 
-    if (this->currentWidget != NULL)
+    if (this->currentWidget != nullptr)
     {
         this->currentWidget->SetVisible(false);
         this->currentWidget->EnableState(true);
@@ -180,7 +186,7 @@ void ScrollbacksManager::SwitchWindow(ScrollbackFrame *window)
 
 ScrollbackFrame *ScrollbacksManager::GetCurrentScrollback() const
 {
-    if (this->currentWidget == NULL)
+    if (this->currentWidget == nullptr)
         throw new GrumpyIRC::NullPointerException("this->currentWidget", BOOST_CURRENT_FUNCTION);
 
     // Return a currently selected window
