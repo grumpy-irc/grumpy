@@ -45,10 +45,10 @@ function cmd_deop(window_id, text)
 
 function cmd_optools(window_id, text)
 {
-    grumpy_log("* /op - gives you OP in current window");
-    grumpy_log("* /deop - removes your OP in current window");
-    grumpy_log("* /ex - setup ban exemption for yourself");
-    grumpy_log("* /deex - removes ban exemption");
+    grumpy.log("* /op - gives you OP in current window");
+    grumpy.log("* /deop - removes your OP in current window");
+    grumpy.log("* /ex - setup ban exemption for yourself");
+    grumpy.log("* /deex - removes ban exemption");
     return 0;
 }
 
