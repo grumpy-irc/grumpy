@@ -65,7 +65,7 @@ namespace GrumpyIRC
             bool IsRunning;
             bool IsFinished;
         protected:
-            void run();
+            void run() override;
     };
 
     class LIBGRUMPYSHARED_EXPORT ScrollbackFrame : public QFrame, public GrumpyObject
@@ -80,12 +80,12 @@ namespace GrumpyIRC
             static QMutex ScrollbackFrames_m;
             static irc2htmlcode::Parser parser;
 
-            explicit ScrollbackFrame(ScrollbackFrame *parentWindow = NULL, QWidget *parent = NULL, Scrollback *_scrollback = NULL, bool is_system = false);
-            ~ScrollbackFrame();
+            explicit ScrollbackFrame(ScrollbackFrame *parentWindow = nullptr, QWidget *parent = nullptr, Scrollback *_scrollback = nullptr, bool is_system = false);
+            ~ScrollbackFrame() override;
             QString GetWindowName() const;
-            void InsertText(QString text, ScrollbackItemType item = ScrollbackItemType_System);
-            void InsertText(ScrollbackItem item);
-            void SetWindowName(QString title);
+            void InsertText(const QString &text, ScrollbackItemType item = ScrollbackItemType_System);
+            void InsertText(const ScrollbackItem &item);
+            void SetWindowName(const QString &title);
             bool IsConnectedToIRC();
             bool IsChannel();
             bool IsNetwork();
@@ -117,11 +117,11 @@ namespace GrumpyIRC
             void RequestMore(unsigned int count);
             void RefreshHtml();
             QString ToHtml();
-            void SendCtcp(QString target, QString ctcp, QString text);
+            void SendCtcp(const QString &target, const QString &ctcp, const QString &text);
             void RefreshHtmlIfNeeded();
-            void SetProperty(QString name, QVariant value);
+            void SetProperty(const QString &name, const QVariant &value);
             libircclient::Network *GetNetwork();
-            void TransferRaw(QString data, libircclient::Priority priority = libircclient::Priority_Normal);
+            void TransferRaw(const QString &data, libircclient::Priority priority = libircclient::Priority_Normal);
             libircclient::User *GetIdentity();
             scrollback_id_t GetItems();
             QList<QString> GetUsers();
@@ -141,15 +141,15 @@ namespace GrumpyIRC
         protected:
             static ScrollbackFrame_WorkerThread *WorkerThread;
         private slots:
-            void _insertText_(ScrollbackItem item);
+            void _insertText_(ScrollbackItem &item);
             void UserList_Insert(libircclient::User *ux, bool bulk);
             void UserList_Refresh(libircclient::User *ux);
             void OnState();
-            void UserList_Remove(QString user, bool bulk);
-            void UserList_Alter(QString old, libircclient::User *us);
+            void UserList_Remove(const QString &user, bool bulk);
+            void UserList_Alter(const QString &old, libircclient::User *us);
             void OnFinishSortBulk();
             void OnDead();
-            void OnLink(QString url);
+            void OnLink(const QString &url);
             void OnScroll();
             void Refresh();
             void Menu(QPoint pn);

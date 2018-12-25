@@ -29,7 +29,7 @@ using namespace GrumpyIRC;
 QMutex GrumpydSession::Sessions_Lock;
 QList<GrumpydSession*> GrumpydSession::Sessions;
 
-GrumpydSession::GrumpydSession(Scrollback *System, QString Hostname, QString UserName, QString Pass, int Port, bool ssl) : GrumpyObject("GrumpydSession")
+GrumpydSession::GrumpydSession(Scrollback *System, const QString &Hostname, const QString &UserName, const QString &Pass, int Port, bool ssl) : GrumpyObject("GrumpydSession")
 {
     this->gp = nullptr;
     this->systemWindow = System;
@@ -98,7 +98,7 @@ libircclient::Network *GrumpydSession::GetNetwork(Scrollback *scrollback)
 {
     IRCSession *ircs = this->GetSessionFromWindow(scrollback);
     if (!ircs)
-        return NULL;
+        return nullptr;
 
     return ircs->GetNetwork();
 }
@@ -162,7 +162,7 @@ void GrumpydSession::RequestRemove(Scrollback *scrollback)
         this->sessionList.clear();
         this->scrollbackHash.clear();
         delete this->gp;
-        this->gp = NULL;
+        this->gp = nullptr;
         return;
     }
     IRCSession *ircs = this->GetSessionFromWindow(scrollback);
@@ -216,7 +216,7 @@ void GrumpyIRC::GrumpydSession::ResyncPB(Scrollback *scrollback)
     this->gp->SendProtocolCommand(GP_CMD_RESYNC_SCROLLBACK_PB, parameters);
 }
 
-void GrumpyIRC::GrumpydSession::ResyncSingleItemPB(Scrollback *scrollback, QString name)
+void GrumpyIRC::GrumpydSession::ResyncSingleItemPB(Scrollback *scrollback, const QString &name)
 {
     QHash<QString, QVariant> single_item_pb;
 
@@ -258,7 +258,7 @@ libircclient::Channel *GrumpydSession::GetChannel(Scrollback *scrollback)
 {
     IRCSession *ircs = this->GetSessionFromWindow(scrollback);
     if (!ircs)
-        return NULL;
+        return nullptr;
 
     return ircs->GetChannel(scrollback);
 }
@@ -276,7 +276,7 @@ Scrollback *GrumpydSession::GetScrollback(scrollback_id_t original_id)
             return sx;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void GrumpydSession::SendNotice(Scrollback *scrollback, QString text)
@@ -340,7 +340,7 @@ void GrumpydSession::SendProtocolCommand(unsigned int command)
     this->SendProtocolCommand(command, QHash<QString, QVariant>());
 }
 
-void GrumpydSession::SendProtocolCommand(unsigned int command, QHash<QString, QVariant> parameters)
+void GrumpydSession::SendProtocolCommand(unsigned int command, const QHash<QString, QVariant> &parameters)
 {
     if (!this->gp)
     {
@@ -366,7 +366,7 @@ IRCSession *GrumpydSession::GetSession(unsigned int nsid)
         if (session->GetSID() == nsid)
             return session;
     }
-    return NULL;
+    return nullptr;
 }
 
 QString GrumpydSession::GetLocalUserModeAsString(Scrollback *scrollback)
@@ -401,7 +401,7 @@ void GrumpydSession::RequestReconnect(Scrollback *scrollback)
         this->sessionList.clear();
         this->scrollbackHash.clear();
         delete this->gp;
-        this->gp = NULL;
+        this->gp = nullptr;
         this->Connect();
         return;
     }
@@ -422,7 +422,7 @@ IRCSession *GrumpydSession::GetSessionFromWindow(Scrollback *scrollback)
         return this->sessionList[scrollback->GetParentScrollback()];
 
     // There seem to be no irc session associated to this scrollback, it's not our scrollback?
-    return NULL;
+    return nullptr;
 }
 
 void GrumpydSession::Connect()
@@ -495,7 +495,7 @@ libircclient::User *GrumpydSession::GetSelfNetworkID(Scrollback *scrollback)
 {
     IRCSession *ircs = this->GetSessionFromWindow(scrollback);
     if (!ircs)
-        return NULL;
+        return nullptr;
 
     return ircs->GetSelfNetworkID(scrollback);
 }
@@ -599,12 +599,12 @@ void GrumpydSession::OnConnected()
     this->gp->SendProtocolCommand(GP_CMD_HELLO, parameters);
 }
 
-void GrumpydSession::OnError(QString reason, int num)
+void GrumpydSession::OnError(const QString &reason, int num)
 {
     this->closeError(reason);
 }
 
-void GrumpydSession::OnIncomingCommand(gp_command_t text, QHash<QString, QVariant> parameters)
+void GrumpydSession::OnIncomingCommand(gp_command_t text, const QHash<QString, QVariant> &parameters)
 {
     switch (text)
     {
@@ -730,7 +730,7 @@ void GrumpydSession::kill()
     this->freememory();
 }
 
-void GrumpydSession::processNewScrollbackItem(QHash<QString, QVariant> hash)
+void GrumpydSession::processNewScrollbackItem(const QHash<QString, QVariant> &hash)
 {
     //if (!hash.contains("network_id"))
     //    return;
@@ -751,7 +751,7 @@ void GrumpydSession::processNewScrollbackItem(QHash<QString, QVariant> hash)
     scrollback->InsertText(ScrollbackItem(hash["item"].toHash()));
 }
 
-void GrumpydSession::processNetwork(QHash<QString, QVariant> hash)
+void GrumpydSession::processNetwork(const QHash<QString, QVariant> &hash)
 {
     if (!hash.contains("sessions"))
         return;
@@ -776,7 +776,7 @@ void GrumpydSession::processNetwork(QHash<QString, QVariant> hash)
     this->IsOpening = false;
 }
 
-void GrumpydSession::processULSync(QHash<QString, QVariant> hash)
+void GrumpydSession::processULSync(const QHash<QString, QVariant> &hash)
 {
     QString channel_name = hash["channel_name"].toString();
     IRCSession *session = this->GetSession(hash["network_id"].toUInt());
@@ -801,7 +801,7 @@ void GrumpydSession::processULSync(QHash<QString, QVariant> hash)
     {
         QString user = hash["target"].toString();
         // Remove the user from scrollback
-        scrollback->UserListChange(user, NULL, UserListChange_Remove);
+        scrollback->UserListChange(user, nullptr, UserListChange_Remove);
         channel->RemoveUser(user);
     } else if (mode == GRUMPY_UL_UPDATE)
     {
@@ -811,7 +811,7 @@ void GrumpydSession::processULSync(QHash<QString, QVariant> hash)
     }
 }
 
-void GrumpydSession::processNetworkResync(QHash<QString, QVariant> hash)
+void GrumpydSession::processNetworkResync(const QHash<QString, QVariant> &hash)
 {
     if (!hash.contains("network_id") || !hash.contains("network"))
         return;
@@ -830,7 +830,7 @@ void GrumpydSession::processNetworkResync(QHash<QString, QVariant> hash)
 
     libircclient::Network resynced_network(hash["network"].toHash());
     libircclient::Network *nt = session->GetNetwork();
-    if (nt == NULL)
+    if (nt == nullptr)
     {
         libirc::ServerAddress server(session->GetHostname(), session->UsingSSL(), session->GetPort(), session->GetNick(), session->GetPassword());
         nt = new libircclient::Network(server, session->GetName());
@@ -845,7 +845,7 @@ void GrumpydSession::processNetworkResync(QHash<QString, QVariant> hash)
     nt->SetCUModes(resynced_network.GetCUModes());
 }
 
-void GrumpydSession::processChannel(QHash<QString, QVariant> hash)
+void GrumpydSession::processChannel(const QHash<QString, QVariant> &hash)
 {
     IRCSession *session = this->GetSession(hash["network_id"].toUInt());
     if (!session)
@@ -857,7 +857,7 @@ void GrumpydSession::processChannel(QHash<QString, QVariant> hash)
     session->RegisterChannel(&channel, scrollback);
 }
 
-void GrumpydSession::processNick(QHash<QString, QVariant> hash)
+void GrumpydSession::processNick(const QHash<QString, QVariant> &hash)
 {
     IRCSession *session = this->GetSession(hash["network_id"].toUInt());
     if (!session)
@@ -873,7 +873,7 @@ void GrumpydSession::processNick(QHash<QString, QVariant> hash)
     session->_gs_ResyncNickChange(new_, old_);
 }
 
-void GrumpydSession::processPreferences(QHash<QString, QVariant> hash)
+void GrumpydSession::processPreferences(const QHash<QString, QVariant> &hash)
 {
     this->Preferences = Generic::MergeHash(this->Preferences, hash["options"].toHash());
     // Automatically fix some missing default preferences
@@ -917,7 +917,7 @@ void GrumpydSession::processPreferences(QHash<QString, QVariant> hash)
     }
 }
 
-void GrumpydSession::processChannelModeSync(QHash<QString, QVariant> hash)
+void GrumpydSession::processChannelModeSync(const QHash<QString, QVariant> &hash)
 {
     IRCSession *session = this->GetSession(hash["network_id"].toUInt());
     if (!session)
@@ -937,7 +937,7 @@ void GrumpydSession::processChannelModeSync(QHash<QString, QVariant> hash)
     }
 }
 
-void GrumpydSession::processRequest(QHash<QString, QVariant> hash)
+void GrumpydSession::processRequest(const QHash<QString, QVariant> &hash)
 {
     Scrollback *scrollback = this->GetScrollback(hash["scrollback_id"].toUInt());
     if (!scrollback)
@@ -952,7 +952,7 @@ void GrumpydSession::processRequest(QHash<QString, QVariant> hash)
     this->IsOpening = false;
 }
 
-void GrumpydSession::processChannelResync(QHash<QString, QVariant> hash)
+void GrumpydSession::processChannelResync(const QHash<QString, QVariant> &hash)
 {
     IRCSession *session = this->GetSession(hash["network_id"].toUInt());
     if (!session)
@@ -1006,7 +1006,7 @@ void GrumpydSession::processChannelResync(QHash<QString, QVariant> hash)
     scrollback->FinishBulk();
 }
 
-void GrumpydSession::processSResync(QHash<QString, QVariant> parameters)
+void GrumpydSession::processSResync(const QHash<QString, QVariant> &parameters)
 {
     // Let's register this scrollback to this session
     Scrollback *root = this->systemWindow;
@@ -1050,7 +1050,7 @@ void GrumpydSession::processSResync(QHash<QString, QVariant> parameters)
     }
 }
 
-void GrumpydSession::processPBResync(QHash<QString, QVariant> parameters)
+void GrumpydSession::processPBResync(const QHash<QString, QVariant> &parameters)
 {
     if (!parameters.contains("scrollback_id"))
         return;
@@ -1069,7 +1069,7 @@ void GrumpydSession::processPBResync(QHash<QString, QVariant> parameters)
     }
 }
 
-void GrumpydSession::processAck(QHash<QString, QVariant> parameters)
+void GrumpydSession::processAck(const QHash<QString, QVariant> &parameters)
 {
     if (parameters.contains("s"))
     {
@@ -1079,7 +1079,7 @@ void GrumpydSession::processAck(QHash<QString, QVariant> parameters)
     }
 }
 
-void GrumpydSession::processPSResync(QHash<QString, QVariant> parameters)
+void GrumpydSession::processPSResync(const QHash<QString, QVariant> &parameters)
 {
     //Scrollback scrollback(parameters["scrollback"].toHash());
     // find a scrollback with this id
@@ -1097,10 +1097,10 @@ void GrumpydSession::processPSResync(QHash<QString, QVariant> parameters)
     }
     // let's resync most of the stuff
     origin->LoadHash(parameters["scrollback"].toHash());
-    origin->Resync(NULL);
+    origin->Resync(nullptr);
 }
 
-void GrumpydSession::processRemove(QHash<QString, QVariant> parameters)
+void GrumpydSession::processRemove(const QHash<QString, QVariant> &parameters)
 {
     if (!parameters.contains("scrollback"))
         return;
@@ -1131,7 +1131,7 @@ void GrumpydSession::processRemove(QHash<QString, QVariant> parameters)
     session->RequestRemove(scrollback);
 }
 
-void GrumpydSession::processUserList(QHash<QString, QVariant> parameters)
+void GrumpydSession::processUserList(const QHash<QString, QVariant> &parameters)
 {
     this->lastUserListUpdate = QDateTime::currentDateTime();
     if (parameters.contains("roles"))
@@ -1147,7 +1147,7 @@ void GrumpydSession::processUserList(QHash<QString, QVariant> parameters)
     }
 }
 
-void GrumpydSession::processSniffer(QHash<QString, QVariant> parameters)
+void GrumpydSession::processSniffer(const QHash<QString, QVariant> &parameters)
 {
     if (!parameters.contains("network_id"))
         return;
@@ -1167,7 +1167,7 @@ void GrumpydSession::processSniffer(QHash<QString, QVariant> parameters)
     this->snifferCache.insert(network_id, sniffer);
 }
 
-void GrumpydSession::processHello(QHash<QString, QVariant> parameters)
+void GrumpydSession::processHello(const QHash<QString, QVariant> &parameters)
 {
     if (!parameters.contains("version"))
         return;
@@ -1201,7 +1201,7 @@ void GrumpydSession::processHello(QHash<QString, QVariant> parameters)
     this->gp->SendProtocolCommand(GP_CMD_LOGIN, params);
 }
 
-void GrumpydSession::processLoginOK(QHash<QString, QVariant> parameters)
+void GrumpydSession::processLoginOK(const QHash<QString, QVariant> &parameters)
 {
     this->syncing = true;
     if (parameters.contains("logged"))
@@ -1214,7 +1214,7 @@ void GrumpydSession::processLoginOK(QHash<QString, QVariant> parameters)
     this->gp->SendProtocolCommand(GP_CMD_OPTIONS);
 }
 
-void GrumpydSession::processInit(QHash<QString, QVariant> parameters)
+void GrumpydSession::processInit(const QHash<QString, QVariant> &parameters)
 {
     QHash<QString, QVariant> params;
     params.insert("password", this->password);
@@ -1222,7 +1222,7 @@ void GrumpydSession::processInit(QHash<QString, QVariant> parameters)
     this->gp->SendProtocolCommand(GP_CMD_LOGIN, params);
 }
 
-void GrumpydSession::processQuit(QHash<QString, QVariant> parameters)
+void GrumpydSession::processQuit(const QHash<QString, QVariant> &parameters)
 {
     IRCSession *session = this->GetSession(parameters["network_id"].toUInt());
     if (!session)
@@ -1233,7 +1233,7 @@ void GrumpydSession::processQuit(QHash<QString, QVariant> parameters)
         sb->SetDead(true);
 }
 
-void GrumpydSession::processRefuse(QHash<QString, QVariant> parameters)
+void GrumpydSession::processRefuse(const QHash<QString, QVariant> &parameters)
 {
     QString source = "unknown request";
     if (parameters.contains("source"))
@@ -1250,7 +1250,7 @@ void GrumpydSession::freememory()
     this->userList.clear();
 }
 
-void GrumpydSession::closeError(QString error)
+void GrumpydSession::closeError(const QString &error)
 {
     this->gp->Disconnect();
     this->kill();

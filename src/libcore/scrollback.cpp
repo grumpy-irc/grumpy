@@ -60,7 +60,7 @@ Scrollback::Scrollback(ScrollbackType Type, Scrollback *parent, bool scrollback_
     this->_original_id = this->_id;
 }
 
-Scrollback::Scrollback(QHash<QString, QVariant> hash)
+Scrollback::Scrollback(const QHash<QString, QVariant> &hash)
 {
     this->_maxItems = 0;
     this->_totalItems = 0;
@@ -332,7 +332,7 @@ bool Scrollback::IsHidable()
     return this->_hidable;
 }
 
-void Scrollback::LoadHash(QHash<QString, QVariant> hash)
+void Scrollback::LoadHash(const QHash<QString, QVariant> &hash)
 {
     GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     UNSERIALIZE_HASH(PropertyBag);
@@ -402,7 +402,7 @@ ScrollbackState Scrollback::GetState()
     return this->scrollbackState;
 }
 
-void Scrollback::SetProperty(QString name, QVariant value)
+void Scrollback::SetProperty(const QString &name, const QVariant &value)
 {
     if (this->PropertyBag.contains(name))
         this->PropertyBag[name] = value;
@@ -410,28 +410,28 @@ void Scrollback::SetProperty(QString name, QVariant value)
         this->PropertyBag.insert(name, value);
 }
 
-int Scrollback::GetPropertyAsInt(QString name, int default_val)
+int Scrollback::GetPropertyAsInt(const QString &name, int default_val)
 {
     if (!this->PropertyBag.contains(name))
         return default_val;
     return this->PropertyBag[name].toInt();
 }
 
-QString Scrollback::GetPropertyAsString(QString name, QString default_val)
+QString Scrollback::GetPropertyAsString(const QString &name, QString default_val)
 {
     if (!this->PropertyBag.contains(name))
         return default_val;
     return this->PropertyBag[name].toString();
 }
 
-bool Scrollback::GetPropertyAsBool(QString name, bool default_val)
+bool Scrollback::GetPropertyAsBool(const QString &name, bool default_val)
 {
     if (!this->PropertyBag.contains(name))
         return default_val;
     return this->PropertyBag[name].toBool();
 }
 
-void Scrollback::insertSI(ScrollbackItem si)
+void Scrollback::insertSI(const ScrollbackItem &si)
 {
     GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     this->_totalItems++;
@@ -442,7 +442,7 @@ void Scrollback::insertSI(ScrollbackItem si)
     this->_items.append(si);
 }
 
-void Scrollback::SetTarget(QString target)
+void Scrollback::SetTarget(const QString &target)
 {
     this->_ltarget.clear();
     this->_target = target;
@@ -483,7 +483,7 @@ QList<ScrollbackItem> Scrollback::GetItems()
     return this->_items;
 }
 
-void Scrollback::UserListChange(QString nick, libircclient::User *user, UserListChangeType change_type, bool bulk)
+void Scrollback::UserListChange(const QString &nick, libircclient::User *user, UserListChangeType change_type, bool bulk)
 {
     switch (change_type)
     {
@@ -538,14 +538,14 @@ QString Scrollback::GetTarget() const
     return this->_target;
 }
 
-void Scrollback::InsertText(QString text, ScrollbackItemType type)
+void Scrollback::InsertText(const QString &text, ScrollbackItemType type)
 {
     ScrollbackItem item(text);
     item.SetType(type);
     this->InsertText(item);
 }
 
-ScrollbackItem::ScrollbackItem(QHash<QString, QVariant> hash)
+ScrollbackItem::ScrollbackItem(const QHash<QString, QVariant> &hash)
 {
 #ifdef GRUMPY_PROFILER
     this->setGrumpyObjectName("ScrollbackItem");
@@ -559,7 +559,7 @@ ScrollbackItem::ScrollbackItem(QHash<QString, QVariant> hash)
     this->LoadHash(hash);
 }
 
-ScrollbackItem::ScrollbackItem(QString text, scrollback_id_t id, bool self)
+ScrollbackItem::ScrollbackItem(const QString &text, scrollback_id_t id, bool self)
 {
 #ifdef GRUMPY_PROFILER
     this->setGrumpyObjectName("ScrollbackItem");
@@ -575,7 +575,7 @@ ScrollbackItem::ScrollbackItem(QString text, scrollback_id_t id, bool self)
     this->_datetime = QDateTime::currentDateTime();
 }
 
-ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User *user, scrollback_id_t id, bool self)
+ScrollbackItem::ScrollbackItem(const QString &text, ScrollbackItemType type, libircclient::User *user, scrollback_id_t id, bool self)
 {
 #ifdef GRUMPY_PROFILER
     this->setGrumpyObjectName("ScrollbackItem");
@@ -595,7 +595,7 @@ ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclie
         this->_user = libircclient::User(user);
 }
 
-ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User user, scrollback_id_t id, bool self)
+ScrollbackItem::ScrollbackItem(const QString &text, ScrollbackItemType type, const libircclient::User &user, scrollback_id_t id, bool self)
 {
 #ifdef GRUMPY_PROFILER
     this->setGrumpyObjectName("ScrollbackItem");
@@ -612,7 +612,7 @@ ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclie
     this->_user = user;
 }
 
-ScrollbackItem::ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User user, QDateTime date, scrollback_id_t id, bool self)
+ScrollbackItem::ScrollbackItem(const QString &text, ScrollbackItemType type, const libircclient::User &user, const QDateTime &date, scrollback_id_t id, bool self)
 {
 #ifdef GRUMPY_PROFILER
     this->setGrumpyObjectName("ScrollbackItem");
@@ -700,7 +700,7 @@ void ScrollbackItem::SetType(ScrollbackItemType type)
     this->_type = type;
 }
 
-void ScrollbackItem::SetText(QString text)
+void ScrollbackItem::SetText(const QString &text)
 {
     this->_text = text;
 }
@@ -720,7 +720,7 @@ libircclient::User ScrollbackItem::GetUser() const
     return this->_user;
 }
 
-void ScrollbackItem::LoadHash(QHash<QString, QVariant> hash)
+void ScrollbackItem::LoadHash(const QHash<QString, QVariant> &hash)
 {
     GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     if (hash.contains("_user"))

@@ -260,11 +260,10 @@ void UserFrame::kb()
     script_win->show();
 }
 
-void UserFrame::ctcp(QString text)
+void UserFrame::ctcp(const QString &text)
 {
     foreach (libircclient::User user, this->SelectedUsers())
     {
-        //this->parentFrame->TransferRaw("PRIVMSG " + user.GetNick());
         this->parentFrame->SendCtcp(user.GetNick(), text, "");
     }
 }
@@ -312,6 +311,7 @@ void UserFrame::InsertUser(libircclient::User *user, bool bulk)
     QString name = user->GetNick().toLower();
     if (this->users.contains(name))
         this->RemoveUser(name);
+    //! \todo Optimize this
     this->users.insert(name, libircclient::User(user));
     UserFrameItem *item = new UserFrameItem(user->GetPrefixedNick(), this->network);
     item->setToolTip(this->GenerateTip(user));
@@ -372,7 +372,7 @@ void UserFrame::Sort()
     this->ui->listWidget->sortItems();
 }
 
-void UserFrame::ChangeNick(QString new_nick, QString old_nick)
+void UserFrame::ChangeNick(const QString &new_nick, QString old_nick)
 {
     GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     old_nick = old_nick.toLower();
@@ -399,7 +399,7 @@ QList<libircclient::User> UserFrame::SelectedUsers()
     QList<libircclient::User> ul;
     if (!this->network)
         return ul;
-    QString channel_name = this->parentFrame->GetScrollback()->GetTarget();
+
     // Check all users who were selected
     foreach(QListWidgetItem* item, this->ui->listWidget->selectedItems())
     {

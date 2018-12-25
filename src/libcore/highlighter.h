@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2019
 
 #ifndef HIGHLIGHTER_H
 #define HIGHLIGHTER_H
@@ -37,13 +37,13 @@ namespace GrumpyIRC
             static bool IsMatch(ScrollbackItem *text, libircclient::Network *network);
             static QList<Highlighter*> Highlighter_Data;
 
-            Highlighter(QHash<QString, QVariant> hash);
-            Highlighter(QString text);
-            ~Highlighter();
-            QHash<QString, QVariant> ToHash();
-            void LoadHash(QHash<QString, QVariant> hash);
+            Highlighter(const QHash<QString, QVariant> &hash);
+            Highlighter(const QString &text);
+            ~Highlighter() override;
+            QHash<QString, QVariant> ToHash() override;
+            void LoadHash(const QHash<QString, QVariant> &hash) override;
             bool IsMatching(ScrollbackItem *text, libircclient::Network *network);
-            void SetDefinition(QString value);
+            void SetDefinition(const QString &value);
             void MakeRegex();
             QString GetDefinition() const;
             bool CaseSensitive;

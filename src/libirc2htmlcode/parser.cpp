@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #include "parser.h"
 
@@ -50,12 +50,7 @@ Parser::Parser()
     this->TextColors.insert(15,   "#DADADA"); // Light grey
 }
 
-Parser::~Parser()
-{
-
-}
-
-FormattedItem Parser::Process(QString format, QDateTime time, QString user, QString text, QString override_default_text_color)
+FormattedItem Parser::Process(const QString &format, const QDateTime &time, const QString &user, const QString &text, const QString &override_default_text_color)
 {
     /*if (this->resolveCache.contains(input))
     {
@@ -111,7 +106,7 @@ QString Parser::linkUrl(QString source, QString protocol)
 {
     int position = 0;
     protocol = protocol + "://";
-    while (position < source.size() && source.mid(position).contains(protocol))
+    while (position < source.size() && source.midRef(position).contains(protocol))
     {
         position = source.indexOf(protocol, position);
         // find the end of link
@@ -335,17 +330,17 @@ QString Parser::replaceSpecials(QString source)
     return source;
 }
 
-QString Parser::formatTime(QDateTime time)
+QString Parser::formatTime(const QDateTime &time)
 {
     return "<font color=\"" + this->TimeColor + "\">" + this->EncodeHtml(time.toString()) + "</font>";
 }
 
-QString Parser::formatUser(QString user)
+QString Parser::formatUser(const QString &user)
 {
     return "<font color=\"" + this->UserColor + "\">" + this->EncodeHtml(user) + "</font>";
 }
 
-QString Parser::formatText(QString text, QString color)
+QString Parser::formatText(const QString &text, const QString &color)
 {
     return "<font color=\"" + color + "\">" + this->replaceSpecials(this->linkChannels(this->linkUrls(this->EncodeHtml(text)))) + "</font>";
 }

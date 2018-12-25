@@ -37,11 +37,11 @@ namespace GrumpyIRC
             Q_OBJECT
         public:
             explicit UserFrame(ScrollbackFrame *parent);
-            ~UserFrame();
+            ~UserFrame() override;
             void InsertUser(libircclient::User *user, bool bulk);
             void RemoveUser(QString user);
             void RefreshUser(libircclient::User *user);
-            void ChangeNick(QString new_nick, QString old_nick);
+            void ChangeNick(const QString &new_nick, QString old_nick);
             void SetNetwork(libircclient::Network *Network);
             QList<libircclient::User> SelectedUsers();
             void Sort();
@@ -65,7 +65,7 @@ namespace GrumpyIRC
             void changeModes(char prefix, char mode);
             void ban();
             void kb();
-            void ctcp(QString text);
+            void ctcp(const QString &text);
             QString GenerateTip(libircclient::User *ux);
             QHash<char, unsigned int> userCounts;
             ScrollbackFrame *parentFrame;

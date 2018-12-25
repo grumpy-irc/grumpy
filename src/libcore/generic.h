@@ -45,7 +45,7 @@ namespace GrumpyIRC
             MessageBox_Type_Error
         };
 
-        LIBCORESHARED_EXPORT bool String2Bool(QString string, bool invalid = false);
+        LIBCORESHARED_EXPORT bool String2Bool(const QString &string, bool invalid = false);
         LIBCORESHARED_EXPORT QString Bool2String(bool boolean);
         //! \todo No unit test
         LIBCORESHARED_EXPORT QStringList Trim(QStringList list);
@@ -53,18 +53,18 @@ namespace GrumpyIRC
         LIBCORESHARED_EXPORT bool Int2Bool(int integer);
         LIBCORESHARED_EXPORT bool IsGrumpy(Scrollback *window);
         //! \todo No unit test
-        LIBCORESHARED_EXPORT QHash<QString, QVariant> MergeHash(QHash<QString, QVariant> x, QHash<QString, QVariant> y);
+        LIBCORESHARED_EXPORT QHash<QString, QVariant> MergeHash(QHash<QString, QVariant> &x, const QHash<QString, QVariant> &y);
         //! \todo No unit test
-        LIBCORESHARED_EXPORT QByteArray VariantToByteArray(QVariant data);
+        LIBCORESHARED_EXPORT QByteArray VariantToByteArray(const QVariant &data);
         //! \todo No unit test
-        LIBCORESHARED_EXPORT QVariant VariantFromByteArray(QByteArray data);
-        LIBCORESHARED_EXPORT QList<QVariant> QStringListToQVariantList(QList<QString> list);
-        LIBCORESHARED_EXPORT QList<int> QVariantListToIntList(QList<QVariant> list);
-        LIBCORESHARED_EXPORT QString GetResource(QString name);
+        LIBCORESHARED_EXPORT QVariant VariantFromByteArray(QByteArray &data);
+        LIBCORESHARED_EXPORT QList<QVariant> QStringListToQVariantList(const QList<QString> &list);
+        LIBCORESHARED_EXPORT QList<int> QVariantListToIntList(const QList<QVariant> &list);
+        LIBCORESHARED_EXPORT QString GetResource(const QString &name);
         LIBCORESHARED_EXPORT QString StripSpecial(QString text);
-        LIBCORESHARED_EXPORT QList<QVariant> QIntListToVariantList(QList<int> list);
+        LIBCORESHARED_EXPORT QList<QVariant> QIntListToVariantList(const QList<int> &list);
         LIBCORESHARED_EXPORT QString ExpandedString(QString string, unsigned int minimum_size, unsigned int maximum_size = 0);
-        LIBCORESHARED_EXPORT int LongestString(QList<QString> list);
+        LIBCORESHARED_EXPORT int LongestString(const QList<QString> &list);
         LIBCORESHARED_EXPORT QString DoubleDigit(int digit);
         LIBCORESHARED_EXPORT HostInfo GetHostPortInfo(QString target, int default_port);
         LIBCORESHARED_EXPORT bool SecondsToTimeSpan(int time, int *days, int *hours, int *minutes, int *seconds);

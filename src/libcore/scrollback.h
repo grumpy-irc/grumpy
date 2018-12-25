@@ -73,14 +73,14 @@ namespace GrumpyIRC
 #ifdef GRUMPY_EXTREME
             static unsigned long long TotalIC;
 #endif
-            ScrollbackItem(QHash<QString, QVariant> hash);
-            ScrollbackItem(QString text, scrollback_id_t id=0, bool self = false);
-            ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User *user = NULL, scrollback_id_t id=0, bool self = false);
-            ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User user, scrollback_id_t id=0, bool self = false);
-            ScrollbackItem(QString text, ScrollbackItemType type, libircclient::User user, QDateTime date, scrollback_id_t id=0, bool self = false);
+            ScrollbackItem(const QHash<QString, QVariant> &hash);
+            ScrollbackItem(const QString &text, scrollback_id_t id=0, bool self = false);
+            ScrollbackItem(const QString &text, ScrollbackItemType type, libircclient::User *user = nullptr, scrollback_id_t id=0, bool self = false);
+            ScrollbackItem(const QString &text, ScrollbackItemType type, const libircclient::User &user, scrollback_id_t id=0, bool self = false);
+            ScrollbackItem(const QString &text, ScrollbackItemType type, const libircclient::User &user, const QDateTime &date, scrollback_id_t id=0, bool self = false);
             ScrollbackItem(ScrollbackItem *i);
             ScrollbackItem(const ScrollbackItem &i);
-            virtual ~ScrollbackItem();
+             ~ScrollbackItem() override;
             virtual void SetID(scrollback_id_t id);
             virtual QString GetText() const;
             //! Items in scrollback are indexed with this so that we can sync only newest items.
@@ -89,12 +89,12 @@ namespace GrumpyIRC
             virtual ScrollbackItemType GetType() const;
             virtual QDateTime GetTime() const;
             virtual void SetType(ScrollbackItemType type);
-            virtual void SetText(QString text);
+            virtual void SetText(const QString &text);
             virtual void SetUser(libircclient::User *user);
             virtual bool IsSelf() const;
             virtual libircclient::User GetUser() const;
-            void LoadHash(QHash<QString, QVariant> hash);
-            QHash<QString, QVariant> ToHash();
+            void LoadHash(const QHash<QString, QVariant> &hash) override;
+            QHash<QString, QVariant> ToHash() override;
         private:
             scrollback_id_t _id;
             libircclient::User _user;
@@ -130,9 +130,9 @@ namespace GrumpyIRC
             static QList<Scrollback*> ScrollbackList;
             static QMutex ScrollbackList_Mutex;
 
-            Scrollback(ScrollbackType Type = ScrollbackType_System, Scrollback *parent = NULL, bool scrollback_hidden = false);
-            Scrollback(QHash<QString, QVariant> hash);
-            virtual ~Scrollback();
+            Scrollback(ScrollbackType Type = ScrollbackType_System, Scrollback *parent = nullptr, bool scrollback_hidden = false);
+            Scrollback(const QHash<QString, QVariant> &hash);
+             ~Scrollback() override;
             virtual void Close();
             //! Maximum amount of items allowed to be stored in buffer of this scrollback
             //! if exceeded, oldest items are removed
@@ -144,18 +144,18 @@ namespace GrumpyIRC
             scrollback_id_t GetOriginalID();
             virtual void SetOriginalID(scrollback_id_t sid);
             void SetMaxItemsSize(scrollback_id_t size);
-            virtual void InsertText(QString text, ScrollbackItemType type = ScrollbackItemType_System);
+            virtual void InsertText(const QString &text, ScrollbackItemType type = ScrollbackItemType_System);
             virtual void InsertText(ScrollbackItem item);
             ScrollbackItem GetFirst();
             QString GetLTarget();
             virtual QString GetTarget() const;
-            virtual void SetTarget(QString target);
+            virtual void SetTarget(const QString &target);
             virtual void SetSITotalCount(scrollback_id_t sitc);
             //! If this scrollback is associated to some session this function returns the pointer to it, in case it's not NULL is returned
             virtual NetworkSession *GetSession();
             virtual QList<ScrollbackItem> GetItems();
             //! Called by IRC session or any other object if there is any change to user list associated to this scrollback
-            virtual void UserListChange(QString nick, libircclient::User *user, UserListChangeType change_type, bool bulk = false);
+            virtual void UserListChange(const QString &nick, libircclient::User *user, UserListChangeType change_type, bool bulk = false);
             virtual ScrollbackType GetType() const;
             virtual void SetSession(NetworkSession *Session);
             virtual bool IsDead() const;
@@ -178,23 +178,23 @@ namespace GrumpyIRC
             QHash<QString, QVariant> ToHash(int max = 200);
             QHash<QString, QVariant> ToPartialHash();
             virtual bool IsHidable();
-            void LoadHash(QHash<QString, QVariant> hash);
+            void LoadHash(const QHash<QString, QVariant> &hash) override;
             //! Used to resync most of attributes with target
             void Resync(Scrollback *target);
             virtual void SetHidable(bool is);
             virtual void SetState(ScrollbackState state, bool enforced = false);
             virtual ScrollbackState GetState();
-            virtual void SetProperty(QString name, QVariant value);
-            virtual int GetPropertyAsInt(QString name, int default_val = 0);
-            virtual QString GetPropertyAsString(QString name, QString default_val = "");
-            virtual bool GetPropertyAsBool(QString name, bool default_val = false);
+            virtual void SetProperty(const QString &name, const QVariant &value);
+            virtual int GetPropertyAsInt(const QString &name, int default_val = 0);
+            virtual QString GetPropertyAsString(const QString &name, QString default_val = "");
+            virtual bool GetPropertyAsBool(const QString &name, bool default_val = false);
             //! You can set this to true in order to suppress state updates
             bool IgnoreState;
             QHash<QString, QVariant> PropertyBag;
 
         signals:
             void Event_Closed();
-            void Event_InsertText(ScrollbackItem item);
+            void Event_InsertText(ScrollbackItem &item);
             //! Called when internal pointer to a network was modified, this is required by some wrappers
             //!
             //! If you are rendering a user list (which is associated with Channel scrollbacks) you need to have a pointer
@@ -220,7 +220,7 @@ namespace GrumpyIRC
         protected:
             static scrollback_id_t lastID;
 
-            virtual void insertSI(ScrollbackItem si);
+            virtual void insertSI(const ScrollbackItem &si);
             scrollback_id_t _lastItemID;
             bool _sbHidden;
             ScrollbackState scrollbackState;

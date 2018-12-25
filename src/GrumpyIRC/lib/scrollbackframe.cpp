@@ -107,7 +107,7 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     connect(this->scrollback, SIGNAL(Event_Reload()), this, SLOT(Refresh()));
     connect(this->scrollback, SIGNAL(Event_UserAltered(QString,libircclient::User*)), this, SLOT(UserList_Alter(QString,libircclient::User*)));
     connect(this->scrollback, SIGNAL(Event_UserRemoved(QString, bool)), this, SLOT(UserList_Remove(QString, bool)));
-    connect(this->scrollback, SIGNAL(Event_InsertText(ScrollbackItem)), this, SLOT(_insertText_(ScrollbackItem)));
+    connect(this->scrollback, SIGNAL(Event_InsertText(ScrollbackItem&)), this, SLOT(_insertText_(ScrollbackItem&)));
     connect(this->scrollback, SIGNAL(Event_Closed()), this, SLOT(OnClosed()));
     connect(this->scrollback, SIGNAL(Event_UserListBulkDone()), this, SLOT(OnFinishSortBulk()));
     connect(this->scrollback, SIGNAL(Event_UserRefresh(libircclient::User*)), this, SLOT(UserList_Refresh(libircclient::User*)));
@@ -147,7 +147,7 @@ QString ScrollbackFrame::GetWindowName() const
     return this->_name;
 }
 
-void ScrollbackFrame::InsertText(QString text, ScrollbackItemType item)
+void ScrollbackFrame::InsertText(const QString &text, ScrollbackItemType item)
 {
     if (!this->scrollback)
         throw new NullPointerException("this->scrollback", BOOST_CURRENT_FUNCTION);
@@ -156,12 +156,12 @@ void ScrollbackFrame::InsertText(QString text, ScrollbackItemType item)
     this->scrollback->InsertText(text, item);
 }
 
-void ScrollbackFrame::InsertText(ScrollbackItem item)
+void ScrollbackFrame::InsertText(const ScrollbackItem &item)
 {
     this->scrollback->InsertText(item);
 }
 
-static QString FormatAction(libircclient::User user, QString action, bool full_user)
+static QString FormatAction(const libircclient::User &user, const QString &action, bool full_user)
 {
     GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     QString result = CONF->GetActionFormat();
@@ -176,7 +176,7 @@ static QString FormatAction(libircclient::User user, QString action, bool full_u
     return result;
 }
 
-static QString ItemToString(ScrollbackItem item, bool highlighted)
+static QString ItemToString(const ScrollbackItem &item, bool highlighted)
 {
     GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     // Render the text according to our formatting
@@ -262,7 +262,7 @@ static QString ItemToString(ScrollbackItem item, bool highlighted)
     return results.source;
 }
 
-static QString ItemToPlainText(ScrollbackItem item)
+static QString ItemToPlainText(const ScrollbackItem &item)
 {
     QString result;
     switch (item.GetType())
@@ -280,7 +280,7 @@ static QString ItemToPlainText(ScrollbackItem item)
     return result;
 }
 
-void ScrollbackFrame::_insertText_(ScrollbackItem item)
+void ScrollbackFrame::_insertText_(ScrollbackItem &item)
 {
     GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     if (!this->ShowJQP)
@@ -300,7 +300,7 @@ void ScrollbackFrame::_insertText_(ScrollbackItem item)
     int highlighted = GRUMPY_H_NOT;
     bool is_opening = this->Refreshing;
     if (!is_opening && Generic::IsGrumpy(this->scrollback))
-        is_opening = ((GrumpydSession*)this->scrollback->GetSession())->IsOpening;
+        is_opening = (dynamic_cast<GrumpydSession*>(this->scrollback->GetSession()))->IsOpening;
     if (Highlighter::IsMatch(&item, this->GetNetwork()))
     {
         if (!is_opening && !this->Muted)
@@ -344,12 +344,12 @@ void ScrollbackFrame::OnState()
         this->TreeNode->UpdateToolTip();
 }
 
-void ScrollbackFrame::UserList_Remove(QString user, bool bulk)
+void ScrollbackFrame::UserList_Remove(const QString &user, bool bulk)
 {
     this->userFrame->RemoveUser(user);
 }
 
-void ScrollbackFrame::UserList_Alter(QString old, libircclient::User *us)
+void ScrollbackFrame::UserList_Alter(const QString &old, libircclient::User *us)
 {
     this->userFrame->RemoveUser(old);
     this->userFrame->InsertUser(us, false);
@@ -368,7 +368,7 @@ void ScrollbackFrame::OnFinishSortBulk()
     this->userFrame->Sort();
 }
 
-void ScrollbackFrame::OnLink(QString url)
+void ScrollbackFrame::OnLink(const QString &url)
 {
     if (!url.contains("://"))
             return;
@@ -512,7 +512,7 @@ QString ScrollbackFrame::itemsToString(QList<ScrollbackItem> items)
 {
     bool is_first = true;
     QString temp;
-    while (items.size())
+    while (!items.empty())
     {
         ScrollbackItem item = items.at(0);
         bool is_hg = Highlighter::IsMatch(&item, this->GetNetwork());
@@ -526,7 +526,7 @@ QString ScrollbackFrame::itemsToString(QList<ScrollbackItem> items)
     return temp;
 }
 
-void ScrollbackFrame::SetWindowName(QString title)
+void ScrollbackFrame::SetWindowName(const QString &title)
 {
     this->_name = title;
 }
@@ -681,8 +681,7 @@ void ScrollbackFrame::RequestClose()
             session = this->GetSession();
         this->GetSession()->RequestRemove(this->GetScrollback());
         // Call to RequestRemove probably called delete on this very scrollback frame, so now we are within a deleted object, be carefull here not to access internal memory
-        if (session)
-            delete session;
+        delete session;
     }
 }
 
@@ -707,7 +706,7 @@ void ScrollbackFrame::EnableState(bool enable)
         this->scrollback->SetState(ScrollbackState_Normal, true);
         if (this->IsGrumpy())
         {
-            GrumpydSession *session = (GrumpydSession*)this->GetSession();
+            GrumpydSession *session = dynamic_cast<GrumpydSession*>(this->GetSession());
             // Resync the information that the window was read
             QHash<QString, QVariant> parameters;
             parameters.insert("_original_id", this->scrollback->GetOriginalID());
@@ -766,7 +765,7 @@ void ScrollbackFrame::RequestMore(unsigned int count)
         MessageBox::Display("only-grumpy", "Error", "This function is available only for use with grumpyd.", MainWindow::Main);
         return;
     }
-    GrumpydSession *grumpy = (GrumpydSession*)this->GetSession();
+    GrumpydSession *grumpy = dynamic_cast<GrumpydSession*>(this->GetSession());
     ScrollbackItem first_item = this->GetScrollback()->GetFirst();
     if (first_item.GetID() == 0)
         return;
@@ -816,7 +815,7 @@ QString ScrollbackFrame::ToHtml()
     return text;
 }
 
-void ScrollbackFrame::SendCtcp(QString target, QString ctcp, QString text)
+void ScrollbackFrame::SendCtcp(const QString &target, const QString &ctcp, const QString &text)
 {
     if (this->GetSession())
         this->GetSession()->SendCTCP(this->GetScrollback(), target, ctcp, text);
@@ -828,7 +827,7 @@ void ScrollbackFrame::RefreshHtmlIfNeeded()
         this->RefreshHtml();
 }
 
-void ScrollbackFrame::SetProperty(QString name, QVariant value)
+void ScrollbackFrame::SetProperty(const QString &name, const QVariant &value)
 {
     this->scrollback->SetProperty(name, value);
     // now, if this is grumpy scrollback we need to share this option with others
@@ -836,7 +835,7 @@ void ScrollbackFrame::SetProperty(QString name, QVariant value)
     if (!Generic::IsGrumpy(this->scrollback))
         return;
 
-    GrumpydSession *session = (GrumpydSession*)this->GetSession();
+    GrumpydSession *session = dynamic_cast<GrumpydSession*>(this->GetSession());
     session->ResyncSingleItemPB(this->scrollback, name);
 }
 
@@ -851,7 +850,7 @@ libircclient::Network *ScrollbackFrame::GetNetwork()
     return this->precachedNetwork;
 }
 
-void ScrollbackFrame::TransferRaw(QString data, libircclient::Priority priority)
+void ScrollbackFrame::TransferRaw(const QString &data, libircclient::Priority priority)
 {
     if (!this->GetSession())
         return;
@@ -940,7 +939,7 @@ ScrollbackFrame_WorkerThread::ScrollbackFrame_WorkerThread(): GrumpyObject("Scro
 
 void ScrollbackFrame_WorkerThread::Sleep(int msec)
 {
-    this->msleep(msec);
+    ScrollbackFrame_WorkerThread::msleep(msec);
 }
 
 void ScrollbackFrame_WorkerThread::run()
@@ -967,7 +966,7 @@ void ScrollbackFrame_WorkerThread::run()
             s->unwritten_m.unlock();
         }
         ScrollbackFrame::ScrollbackFrames_m.unlock();
-        this->msleep(200);
+        ScrollbackFrame_WorkerThread::msleep(200);
     }
     this->IsFinished = true;
 }

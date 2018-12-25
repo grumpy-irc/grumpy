@@ -21,7 +21,7 @@
 
 using namespace GrumpyIRC;
 
-bool Generic::String2Bool(QString string, bool invalid)
+bool Generic::String2Bool(const QString &string, bool invalid)
 {
     if (string.toLower() == "true")
         return true;
@@ -70,7 +70,7 @@ int GrumpyIRC::Generic::Bool2Int(bool value)
         return 0;
 }
 
-QByteArray Generic::VariantToByteArray(QVariant data)
+QByteArray Generic::VariantToByteArray(const QVariant &data)
 {
     QByteArray result;
     QDataStream stream(&result, QIODevice::ReadWrite);
@@ -78,7 +78,7 @@ QByteArray Generic::VariantToByteArray(QVariant data)
     return result;
 }
 
-QVariant Generic::VariantFromByteArray(QByteArray data)
+QVariant Generic::VariantFromByteArray(QByteArray &data)
 {
     QDataStream stream(&data, QIODevice::ReadWrite);
     QVariant result;
@@ -86,7 +86,7 @@ QVariant Generic::VariantFromByteArray(QByteArray data)
     return result;
 }
 
-QHash<QString, QVariant> Generic::MergeHash(QHash<QString, QVariant> x, QHash<QString, QVariant> y)
+QHash<QString, QVariant> Generic::MergeHash(QHash<QString, QVariant> &x, const QHash<QString, QVariant> &y)
 {
     foreach (QString key, y.keys())
     {
@@ -98,7 +98,7 @@ QHash<QString, QVariant> Generic::MergeHash(QHash<QString, QVariant> x, QHash<QS
     return x;
 }
 
-QList<QVariant> Generic::QStringListToQVariantList(QList<QString> list)
+QList<QVariant> Generic::QStringListToQVariantList(const QList<QString> &list)
 {
     QList<QVariant> results;
 
@@ -108,7 +108,7 @@ QList<QVariant> Generic::QStringListToQVariantList(QList<QString> list)
     return results;
 }
 
-QList<int> Generic::QVariantListToIntList(QList<QVariant> list)
+QList<int> Generic::QVariantListToIntList(const QList<QVariant> &list)
 {
     QList<int> results;
 
@@ -118,7 +118,7 @@ QList<int> Generic::QVariantListToIntList(QList<QVariant> list)
     return results;
 }
 
-QList<QVariant> Generic::QIntListToVariantList(QList<int> list)
+QList<QVariant> Generic::QIntListToVariantList(const QList<int> &list)
 {
     QList<QVariant> results;
 
@@ -152,7 +152,7 @@ QString Generic::ExpandedString(QString string, unsigned int minimum_size, unsig
     return string;
 }
 
-int Generic::LongestString(QList<QString> list)
+int Generic::LongestString(const QList<QString> &list)
 {
     int longest = 0;
     foreach (QString item, list)
@@ -163,7 +163,7 @@ int Generic::LongestString(QList<QString> list)
     return longest;
 }
 
-QString Generic::GetResource(QString name)
+QString Generic::GetResource(const QString &name)
 {
     QFile file(name);
     if (!file.open(QIODevice::ReadOnly))
@@ -259,7 +259,7 @@ Generic::HostInfo Generic::GetHostPortInfo(QString target, int default_port)
 
     // This is either IPv4 or string
     info.Host = target.mid(0, target.indexOf(":"));
-    p = target.mid(target.indexOf(":") + 1).toInt(&success);
+    p = target.midRef(target.indexOf(":") + 1).toInt(&success);
     if (!success)
     {
         info.Invalid = true;

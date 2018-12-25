@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2018
 
 #ifndef PARSER_H
 #define PARSER_H
@@ -33,8 +33,8 @@ namespace irc2htmlcode
     {
         public:
             Parser();
-            virtual ~Parser();
-            virtual FormattedItem Process(QString format, QDateTime time, QString user, QString text, QString override_default_text_color = "");
+            virtual ~Parser()=default;
+            virtual FormattedItem Process(const QString &format, const QDateTime &time, const QString &user, const QString &text, const QString &override_default_text_color = "");
             QString EncodeHtml(QString text);
             QString GetStyle();
             char ChannelSymbol;
@@ -60,9 +60,9 @@ namespace irc2htmlcode
             QString linkUrls(QString source);
             QString linkChannels(QString source);
             QString replaceSpecials(QString source);
-            QString formatTime(QDateTime time);
-            QString formatUser(QString user);
-            QString formatText(QString text, QString color);
+            QString formatTime(const QDateTime &time);
+            QString formatUser(const QString &user);
+            QString formatText(const QString &text, const QString &color);
             int resolveCacheSize;
             unsigned long long cacheHits;
             unsigned long long cacheMiss;
