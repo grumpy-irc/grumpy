@@ -161,7 +161,7 @@ cp $openssl_path\bin\libeay32.dll release
 # Set the environment variable needed by windeployqt, todo: check if it's already set
 $env:VCINSTALLDIR = $vcinstall_path
 
-Invoke-Expression "$qt5_path\bin\windeployqt.exe release\grumpy.exe"
+Invoke-Expression "$qt5_path\bin\windeployqt.exe release\grumpy.dll"
 
 echo "Making package out of this"
 

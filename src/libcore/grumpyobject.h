@@ -22,7 +22,7 @@
 
 namespace GrumpyIRC
 {
-    class GrumpyObject
+    class LIBCORESHARED_EXPORT GrumpyObject
     {
         public:
             static QHash<QString, quint64> GetClassInstanceCounts();
