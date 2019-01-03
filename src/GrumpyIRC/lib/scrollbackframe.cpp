@@ -495,7 +495,7 @@ void ScrollbackFrame::clearItems()
     this->textEdit->Clear();
 }
 
-void ScrollbackFrame::writeText(ScrollbackItem item, int highlighted)
+void ScrollbackFrame::writeText(ScrollbackItem &item, int highlighted)
 {
     bool is_hg = false;
     if (!highlighted)
@@ -510,6 +510,7 @@ void ScrollbackFrame::writeText(ScrollbackItem item, int highlighted)
 
 QString ScrollbackFrame::itemsToString(QList<ScrollbackItem> items)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     bool is_first = true;
     QString temp;
     while (!items.empty())
@@ -729,7 +730,7 @@ void ScrollbackFrame::ToggleSecure()
     this->inputBox->Secure();
 }
 
-void ScrollbackFrame::ExecuteScript(QString text)
+void ScrollbackFrame::ExecuteScript(const QString &text)
 {
     if (!this->GetSession())
         return;

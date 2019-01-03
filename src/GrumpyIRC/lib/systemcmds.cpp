@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #include "systemcmds.h"
 #include "mainwindow.h"
@@ -658,7 +658,7 @@ int SystemCmds::ScriptList(SystemCommand *command, CommandArgs command_args)
     return 0;
 }
 
-static bool ReloadExtension(QString name)
+static bool ReloadExtension(const QString &name)
 {
     ScriptExtension *e = ScriptExtension::GetExtensionByName(name);
     if (!e)
@@ -734,15 +734,42 @@ int SystemCmds::Profiler(SystemCommand *command, CommandArgs command_args)
         sx->InsertText(Generic::ExpandedString(cx, 60, 60) + "| " + Generic::ExpandedString(QString::number(memory_cx[cx]), 22, 22));
     }
 #ifdef GRUMPY_PROFILER
-    sx->InsertText("-----------------------------------------------------------------------------------");
+    sx->InsertText("-------------------------------------------------------------------------------------------------------");
     sx->InsertText("Function calls");
-    sx->InsertText("Name                                                        | Count");
-    sx->InsertText("------------------------------------------------------------+----------------------");
+    sx->InsertText("Name                                                                                      | Count");
+    sx->InsertText("------------------------------------------------------------------------------------------+------------");
     foreach (QString function, GrumpyIRC::Profiler::GetRegisteredCounterFunctions())
     {
-        sx->InsertText(Generic::ExpandedString(function, 60, 60) + "| " + Generic::ExpandedString(QString::number(GrumpyIRC::Profiler::GetCallsForFunction(function)), 22, 22));
+        sx->InsertText(Generic::ExpandedString(function, 90, 90) + "| " + Generic::ExpandedString(QString::number(GrumpyIRC::Profiler::GetCallsForFunction(function)), 22, 22));
     }
-    sx->InsertText("-----------------------------------------------------------------------------------");
+    sx->InsertText("-------------------------------------------------------------------------------------------------------");
 #endif
+    return 0;
+}
+
+int SystemCmds::Disconnect(SystemCommand *command, CommandArgs command_args)
+{
+    (void)command_args;
+    (void)command;
+    ScrollbackFrame *sx = MainWindow::Main->GetCurrentScrollbackFrame();
+    sx->RequestDisconnect();
+    return 0;
+}
+
+int SystemCmds::Reconnect(SystemCommand *command, CommandArgs command_args)
+{
+    (void)command_args;
+    (void)command;
+    ScrollbackFrame *sx = MainWindow::Main->GetCurrentScrollbackFrame();
+    sx->Reconnect();
+    return 0;
+}
+
+int SystemCmds::Close(SystemCommand *command, CommandArgs command_args)
+{
+    (void)command_args;
+    (void)command;
+    ScrollbackFrame *sx = MainWindow::Main->GetCurrentScrollbackFrame();
+    sx->RequestClose();
     return 0;
 }

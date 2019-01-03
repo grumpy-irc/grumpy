@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #ifndef IRCSESSION_H
 #define IRCSESSION_H
@@ -57,17 +57,17 @@ namespace GrumpyIRC
             static QMutex Sessions_Lock;
 			static QList<IRCSession*> Sessions;
 
-            IRCSession(QHash<QString, QVariant> sx, Scrollback *root = NULL);
+            IRCSession(QHash<QString, QVariant> sx, Scrollback *root = nullptr);
 			
             /*!
              * \brief IRCSession Creates a new uninitialized session, you should always create new sessions
              *                   with IRCSession::Open() instead of calling this directly
              */
-            IRCSession(Scrollback *system, Scrollback *root = NULL);
-            IRCSession(unsigned int id, Scrollback *system, Scrollback *root = NULL);
-            virtual ~IRCSession();
-            bool IsAway(Scrollback *scrollback = NULL);
-            virtual Scrollback *GetSystemWindow();
+            IRCSession(Scrollback *system, Scrollback *root = nullptr);
+            IRCSession(unsigned int id, Scrollback *system, Scrollback *root = nullptr);
+             ~IRCSession() override;
+            bool IsAway(Scrollback *scrollback = nullptr) override;
+            Scrollback *GetSystemWindow() override;
             //! Return a first scrollback that matches the name, keep in mind that scrollbacks may have same name, for unique
             //! instance use SID of the give scrollback
             virtual Scrollback *GetScrollback(QString name);
@@ -77,41 +77,41 @@ namespace GrumpyIRC
             virtual Scrollback *GetScrollbackForChannel(QString channel);
             //! Retrieves a scrollback for given user, if it doesn't exist it will be created
             virtual Scrollback *GetScrollbackForUser(QString user);
-            virtual libircclient::Network *GetNetwork(Scrollback *scrollback = 0);
+            libircclient::Network *GetNetwork(Scrollback *scrollback = nullptr) override;
             virtual QList<Scrollback*> GetScrollbacks();
             virtual QList<Scrollback*> GetUserScrollbacks();
             virtual QList<Scrollback*> GetChannelScrollbacks();
             virtual unsigned int GetSID();
             virtual void Connect(libircclient::Network *Network);
-            void SendMessage(Scrollback *scrollback, QString target, QString text);
-            void SendNotice(Scrollback *scrollback, QString target, QString text);
-            void SendMessage(Scrollback *scrollback, QString text);
-            void SendCTCP(Scrollback *scrollback, QString target, QString ctcp, QString param);
-            virtual bool IsConnected() const;
+            void SendMessage(Scrollback *scrollback, QString target, QString text) override;
+            void SendNotice(Scrollback *scrollback, QString target, QString text) override;
+            void SendMessage(Scrollback *scrollback, QString text) override;
+            void SendCTCP(Scrollback *scrollback, QString target, QString ctcp, QString param) override;
+            bool IsConnected() const override;
             virtual void SetNetwork(libircclient::Network *nt);
-            void SendNotice(Scrollback *scrollback, QString text);
+            void SendNotice(Scrollback *scrollback, QString text) override;
             virtual QList<NetworkSniffer_Item> GetSniffer();
-            SessionType GetType();
-            QList<QString> GetChannels(Scrollback *scrollback);
+            SessionType GetType() override;
+            QList<QString> GetChannels(Scrollback *scrollback) override;
             QHash<QString, QVariant> ToHash(int max_items = 2000);
-            void LoadHash(QHash<QString, QVariant> hash);
-            void SendAction(Scrollback *scrollback, QString text);
-            void SendRaw(Scrollback *scrollback, QString raw, libircclient::Priority pr = libircclient::Priority_Normal);
-            void RequestRemove(Scrollback *scrollback);
-            void RequestReconnect(Scrollback *scrollback);
-            void Query(Scrollback *scrollback, QString target, QString message);
-            libircclient::Channel *GetChannel(Scrollback *scrollback);
-            void RequestDisconnect(Scrollback *scrollback, QString reason, bool auto_delete);
-            void RequestPart(Scrollback *scrollback);
-            libircclient::User *GetSelfNetworkID(Scrollback *scrollback);
+            void LoadHash(const QHash<QString, QVariant> &hash) override;
+            void SendAction(Scrollback *scrollback, QString text) override;
+            void SendRaw(Scrollback *scrollback, QString raw, libircclient::Priority pr = libircclient::Priority_Normal) override;
+            void RequestRemove(Scrollback *scrollback) override;
+            void RequestReconnect(Scrollback *scrollback) override;
+            void Query(Scrollback *scrollback, QString target, QString message) override;
+            libircclient::Channel *GetChannel(Scrollback *scrollback) override;
+            void RequestDisconnect(Scrollback *scrollback, QString reason, bool auto_delete) override;
+            void RequestPart(Scrollback *scrollback) override;
+            libircclient::User *GetSelfNetworkID(Scrollback *scrollback) override;
             //! Used mostly only for synchronization with grumpyd
             virtual void RegisterChannel(libircclient::Channel *channel, Scrollback *scrollback);
             void RetrieveChannelExceptionList(Scrollback *scrollback, QString channel_name);
             void RetrieveChannelInviteList(Scrollback *scrollback, QString channel_name);
-            void RetrieveChannelBanList(Scrollback *scrollback, QString channel_name);
-            void SetAway(QString reason);
-            void UnsetAway();
-            QString GetLocalUserModeAsString(Scrollback *scrollback);
+            void RetrieveChannelBanList(Scrollback *scrollback, QString channel_name) override;
+            void SetAway(QString reason) override;
+            void UnsetAway() override;
+            QString GetLocalUserModeAsString(Scrollback *scrollback) override;
             QString GetName() const;
             QString GetHostname() const;
             QString GetNick() const;
@@ -120,8 +120,8 @@ namespace GrumpyIRC
             bool UsingSSL() const;
             unsigned int GetPort() const;
             QList<long long> GetPingHistory();
-            bool IsAutoreconnect(Scrollback *scrollback);
-            void SetAutoreconnect(Scrollback *scrollback, bool reconnect);
+            bool IsAutoreconnect(Scrollback *scrollback) override;
+            void SetAutoreconnect(Scrollback *scrollback, bool reconnect) override;
             void SetSniffer(bool enabled, int size);
             QList<int> IgnoredNums;
             Scrollback *Root;

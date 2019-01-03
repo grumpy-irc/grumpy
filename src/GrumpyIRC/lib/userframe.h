@@ -47,7 +47,7 @@ namespace GrumpyIRC
             void Sort();
             QList<QString> GetUsers();
             void Whois();
-            void ChangeMode(QString mode);
+            void ChangeMode(const QString &mode);
             void UpdateInfo();
             bool IsVisible;
             bool NeedsUpdate;

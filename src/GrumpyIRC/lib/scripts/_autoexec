@@ -11,6 +11,9 @@
 
 # Now these are usually present on all IRCD but we override them with our "better" version
 # if you want to use native version provided by IRCD, simply remove them
+/grumpy.alias close grumpy.close
+/grumpy.alias disconnect grumpy.disconnect
+/grumpy.alias reconnect grumpy.reconnect
 /grumpy.alias topic grumpy.topic
 /grumpy.alias quit grumpy.quit
 /grumpy.alias join grumpy.join

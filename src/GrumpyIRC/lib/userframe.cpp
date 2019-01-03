@@ -429,7 +429,7 @@ QList<QString> UserFrame::GetUsers()
     return ul;
 }
 
-void UserFrame::ChangeMode(QString mode)
+void UserFrame::ChangeMode(const QString &mode)
 {
     QString channel_name = this->parentFrame->GetScrollback()->GetTarget();
     QList<libircclient::User> users = this->SelectedUsers();

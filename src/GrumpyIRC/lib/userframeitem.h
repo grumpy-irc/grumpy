@@ -27,8 +27,8 @@ namespace GrumpyIRC
     class LIBGRUMPYSHARED_EXPORT UserFrameItem : public QListWidgetItem, public GrumpyObject
     {
         public:
-            UserFrameItem(QString text, libircclient::Network *nt);
-            bool operator<(const QListWidgetItem &other) const;
+            UserFrameItem(const QString &text, libircclient::Network *nt);
+            bool operator<(const QListWidgetItem &other) const override;
             bool lowerThan(const QListWidgetItem &other) const;
             libircclient::Network *network;
     };

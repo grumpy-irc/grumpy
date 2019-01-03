@@ -28,8 +28,8 @@ namespace GrumpyIRC
         public:
             static void Reset();
             static qint64 GetTime();
-            static void IncrementCall(QString function);
-            static unsigned long long GetCallsForFunction(QString function);
+            static void IncrementCall(const QString &function);
+            static unsigned long long GetCallsForFunction(const QString &function);
             static QList<QString> GetRegisteredCounterFunctions();
         private:
             static QHash<QString, unsigned long long> callCounter;

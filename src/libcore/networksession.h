@@ -40,12 +40,12 @@ namespace GrumpyIRC
             Q_OBJECT
         public:
             NetworkSession();
-            virtual ~NetworkSession();
+             ~NetworkSession() override;
             virtual bool IsAutoreconnect(Scrollback *scrollback)=0;
             virtual void SetAutoreconnect(Scrollback *scrollback, bool reconnect)=0;
-            virtual bool IsAway(Scrollback *scrollback = NULL)=0;
+            virtual bool IsAway(Scrollback *scrollback = nullptr)=0;
             virtual bool IsConnected() const=0;
-            virtual libircclient::Network *GetNetwork(Scrollback *scrollback = 0)=0;
+            virtual libircclient::Network *GetNetwork(Scrollback *scrollback = nullptr)=0;
             virtual void SendAction(Scrollback *scrollback, QString text)=0;
             virtual void SendMessage(Scrollback *scrollback, QString text)=0;
             virtual void SendRaw(Scrollback *scrollback, QString raw, libircclient::Priority pr = libircclient::Priority_Normal)=0;

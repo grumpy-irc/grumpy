@@ -110,7 +110,7 @@ namespace GrumpyIRC
             void EnableState(bool enable);
             void RequestPart();
             void ToggleSecure();
-            void ExecuteScript(QString text);
+            void ExecuteScript(const QString &text);
             void RequestJoin();
             void Reconnect();
             void RequestDisconnect();
@@ -158,7 +158,7 @@ namespace GrumpyIRC
         private:
             friend class ScrollbackFrame_WorkerThread;
             void clearItems();
-            void writeText(ScrollbackItem item, int highlighted = 0);
+            void writeText(ScrollbackItem &item, int highlighted = 0);
             QString itemsToString(QList<ScrollbackItem> items);
             bool isVisible;
             // Doesn't work :(

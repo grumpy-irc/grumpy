@@ -12,7 +12,9 @@
 
 #include "../libcore/scrollback.h"
 #include "../libirc/libircclient/network.h"
+#include "exception.h"
 #include "highlighter.h"
+#include "profiler.h"
 
 using namespace GrumpyIRC;
 
@@ -27,6 +29,7 @@ QList<Highlighter*> Highlighter::Highlighter_Data;
 
 bool Highlighter::IsMatch(ScrollbackItem *text, libircclient::Network *network)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     foreach (Highlighter *hx, Highlighter_Data)
     {
         if (hx->IsMatching(text, network))
@@ -86,6 +89,7 @@ void Highlighter::LoadHash(const QHash<QString, QVariant> &hash)
 
 bool Highlighter::IsMatching(ScrollbackItem *text, libircclient::Network *network)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     if (!this->Enabled)
         return false;
 

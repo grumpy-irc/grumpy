@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #include "aboutwin.h"
 #include "corewrapper.h"
@@ -118,6 +118,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.script.list",         (SC_Callback)SystemCmds::ScriptList));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.script.reload",       (SC_Callback)SystemCmds::ScriptReload));
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.script.reload.all",   (SC_Callback)SystemCmds::ScriptReloadAll));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.close",               (SC_Callback)SystemCmds::Close));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.reconnect",           (SC_Callback)SystemCmds::Reconnect));
+    CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.disconnect",          (SC_Callback)SystemCmds::Disconnect));
 #ifdef GRUMPY_PROFILER
     CoreWrapper::GrumpyCore->GetCommandProcessor()->RegisterCommand(new SystemCommand("grumpy.profiler",            (SC_Callback)SystemCmds::Profiler));
 #endif

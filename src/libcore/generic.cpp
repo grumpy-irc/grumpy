@@ -16,6 +16,7 @@
 #include <QFile>
 #include "generic.h"
 #include "exception.h"
+#include "profiler.h"
 #include "networksession.h"
 #include "scrollback.h"
 
@@ -88,6 +89,7 @@ QVariant Generic::VariantFromByteArray(QByteArray &data)
 
 QHash<QString, QVariant> Generic::MergeHash(QHash<QString, QVariant> &x, const QHash<QString, QVariant> &y)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     foreach (QString key, y.keys())
     {
         if (x.contains(key))
@@ -100,6 +102,7 @@ QHash<QString, QVariant> Generic::MergeHash(QHash<QString, QVariant> &x, const Q
 
 QList<QVariant> Generic::QStringListToQVariantList(const QList<QString> &list)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     QList<QVariant> results;
 
     foreach (QString item, list)
@@ -110,6 +113,7 @@ QList<QVariant> Generic::QStringListToQVariantList(const QList<QString> &list)
 
 QList<int> Generic::QVariantListToIntList(const QList<QVariant> &list)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     QList<int> results;
 
     foreach (QVariant item, list)
@@ -120,6 +124,7 @@ QList<int> Generic::QVariantListToIntList(const QList<QVariant> &list)
 
 QList<QVariant> Generic::QIntListToVariantList(const QList<int> &list)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     QList<QVariant> results;
 
     foreach (int item, list)
@@ -130,6 +135,7 @@ QList<QVariant> Generic::QIntListToVariantList(const QList<int> &list)
 
 QString Generic::ExpandedString(QString string, unsigned int minimum_size, unsigned int maximum_size)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     if (maximum_size != 0 && minimum_size > maximum_size)
         throw new Exception("Maximum size smaller than minimum size", BOOST_CURRENT_FUNCTION);
 
@@ -175,6 +181,7 @@ QString Generic::GetResource(const QString &name)
 
 QString Generic::StripSpecial(QString text)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     text = text.replace((char)1, "").replace((char)2, "").replace((char)4, "").replace((char)15, "").replace((char)16, "").replace((char)29, "");
     // now find a remove color codes
     while (text.contains((char)3))

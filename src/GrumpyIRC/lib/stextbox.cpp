@@ -23,18 +23,13 @@ STextBox::STextBox(QWidget *parent) : QPlainTextEdit(parent), GrumpyObject("STex
     this->setContextMenuPolicy(Qt::CustomContextMenu);
 }
 
-STextBox::~STextBox()
-{
-
-}
-
-void STextBox::AppendHtml(QString html)
+void STextBox::AppendHtml(const QString &html)
 {
     GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     this->appendHtml(html);
 }
 
-void STextBox::SetStyleSheet(QString css)
+void STextBox::SetStyleSheet(const QString &css)
 {
     this->setStyleSheet(css);
 }

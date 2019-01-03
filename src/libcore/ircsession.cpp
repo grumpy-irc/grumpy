@@ -14,6 +14,7 @@
 #include "configuration.h"
 #include "ircsession.h"
 #include "eventhandler.h"
+#include "profiler.h"
 #include "../libirc/libircclient/generic.h"
 #include "../libirc/libircclient/parser.h"
 #include "../libirc/libirc/serveraddress.h"
@@ -60,7 +61,7 @@ IRCSession *IRCSession::Open(Scrollback *system_window, libirc::ServerAddress &s
 
 IRCSession::IRCSession(QHash<QString, QVariant> sx, Scrollback *root)
 {
-    this->systemWindow = NULL;
+    this->systemWindow = nullptr;
     this->init(false);
     this->Root = root;
     this->LoadHash(sx);
@@ -106,6 +107,7 @@ Scrollback *IRCSession::GetSystemWindow()
 
 Scrollback *IRCSession::GetScrollback(QString name)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     if (this->systemWindow && this->systemWindow->GetTarget() == name)
         return this->systemWindow;
 
@@ -117,11 +119,14 @@ Scrollback *IRCSession::GetScrollback(QString name)
     if (this->channels.contains(name))
         return this->channels[name];
 
-    return NULL;
+    return nullptr;
 }
 
+
+//! \todo optimize this crap
 Scrollback *IRCSession::GetScrollback(scrollback_id_t sid)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     if (this->systemWindow && this->systemWindow->GetOriginalID() == sid)
         return this->systemWindow;
 
@@ -137,11 +142,12 @@ Scrollback *IRCSession::GetScrollback(scrollback_id_t sid)
             return scrollback;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 Scrollback *IRCSession::GetScrollbackByOriginal(scrollback_id_t original_sid)
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     if (this->systemWindow && this->systemWindow->GetOriginalID() == original_sid)
         return this->systemWindow;
 
@@ -157,7 +163,7 @@ Scrollback *IRCSession::GetScrollbackByOriginal(scrollback_id_t original_sid)
             return scrollback;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 libircclient::Network *IRCSession::GetNetwork(Scrollback *scrollback)
@@ -168,6 +174,7 @@ libircclient::Network *IRCSession::GetNetwork(Scrollback *scrollback)
 
 QList<Scrollback *> IRCSession::GetScrollbacks()
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     QList<Scrollback*> sx;
     // Fetch all scrollbacks we manage
     sx.append(this->users.values());
@@ -179,6 +186,7 @@ QList<Scrollback *> IRCSession::GetScrollbacks()
 
 QList<Scrollback *> IRCSession::GetUserScrollbacks()
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     QList<Scrollback*> sx;
 
     // Fetch all scrollbacks we manage
@@ -188,6 +196,7 @@ QList<Scrollback *> IRCSession::GetUserScrollbacks()
 
 QList<Scrollback *> IRCSession::GetChannelScrollbacks()
 {
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     QList<Scrollback*> sx;
 
     // Fetch all scrollbacks we manage
@@ -408,10 +417,12 @@ QHash<QString, QVariant> IRCSession::ToHash(int max_items)
     if (this->network)
         hash.insert("network", QVariant(this->network->ToHash()));
     QHash<QString, QVariant> channels_hash;
-    foreach (QString channel, this->channels.keys())
+    QList<QString> channel_keys = this->channels.keys();
+    foreach (QString channel, channel_keys)
         channels_hash.insert(channel, QVariant(this->channels[channel]->ToHash(max_items)));
+    QList<QString> user_keys = this->users.keys();
     QHash<QString, QVariant> users_hash;
-    foreach (QString user, this->users.keys())
+    foreach (QString user, user_keys)
         users_hash.insert(user, QVariant(this->users[user]->ToHash(max_items)));
     hash.insert("channels", QVariant(channels_hash));
     hash.insert("users", QVariant(users_hash));
@@ -419,7 +430,7 @@ QHash<QString, QVariant> IRCSession::ToHash(int max_items)
     return hash;
 }
 
-void IRCSession::LoadHash(QHash<QString, QVariant> hash)
+void IRCSession::LoadHash(const QHash<QString, QVariant> &hash)
 {
     UNSERIALIZE_UINT(SID);
     UNSERIALIZE_BOOL(_autoReconnect);

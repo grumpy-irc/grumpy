@@ -23,19 +23,19 @@ namespace GrumpyIRC
     {
             Q_OBJECT
         public:
-            STextBox(QWidget *parent = NULL);
-            ~STextBox();
-            void AppendHtml(QString html);
-            void SetStyleSheet(QString css);
+            STextBox(QWidget *parent = nullptr);
+            ~STextBox() override=default;
+            void AppendHtml(const QString &html);
+            void SetStyleSheet(const QString &css);
             void Clear();
             bool SendEvent(QEvent *e);
         signals:
             void Event_Link(QString text);
         protected:
-            void dropEvent(QDropEvent *e);
+            void dropEvent(QDropEvent *e) override;
             void scrollContentsBy();
-            void mousePressEvent(QMouseEvent *e);
-            void mouseReleaseEvent(QMouseEvent *e);
+            void mousePressEvent(QMouseEvent *e) override;
+            void mouseReleaseEvent(QMouseEvent *e) override;
             QString clickedAnchor;
     };
 }

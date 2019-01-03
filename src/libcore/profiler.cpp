@@ -26,14 +26,14 @@ qint64 Profiler::GetTime()
     return ts.msecsTo(QDateTime::currentDateTime());
 }
 
-void Profiler::IncrementCall(QString function)
+void Profiler::IncrementCall(const QString &function)
 {
     if (!callCounter.contains(function))
         callCounter.insert(function, 1);
     callCounter[function]++;
 }
 
-unsigned long long Profiler::GetCallsForFunction(QString function)
+unsigned long long Profiler::GetCallsForFunction(const QString &function)
 {
     if (!callCounter.contains(function))
         return 0;
