@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2019
 
 #ifndef SCROLLBACKFACTORY_H
 #define SCROLLBACKFACTORY_H
@@ -20,8 +20,8 @@ namespace GrumpyIRC
     class ScrollbackFactory : public Factory
     {
         public:
-            ScrollbackFactory();
-            Scrollback *NewScrollback(Scrollback *parent, QString name, ScrollbackType type);
+            ScrollbackFactory() = default;
+            Scrollback *NewScrollback(Scrollback *parent, const QString &name, ScrollbackType type) override;
     };
 }
 

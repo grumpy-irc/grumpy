@@ -47,12 +47,12 @@ QString GrumpyConf::GetRawQuitMessage()
     return GCFG->GetValueAsString("quit_message", "GrumpyChat v. $version. Such client. WOW. Much quit. https://github.com/grumpy-irc/grumpy");
 }
 
-void GrumpyConf::SetQuitMessage(QString text)
+void GrumpyConf::SetQuitMessage(const QString &text)
 {
     GCFG->SetValue("quit_message", QVariant(text));
 }
 
-void GrumpyConf::SetNick(QString nick)
+void GrumpyConf::SetNick(const QString &nick)
 {
     GCFG->SetValue("nick", QVariant(nick));
 }
@@ -62,7 +62,7 @@ QString GrumpyConf::GetIdent()
     return GCFG->GetValueAsString("ident", DEFAULT_IDENT);
 }
 
-void GrumpyConf::SetIdent(QString ident)
+void GrumpyConf::SetIdent(const QString &ident)
 {
     GCFG->SetValue("ident", QVariant(ident));
 }
@@ -72,7 +72,7 @@ QString GrumpyConf::GetAlterNick()
     return GCFG->GetValueAsString("alternative_nick");
 }
 
-void GrumpyConf::SetAlterNick(QString text)
+void GrumpyConf::SetAlterNick(const QString &text)
 {
     GCFG->SetValue("alternative_nick", QVariant(text));
 }
@@ -82,7 +82,7 @@ bool GrumpyConf::WriteNoticesToSystem()
     return GCFG->GetValueAsBool("write_notices_to_system", true);
 }
 
-void GrumpyConf::SetName(QString text)
+void GrumpyConf::SetName(const QString &text)
 {
     GCFG->SetValue("name", text);
 }
@@ -94,14 +94,14 @@ QList<char> GrumpyConf::GetSeparators()
     return results;
 }
 
-bool GrumpyConf::IsDisabledMessage(QString id)
+bool GrumpyConf::IsDisabledMessage(const QString &id)
 {
     if (!GCFG->Contains("messages.disabled." + id))
         return false;
     return GCFG->GetValueAsBool("messages.disabled." + id);
 }
 
-void GrumpyConf::SetDisabledMessage(bool enabled, QString id)
+void GrumpyConf::SetDisabledMessage(bool enabled, const QString &id)
 {
     GCFG->SetValue("messages.disabled." + id, enabled);
 }
@@ -121,17 +121,17 @@ QString GrumpyConf::GetLineFormat()
     return GCFG->GetValueAsString("line_format", "($time) $string");
 }
 
-void GrumpyConf::SetLineFormat(QString format)
+void GrumpyConf::SetLineFormat(const QString &format)
 {
     GCFG->SetValue("line_format", format);
 }
 
-void GrumpyConf::SetNoticeFormat(QString format)
+void GrumpyConf::SetNoticeFormat(const QString &format)
 {
     GCFG->SetValue("notice_format", format);
 }
 
-void GrumpyConf::SetMessageFormat(QString format)
+void GrumpyConf::SetMessageFormat(const QString &format)
 {
     GCFG->SetValue("message_format", format);
 }
@@ -195,7 +195,7 @@ bool GrumpyConf::GetColorBoxShow()
     return GCFG->GetValueAsBool("color_box_show", true);
 }
 
-void GrumpyConf::SetAutorun(QString data)
+void GrumpyConf::SetAutorun(const QString &data)
 {
     QFile f(GCFG->GetHomePath() + "autoexec.cfg");
 
@@ -210,17 +210,17 @@ void GrumpyConf::SetAutorun(QString data)
     f.close();
 }
 
-void GrumpyConf::SetLabeledH(QString text)
+void GrumpyConf::SetLabeledH(const QString &text)
 {
     GCFG->SetValue("labeled_header", text);
 }
 
-void GrumpyConf::SetStandardH(QString text)
+void GrumpyConf::SetStandardH(const QString &text)
 {
     GCFG->SetValue("standard_header", text);
 }
 
-void GrumpyConf::SetChannelH(QString text)
+void GrumpyConf::SetChannelH(const QString &text)
 {
     GCFG->SetValue("channel_header", text);
 }
@@ -240,7 +240,7 @@ QString GrumpyConf::GetStandardHeader() const
     return GCFG->GetValueAsString("standard_header", "GrumpyChat");
 }
 
-void GrumpyConf::SetActionFormat(QString format)
+void GrumpyConf::SetActionFormat(const QString &format)
 {
     GCFG->SetValue("action_format", format);
 }
@@ -260,7 +260,7 @@ bool GrumpyConf::GetIgnoreSSLProblems()
     return GCFG->GetValueAsBool("ignore_ssl", true);
 }
 
-void GrumpyConf::SetDefaultAwayReason(QString reason)
+void GrumpyConf::SetDefaultAwayReason(const QString &reason)
 {
     GCFG->SetValue("reason_away", reason);
 }
@@ -270,7 +270,7 @@ bool GrumpyConf::Batches()
     return GCFG->GetValueAsBool("mode_batching", true);
 }
 
-void GrumpyConf::SetDefaultKickReason(QString text)
+void GrumpyConf::SetDefaultKickReason(const QString &text)
 {
     GCFG->SetValue("kick", text);
 }
@@ -317,7 +317,7 @@ QList<int> GrumpyConf::IgnoredNums()
     return Generic::QVariantListToIntList(GCFG->GetValue("ignored_nmrs").toList());
 }
 
-void GrumpyConf::SetIRCIgnoredNumerics(QList<int> list)
+void GrumpyConf::SetIRCIgnoredNumerics(const QList<int> &list)
 {
     GCFG->SetValue("ignored_nmrs", Generic::QIntListToVariantList(list));
 }
@@ -327,7 +327,7 @@ QString GrumpyConf::GetDefaultBanMask()
     return GCFG->GetValueAsString("ban_mask", "*!*@$host");
 }
 
-void GrumpyConf::SetDefaultBanMask(QString ban)
+void GrumpyConf::SetDefaultBanMask(const QString &ban)
 {
     GCFG->SetValue("ban_mask", ban);
 }
@@ -354,7 +354,7 @@ void GrumpyConf::SetAutoReduceMaxSendSize(bool yes)
     GCFG->SetValue("auto_reduce_max_send_size", yes);
 }
 
-void GrumpyConf::SetAutoAwayMsg(QString message)
+void GrumpyConf::SetAutoAwayMsg(const QString &message)
 {
     GCFG->SetValue("auto_away_text", message);
 }
@@ -386,7 +386,7 @@ void GrumpyConf::SetAutoAwayTime(int time)
     GCFG->SetValue("auto_away_time", time);
 }
 
-void GrumpyConf::SetLastSavePath(QString path)
+void GrumpyConf::SetLastSavePath(const QString &path)
 {
     GCFG->SetValue("save_path", path);
 }
@@ -401,7 +401,7 @@ void GrumpyConf::SetProxy(int proxy)
     GCFG->SetValue("proxy", proxy);
 }
 
-void GrumpyConf::SetProxy(QNetworkProxy proxy)
+void GrumpyConf::SetProxy(const QNetworkProxy &proxy)
 {
     GCFG->SetValue("proxy_hostname", proxy.hostName());
     GCFG->SetValue("proxy_user", proxy.user());

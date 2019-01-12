@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2019
 
 #ifndef FACTORY_H
 #define FACTORY_H
@@ -34,8 +34,8 @@ namespace GrumpyIRC
     {
         public:
             Factory();
-            virtual ~Factory() {}
-            virtual Scrollback *NewScrollback(Scrollback *parent, QString name, ScrollbackType type);
+            virtual ~Factory() = default;
+            virtual Scrollback *NewScrollback(Scrollback *parent, const QString &name, ScrollbackType type);
     };
 }
 

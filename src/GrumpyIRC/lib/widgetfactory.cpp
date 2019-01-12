@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #include <libcore/exception.h>
 #include "widgetfactory.h"
@@ -19,17 +19,12 @@ using namespace GrumpyIRC;
 
 #define MANAGER MainWindow::Main->GetScrollbackManager()
 
-WidgetFactory::WidgetFactory()
-{
-
-}
-
 // This function is called by core when a new scrollback is created
 // because here we have a gui, we need to create a wrapper for it
-Scrollback *WidgetFactory::NewScrollback(Scrollback *parent, QString name, ScrollbackType type)
+Scrollback *WidgetFactory::NewScrollback(Scrollback *parent, const QString &name, ScrollbackType type)
 {
     Scrollback *sx = Factory::NewScrollback(parent, name, type);
-    if (MainWindow::Main == NULL)
+    if (MainWindow::Main == nullptr)
         throw new GrumpyIRC::NullPointerException("MainWindow *MainWindow::Main", BOOST_CURRENT_FUNCTION);
     // Create a new scrollback wrapper for this one
     MANAGER->CreateWindow(name, MANAGER->GetWindowFromScrollback(parent), false, true, sx);

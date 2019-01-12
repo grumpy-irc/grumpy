@@ -45,7 +45,7 @@ namespace GrumpyIRC
 
         public:
             explicit ChannelWin(NetworkSession *session, libircclient::Network *network, libircclient::Channel *channel, ScrollbackFrame *parent);
-            ~ChannelWin();
+            ~ChannelWin() override;
 
         private slots:
             void on_pushButton_clicked();

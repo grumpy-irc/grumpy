@@ -569,7 +569,7 @@ int SystemCmds::Ban(SystemCommand *command, CommandArgs command_args)
     {
         channel_name = sx->GetTarget();
     }
-    if (command_args.Parameters.size() == 0)
+    if (command_args.Parameters.empty())
     {
         GRUMPY_ERROR("No target");
         return 4;

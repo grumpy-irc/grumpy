@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #ifndef GRUMPYEVENTHANDLER_H
 #define GRUMPYEVENTHANDLER_H
@@ -21,11 +21,11 @@ namespace GrumpyIRC
     class LIBGRUMPYSHARED_EXPORT GrumpyEventHandler : public EventHandler
 	{
 		public:
-			GrumpyEventHandler();
-            void OnMessage(scrollback_id_t ScrollbackID);
-			void OnDebug(QString text, unsigned int verbosity = 1);
-			void OnError(QString text);
-			void OnSystemLog(QString text);
+            GrumpyEventHandler() = default;
+            void OnMessage(scrollback_id_t ScrollbackID) override;
+            void OnDebug(const QString &text, unsigned int verbosity = 1) override;
+            void OnError(const QString &text) override;
+            void OnSystemLog(const QString &text) override;
 
 	};
 }

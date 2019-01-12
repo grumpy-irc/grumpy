@@ -24,32 +24,32 @@ namespace GrumpyIRC
         public:
             static void CheckDriver();
             DatabaseQtSQL();
-            ~DatabaseQtSQL();
-            void LoadRoles()=0;
-            void LoadUsers()=0;
-            void LoadSessions()=0;
-            void LoadWindows()=0;
-            void LoadText()=0;
-            void Maintenance()=0;
-            void StoreUser(User *item)=0;
-            void StoreNetwork(IRCSession *session)=0;
-            QList<QVariant> FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size)=0;
-            void UpdateUser(User *user)=0;
-            void RemoveNetwork(IRCSession *session)=0;
-            void RemoveUser(User *user)=0;
-            void RemoveScrollback(User *owner, Scrollback *sx)=0;
-            void LockUser(User *user)=0;
-            void UnlockUser(User *user)=0;
-            void StoreScrollback(User *owner, Scrollback *sx)=0;
-            void UpdateNetwork(IRCSession *session)=0;
-            void StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem *item)=0;
-            void UpdateRoles()=0;
-            QHash<QString, QVariant> GetConfiguration(user_id_t user)=0;
-            void SetConfiguration(user_id_t user, QHash<QString, QVariant> data)=0;
-            QHash<QString, QByteArray> GetStorage(user_id_t user)=0;
-            void InsertStorage(user_id_t user, QString key, QByteArray data)=0;
-            void UpdateStorage(user_id_t user, QString key, QByteArray data)=0;
-            void RemoveStorage(user_id_t user, QString key)=0;
+            ~DatabaseQtSQL() override;
+            void LoadRoles() override=0;
+            void LoadUsers() override=0;
+            void LoadSessions() override=0;
+            void LoadWindows() override=0;
+            void LoadText() override=0;
+            void Maintenance() override=0;
+            void StoreUser(User *item) override=0;
+            void StoreNetwork(IRCSession *session) override=0;
+            QList<QVariant> FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size) override=0;
+            void UpdateUser(User *user) override=0;
+            void RemoveNetwork(IRCSession *session) override=0;
+            void RemoveUser(User *user) override=0;
+            void RemoveScrollback(User *owner, Scrollback *sx) override=0;
+            void LockUser(User *user) override=0;
+            void UnlockUser(User *user) override=0;
+            void StoreScrollback(User *owner, Scrollback *sx) override=0;
+            void UpdateNetwork(IRCSession *session) override=0;
+            void StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem *item) override=0;
+            void UpdateRoles() override=0;
+            QHash<QString, QVariant> GetConfiguration(user_id_t user) override=0;
+            void SetConfiguration(user_id_t user, QHash<QString, QVariant> data) override=0;
+            QHash<QString, QByteArray> GetStorage(user_id_t user) override=0;
+            void InsertStorage(user_id_t user, QString key, QByteArray data) override=0;
+            void UpdateStorage(user_id_t user, QString key, QByteArray data) override=0;
+            void RemoveStorage(user_id_t user, QString key) override=0;
             //!
             //! \brief ExecuteFile this function implements missing Qt functionality to execute SQL files
             //!        it requires the file to contain semicolons only as final characters separating stmts

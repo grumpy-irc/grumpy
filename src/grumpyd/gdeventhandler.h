@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2019
 
 #ifndef GDEVENTHANDLER_H
 #define GDEVENTHANDLER_H
@@ -21,11 +21,11 @@ namespace GrumpyIRC
     class GDEventHandler : public EventHandler
     {
         public:
-            GDEventHandler();
+            GDEventHandler()=default;
 #ifdef __linux__
-            void OnDebug(QString text, unsigned int verbosity = 1);
-            void OnError(QString text);
-            void OnSystemLog(QString text);
+            void OnDebug(const QString &text, unsigned int verbosity = 1) override;
+            void OnError(const QString &text) override;
+            void OnSystemLog(const QString &text) override;
 #endif
     };
 }

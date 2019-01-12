@@ -33,33 +33,33 @@ namespace GrumpyIRC
             virtual ~Configuration();
 
             // General config
-            virtual bool Contains(QString key);
-            virtual QVariant GetValue(QString key);
-            virtual void SetAlternativeConfigFile(QString file);
-            virtual bool GetValueAsBool(QString key, bool none = false);
-            virtual unsigned int GetValueAsUInt(QString key, unsigned int none = 0);
-            virtual QString GetValueAsString(QString key, QString default_value = "");
-            virtual int GetValueAsInt(QString key, int none = 0);
-            virtual float GetValueAsFloat(QString key, float none = 0);
-            virtual void RemoveValue(QString key);
-            virtual void SetValue(QString key, QVariant value);
+            virtual bool Contains(const QString &key);
+            virtual QVariant GetValue(const QString &key);
+            virtual void SetAlternativeConfigFile(const QString &file);
+            virtual bool GetValueAsBool(const QString &key, bool none = false);
+            virtual unsigned int GetValueAsUInt(const QString &key, unsigned int none = 0);
+            virtual QString GetValueAsString(const QString &key, const QString &default_value = "");
+            virtual int GetValueAsInt(const QString &key, int none = 0);
+            virtual float GetValueAsFloat(const QString &key, float none = 0);
+            virtual void RemoveValue(const QString &key);
+            virtual void SetValue(const QString &key, const QVariant &value);
             virtual void SetValue(QString key, bool value);
             virtual void SetValue(QString key, int value);
             virtual void SetValue(QString key, QString value);
-            virtual void SetHomePath(QString path);
+            virtual void SetHomePath(const QString &path);
 
             // Extension config
-            virtual bool        Extension_Contains(QString extension, QString key);
-            virtual QVariant    Extension_GetValue(QString extension, QString key);
-            virtual bool        Extension_GetValueAsBool(QString extension, QString key, bool none = false);
-            virtual QString     Extension_GetValueAsString(QString extension, QString key, QString default_value = "");
-            virtual int         Extension_GetValueAsInt(QString extension, QString key, int none = 0);
-            virtual float       Extension_GetValueAsFloat(QString extension, QString key, float none = 0);
-            virtual void        Extension_RemoveValue(QString extension, QString key);
-            virtual void        Extension_SetValue(QString extension, QString key, QVariant value);
-            virtual void        Extension_SetValue(QString extension, QString key, bool value);
-            virtual void        Extension_SetValue(QString extension, QString key, int value);
-            virtual void        Extension_SetValue(QString extension, QString key, QString value);
+            virtual bool        Extension_Contains(const QString &extension, const QString &key);
+            virtual QVariant    Extension_GetValue(const QString &extension, const QString &key);
+            virtual bool        Extension_GetValueAsBool(const QString &extension, const QString &key, bool none = false);
+            virtual QString     Extension_GetValueAsString(const QString &extension, const QString &key, const QString &default_value = "");
+            virtual int         Extension_GetValueAsInt(const QString &extension, const QString &key, int none = 0);
+            virtual float       Extension_GetValueAsFloat(const QString &extension, const QString &key, float none = 0);
+            virtual void        Extension_RemoveValue(const QString &extension, const QString &key);
+            virtual void        Extension_SetValue(const QString &extension, const QString &key, const QVariant &value);
+            virtual void        Extension_SetValue(const QString &extension, const QString &key, bool value);
+            virtual void        Extension_SetValue(const QString &extension, const QString &key, int value);
+            virtual void        Extension_SetValue(const QString &extension, const QString &key, const QString &value);
 
             // Scripting config
             virtual void SetUnsafeScriptFc(bool enabled);

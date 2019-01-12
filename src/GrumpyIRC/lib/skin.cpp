@@ -55,13 +55,13 @@ Skin::Skin(QHash<QString, QVariant> skin)
 
 Skin::Skin()
 {
-    SkinList.append(this);
+    Skin::SkinList.append(this);
     this->setDefaults();
 }
 
 Skin::~Skin()
 {
-    this->SkinList.removeAll(this);
+    Skin::SkinList.removeAll(this);
 }
 
 QPalette GrumpyIRC::Skin::Palette()

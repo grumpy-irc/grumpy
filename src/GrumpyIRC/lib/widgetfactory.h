@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #ifndef WIDGETFACTORY_H
 #define WIDGETFACTORY_H
@@ -21,8 +21,8 @@ namespace GrumpyIRC
     class LIBGRUMPYSHARED_EXPORT WidgetFactory : public Factory
     {
         public:
-            WidgetFactory();
-            Scrollback *NewScrollback(Scrollback *parent, QString name, ScrollbackType type);
+            WidgetFactory() = default;
+            Scrollback *NewScrollback(Scrollback *parent, const QString &name, ScrollbackType type) override;
     };
 }
 

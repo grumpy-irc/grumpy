@@ -8,37 +8,27 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2019
 
 #include <QDebug>
 #include "eventhandler.h"
-
-GrumpyIRC::EventHandler::EventHandler()
-{
-
-}
-
-GrumpyIRC::EventHandler::~EventHandler()
-{
-
-}
 
 void GrumpyIRC::EventHandler::OnMessage(scrollback_id_t ScrollbackID)
 {
     //qDebug() << "Message: " +
 }
 
-void GrumpyIRC::EventHandler::OnDebug(QString text, unsigned int verbosity)
+void GrumpyIRC::EventHandler::OnDebug(const QString &text, unsigned int verbosity)
 {
     qDebug() << "DEBUG: " + text;
 }
 
-void GrumpyIRC::EventHandler::OnError(QString text)
+void GrumpyIRC::EventHandler::OnError(const QString &text)
 {
     qDebug() << "ERROR: " + text;
 }
 
-void GrumpyIRC::EventHandler::OnSystemLog(QString text)
+void GrumpyIRC::EventHandler::OnSystemLog(const QString &text)
 {
     qDebug() << "INFO:  " + text;
 }

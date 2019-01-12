@@ -17,7 +17,7 @@
 
 using namespace GrumpyIRC;
 
-QPalette Color2Pal(QColor color)
+QPalette Color2Pal(const QColor& color)
 {
     QPalette px;
     px.setColor(QPalette::Base, color);

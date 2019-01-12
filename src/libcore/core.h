@@ -32,14 +32,14 @@ namespace GrumpyIRC
 
             Core();
             virtual ~Core();
-            void InitCfg(QString home_path = "");
+            void InitCfg(const QString &home_path = "");
             void LoadCfg();
             CommandProcessor *GetCommandProcessor();
             void SetSystemEventHandler(EventHandler *e);
             EventHandler *GetCurrentEventHandler();
             Configuration *GetConfiguration();
             void InstallFactory(Factory *f);
-            Scrollback *NewScrollback(Scrollback *parent, QString name, ScrollbackType type);
+            Scrollback *NewScrollback(Scrollback *parent, const QString &name, ScrollbackType type);
             void RegisterExtension(Extension *extension);
             void UnregisterExtension(Extension *extension);
             QList<Extension*> GetExtensions();

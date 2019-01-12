@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2019
 
 #ifndef LIBEVENTHANDLER_H
 #define LIBEVENTHANDLER_H
@@ -36,12 +36,12 @@ namespace GrumpyIRC
     class LIBCORESHARED_EXPORT EventHandler : libircclient::IRCEventHandler
     {
         public:
-            EventHandler();
-            virtual ~EventHandler();
+            EventHandler()=default;
+             ~EventHandler() override=default;
             virtual void OnMessage(scrollback_id_t ScrollbackID);
-            virtual void OnDebug(QString text, unsigned int verbosity = 1);
-            virtual void OnError(QString text);
-            virtual void OnSystemLog(QString text);
+            virtual void OnDebug(const QString &text, unsigned int verbosity = 1);
+            virtual void OnError(const QString &text);
+            virtual void OnSystemLog(const QString &text);
             virtual void OnGrumpydCtorCall(GrumpydSession *session);
             virtual void OnGrumpydDtorCall(GrumpydSession *session);
     };

@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #include "corewrapper.h"
 #include "mainwindow.h"
@@ -20,17 +20,12 @@
 
 using namespace GrumpyIRC;
 
-GrumpyEventHandler::GrumpyEventHandler()
-{
-
-}
-
 void GrumpyEventHandler::OnMessage(scrollback_id_t ScrollbackID)
 {
 
 }
 
-void GrumpyEventHandler::OnDebug(QString text, unsigned int verbosity)
+void GrumpyEventHandler::OnDebug(const QString &text, unsigned int verbosity)
 {
     qDebug() << text;
 
@@ -44,7 +39,7 @@ void GrumpyEventHandler::OnDebug(QString text, unsigned int verbosity)
     MainWindow::Main->WriteToCurrentWindow("DEBUG(" + QString::number(verbosity) + "): " + text);
 }
 
-void GrumpyEventHandler::OnError(QString text)
+void GrumpyEventHandler::OnError(const QString &text)
 {
     qWarning() << text;
     if (!MainWindow::Main)
@@ -54,7 +49,7 @@ void GrumpyEventHandler::OnError(QString text)
     MainWindow::Main->WriteToCurrentWindow(QObject::tr("ERROR") + ": " + text, ScrollbackItemType_SystemError);
 }
 
-void GrumpyEventHandler::OnSystemLog(QString text)
+void GrumpyEventHandler::OnSystemLog(const QString &text)
 {
     qDebug() << "LOG: " + text;
     if (!MainWindow::Main)

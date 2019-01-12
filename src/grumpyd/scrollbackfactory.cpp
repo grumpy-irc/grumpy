@@ -8,19 +8,14 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2019
 
 #include "virtualscrollback.h"
 #include "scrollbackfactory.h"
 
 using namespace GrumpyIRC;
 
-ScrollbackFactory::ScrollbackFactory()
-{
-
-}
-
-Scrollback *ScrollbackFactory::NewScrollback(Scrollback *parent, QString name, ScrollbackType type)
+Scrollback *ScrollbackFactory::NewScrollback(Scrollback *parent, const QString &name, ScrollbackType type)
 {
     VirtualScrollback *vs = new VirtualScrollback(type, parent);
     vs->SetTarget(name);

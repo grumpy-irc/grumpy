@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2019
 
 #include "factory.h"
 #include "scrollback.h"
@@ -20,7 +20,7 @@ Factory::Factory()
 
 }
 
-Scrollback *Factory::NewScrollback(Scrollback *parent, QString name, ScrollbackType type)
+Scrollback *Factory::NewScrollback(Scrollback *parent, const QString &name, ScrollbackType type)
 {
     Scrollback *scrollback = new Scrollback(type, parent);
     scrollback->SetTarget(name);

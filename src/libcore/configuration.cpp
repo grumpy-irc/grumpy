@@ -36,12 +36,12 @@ Configuration::~Configuration()
     this->Options.clear();
 }
 
-bool Configuration::Contains(QString key)
+bool Configuration::Contains(const QString &key)
 {
     return this->Options.contains(key);
 }
 
-QVariant Configuration::GetValue(QString key)
+QVariant Configuration::GetValue(const QString &key)
 {
     if (!this->Options.contains(key))
         return QVariant();
@@ -49,12 +49,12 @@ QVariant Configuration::GetValue(QString key)
     return this->Options[key];
 }
 
-void Configuration::SetAlternativeConfigFile(QString file)
+void Configuration::SetAlternativeConfigFile(const QString &file)
 {
     this->configuration_path = file;
 }
 
-bool Configuration::GetValueAsBool(QString key, bool none)
+bool Configuration::GetValueAsBool(const QString &key, bool none)
 {
     if (!this->Options.contains(key))
         return none;
@@ -62,7 +62,7 @@ bool Configuration::GetValueAsBool(QString key, bool none)
     return this->Options[key].toBool();
 }
 
-void Configuration::RemoveValue(QString key)
+void Configuration::RemoveValue(const QString &key)
 {
     if (!this->Options.contains(key))
     {
@@ -72,7 +72,7 @@ void Configuration::RemoveValue(QString key)
     this->Options.remove(key);
 }
 
-QString Configuration::GetValueAsString(QString key, QString default_value)
+QString Configuration::GetValueAsString(const QString &key, const QString &default_value)
 {
     if (!this->Options.contains(key))
         return default_value;
@@ -80,7 +80,7 @@ QString Configuration::GetValueAsString(QString key, QString default_value)
     return this->Options[key].toString();
 }
 
-int Configuration::GetValueAsInt(QString key, int none)
+int Configuration::GetValueAsInt(const QString &key, int none)
 {
     if (!this->Options.contains(key))
         return none;
@@ -88,7 +88,7 @@ int Configuration::GetValueAsInt(QString key, int none)
     return this->Options[key].toInt();
 }
 
-void Configuration::SetValue(QString key, QVariant value)
+void Configuration::SetValue(const QString &key, const QVariant &value)
 {
     if (!this->Options.contains(key))
         this->Options.insert(key, value);
@@ -98,7 +98,7 @@ void Configuration::SetValue(QString key, QVariant value)
     this->Options[key] = value;
 }
 
-void Configuration::SetHomePath(QString path)
+void Configuration::SetHomePath(const QString &path)
 {
     this->home_path = path;
 }
@@ -114,57 +114,57 @@ void Configuration::GetVersion(int *major, int *minor, int *revision)
     }
 }
 
-bool Configuration::Extension_Contains(QString extension, QString key)
+bool Configuration::Extension_Contains(const QString &extension, const QString &key)
 {
     return this->Options.contains(this->mkExt(extension, key));
 }
 
-QVariant Configuration::Extension_GetValue(QString extension, QString key)
+QVariant Configuration::Extension_GetValue(const QString &extension, const QString &key)
 {
     return this->GetValue(this->mkExt(extension, key));
 }
 
-bool Configuration::Extension_GetValueAsBool(QString extension, QString key, bool none)
+bool Configuration::Extension_GetValueAsBool(const QString &extension, const QString &key, bool none)
 {
     return this->GetValueAsBool(this->mkExt(extension, key), none);
 }
 
-QString Configuration::Extension_GetValueAsString(QString extension, QString key, QString default_value)
+QString Configuration::Extension_GetValueAsString(const QString &extension, const QString &key, const QString &default_value)
 {
     return this->GetValueAsString(this->mkExt(extension, key), default_value);
 }
 
-int Configuration::Extension_GetValueAsInt(QString extension, QString key, int none)
+int Configuration::Extension_GetValueAsInt(const QString &extension, const QString &key, int none)
 {
     return this->GetValueAsInt(this->mkExt(extension, key), none);
 }
 
-float Configuration::Extension_GetValueAsFloat(QString extension, QString key, float none)
+float Configuration::Extension_GetValueAsFloat(const QString &extension, const QString &key, float none)
 {
     return this->GetValueAsFloat(this->mkExt(extension, key), none);
 }
 
-void Configuration::Extension_RemoveValue(QString extension, QString key)
+void Configuration::Extension_RemoveValue(const QString &extension, const QString &key)
 {
     this->RemoveValue(this->mkExt(extension, key));
 }
 
-void Configuration::Extension_SetValue(QString extension, QString key, QVariant value)
+void Configuration::Extension_SetValue(const QString &extension, const QString &key, const QVariant &value)
 {
     this->SetValue(this->mkExt(extension, key), value);
 }
 
-void Configuration::Extension_SetValue(QString extension, QString key, bool value)
+void Configuration::Extension_SetValue(const QString &extension, const QString &key, bool value)
 {
     this->SetValue(this->mkExt(extension, key), value);
 }
 
-void Configuration::Extension_SetValue(QString extension, QString key, int value)
+void Configuration::Extension_SetValue(const QString &extension, const QString &key, int value)
 {
     this->SetValue(this->mkExt(extension, key), value);
 }
 
-void Configuration::Extension_SetValue(QString extension, QString key, QString value)
+void Configuration::Extension_SetValue(const QString &extension, const QString &key, const QString &value)
 {
     this->SetValue(this->mkExt(extension, key), value);
 }
@@ -238,7 +238,7 @@ void Configuration::Save()
     delete settings;
 }
 
-unsigned int GrumpyIRC::Configuration::GetValueAsUInt(QString key, unsigned int none)
+unsigned int GrumpyIRC::Configuration::GetValueAsUInt(const QString &key, unsigned int none)
 {
     if (!this->Options.contains(key))
         return none;
@@ -246,7 +246,7 @@ unsigned int GrumpyIRC::Configuration::GetValueAsUInt(QString key, unsigned int 
     return this->Options[key].toUInt();
 }
 
-float GrumpyIRC::Configuration::GetValueAsFloat(QString key, float none)
+float GrumpyIRC::Configuration::GetValueAsFloat(const QString &key, float none)
 {
     if (!this->Options.contains(key))
         return none;

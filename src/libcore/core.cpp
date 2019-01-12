@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #include "configuration.h"
 #include "core.h"
@@ -18,12 +18,12 @@
 #include "eventhandler.h"
 #include <QDir>
 
-GrumpyIRC::Core *GrumpyIRC::Core::GrumpyCore = NULL;
+GrumpyIRC::Core *GrumpyIRC::Core::GrumpyCore = nullptr;
 
 GrumpyIRC::Core::Core()
 {
     this->commandProcessor = new CommandProcessor();
-    this->config = NULL;
+    this->config = nullptr;
     this->eventHandler = new EventHandler();
     GrumpyCore = this;
     this->factory = new Factory();
@@ -45,7 +45,7 @@ GrumpyIRC::Core::~Core()
     GrumpyCore = nullptr;
 }
 
-GrumpyIRC::Scrollback *GrumpyIRC::Core::NewScrollback(GrumpyIRC::Scrollback *parent, QString name, ScrollbackType type)
+GrumpyIRC::Scrollback *GrumpyIRC::Core::NewScrollback(GrumpyIRC::Scrollback *parent, const QString &name, ScrollbackType type)
 {
     return this->factory->NewScrollback(parent, name, type);
 }
@@ -73,7 +73,7 @@ void GrumpyIRC::Core::InstallFactory(Factory *f)
     this->factory = f;
 }
 
-void GrumpyIRC::Core::InitCfg(QString home_path)
+void GrumpyIRC::Core::InitCfg(const QString &home_path)
 {
     this->config = new Configuration();
 

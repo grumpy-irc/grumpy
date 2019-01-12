@@ -22,31 +22,31 @@ namespace GrumpyIRC
         public:
             DatabaseDummy();
 
-            void LoadRoles();
-            void LoadUsers();
-            void Maintenance() {}
-            QHash<QString, QVariant> GetConfiguration(user_id_t user);
-            void SetConfiguration(user_id_t user, QHash<QString, QVariant> data);
-            void RemoveNetwork(IRCSession *session);
-            void RemoveScrollback(User *owner, Scrollback *sx);
-            QList<QVariant> FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size);
-            void UpdateRoles();
-            void StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem *item);
-            void LoadSessions();
-            void UpdateNetwork(IRCSession *session);
-            void RemoveUser(User *user);
-            void UnlockUser(User *user);
-            void LockUser(User *user);
-            void LoadWindows();
-            void LoadText();
-            void StoreScrollback(User *owner, Scrollback *sx);
-            void StoreNetwork(IRCSession *session);
-            void StoreUser(User *item);
-            void UpdateUser(User *user);
-            QHash<QString, QByteArray> GetStorage(user_id_t user);
-            void InsertStorage(user_id_t user, QString key, QByteArray data);
-            void UpdateStorage(user_id_t user, QString key, QByteArray data);
-            void RemoveStorage(user_id_t user, QString key);
+            void LoadRoles() override;
+            void LoadUsers() override;
+            void Maintenance() override {}
+            QHash<QString, QVariant> GetConfiguration(user_id_t user) override;
+            void SetConfiguration(user_id_t user, QHash<QString, QVariant> data) override;
+            void RemoveNetwork(IRCSession *session) override;
+            void RemoveScrollback(User *owner, Scrollback *sx) override;
+            QList<QVariant> FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size) override;
+            void UpdateRoles() override;
+            void StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem *item) override;
+            void LoadSessions() override;
+            void UpdateNetwork(IRCSession *session) override;
+            void RemoveUser(User *user) override;
+            void UnlockUser(User *user) override;
+            void LockUser(User *user) override;
+            void LoadWindows() override;
+            void LoadText() override;
+            void StoreScrollback(User *owner, Scrollback *sx) override;
+            void StoreNetwork(IRCSession *session) override;
+            void StoreUser(User *item) override;
+            void UpdateUser(User *user) override;
+            QHash<QString, QByteArray> GetStorage(user_id_t user) override;
+            void InsertStorage(user_id_t user, QString key, QByteArray data) override;
+            void UpdateStorage(user_id_t user, QString key, QByteArray data) override;
+            void RemoveStorage(user_id_t user, QString key) override;
     };
 }
 

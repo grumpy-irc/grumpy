@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2019
 
 #include "gdeventhandler.h"
 #include <iostream>
@@ -22,12 +22,8 @@
 
 using namespace GrumpyIRC;
 
-GDEventHandler::GDEventHandler()
-{
-
-}
 #ifdef __linux__
-void GDEventHandler::OnDebug(QString text, unsigned int verbosity)
+void GDEventHandler::OnDebug(const QString &text, unsigned int verbosity)
 {
     if (GCFG->Verbosity >= verbosity)
     {
@@ -42,7 +38,7 @@ void GDEventHandler::OnDebug(QString text, unsigned int verbosity)
     }
 }
 
-void GDEventHandler::OnError(QString text)
+void GDEventHandler::OnError(const QString &text)
 {
     if (!CONF->Stdout)
     {
@@ -56,7 +52,7 @@ void GDEventHandler::OnError(QString text)
     }
 }
 
-void GDEventHandler::OnSystemLog(QString text)
+void GDEventHandler::OnSystemLog(const QString &text)
 {
     if (CONF->Stdout)
     {
