@@ -106,8 +106,8 @@ namespace GrumpyIRC
             libircclient::User *GetSelfNetworkID(Scrollback *scrollback) override;
             //! Used mostly only for synchronization with grumpyd
             virtual void RegisterChannel(libircclient::Channel *channel, Scrollback *scrollback);
-            void RetrieveChannelExceptionList(Scrollback *scrollback, QString channel_name);
-            void RetrieveChannelInviteList(Scrollback *scrollback, QString channel_name);
+            void RetrieveChannelExceptionList(Scrollback *scrollback, const QString& channel_name);
+            void RetrieveChannelInviteList(Scrollback *scrollback, const QString& channel_name);
             void RetrieveChannelBanList(Scrollback *scrollback, QString channel_name) override;
             void SetAway(QString reason) override;
             void UnsetAway() override;

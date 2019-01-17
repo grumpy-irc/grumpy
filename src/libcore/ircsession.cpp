@@ -526,7 +526,7 @@ void IRCSession::Query(Scrollback *scrollback, QString target, QString message)
         return;
     }
     Scrollback *sx = this->GetScrollbackForUser(target);
-    if (sx == NULL)
+    if (sx == nullptr)
     {
         this->systemWindow->InsertText("No target for " + target + ": " + message);
         return;
@@ -541,7 +541,7 @@ void IRCSession::Query(Scrollback *scrollback, QString target, QString message)
 libircclient::Channel *IRCSession::GetChannel(Scrollback *scrollback)
 {
     if (!this->network)
-        return NULL;
+        return nullptr;
     return this->GetNetwork()->GetChannel(scrollback->GetTarget());
 }
 
@@ -569,7 +569,7 @@ void IRCSession::RequestPart(Scrollback *scrollback)
 libircclient::User *IRCSession::GetSelfNetworkID(Scrollback *scrollback)
 {
     if (!this->network)
-        return NULL;
+        return nullptr;
 
     // return data from network info
     return this->network->GetLocalUserInfo();
@@ -582,7 +582,7 @@ void IRCSession::RegisterChannel(libircclient::Channel *channel, Scrollback *scr
         this->GetNetwork()->_st_InsertChannel(channel);
 }
 
-void IRCSession::RetrieveChannelExceptionList(Scrollback *scrollback, QString channel_name)
+void IRCSession::RetrieveChannelExceptionList(Scrollback *scrollback, const QString& channel_name)
 {
     Q_UNUSED(scrollback);
     if (!this->network)
@@ -593,7 +593,7 @@ void IRCSession::RetrieveChannelExceptionList(Scrollback *scrollback, QString ch
     this->GetNetwork()->TransferRaw("MODE " + channel_name + " +e", libircclient::Priority_Low);
 }
 
-void IRCSession::RetrieveChannelInviteList(Scrollback *scrollback, QString channel_name)
+void IRCSession::RetrieveChannelInviteList(Scrollback *scrollback, const QString& channel_name)
 {
     Q_UNUSED(scrollback);
     if (!this->network)
@@ -754,7 +754,7 @@ void IRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
         this->retrievingWho.append(ln);
     this->GetNetwork()->TransferRaw("MODE " + channel->GetName(), libircclient::Priority_Low);
     if (this->AutomaticallyRetrieveBanList)
-        this->RetrieveChannelBanList(NULL, ln);
+        this->RetrieveChannelBanList(nullptr, ln);
     this->GetNetwork()->TransferRaw("WHO " + channel->GetName(), libircclient::Priority_Low);
 }
 
@@ -769,7 +769,7 @@ void IRCSession::OnKICK(libircclient::Parser *px, libircclient::Channel *channel
     QString l = channel->GetName().toLower();
     if (!this->channels.contains(l))
         return;
-    this->channels[l]->UserListChange(px->GetParameters()[1], NULL, UserListChange_Remove);
+    this->channels[l]->UserListChange(px->GetParameters()[1], nullptr, UserListChange_Remove);
     this->channels[l]->InsertText(ScrollbackItem("kicked " + px->GetParameters()[1] + " from channel: " + px->GetText(), ScrollbackItemType_Kick, px->GetSourceUserInfo()));
 }
 
@@ -836,7 +836,7 @@ void IRCSession::OnPart(libircclient::Parser *px, libircclient::Channel *channel
     Scrollback *sc = this->channels[channel->GetName().toLower()];
     // Remove the user from scrollback's user list widget
     // we can't pass a pointer to user in a channel object here, because it was already deleted from channel
-    sc->UserListChange(px->GetSourceUserInfo()->GetNick(), NULL, UserListChange_Remove);
+    sc->UserListChange(px->GetSourceUserInfo()->GetNick(), nullptr, UserListChange_Remove);
     sc->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Part, px->GetSourceUserInfo()));
 }
 
@@ -924,7 +924,7 @@ void IRCSession::OnEndOfNames(libircclient::Parser *px)
     Scrollback *scrollback = this->channels[channel];
     // Get a channel from network
     libircclient::Channel *ch = this->network->GetChannel(channel);
-    if (ch == NULL)
+    if (ch == nullptr)
         return;
     foreach (libircclient::User *user, ch->GetUsers())
     {
@@ -954,7 +954,7 @@ void IRCSession::OnNotice(libircclient::Parser *px)
         this->systemWindow->InsertText("Ignoring malformed NOTICE: " + px->GetRaw());
         return;
     }
-    Scrollback *sx = NULL;
+    Scrollback *sx = nullptr;
     // Get the target scrollback
     QString target = px->GetParameters()[0];
     // if target is current user we need to find target scrollback based on a user's nick
@@ -968,7 +968,7 @@ void IRCSession::OnNotice(libircclient::Parser *px)
     {
         sx = this->GetScrollbackForChannel(target);
     }
-    if (sx == NULL)
+    if (sx == nullptr)
     {
         this->systemWindow->InsertText("No target for " + target + ": " + px->GetRaw());
         return;
@@ -1266,7 +1266,7 @@ void IRCSession::OnCHGH(libircclient::Parser *px, QString old_host, QString old_
 
 void IRCSession::processME(libircclient::Parser *px, QString message)
 {
-    Scrollback *sx = NULL;
+    Scrollback *sx = nullptr;
     // Get the target scrollback
     QString target = px->GetParameters()[0];
     // if target is current user we need to find target scrollback based on a user's nick
@@ -1277,7 +1277,7 @@ void IRCSession::processME(libircclient::Parser *px, QString message)
     {
         sx = this->GetScrollbackForChannel(target);
     }
-    if (sx == NULL)
+    if (sx == nullptr)
     {
         this->systemWindow->InsertText("No target for " + target + ": " + px->GetRaw());
         return;
@@ -1410,7 +1410,7 @@ void IRCSession::rmScrollback(Scrollback *window)
     else if (this->users.contains(name))
         this->users.remove(name);
     else if (window == this->systemWindow)
-        this->systemWindow = NULL;
+        this->systemWindow = nullptr;
     else
         return;
     // We removed the window from all lists
@@ -1440,7 +1440,7 @@ void IRCSession::OnDisconnect()
 
 void IRCSession::OnMessage(libircclient::Parser *px)
 {
-    Scrollback *sx = NULL;
+    Scrollback *sx = nullptr;
     // Get the target scrollback
     QString target = px->GetParameters()[0];
     // if target is current user we need to find target scrollback based on a user's nick
@@ -1451,7 +1451,7 @@ void IRCSession::OnMessage(libircclient::Parser *px)
     {
         sx = this->GetScrollbackForChannel(target);
     }
-    if (sx == NULL)
+    if (sx == nullptr)
     {
         this->systemWindow->InsertText("No target for " + target + ": " + px->GetRaw());
         return;
@@ -1466,7 +1466,7 @@ void IRCSession::OnFailure(QString reason, int code)
 
 void IRCSession::OnIRCJoin(libircclient::Parser *px, libircclient::User *user, libircclient::Channel *channel)
 {
-    if (user == NULL || channel == NULL)
+    if (user == nullptr || channel == nullptr)
     {
         this->systemWindow->InsertText("Ignoring malformed IRC command (unknown user or channel): " + px->GetRaw());
         return;

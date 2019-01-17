@@ -405,10 +405,14 @@ void GrumpydSession::RetrieveChannelBanList(Scrollback *scrollback, QString chan
 void GrumpydSession::RequestReconnect(Scrollback *scrollback)
 {
     GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
-    if (this->IsConnected())
-        return;
     if (scrollback == this->systemWindow)
     {
+        // Don't allow to perform reconnect on grumpyd session that's already connected
+        if (this->IsConnected())
+        {
+            GRUMPY_DEBUG("Ignoring request to reconnect grumpyd which is still connected", 1);
+            return;
+        }
         // Reconnect grumpyd
         foreach(IRCSession *nw, this->sessionList.values())
             nw->RequestRemove(nw->GetSystemWindow());

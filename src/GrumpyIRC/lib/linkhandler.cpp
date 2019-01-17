@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #include "linkhandler.h"
 #include <QUrl>
@@ -22,7 +22,7 @@ LinkHandler_Priv::LinkHandler_Priv()
     this->IsOffline = false;
 }
 
-void LinkHandler::OpenLink(QString url)
+void LinkHandler::OpenLink(const QString& url)
 {
     // Queue for open
 
@@ -64,7 +64,7 @@ void LinkHandler_Priv::run()
             this->mutex.unlock();
             QDesktopServices::openUrl(QUrl(url));
         }
-        this->usleep(200000);
+        LinkHandler_Priv::usleep(200000);
     }
     this->IsOffline = true;
 }

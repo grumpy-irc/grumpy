@@ -1055,11 +1055,11 @@ void Session::processLogin(QHash<QString, QVariant> parameters)
         QHash<QString, QVariant> param;
         param.insert("logged", this->loggedUser->GetSessionCount());
         this->protocol->SendProtocolCommand(GP_CMD_LOGIN_OK, param);
-        GRUMPY_LOG("SID " + QString::number(this->SID) + " identified to " + this->loggedUser->GetName());
+        GRUMPY_LOG("SID " + QString::number(this->SID) + " identified as " + this->loggedUser->GetName());
         this->loggedUser->InsertSession(this);
     } else
     {
-        GRUMPY_LOG("SID " + QString::number(this->SID) + " failed to login (wrong user / pass) to name " + parameters["username"].toString());
+        GRUMPY_LOG("SID " + QString::number(this->SID) + " failed to login (wrong user / pass) as name " + parameters["username"].toString());
         this->protocol->SendProtocolCommand(GP_CMD_LOGIN_FAIL);
     }
 }

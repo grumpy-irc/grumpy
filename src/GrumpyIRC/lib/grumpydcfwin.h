@@ -32,8 +32,8 @@ namespace GrumpyIRC
             Q_OBJECT
 
         public:
-            explicit GrumpydCfWin(GrumpydSession *session, QWidget *parent = 0);
-            ~GrumpydCfWin();
+            explicit GrumpydCfWin(GrumpydSession *session, QWidget *parent = nullptr);
+            ~GrumpydCfWin() override;
             GrumpydSession *GrumpySession;
 
         private slots:
