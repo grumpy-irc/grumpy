@@ -24,8 +24,8 @@ namespace GrumpyIRC
         public:
             DatabaseQtSqlite();
         protected:
-            void init();
-            bool install();
+            void init() override;
+            bool install() override;
         private:
             void UpdateDB(unsigned int patch);
             QString datafile;

@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #ifndef DATABASELITE_H
 #define DATABASELITE_H
@@ -31,7 +31,7 @@ namespace GrumpyIRC
     class DatabaseLite : public DatabaseBackend
     {
         public:
-            static QString GetSource(QString name);
+            static QString GetSource(const QString& name);
 
             DatabaseLite();
             ~DatabaseLite() override;

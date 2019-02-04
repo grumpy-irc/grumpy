@@ -23,7 +23,7 @@ using namespace GrumpyIRC;
 DatabaseQtSqlite::DatabaseQtSqlite()
 {
     this->datafile = Grumpyd::GetDFPath() + "sqlite.dat";
-    bool install = !QFile().exists(this->datafile);
+    bool install = !QFile::exists(this->datafile);
     this->database = new QSqlDatabase(QSqlDatabase::addDatabase("SQLITE"));
     this->database->setDatabaseName(this->datafile);
     if (!this->database->open())

@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #ifdef GRUMPY_SQLITE
 
@@ -40,7 +40,7 @@ static QString ListToString(QList<Scrollback*> list)
     return result;
 }
 
-static QList<scrollback_id_t> StringToList(QString list)
+static QList<scrollback_id_t> StringToList(const QString& list)
 {
     QList<scrollback_id_t> rx;
     QList<QString> temp = list.split(',');
@@ -53,7 +53,7 @@ static QList<scrollback_id_t> StringToList(QString list)
     return rx;
 }
 
-QString DatabaseLite::GetSource(QString name)
+QString DatabaseLite::GetSource(const QString& name)
 {
     QFile file(":/sql/" + name);
     if (!file.open(QIODevice::ReadOnly))
@@ -62,7 +62,7 @@ QString DatabaseLite::GetSource(QString name)
     return QString(file.readAll());
 }
 
-static QByteArray ToArray(QHash<QString, QVariant> data)
+static QByteArray ToArray(const QHash<QString, QVariant>& data)
 {
     QByteArray result;
     QDataStream stream(&result, QIODevice::ReadWrite);
@@ -83,7 +83,7 @@ static QHash<QString, QVariant> FromArray(QByteArray data)
 DatabaseLite::DatabaseLite()
 {
     QString datafile = Grumpyd::GetDFPath() + "sqlite.dat";
-    bool install = !QFile().exists(datafile);
+    bool install = !QFile::exists(datafile);
     this->database = new SQLite(datafile);
     this->last_user_id = 0;
     if (install)
@@ -134,7 +134,7 @@ void DatabaseLite::LoadRoles()
 
 void DatabaseLite::LoadUsers()
 {
-    Q_ASSERT(User::UserInfo.size() == 0);
+    Q_ASSERT(User::UserInfo.empty());
     std::shared_ptr<SqlResult> userlist = this->database->ExecuteQuery("SELECT id, name, password, role, is_locked FROM users;");
     if (!userlist->Count())
     {
@@ -196,7 +196,7 @@ void DatabaseLite::LoadSessions()
         QList<Scrollback*> scrollback_list;
         QList<scrollback_id_t> scrollback_temp = StringToList(row.GetField(10).toString());
         system->SetDead(true);
-        SyncableIRCSession *session = NULL;
+        SyncableIRCSession *session = nullptr;
         foreach (scrollback_id_t item, scrollback_temp)
         {
             Scrollback *scrollback = user->GetScrollback(item);
@@ -322,7 +322,7 @@ void DatabaseLite::LoadWindows()
         scrollback_id_t parent_id = 0;
         if (!row.GetField(6).isNull())
             parent_id = row.GetField(6).toUInt();
-        Scrollback *parent_ptr = NULL;
+        Scrollback *parent_ptr = nullptr;
         User *user = User::GetUser(row.GetField(1).toUInt());
         if (!user)
         {

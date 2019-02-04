@@ -72,6 +72,7 @@ namespace GrumpyIRC
             void ShowProgress();
             void SetMaxProgressValue(int max);
             void SetProgress(int progress);
+            void ToggleProxy(bool enable);
             void ExecuteLine(QString line);
             void OpenGrumpy(QString hostname, int port, QString username, QString password, bool ssl);
             void OpenIRCNetworkLink(QString link);

@@ -350,6 +350,11 @@ void MainWindow::SetProgress(int progress)
     this->progressBar->setValue(progress);
 }
 
+void MainWindow::ToggleProxy(bool enable)
+{
+    this->ui->actionProxy->setChecked(enable);
+}
+
 void MainWindow::ExecuteLine(QString line)
 {
     if (line.isEmpty())

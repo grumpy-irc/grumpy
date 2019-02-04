@@ -13,6 +13,7 @@
 #include "proxy.h"
 #include "grumpyconf.h"
 #include "ui_proxy.h"
+#include "mainwindow.h"
 #include <QNetworkProxy>
 
 using namespace GrumpyIRC;
@@ -24,6 +25,7 @@ static QNetworkProxy SetProxy(int type, QString host, unsigned int port, QString
     {
         case 0:
             QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
+            MainWindow::Main->ToggleProxy(false);
             return proxy;
         case 1:
             proxy.setType(QNetworkProxy::Socks5Proxy);
@@ -41,6 +43,7 @@ static QNetworkProxy SetProxy(int type, QString host, unsigned int port, QString
             return proxy;
     }
 
+    MainWindow::Main->ToggleProxy(true);
     proxy.setHostName(host);
     proxy.setPort(port);
     proxy.setUser(name);

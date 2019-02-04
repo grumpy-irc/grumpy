@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #ifndef COLORBOX_H
 #define COLORBOX_H
@@ -30,12 +30,12 @@ namespace GrumpyIRC
             Q_OBJECT
 
         public:
-            explicit ColorBox(InputBox *in, QWidget *parent = 0);
-            ~ColorBox();
+            explicit ColorBox(InputBox *in, QWidget *parent = nullptr);
+            ~ColorBox() override;
             InputBox *input;
 
         protected:
-            void keyPressEvent(QKeyEvent *e);
+            void keyPressEvent(QKeyEvent *e) override;
 
         private:
             Ui::ColorBox *ui;
