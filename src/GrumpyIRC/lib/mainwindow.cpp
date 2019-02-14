@@ -352,7 +352,7 @@ void MainWindow::SetProgress(int progress)
 
 void MainWindow::ToggleProxy(bool enable)
 {
-    this->ui->actionProxy->setChecked(enable);
+    this->ui->actionEnable_proxy->setChecked(enable);
 }
 
 void MainWindow::ExecuteLine(QString line)
