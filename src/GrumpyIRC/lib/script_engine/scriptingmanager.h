@@ -23,11 +23,13 @@ namespace Ui
 
 namespace GrumpyIRC
 {
+    class GrumpydSession;
+
     class ScriptingManager : public QDialog
     {
             Q_OBJECT
         public:
-            explicit ScriptingManager(QWidget *parent = 0);
+            explicit ScriptingManager(QWidget *parent = nullptr, GrumpydSession *remote = nullptr);
             ~ScriptingManager();
             void Reload();
             void LoadFile(QString path);
@@ -43,6 +45,7 @@ namespace GrumpyIRC
             void deleteSelectSc();
             void reloadSelectSc();
             QList<int> selectedRows();
+            GrumpydSession *remoteSession;
             Ui::ScriptingManager *ui;
     };
 }

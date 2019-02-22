@@ -42,6 +42,8 @@ namespace GrumpyIRC
             void SetDatafilePath(QString name);
             QString GetCertFilePath();
             void SetCertFilePath(QString path);
+            QString GetScriptPath();
+            void SetScriptPath(QString path);
             QString GetQuitMessage();
             void SetNick(QString nick);
             unsigned int GetMaxLoadSize();

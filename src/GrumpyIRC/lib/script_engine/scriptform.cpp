@@ -27,8 +27,9 @@
 
 using namespace GrumpyIRC;
 
-ScriptForm::ScriptForm(QWidget *parent) : QDialog(parent), ui(new Ui::ScriptForm)
+ScriptForm::ScriptForm(QWidget *parent, GrumpydSession *gsession) : QDialog(parent), ui(new Ui::ScriptForm)
 {
+    this->remoteSession = gsession;
     this->ui->setupUi(this);
     this->ui->textEdit->setText(Resources::GetSource("/grumpy_core/scripting/ecma/example.js"));
     this->ui->textEdit->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
@@ -40,6 +41,8 @@ ScriptForm::ScriptForm(QWidget *parent) : QDialog(parent), ui(new Ui::ScriptForm
     }
     this->ui->lineEdit_2->setText(file_name);
     this->highlighter = new JSHighlighter(this->ui->textEdit->document());
+    if (this->remoteSession != nullptr)
+        this->ui->pushButton_2->setEnabled(false);
 }
 
 ScriptForm::~ScriptForm()
@@ -50,6 +53,13 @@ ScriptForm::~ScriptForm()
 
 void ScriptForm::EditScript(QString path, QString script_name)
 {
+    if (this->remoteSession != nullptr)
+    {
+        MessageBox::Error("not-implemented", "Not implemented");
+        // todo
+        return;
+    }
+
     QFile file(path);
     if (!file.open(QIODevice::ReadWrite))
     {
@@ -78,6 +88,13 @@ void ScriptForm::on_pushButton_2_clicked()
 
 void ScriptForm::on_pushButton_clicked()
 {
+    if (this->remoteSession != nullptr)
+    {
+        MessageBox::Error("not-implemented", "Not implemented");
+        // todo
+        return;
+    }
+
     QString fullpath = this->ui->lineEdit_2->text();
     QFile f(fullpath);
     if (!f.open(QIODevice::ReadWrite | QIODevice::Truncate))

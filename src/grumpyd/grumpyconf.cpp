@@ -101,6 +101,16 @@ void GrumpyConf::SetCertFilePath(QString path)
     GCFG->SetValue("certfile", path);
 }
 
+QString GrumpyConf::GetScriptPath()
+{
+    return GCFG->GetValueAsString("scriptpath", QCoreApplication::applicationDirPath() + "/scripts/");
+}
+
+void GrumpyConf::SetScriptPath(QString path)
+{
+    GCFG->SetValue("scriptpath", path);
+}
+
 
 
 

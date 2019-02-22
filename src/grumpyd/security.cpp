@@ -39,7 +39,7 @@ void Role::Defaults()
     Role::Roles["admin"]->Grant(PRIVILEGE_LOCK_USER);
     Role::Roles["admin"]->Grant(PRIVILEGE_UNLOCK_USER);
     Role::Roles["admin"]->Grant(PRIVILEGE_MANAGE_SCRIPT);
-    Role::Roles["poweruser"]->Grant(PRIVILEGE_USE_SCRIPT);
+    Role::Roles["poweruser"]->Grant(PRIVILEGE_READ_SCRIPT);
     Role::Roles["poweruser"]->Grant(PRIVILEGE_USE_STORAGE);
     Role::Roles["poweruser"]->Grant(PRIVILEGE_SEARCH_TEXT);
     Role::Roles["poweruser"]->Grant(PRIVILEGE_USE_SNIFFER);

@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #ifndef GENERIC_H
 #define GENERIC_H
@@ -47,6 +47,7 @@ namespace GrumpyIRC
 
         LIBCORESHARED_EXPORT bool String2Bool(const QString &string, bool invalid = false);
         LIBCORESHARED_EXPORT QString Bool2String(bool boolean);
+        LIBCORESHARED_EXPORT bool IsValidFileName(QString file);
         //! \todo No unit test
         LIBCORESHARED_EXPORT QStringList Trim(QStringList list);
         LIBCORESHARED_EXPORT int Bool2Int(bool value);

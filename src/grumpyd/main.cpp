@@ -230,6 +230,22 @@ void signal_handler(int sn)
     exit(0);
 }
 
+bool safe_mkdir(QString path)
+{
+    if (!QDir().exists(path))
+    {
+        GRUMPY_DEBUG("Creating path: " + path, 1);
+        // Let's try to make it
+        // We might fail here
+        if (!QDir().mkpath(path))
+        {
+            GRUMPY_ERROR("Unable to create path: " + path);
+            return false;
+        }
+    }
+    return true;
+}
+
 //////////////////////////////////////////////////////////////////
 // Main
 
@@ -305,19 +321,12 @@ int main(int argc, char *argv[])
         CONF->SetStorage(CONF->GetStorage());
         CONF->SetDatafilePath(CONF->GetDatafilePath());
         CONF->SetCertFilePath(CONF->GetCertFilePath());
+        CONF->SetScriptPath(CONF->GetScriptPath());
+        GrumpyIRC::CoreWrapper::GrumpyCore->GetConfiguration()->Save();
         GRUMPY_LOG("Datafile path: " + CONF->GetDatafilePath());
         // Check if the datafile path exists
-        if (!QDir().exists(CONF->GetDatafilePath()))
-        {
-            // Let's try to make it
-            // We might fail here
-            if (!QDir().mkpath(CONF->GetDatafilePath()))
-            {
-                GRUMPY_ERROR("Unable to create datafile path: " + CONF->GetDatafilePath());
-                return 1;
-            }
-        }
-        GrumpyIRC::CoreWrapper::GrumpyCore->GetConfiguration()->Save();
+        if (!safe_mkdir(CONF->GetDatafilePath()) || !safe_mkdir(CONF->GetScriptPath()))
+            return 1;
         GrumpyIRC::Grumpyd *daemon = new GrumpyIRC::Grumpyd();
         QTimer::singleShot(0, daemon, SLOT(Main()));
         GRUMPY_DEBUG("Verbosity level: " + QString::number(verbosity), 1);

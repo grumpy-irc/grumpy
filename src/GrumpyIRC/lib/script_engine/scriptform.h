@@ -24,13 +24,14 @@ namespace Ui
 namespace GrumpyIRC
 {
     class JSHighlighter;
+    class GrumpydSession;
 
     class ScriptForm : public QDialog
     {
             Q_OBJECT
 
         public:
-            explicit ScriptForm(QWidget *parent = 0);
+            explicit ScriptForm(QWidget *parent = nullptr, GrumpydSession *gsession = nullptr);
             ~ScriptForm();
             void EditScript(QString path, QString script_name);
 
@@ -39,6 +40,7 @@ namespace GrumpyIRC
             void on_pushButton_clicked();
 
         private:
+            GrumpydSession *remoteSession;
             QString editingName;
             bool editing = false;
             JSHighlighter *highlighter = nullptr;
