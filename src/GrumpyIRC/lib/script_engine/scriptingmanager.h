@@ -8,18 +8,21 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2018
+// Copyright (c) Petr Bena 2018 - 2019
 
 #ifndef SCRIPTINGMANAGER_HPP
 #define SCRIPTINGMANAGER_HPP
 
 #include "../grumpy_global.h"
+#include <QDateTime>
 #include <QDialog>
 
 namespace Ui
 {
     class ScriptingManager;
 }
+
+class QTimer;
 
 namespace GrumpyIRC
 {
@@ -39,12 +42,15 @@ namespace GrumpyIRC
             void on_bReload_clicked();
             void on_tableWidget_customContextMenuRequested(const QPoint &pos);
             void on_pushScript_clicked();
+            void OnTimer();
 
         private:
             void unloadSelectSc();
             void deleteSelectSc();
             void reloadSelectSc();
             QList<int> selectedRows();
+            QTimer *grumpydRefresh = nullptr;
+            QDateTime lastRefresh;
             GrumpydSession *remoteSession;
             Ui::ScriptingManager *ui;
     };

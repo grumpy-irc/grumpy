@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2018
+// Copyright (c) Petr Bena 2018 - 2019
 
 #include "scriptingmanager.h"
 #include "../messagebox.h"
@@ -18,7 +18,9 @@
 #include <QMessageBox>
 #include <QFile>
 #include <QFileDialog>
+#include <QTimer>
 #include <QMenu>
+#include <libcore/grumpydsession.h>
 #include <libcore/generic.h>
 #include <libcore/scripting/scriptextension.h>
 
@@ -40,11 +42,22 @@ ScriptingManager::ScriptingManager(QWidget *parent, GrumpydSession *remote) : QD
     this->ui->tableWidget->setHorizontalHeaderLabels(headers);
     this->ui->tableWidget->setShowGrid(false);
     this->ui->tableWidget->resizeRowsToContents();
-    this->Reload();
+    if (this->remoteSession == nullptr)
+    {
+        this->Reload();
+    } else
+    {
+        this->lastRefresh = this->remoteSession->GetLastUpdateOfScripts();
+        this->remoteSession->SendProtocolCommand(GP_CMD_SYS_LIST_SCRIPT);
+        this->grumpydRefresh = new QTimer();
+        connect(this->grumpydRefresh, SIGNAL(timeout()), this, SLOT(OnTimer()));
+        this->grumpydRefresh->start(100);
+    }
 }
 
 ScriptingManager::~ScriptingManager()
 {
+    delete this->grumpydRefresh;
     delete this->ui;
 }
 
@@ -71,6 +84,7 @@ void ScriptingManager::Reload()
     } else
     {
         // Load a list of scripts loaded in remote grumpyd session
+
     }
     this->ui->tableWidget->resizeColumnsToContents();
     this->ui->tableWidget->resizeRowsToContents();
@@ -186,6 +200,11 @@ void ScriptingManager::on_pushScript_clicked()
     ScriptForm sf(this, this->remoteSession);
     sf.exec();
     this->Reload();
+}
+
+void ScriptingManager::OnTimer()
+{
+
 }
 
 void ScriptingManager::unloadSelectSc()

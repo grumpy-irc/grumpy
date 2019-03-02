@@ -45,6 +45,7 @@ GrumpydSession::GrumpydSession(Scrollback *System, const QString &Hostname, cons
     this->password = Pass;
     this->SSL = ssl;
     this->lastUserListUpdate = QDateTime::currentDateTime();
+    this->lastScriptListUpdate = QDateTime::currentDateTime();
     GrumpydSession::Sessions_Lock.lock();
     GrumpydSession::Sessions.append(this);
     GrumpydSession::Sessions_Lock.unlock();
@@ -586,6 +587,11 @@ QDateTime GrumpydSession::GetLastUpdateOfUserList()
     return this->lastUserListUpdate;
 }
 
+QDateTime GrumpydSession::GetLastUpdateOfScripts()
+{
+    return this->lastScriptListUpdate;
+}
+
 QList<QVariant> GrumpydSession::GetUserList()
 {
     return this->userList;
@@ -702,6 +708,9 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, const QHash<QString, Q
             break;
         case GP_CMD_GET_SNIFFER:
             this->processSniffer(parameters);
+            break;
+        case GP_CMD_SYS_LIST_SCRIPT:
+            this->processLScript(parameters);
             break;
         case GP_CMD_SYS_LIST_USER:
             this->processUserList(parameters);
@@ -966,6 +975,13 @@ void GrumpydSession::processChannelModeSync(const QHash<QString, QVariant> &hash
         else if (type == "remove")
             channel->RemovePMode(mode);
     }
+}
+
+void GrumpydSession::processLScript(const QHash<QString, QVariant> &hash)
+{
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
+    this->lastScriptListUpdate = QDateTime::currentDateTime();
+    this->ScriptList = hash["list"].toList();
 }
 
 void GrumpydSession::processRequest(const QHash<QString, QVariant> &hash)

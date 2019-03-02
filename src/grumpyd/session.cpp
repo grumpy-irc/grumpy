@@ -20,7 +20,7 @@
 #include "../libcore/grumpydsession.h"
 #include "../libcore/eventhandler.h"
 #include "../libcore/generic.h"
-#include "../libcore/scripting/scriptextension.h"
+#include "script_engine/grumpydscript.h"
 #include "databasebackend.h"
 #include "grumpyconf.h"
 #include "corewrapper.h"
@@ -824,7 +824,7 @@ void Session::processInstallScript(QHash<QString, QVariant> parameters)
     QString extension_id = parameters["id"].toString();
     QString extension_source = parameters["source"].toString();
 
-    if (!Generic::IsValidFileName(extension_id))
+    if (!Generic::IsValidFileName(extension_id) || !extension_id.toLower().endsWith(".js"))
     {
         this->TransferError(GP_CMD_SYS_INSTALL_SCRIPT, "Script ID is not a valid file name", GP_ERROR);
         return;
@@ -855,10 +855,13 @@ void Session::processInstallScript(QHash<QString, QVariant> parameters)
 
     file.close();
 
+    GRUMPY_LOG("User " + this->loggedUser->GetName() +  " is installing script " + extension_id);
+
     QString error;
-    ScriptExtension *ex = new ScriptExtension();
+    GrumpydScript *ex = new GrumpydScript();
     if (!ex->LoadSrc(path, extension_source, &error))
     {
+        GRUMPY_ERROR("Unable to load script " + extension_id + ": " + error);
         this->TransferError(GP_CMD_SYS_INSTALL_SCRIPT, error, GP_ERROR);
         delete ex;
         return;

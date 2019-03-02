@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2015 - 2019
 
 #include <QFile>
 #include <QSslSocket>
@@ -24,6 +24,7 @@
 #include "listener.h"
 #include "databaseqtsql.h"
 #include "databasebin.h"
+#include "script_engine/grumpydscript.h"
 #include "../libcore/core.h"
 #include "../libcore/configuration.h"
 #include "../libcore/eventhandler.h"
@@ -114,6 +115,7 @@ static DatabaseBackend *InstantiateStorage(QString type)
 
 void Grumpyd::Main()
 {
+    this->initScripts();
     DatabaseQtSQL::CheckDriver();
     GRUMPY_LOG("Loading storage: " + CONF->GetStorage());
     this->databaseBackend = InstantiateStorage(CONF->GetStorage());
@@ -148,6 +150,37 @@ void Grumpyd::Main()
         {
             GRUMPY_LOG("Listener (SSL) open on port " + QString::number(CONF->SecuredPort));
         }
+    }
+}
+
+void Grumpyd::initScripts()
+{
+    QString script_path = CONF->GetScriptPath();
+    QDir script_dir(script_path);
+    QList<QString> scripts = script_dir.entryList();
+    foreach (QString name, scripts)
+    {
+        if (!name.toLower().endsWith(".js"))
+            continue;
+        QString source;
+        QString file_path = script_path + QDir::separator() + name;
+        QString error;
+        QFile file(file_path);
+        if (!file.open(QIODevice::ReadOnly))
+        {
+            GRUMPY_ERROR("Unable to read source code of " + file_path);
+            continue;
+        }
+        source = QString(file.readAll());
+        file.close();
+        GrumpydScript *ex = new GrumpydScript();
+        if (!ex->LoadSrc(name, source, &error))
+        {
+            GRUMPY_ERROR("Unable to load script " + file_path + ": " + error);
+            delete ex;
+            return;
+        }
+        Core::GrumpyCore->RegisterExtension(ex);
     }
 }
 

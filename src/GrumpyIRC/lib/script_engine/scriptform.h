@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2018
+// Copyright (c) Petr Bena 2018 - 2019
 
 #ifndef SCRIPTFORM_HPP
 #define SCRIPTFORM_HPP
@@ -40,6 +40,7 @@ namespace GrumpyIRC
             void on_pushButton_clicked();
 
         private:
+            void installRemote();
             GrumpydSession *remoteSession;
             QString editingName;
             bool editing = false;
