@@ -141,6 +141,10 @@ void ScriptForm::installRemote()
         MessageBox::Error("Error", "No script name provided", this);
         return;
     }
+
+    if (id.toLower().endsWith(".js"))
+        id += ".js";
+
     if (!Generic::IsValidFileName(id))
     {
         MessageBox::Error("Error", "Script name is not valid", this);

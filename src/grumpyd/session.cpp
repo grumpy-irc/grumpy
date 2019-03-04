@@ -864,6 +864,10 @@ void Session::processInstallScript(QHash<QString, QVariant> parameters)
         GRUMPY_ERROR("Unable to load script " + extension_id + ": " + error);
         this->TransferError(GP_CMD_SYS_INSTALL_SCRIPT, error, GP_ERROR);
         delete ex;
+        if (!QFile::remove(path))
+        {
+            GRUMPY_ERROR("Unable to delete: " + path);
+        }
         return;
     }
     Core::GrumpyCore->RegisterExtension(ex);
@@ -897,9 +901,11 @@ void Session::processRemoveScript(QHash<QString, QVariant> parameters)
 
     // Remove from disk
     QString extension_path = e->GetPath();
+    if (!extension_path.startsWith(CONF->GetScriptPath()))
+        extension_path = CONF->GetScriptPath() + QDir::separator() + extension_path;
     if (!QFile::exists(extension_path))
     {
-        GRUMPY_ERROR("Unable to find: " + e->GetPath() + " not deleting extension from storage");
+        GRUMPY_ERROR("Unable to find: " + extension_path + " not deleting extension from storage");
     } else
     {
         if (!QFile::remove(extension_path))

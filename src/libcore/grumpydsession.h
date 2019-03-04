@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #ifndef GRUMPYDSESSION_H
 #define GRUMPYDSESSION_H
@@ -104,6 +104,8 @@
 #define GP_CMD_SYS_UNINST_SCRIPT           49
 #define GP_CMD_SYS_LIST_SCRIPT             50
 #define GP_CMD_GET_SNIFFER                 51
+#define GP_CMD_SYS_RELOAD_SCRIPT           52
+#define GP_CMD_SYS_RELOAD_ALL_SCRIPTS      53
 
 // PACKET VERIFICATION
 // This system is used to verify if packet was delivered or not
@@ -210,6 +212,8 @@ namespace GrumpyIRC
             void Event_ScriptDeleted(const QHash<QString, QVariant> &info);
             void Event_ScriptInstalled(const QHash<QString, QVariant> &info);
             void Event_ScriptList(const QList<QVariant> &scripts);
+            void Event_ScriptReloaded(const QHash<QString, QVariant> &info);
+            void Event_ScriptsReloaded(const QHash<QString, QVariant> &info);
             //void Event_Deleted();
 
         public slots:

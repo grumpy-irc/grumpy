@@ -126,7 +126,7 @@ void ScriptingManager::LoadFile(QString path)
 void ScriptingManager::OnScriptChange(const QHash<QString, QVariant> &script_info)
 {
     Q_UNUSED(script_info);
-    this->Reload();
+    this->remoteSession->SendProtocolCommand(GP_CMD_SYS_LIST_SCRIPT);
 }
 
 void ScriptingManager::on_bLoad_clicked()
