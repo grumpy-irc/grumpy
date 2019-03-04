@@ -715,6 +715,12 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, const QHash<QString, Q
         case GP_CMD_SYS_LIST_USER:
             this->processUserList(parameters);
             break;
+        case GP_CMD_SYS_INSTALL_SCRIPT:
+            this->processIScript(parameters);
+            break;
+        case GP_CMD_SYS_UNINST_SCRIPT:
+            this->processUScript(parameters);
+            break;
         case GP_CMD_SYS_CREATE_USER:
             if (parameters.contains("username"))
             {
@@ -982,6 +988,19 @@ void GrumpydSession::processLScript(const QHash<QString, QVariant> &hash)
     GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     this->lastScriptListUpdate = QDateTime::currentDateTime();
     this->ScriptList = hash["list"].toList();
+    emit this->Event_ScriptList(this->ScriptList);
+}
+
+void GrumpydSession::processIScript(const QHash<QString, QVariant> &hash)
+{
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
+    emit this->Event_ScriptInstalled(hash);
+}
+
+void GrumpydSession::processUScript(const QHash<QString, QVariant> &hash)
+{
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
+    emit this->Event_ScriptDeleted(hash);
 }
 
 void GrumpydSession::processRequest(const QHash<QString, QVariant> &hash)

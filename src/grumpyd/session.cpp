@@ -890,6 +890,7 @@ void Session::processRemoveScript(QHash<QString, QVariant> parameters)
 
     if (e == nullptr)
     {
+        GRUMPY_DEBUG("Request to delete nonexistent script", 1);
         this->TransferError(GP_CMD_SYS_UNINST_SCRIPT, "Extension not found", GP_ERROR);
         return;
     }
@@ -903,14 +904,19 @@ void Session::processRemoveScript(QHash<QString, QVariant> parameters)
     {
         if (!QFile::remove(extension_path))
         {
-            this->TransferError(GP_CMD_SYS_INSTALL_SCRIPT, "Unable to delete " + extension_path, GP_ERROR);
+            GRUMPY_DEBUG("Unable to rm: " + extension_path, 1);
+            this->TransferError(GP_CMD_SYS_UNINST_SCRIPT, "Unable to delete " + extension_path, GP_ERROR);
             return;
         }
     }
 
+    QString name = e->GetName();
+
     e->Unload();
     Core::GrumpyCore->UnregisterExtension(e);
     delete e;
+
+    GRUMPY_DEBUG("Successfuly removed extension " + name, 1);
 
     this->protocol->SendProtocolCommand(GP_CMD_SYS_UNINST_SCRIPT, parameters);
 }

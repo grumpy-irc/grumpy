@@ -207,6 +207,9 @@ namespace GrumpyIRC
 
         signals:
             void Event_IncomingData(QByteArray data);
+            void Event_ScriptDeleted(const QHash<QString, QVariant> &info);
+            void Event_ScriptInstalled(const QHash<QString, QVariant> &info);
+            void Event_ScriptList(const QList<QVariant> &scripts);
             //void Event_Deleted();
 
         public slots:
@@ -228,6 +231,8 @@ namespace GrumpyIRC
             void processPreferences(const QHash<QString, QVariant> &hash);
             void processChannelModeSync(const QHash<QString, QVariant> &hash);
             void processLScript(const QHash<QString, QVariant> &hash);
+            void processIScript(const QHash<QString, QVariant> &hash);
+            void processUScript(const QHash<QString, QVariant> &hash);
             void processRequest(const QHash<QString, QVariant> &hash);
             void processChannelResync(const QHash<QString, QVariant> &hash);
             void processSResync(const QHash<QString, QVariant> &parameters);

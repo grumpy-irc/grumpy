@@ -38,6 +38,7 @@ namespace GrumpyIRC
             void LoadFile(QString path);
 
         private slots:
+            void OnScriptChange(const QHash<QString, QVariant> &script_info);
             void on_bLoad_clicked();
             void on_bReload_clicked();
             void on_tableWidget_customContextMenuRequested(const QPoint &pos);

@@ -41,5 +41,5 @@ void GrumpydScript::registerFunctions()
 
 void GrumpydScript::registerClasses()
 {
-
+    ScriptExtension::registerClasses();
 }
