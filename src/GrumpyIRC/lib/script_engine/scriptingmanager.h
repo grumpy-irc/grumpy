@@ -8,12 +8,13 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2018
+// Copyright (c) Petr Bena 2018 - 2019
 
 #ifndef SCRIPTINGMANAGER_HPP
 #define SCRIPTINGMANAGER_HPP
 
 #include "../grumpy_global.h"
+#include <QDateTime>
 #include <QDialog>
 
 namespace Ui
@@ -21,28 +22,37 @@ namespace Ui
     class ScriptingManager;
 }
 
+class QTimer;
+
 namespace GrumpyIRC
 {
+    class GrumpydSession;
+
     class ScriptingManager : public QDialog
     {
             Q_OBJECT
         public:
-            explicit ScriptingManager(QWidget *parent = 0);
+            explicit ScriptingManager(QWidget *parent = nullptr, GrumpydSession *remote = nullptr);
             ~ScriptingManager();
             void Reload();
             void LoadFile(QString path);
 
         private slots:
+            void OnScriptChange(const QHash<QString, QVariant> &script_info);
             void on_bLoad_clicked();
             void on_bReload_clicked();
             void on_tableWidget_customContextMenuRequested(const QPoint &pos);
             void on_pushScript_clicked();
+            void OnTimer();
 
         private:
             void unloadSelectSc();
             void deleteSelectSc();
             void reloadSelectSc();
             QList<int> selectedRows();
+            QTimer *grumpydRefresh = nullptr;
+            QDateTime lastRefresh;
+            GrumpydSession *remoteSession;
             Ui::ScriptingManager *ui;
     };
 }

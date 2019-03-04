@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #include "definitions.h"
 
@@ -299,4 +299,14 @@ QString Generic::DoubleDigit(int digit)
     if (digit >= 10)
         return QString::number(digit);
     return "0" + QString::number(digit);
+}
+
+bool Generic::IsValidFileName(QString file)
+{
+    if (file.length() > 512)
+        return false;
+    if (file.contains("/") || file.contains(("\\")) || file.contains("\n") ||
+        file == "." || file == "..")
+        return false;
+    return true;
 }

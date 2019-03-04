@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2018
+// Copyright (c) Petr Bena 2018 - 2019
 
 #include "../messagebox.h"
 #include "../grumpyconf.h"
@@ -18,8 +18,10 @@
 #include "jshighlighter.h"
 #include <libcore/configuration.h>
 #include <libcore/core.h>
-#include <libcore/scripting/scriptextension.h>
+#include <libcore/generic.h>
+#include <libcore/grumpydsession.h>
 #include <libcore/resources.h>
+#include <libcore/scripting/scriptextension.h>
 #include <QFontDatabase>
 #include <QHash>
 #include <QFile>
@@ -27,19 +29,28 @@
 
 using namespace GrumpyIRC;
 
-ScriptForm::ScriptForm(QWidget *parent) : QDialog(parent), ui(new Ui::ScriptForm)
+ScriptForm::ScriptForm(QWidget *parent, GrumpydSession *gsession) : QDialog(parent), ui(new Ui::ScriptForm)
 {
+    this->remoteSession = gsession;
     this->ui->setupUi(this);
     this->ui->textEdit->setText(Resources::GetSource("/grumpy_core/scripting/ecma/example.js"));
     this->ui->textEdit->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
     QString file_name = Core::GrumpyCore->GetConfiguration()->GetHomeScriptPath() + "new_script.js";
-    int file_id = 1;
-    while (QFile(file_name).exists())
+    if (this->remoteSession == nullptr)
     {
-        file_name = Core::GrumpyCore->GetConfiguration()->GetHomeScriptPath() + "new_script" + QString::number(file_id++) + ".js";
+        int file_id = 1;
+        while (QFile(file_name).exists())
+        {
+            file_name = Core::GrumpyCore->GetConfiguration()->GetHomeScriptPath() + "new_script" + QString::number(file_id++) + ".js";
+        }
+    } else
+    {
+        file_name = "";
     }
     this->ui->lineEdit_2->setText(file_name);
     this->highlighter = new JSHighlighter(this->ui->textEdit->document());
+    if (this->remoteSession != nullptr)
+        this->ui->pushButton_2->setEnabled(false);
 }
 
 ScriptForm::~ScriptForm()
@@ -78,6 +89,12 @@ void ScriptForm::on_pushButton_2_clicked()
 
 void ScriptForm::on_pushButton_clicked()
 {
+    if (this->remoteSession != nullptr)
+    {
+        this->installRemote();
+        return;
+    }
+
     QString fullpath = this->ui->lineEdit_2->text();
     QFile f(fullpath);
     if (!f.open(QIODevice::ReadWrite | QIODevice::Truncate))
@@ -114,4 +131,30 @@ void ScriptForm::on_pushButton_clicked()
         MessageBox::Error("Error", "Failed to load a JS script: " + er, this);
         delete script;
     }
+}
+
+void ScriptForm::installRemote()
+{
+    QString id = this->ui->lineEdit_2->text();
+    if (id.isEmpty())
+    {
+        MessageBox::Error("Error", "No script name provided", this);
+        return;
+    }
+
+    if (id.toLower().endsWith(".js"))
+        id += ".js";
+
+    if (!Generic::IsValidFileName(id))
+    {
+        MessageBox::Error("Error", "Script name is not valid", this);
+        return;
+    }
+    QString source = this->ui->textEdit->toPlainText();
+    QHash<QString, QVariant> parameters;
+    parameters.insert("id", QVariant(id));
+    parameters.insert("source", QVariant(source));
+    this->remoteSession->SendProtocolCommand(GP_CMD_SYS_INSTALL_SCRIPT, parameters);
+    // TO-DO: wait for remote with response before closing
+    this->close();
 }

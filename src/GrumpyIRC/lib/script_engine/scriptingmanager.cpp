@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2018
+// Copyright (c) Petr Bena 2018 - 2019
 
 #include "scriptingmanager.h"
 #include "../messagebox.h"
@@ -18,16 +18,24 @@
 #include <QMessageBox>
 #include <QFile>
 #include <QFileDialog>
+#include <QTimer>
 #include <QMenu>
+#include <libcore/exception.h>
+#include <libcore/grumpydsession.h>
 #include <libcore/generic.h>
 #include <libcore/scripting/scriptextension.h>
 
 using namespace GrumpyIRC;
 
-ScriptingManager::ScriptingManager(QWidget *parent) : QDialog(parent), ui(new Ui::ScriptingManager)
+ScriptingManager::ScriptingManager(QWidget *parent, GrumpydSession *remote) : QDialog(parent), ui(new Ui::ScriptingManager)
 {
+    this->remoteSession = remote;
     this->ui->setupUi(this);
     QStringList headers;
+    if (remote != nullptr)
+    {
+        this->setWindowTitle(this->windowTitle() + " (remote)");
+    }
     headers << "Name" << "Author" << "Version" << "Is working" << "Description" << "Path";
     this->ui->tableWidget->setColumnCount(headers.count());
     this->ui->tableWidget->verticalHeader()->setVisible(false);
@@ -35,11 +43,24 @@ ScriptingManager::ScriptingManager(QWidget *parent) : QDialog(parent), ui(new Ui
     this->ui->tableWidget->setHorizontalHeaderLabels(headers);
     this->ui->tableWidget->setShowGrid(false);
     this->ui->tableWidget->resizeRowsToContents();
-    this->Reload();
+    if (this->remoteSession == nullptr)
+    {
+        this->Reload();
+    } else
+    {
+        connect(this->remoteSession, SIGNAL(Event_ScriptDeleted(const QHash<QString, QVariant>&)), this, SLOT(OnScriptChange(const QHash<QString, QVariant>&)));
+        connect(this->remoteSession, SIGNAL(Event_ScriptInstalled(const QHash<QString, QVariant>&)), this, SLOT(OnScriptChange(const QHash<QString, QVariant>&)));
+        this->lastRefresh = this->remoteSession->GetLastUpdateOfScripts();
+        this->remoteSession->SendProtocolCommand(GP_CMD_SYS_LIST_SCRIPT);
+        this->grumpydRefresh = new QTimer();
+        connect(this->grumpydRefresh, SIGNAL(timeout()), this, SLOT(OnTimer()));
+        this->grumpydRefresh->start(100);
+    }
 }
 
 ScriptingManager::~ScriptingManager()
 {
+    delete this->grumpydRefresh;
     delete this->ui;
 }
 
@@ -50,16 +71,35 @@ void ScriptingManager::Reload()
         this->ui->tableWidget->removeRow(0);
     }
 
-    foreach (ScriptExtension *sx, ScriptExtension::GetExtensions())
+    if (this->remoteSession == nullptr)
     {
-        int row = this->ui->tableWidget->rowCount();
-        this->ui->tableWidget->insertRow(row);
-        this->ui->tableWidget->setItem(row, 0, new QTableWidgetItem(sx->GetName()));
-        this->ui->tableWidget->setItem(row, 1, new QTableWidgetItem(sx->GetAuthor()));
-        this->ui->tableWidget->setItem(row, 2, new QTableWidgetItem(sx->GetVersion()));
-        this->ui->tableWidget->setItem(row, 3, new QTableWidgetItem(Generic::Bool2String(sx->IsWorking())));
-        this->ui->tableWidget->setItem(row, 4, new QTableWidgetItem(sx->GetDescription()));
-        this->ui->tableWidget->setItem(row, 5, new QTableWidgetItem(sx->GetPath()));
+        foreach (ScriptExtension *sx, ScriptExtension::GetExtensions())
+        {
+            int row = this->ui->tableWidget->rowCount();
+            this->ui->tableWidget->insertRow(row);
+            this->ui->tableWidget->setItem(row, 0, new QTableWidgetItem(sx->GetName()));
+            this->ui->tableWidget->setItem(row, 1, new QTableWidgetItem(sx->GetAuthor()));
+            this->ui->tableWidget->setItem(row, 2, new QTableWidgetItem(sx->GetVersion()));
+            this->ui->tableWidget->setItem(row, 3, new QTableWidgetItem(Generic::Bool2String(sx->IsWorking())));
+            this->ui->tableWidget->setItem(row, 4, new QTableWidgetItem(sx->GetDescription()));
+            this->ui->tableWidget->setItem(row, 5, new QTableWidgetItem(sx->GetPath()));
+        }
+    } else
+    {
+        // Load a list of scripts loaded in remote grumpyd session
+        QList<QVariant> scripts = this->remoteSession->ScriptList;
+        foreach (QVariant script, scripts)
+        {
+            QHash<QString, QVariant> info = script.toHash();
+            int row = this->ui->tableWidget->rowCount();
+            this->ui->tableWidget->insertRow(row);
+            this->ui->tableWidget->setItem(row, 0, new QTableWidgetItem(info["name"].toString()));
+            this->ui->tableWidget->setItem(row, 1, new QTableWidgetItem(info["author"].toString()));
+            this->ui->tableWidget->setItem(row, 2, new QTableWidgetItem(info["version"].toString()));
+            this->ui->tableWidget->setItem(row, 3, new QTableWidgetItem(Generic::Bool2String(info["is_working"].toBool())));
+            this->ui->tableWidget->setItem(row, 4, new QTableWidgetItem(info["description"].toString()));
+            this->ui->tableWidget->setItem(row, 5, new QTableWidgetItem(info["id"].toString()));
+        }
     }
     this->ui->tableWidget->resizeColumnsToContents();
     this->ui->tableWidget->resizeRowsToContents();
@@ -67,6 +107,12 @@ void ScriptingManager::Reload()
 
 void ScriptingManager::LoadFile(QString path)
 {
+    if (this->remoteSession != nullptr)
+    {
+        MessageBox::Error("not-implemented", "Not implemented");
+        // todo
+        return;
+    }
     UiScript *script = new UiScript();
     QString er;
     if (!script->Load(path, &er))
@@ -75,6 +121,12 @@ void ScriptingManager::LoadFile(QString path)
         delete script;
         return;
     }
+}
+
+void ScriptingManager::OnScriptChange(const QHash<QString, QVariant> &script_info)
+{
+    Q_UNUSED(script_info);
+    this->remoteSession->SendProtocolCommand(GP_CMD_SYS_LIST_SCRIPT);
 }
 
 void ScriptingManager::on_bLoad_clicked()
@@ -93,6 +145,12 @@ void ScriptingManager::on_bLoad_clicked()
 
 void ScriptingManager::on_bReload_clicked()
 {
+    if (this->remoteSession != nullptr)
+    {
+        MessageBox::Error("not-implemented", "Not implemented");
+        // todo
+        return;
+    }
     QList<ScriptExtension*> old_scripts = ScriptExtension::GetExtensions();
     foreach (ScriptExtension *script, old_scripts)
     {
@@ -126,6 +184,8 @@ void ScriptingManager::on_tableWidget_customContextMenuRequested(const QPoint &p
     menu.addAction(delete_file);
     menu.addSeparator();
     menu.addAction(edit);
+    if (this->remoteSession)
+        unload->setEnabled(false);
     QAction *selection = menu.exec(global);
     if (selection == unload)
     {
@@ -160,13 +220,33 @@ void ScriptingManager::on_tableWidget_customContextMenuRequested(const QPoint &p
 
 void ScriptingManager::on_pushScript_clicked()
 {
-    ScriptForm sf;
+    ScriptForm sf(this, this->remoteSession);
     sf.exec();
+    this->Reload();
+}
+
+void ScriptingManager::OnTimer()
+{
+    if (!this->remoteSession)
+        throw new NullPointerException("this->remoteSession", BOOST_CURRENT_FUNCTION);
+
+    if (this->lastRefresh == this->remoteSession->GetLastUpdateOfScripts())
+        return;
+
+    this->lastRefresh = this->remoteSession->GetLastUpdateOfScripts();
+
+    // Refresh the list of scripts we have new information from remote
     this->Reload();
 }
 
 void ScriptingManager::unloadSelectSc()
 {
+    if (this->remoteSession != nullptr)
+    {
+        MessageBox::Error("not-implemented", "Not implemented");
+        // todo
+        return;
+    }
     QList<int> selected = selectedRows();
     foreach (int i, selected)
     {
@@ -185,10 +265,24 @@ void ScriptingManager::unloadSelectSc()
 
 void ScriptingManager::deleteSelectSc()
 {
+    QList<int> selected = selectedRows();
+    if (selected.isEmpty())
+        return;
+
     if (MessageBox::Question("scr", "Delete files", "Are you sure you want to permanently delete selected files?", this) == MessageBoxResponse_No)
         return;
 
-    QList<int> selected = selectedRows();
+    if (this->remoteSession != nullptr)
+    {
+        foreach (int i, selected)
+        {
+            QHash<QString, QVariant> info;
+            info.insert("name", this->ui->tableWidget->item(i, 0)->text());
+            this->remoteSession->SendProtocolCommand(GP_CMD_SYS_UNINST_SCRIPT, info);
+        }
+        return;
+    }
+
     foreach (int i, selected)
     {
         QString script_name = this->ui->tableWidget->item(i, 0)->text();
@@ -210,6 +304,13 @@ void ScriptingManager::deleteSelectSc()
 
 void ScriptingManager::reloadSelectSc()
 {
+    if (this->remoteSession != nullptr)
+    {
+        MessageBox::Error("not-implemented", "Not implemented");
+        // todo
+        return;
+    }
+
     QList<int> selected = selectedRows();
     foreach (int i, selected)
     {

@@ -8,18 +8,19 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #include <QHostAddress>
 #include <QHash>
 #include <QSslSocket>
+#include <QDir>
 #include "../libirc/libirc/serveraddress.h"
 #include "../libirc/libircclient/network.h"
 #include "../libcore/core.h"
 #include "../libcore/grumpydsession.h"
 #include "../libcore/eventhandler.h"
 #include "../libcore/generic.h"
-#include "../libcore/scripting/scriptextension.h"
+#include "script_engine/grumpydscript.h"
 #include "databasebackend.h"
 #include "grumpyconf.h"
 #include "corewrapper.h"
@@ -820,12 +821,53 @@ void Session::processInstallScript(QHash<QString, QVariant> parameters)
         return;
     }
 
-    QString error;
-    ScriptExtension *ex = new ScriptExtension();
-    if (!ex->LoadSrc(parameters["id"].toString(), parameters["source"].toString(), &error))
+    QString extension_id = parameters["id"].toString();
+    QString extension_source = parameters["source"].toString();
+
+    if (!Generic::IsValidFileName(extension_id) || !extension_id.toLower().endsWith(".js"))
     {
+        this->TransferError(GP_CMD_SYS_INSTALL_SCRIPT, "Script ID is not a valid file name", GP_ERROR);
+        return;
+    }
+
+    // Try to store this as a file
+    QString path = CONF->GetScriptPath() + QDir::separator() + extension_id;
+    if (QFile::exists(path))
+    {
+        this->TransferError(GP_CMD_SYS_INSTALL_SCRIPT, "Script with this name is already located on disk", GP_ERROR);
+        return;
+    }
+
+    QFile file(path);
+    if (!file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text))
+    {
+        GRUMPY_ERROR("Unable to open " + path + " for writing");
+        this->TransferError(GP_CMD_SYS_INSTALL_SCRIPT, "Unable to open " + path + " for writing", GP_ERROR);
+        return;
+    }
+
+    if (!file.write(extension_source.toLatin1()))
+    {
+        GRUMPY_ERROR("Unable to write extension source into " + path);
+        this->TransferError(GP_CMD_SYS_INSTALL_SCRIPT, "Unable to write data into " + path + " (storage full?)", GP_ERROR);
+        return;
+    }
+
+    file.close();
+
+    GRUMPY_LOG("User " + this->loggedUser->GetName() +  " is installing script " + extension_id);
+
+    QString error;
+    GrumpydScript *ex = new GrumpydScript();
+    if (!ex->LoadSrc(path, extension_source, &error))
+    {
+        GRUMPY_ERROR("Unable to load script " + extension_id + ": " + error);
         this->TransferError(GP_CMD_SYS_INSTALL_SCRIPT, error, GP_ERROR);
         delete ex;
+        if (!QFile::remove(path))
+        {
+            GRUMPY_ERROR("Unable to delete: " + path);
+        }
         return;
     }
     Core::GrumpyCore->RegisterExtension(ex);
@@ -852,13 +894,35 @@ void Session::processRemoveScript(QHash<QString, QVariant> parameters)
 
     if (e == nullptr)
     {
+        GRUMPY_DEBUG("Request to delete nonexistent script", 1);
         this->TransferError(GP_CMD_SYS_UNINST_SCRIPT, "Extension not found", GP_ERROR);
         return;
     }
 
+    // Remove from disk
+    QString extension_path = e->GetPath();
+    if (!extension_path.startsWith(CONF->GetScriptPath()))
+        extension_path = CONF->GetScriptPath() + QDir::separator() + extension_path;
+    if (!QFile::exists(extension_path))
+    {
+        GRUMPY_ERROR("Unable to find: " + extension_path + " not deleting extension from storage");
+    } else
+    {
+        if (!QFile::remove(extension_path))
+        {
+            GRUMPY_DEBUG("Unable to rm: " + extension_path, 1);
+            this->TransferError(GP_CMD_SYS_UNINST_SCRIPT, "Unable to delete " + extension_path, GP_ERROR);
+            return;
+        }
+    }
+
+    QString name = e->GetName();
+
     e->Unload();
     Core::GrumpyCore->UnregisterExtension(e);
     delete e;
+
+    GRUMPY_DEBUG("Successfuly removed extension " + name, 1);
 
     this->protocol->SendProtocolCommand(GP_CMD_SYS_UNINST_SCRIPT, parameters);
 }
@@ -866,7 +930,7 @@ void Session::processRemoveScript(QHash<QString, QVariant> parameters)
 void Session::processScriptLS(QHash<QString, QVariant> parameters)
 {
     Q_UNUSED(parameters);
-    if (!this->IsAuthorized(PRIVILEGE_USE_SCRIPT))
+    if (!this->IsAuthorized(PRIVILEGE_READ_SCRIPT))
     {
         this->PermissionDeny(GP_CMD_SYS_LIST_SCRIPT);
         return;

@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2018
+// Copyright (c) Petr Bena 2018 - 2019
 
 #ifndef SCRIPTFORM_HPP
 #define SCRIPTFORM_HPP
@@ -24,13 +24,14 @@ namespace Ui
 namespace GrumpyIRC
 {
     class JSHighlighter;
+    class GrumpydSession;
 
     class ScriptForm : public QDialog
     {
             Q_OBJECT
 
         public:
-            explicit ScriptForm(QWidget *parent = 0);
+            explicit ScriptForm(QWidget *parent = nullptr, GrumpydSession *gsession = nullptr);
             ~ScriptForm();
             void EditScript(QString path, QString script_name);
 
@@ -39,6 +40,8 @@ namespace GrumpyIRC
             void on_pushButton_clicked();
 
         private:
+            void installRemote();
+            GrumpydSession *remoteSession;
             QString editingName;
             bool editing = false;
             JSHighlighter *highlighter = nullptr;

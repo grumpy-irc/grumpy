@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #ifndef GRUMPYDSESSION_H
 #define GRUMPYDSESSION_H
@@ -104,6 +104,8 @@
 #define GP_CMD_SYS_UNINST_SCRIPT           49
 #define GP_CMD_SYS_LIST_SCRIPT             50
 #define GP_CMD_GET_SNIFFER                 51
+#define GP_CMD_SYS_RELOAD_SCRIPT           52
+#define GP_CMD_SYS_RELOAD_ALL_SCRIPTS      53
 
 // PACKET VERIFICATION
 // This system is used to verify if packet was delivered or not
@@ -196,15 +198,22 @@ namespace GrumpyIRC
             qint64 GetProgress();
             //! Return last time when user list was updated
             QDateTime GetLastUpdateOfUserList();
+            QDateTime GetLastUpdateOfScripts();
             //! Return user list from cache
             QList<QVariant> GetUserList();
             QList<QString> GetRoles();
             QString Version;
             bool IsOpening = false;
             QHash<QString, QVariant> Preferences;
+            QList<QVariant> ScriptList;
 
         signals:
             void Event_IncomingData(QByteArray data);
+            void Event_ScriptDeleted(const QHash<QString, QVariant> &info);
+            void Event_ScriptInstalled(const QHash<QString, QVariant> &info);
+            void Event_ScriptList(const QList<QVariant> &scripts);
+            void Event_ScriptReloaded(const QHash<QString, QVariant> &info);
+            void Event_ScriptsReloaded(const QHash<QString, QVariant> &info);
             //void Event_Deleted();
 
         public slots:
@@ -225,6 +234,9 @@ namespace GrumpyIRC
             void processNick(const QHash<QString, QVariant> &hash);
             void processPreferences(const QHash<QString, QVariant> &hash);
             void processChannelModeSync(const QHash<QString, QVariant> &hash);
+            void processLScript(const QHash<QString, QVariant> &hash);
+            void processIScript(const QHash<QString, QVariant> &hash);
+            void processUScript(const QHash<QString, QVariant> &hash);
             void processRequest(const QHash<QString, QVariant> &hash);
             void processChannelResync(const QHash<QString, QVariant> &hash);
             void processSResync(const QHash<QString, QVariant> &parameters);
@@ -246,6 +258,7 @@ namespace GrumpyIRC
             bool AutoReconnect;
             QDateTime syncInit;
             QList<unsigned int> processedMessages;
+            QDateTime lastScriptListUpdate;
             unsigned int lastProcessedMessage = 1;
             bool syncing;
             libgp::GP *gp;

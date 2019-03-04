@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #include "../libirc/libircclient/network.h"
 #include "../libirc/libircclient/user.h"
@@ -45,6 +45,7 @@ GrumpydSession::GrumpydSession(Scrollback *System, const QString &Hostname, cons
     this->password = Pass;
     this->SSL = ssl;
     this->lastUserListUpdate = QDateTime::currentDateTime();
+    this->lastScriptListUpdate = QDateTime::currentDateTime();
     GrumpydSession::Sessions_Lock.lock();
     GrumpydSession::Sessions.append(this);
     GrumpydSession::Sessions_Lock.unlock();
@@ -586,6 +587,11 @@ QDateTime GrumpydSession::GetLastUpdateOfUserList()
     return this->lastUserListUpdate;
 }
 
+QDateTime GrumpydSession::GetLastUpdateOfScripts()
+{
+    return this->lastScriptListUpdate;
+}
+
 QList<QVariant> GrumpydSession::GetUserList()
 {
     return this->userList;
@@ -703,8 +709,17 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, const QHash<QString, Q
         case GP_CMD_GET_SNIFFER:
             this->processSniffer(parameters);
             break;
+        case GP_CMD_SYS_LIST_SCRIPT:
+            this->processLScript(parameters);
+            break;
         case GP_CMD_SYS_LIST_USER:
             this->processUserList(parameters);
+            break;
+        case GP_CMD_SYS_INSTALL_SCRIPT:
+            this->processIScript(parameters);
+            break;
+        case GP_CMD_SYS_UNINST_SCRIPT:
+            this->processUScript(parameters);
             break;
         case GP_CMD_SYS_CREATE_USER:
             if (parameters.contains("username"))
@@ -966,6 +981,26 @@ void GrumpydSession::processChannelModeSync(const QHash<QString, QVariant> &hash
         else if (type == "remove")
             channel->RemovePMode(mode);
     }
+}
+
+void GrumpydSession::processLScript(const QHash<QString, QVariant> &hash)
+{
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
+    this->lastScriptListUpdate = QDateTime::currentDateTime();
+    this->ScriptList = hash["list"].toList();
+    emit this->Event_ScriptList(this->ScriptList);
+}
+
+void GrumpydSession::processIScript(const QHash<QString, QVariant> &hash)
+{
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
+    emit this->Event_ScriptInstalled(hash);
+}
+
+void GrumpydSession::processUScript(const QHash<QString, QVariant> &hash)
+{
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
+    emit this->Event_ScriptDeleted(hash);
 }
 
 void GrumpydSession::processRequest(const QHash<QString, QVariant> &hash)

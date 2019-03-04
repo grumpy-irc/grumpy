@@ -20,6 +20,7 @@
 #include "grumpydcfwin.h"
 #include "skin.h"
 #include "ui_scrollbacklist.h"
+#include "script_engine/scriptingmanager.h"
 #include "scrollbackframe.h"
 #include "scrollbacksmanager.h"
 #include "scrollbacklist_node.h"
@@ -185,6 +186,7 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     QAction *menuAway_Set = nullptr;
     QAction *menuAway_Uns = nullptr;
     QAction *menuSettings = nullptr;
+    QAction *menuScripts = nullptr;
     QAction *menuPart = nullptr;
     QAction *menuJoin = nullptr;
     QAction *menuHide = nullptr;
@@ -228,6 +230,8 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
         {
             menuSettings = new QAction(QObject::tr("Settings"), &Menu);
             Menu.addAction(menuSettings);
+            menuScripts = new QAction(QObject::tr("Remote scripts"), &Menu);
+            Menu.addAction(menuScripts);
         }
 
         if (wx->IsChannel())
@@ -296,6 +300,16 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
             return;
         }
         GrumpydCfWin *window = new GrumpydCfWin((GrumpydSession*)wx->GetSession());
+        window->setAttribute(Qt::WA_DeleteOnClose);
+        window->show();
+    } else if (selectedItem == menuScripts)
+    {
+        if (wx->IsDead())
+        {
+            MessageBox::Display("scripts_not_connected_network", "Error", "You can't use this function on disconnected window", MainWindow::Main);
+            return;
+        }
+        ScriptingManager *window = new ScriptingManager(nullptr, (GrumpydSession*)wx->GetSession());
         window->setAttribute(Qt::WA_DeleteOnClose);
         window->show();
     } else if (selectedItem == menuDisconnect)

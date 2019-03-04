@@ -90,7 +90,7 @@ ScriptExtension::~ScriptExtension()
         this->DestroyScrollback(this->scriptScbs.first());
 
     delete this->engine;
-    if (!this->scriptPath.isEmpty())
+    if (this->isLoaded && !this->scriptPath.isEmpty())
         ScriptExtension::loadedPaths.removeAll(this->scriptPath);
     if (this->isLoaded && ScriptExtension::extensions.contains(this->GetName()))
         ScriptExtension::extensions.remove(this->scriptName);
@@ -312,6 +312,7 @@ bool ScriptExtension::loadSource(QString source, QString *error)
     {
         *error = "Unable to load script " + this->scriptPath + ", ext_is_working() didn't return true";
         this->isWorking = false;
+        this->isLoaded = false;
         return false;
     }
 
@@ -320,6 +321,7 @@ bool ScriptExtension::loadSource(QString source, QString *error)
     {
         *error = "Unable to load script " + this->scriptPath + ", ext_get_info() didn't return valid object";
         this->isWorking = false;
+        this->isLoaded = false;
         return false;
     }
 
@@ -327,6 +329,7 @@ bool ScriptExtension::loadSource(QString source, QString *error)
     {
         *error = "Unable to load script, ext_get_info() didn't contain some of these properties: name, author, description, version";
         this->isWorking = false;
+        this->isLoaded = false;
         return false;
     }
 
@@ -339,6 +342,7 @@ bool ScriptExtension::loadSource(QString source, QString *error)
     {
         *error = "Unable to load script, invalid extension name (name must be a string)";
         this->isWorking = false;
+        this->isLoaded = false;
         return false;
     }
 
@@ -348,6 +352,7 @@ bool ScriptExtension::loadSource(QString source, QString *error)
     {
         *error = this->scriptName + " is already loaded";
         this->isWorking = false;
+        this->isLoaded = false;
         return false;
     }
 
@@ -358,6 +363,7 @@ bool ScriptExtension::loadSource(QString source, QString *error)
     {
         *error = "Unable to load script, ext_init() didn't return true";
         this->isWorking = false;
+        this->isLoaded = false;
         return false;
     }
     return true;
