@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2018
+// Copyright (c) Petr Bena 2018 - 2019
 
 #ifndef GRUMPYJS_UNSAFE_H
 #define GRUMPYJS_UNSAFE_H
@@ -30,6 +30,7 @@ namespace GrumpyIRC
             GrumpyJS_Unsafe(ScriptExtension *s);
             QHash<QString, QString> GetFunctions();
             Q_INVOKABLE QJSValue process(unsigned int window_id, QString command);
+            Q_INVOKABLE bool file_exists(QString path);
     };
 }
 

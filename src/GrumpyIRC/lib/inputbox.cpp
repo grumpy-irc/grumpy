@@ -57,8 +57,12 @@ void InputBox::ProcessInput()
         if (response != MessageBoxResponse_Yes)
             return;
     }
-    this->insertToHistory();
-    this->historyPosition = this->history.count();
+    // Ignore dups
+    if (this->history.isEmpty() || this->history.last() != text)
+    {
+        this->insertToHistory();
+        this->historyPosition = this->history.count();
+    }
     this->ui->textEdit->setText("");
     CoreWrapper::GrumpyCore->GetCommandProcessor()->ProcessText(text, this->parent->GetScrollback());
 }

@@ -8,8 +8,10 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2018
+// Copyright (c) Petr Bena 2018 - 2019
 
+#include <QDir>
+#include <QFile>
 #include "grumpyjs_unsafe.h"
 #include "scriptextension.h"
 #include "../scrollback.h"
@@ -29,6 +31,7 @@ QHash<QString, QString> GrumpyJS_Unsafe::GetFunctions()
 {
     QHash<QString, QString> fh;
     fh.insert("process", "(window_id, text): !unsafe! sends input to command processor, esentially same as entering text to input box in program");
+    fh.insert("file_exists", "(path): returns true if file exists");
     return fh;
 }
 
@@ -42,4 +45,9 @@ QJSValue GrumpyJS_Unsafe::process(unsigned int window_id, QString command)
     }
 
     return QJSValue(Core::GrumpyCore->GetCommandProcessor()->ProcessText(command, w));
+}
+
+bool GrumpyJS_Unsafe::file_exists(QString path)
+{
+    return QFile::exists(path);
 }
