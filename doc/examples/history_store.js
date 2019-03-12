@@ -9,6 +9,7 @@ var history_max = 20;
 var only_command = false;
 // Print extra debug
 var debugging_on = false;
+var repeated = false;
 //////////////////////////////////////////
 
 //////////////////////////////////////////
@@ -16,6 +17,7 @@ var debugging_on = false;
 // Code starts here
 // This is where we store history for every single scrollback
 var global_history = [];
+var last_text = [];
 
 function debug(text)
 {
@@ -48,7 +50,7 @@ function save_hist(key)
     while (list.length > history_max)
         list.shift()
     // Turn it back to one huge string
-    temp = ""; 
+    var temp = ""; 
     for (var i = 0, len = list.length; i < len; i++)
         temp += list[i] + "\n";
     // Remove the extra newline
@@ -164,6 +166,14 @@ function ext_ui_on_exit()
 function ext_ui_on_history(window_id, text)
 {
     window_name = get_win(window_id);
+    if (!repeated)
+    {
+        if (window_name in last_text && (last_text[window_name] == text))
+        {
+            return;
+        }
+        last_text[window_name] = text;
+    }
     if (!(window_name in global_history))
     {
         global_history[window_name] = text;

@@ -698,7 +698,7 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, const QHash<QString, Q
             this->processRefuse(parameters);
             break;
         case GP_CMD_ERROR:
-            this->systemWindow->InsertText("Error: " + parameters["description"].toString(), ScrollbackItemType_SystemError);
+            this->processErr(parameters);
             break;
         case GP_CMD_OPTIONS:
             this->processPreferences(parameters);
@@ -720,6 +720,9 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, const QHash<QString, Q
             break;
         case GP_CMD_SYS_UNINST_SCRIPT:
             this->processUScript(parameters);
+            break;
+        case GP_CMD_SYS_READ_SCRIPT_SOURCE_CODE:
+            this->processScriptSource(parameters);
             break;
         case GP_CMD_SYS_CREATE_USER:
             if (parameters.contains("username"))
@@ -1313,6 +1316,18 @@ void GrumpydSession::processRefuse(const QHash<QString, QVariant> &parameters)
     if (parameters.contains("source"))
         source = parameters["source"].toString();
     this->systemWindow->InsertText("Permission denied: " + source, ScrollbackItemType_SystemError);
+}
+
+void GrumpydSession::processScriptSource(const QHash<QString, QVariant> &parameters)
+{
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
+    emit this->Event_ScriptSource(parameters);
+}
+
+void GrumpydSession::processErr(const QHash<QString, QVariant> &parameters)
+{
+    this->systemWindow->InsertText("Error: " + parameters["description"].toString(), ScrollbackItemType_SystemError);
+    emit this->Event_Error(parameters);
 }
 
 void GrumpydSession::freememory()

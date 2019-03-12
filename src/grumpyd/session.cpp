@@ -810,9 +810,9 @@ void Session::processInstallScript(QHash<QString, QVariant> parameters)
         return;
     }
 
-    if (!parameters.contains("id"))
+    if (!parameters.contains("path"))
     {
-        this->TransferError(GP_CMD_SYS_INSTALL_SCRIPT, "Missing id", GP_ERROR);
+        this->TransferError(GP_CMD_SYS_INSTALL_SCRIPT, "Missing path", GP_ERROR);
         return;
     }
     if (!parameters.contains("source"))
@@ -821,17 +821,17 @@ void Session::processInstallScript(QHash<QString, QVariant> parameters)
         return;
     }
 
-    QString extension_id = parameters["id"].toString();
+    QString extension_path = parameters["path"].toString();
     QString extension_source = parameters["source"].toString();
 
-    if (!Generic::IsValidFileName(extension_id) || !extension_id.toLower().endsWith(".js"))
+    if (!Generic::IsValidFileName(extension_path) || !extension_path.toLower().endsWith(".js"))
     {
-        this->TransferError(GP_CMD_SYS_INSTALL_SCRIPT, "Script ID is not a valid file name", GP_ERROR);
+        this->TransferError(GP_CMD_SYS_INSTALL_SCRIPT, "Script path is not a valid file name", GP_ERROR);
         return;
     }
 
     // Try to store this as a file
-    QString path = CONF->GetScriptPath() + QDir::separator() + extension_id;
+    QString path = CONF->GetScriptPath() + QDir::separator() + extension_path;
     if (QFile::exists(path))
     {
         this->TransferError(GP_CMD_SYS_INSTALL_SCRIPT, "Script with this name is already located on disk", GP_ERROR);
@@ -855,13 +855,13 @@ void Session::processInstallScript(QHash<QString, QVariant> parameters)
 
     file.close();
 
-    GRUMPY_LOG("User " + this->loggedUser->GetName() +  " is installing script " + extension_id);
+    GRUMPY_LOG("User " + this->loggedUser->GetName() +  " is installing script " + extension_path);
 
     QString error;
     GrumpydScript *ex = new GrumpydScript();
     if (!ex->LoadSrc(path, extension_source, &error))
     {
-        GRUMPY_ERROR("Unable to load script " + extension_id + ": " + error);
+        GRUMPY_ERROR("Unable to load script " + extension_path + ": " + error);
         this->TransferError(GP_CMD_SYS_INSTALL_SCRIPT, error, GP_ERROR);
         delete ex;
         if (!QFile::remove(path))
@@ -941,7 +941,10 @@ void Session::processScriptLS(QHash<QString, QVariant> parameters)
     {
         QHash<QString, QVariant> data;
         data.insert("name", s->GetName());
-        data.insert("id", s->GetPath());
+        QString fixedpath = s->GetPath();
+        if (fixedpath.contains(QDir::separator()))
+            fixedpath = fixedpath.mid(fixedpath.lastIndexOf(QDir::separator()) + 1);
+        data.insert("path", fixedpath);
         data.insert("is_working", s->IsWorking());
         data.insert("author", s->GetAuthor());
         data.insert("version", s->GetVersion());
@@ -953,6 +956,40 @@ void Session::processScriptLS(QHash<QString, QVariant> parameters)
     response.insert("list", QVariant(script_list));
 
     this->protocol->SendProtocolCommand(GP_CMD_SYS_LIST_SCRIPT, response);
+}
+
+void Session::processScriptReadSource(QHash<QString, QVariant> parameters)
+{
+    Q_UNUSED(parameters);
+    if (!this->IsAuthorized(PRIVILEGE_READ_SCRIPT))
+    {
+        this->PermissionDeny(GP_CMD_SYS_READ_SCRIPT_SOURCE_CODE);
+        return;
+    }
+
+    ScriptExtension *e = nullptr;
+
+    if (parameters.contains("path"))
+        e = ScriptExtension::GetExtensionByPath(parameters["path"].toString());
+    else if (parameters.contains("name"))
+        e = ScriptExtension::GetExtensionByName(parameters["name"].toString());
+
+    if (e == nullptr)
+    {
+        GRUMPY_DEBUG("Request to get a source code of nonexistent script", 1);
+        this->TransferError(GP_CMD_SYS_READ_SCRIPT_SOURCE_CODE, "Script not found", GP_ERROR);
+        return;
+    }
+
+    QHash<QString, QVariant> data;
+    data.insert("name", e->GetName());
+    data.insert("id", e->GetPath());
+    data.insert("source", e->GetSource());
+    data.insert("is_working", e->IsWorking());
+    data.insert("author", e->GetAuthor());
+    data.insert("version", e->GetVersion());
+    data.insert("description", e->GetDescription());
+    this->protocol->SendProtocolCommand(GP_CMD_SYS_READ_SCRIPT_SOURCE_CODE, data);
 }
 
 void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
@@ -1056,6 +1093,9 @@ void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
             break;
         case GP_CMD_AWAY:
             this->processAway(parameters);
+            break;
+        case GP_CMD_SYS_READ_SCRIPT_SOURCE_CODE:
+            this->processScriptReadSource(parameters);
             break;
         case GP_CMD_SYS_UNINST_SCRIPT:
             this->processRemoveScript(parameters);

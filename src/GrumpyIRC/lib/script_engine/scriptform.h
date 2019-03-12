@@ -14,6 +14,7 @@
 #define SCRIPTFORM_HPP
 
 #include "../grumpy_global.h"
+#include <QHash>
 #include <QDialog>
 
 namespace Ui
@@ -38,8 +39,14 @@ namespace GrumpyIRC
         private slots:
             void on_pushButton_2_clicked();
             void on_pushButton_clicked();
+            void ScriptError(const QHash<QString, QVariant> &info);
+            void ScriptGet(const QHash<QString, QVariant> &info);
+            void ScriptLoaded(const QHash<QString, QVariant> &info);
+            void ScriptRm(const QHash<QString, QVariant> &info);
 
         private:
+            void showError(QString detail);
+            void dropRemote();
             void installRemote();
             GrumpydSession *remoteSession;
             QString editingName;

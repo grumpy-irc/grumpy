@@ -304,7 +304,7 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
         window->show();
     } else if (selectedItem == menuScripts)
     {
-        if (wx->IsDead())
+        if (wx->IsDead() || !wx->GetSession()->IsConnected())
         {
             MessageBox::Display("scripts_not_connected_network", "Error", "You can't use this function on disconnected window", MainWindow::Main);
             return;

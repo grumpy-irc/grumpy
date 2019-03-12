@@ -98,7 +98,7 @@ void ScriptingManager::Reload()
             this->ui->tableWidget->setItem(row, 2, new QTableWidgetItem(info["version"].toString()));
             this->ui->tableWidget->setItem(row, 3, new QTableWidgetItem(Generic::Bool2String(info["is_working"].toBool())));
             this->ui->tableWidget->setItem(row, 4, new QTableWidgetItem(info["description"].toString()));
-            this->ui->tableWidget->setItem(row, 5, new QTableWidgetItem(info["id"].toString()));
+            this->ui->tableWidget->setItem(row, 5, new QTableWidgetItem(info["path"].toString()));
         }
     }
     this->ui->tableWidget->resizeColumnsToContents();
@@ -198,23 +198,7 @@ void ScriptingManager::on_tableWidget_customContextMenuRequested(const QPoint &p
         this->reloadSelectSc();
     } else if (selection == edit)
     {
-        QList<int> selected_sc = this->selectedRows();
-        if (selected_sc.count() != 1)
-        {
-            MessageBox::Error("Error", "Please select 1 script to edit", this);
-            return;
-        }
-        QString script_name = this->ui->tableWidget->item(selected_sc[0], 0)->text();
-        ScriptExtension *script = ScriptExtension::GetExtensionByName(script_name);
-        if (!script)
-        {
-            MessageBox::Error("Error", "Unable to edit " + script_name + " script not found in memory", this);
-            return;
-        }
-        ScriptForm sf;
-        sf.EditScript(script->GetPath(), script->GetName());
-        sf.exec();
-        this->Reload();
+        this->editSelectedSc();
     }
 }
 
@@ -299,6 +283,37 @@ void ScriptingManager::deleteSelectSc()
         if (!file.remove())
             MessageBox::Error("Error", "Unable to remove " + path, this);
     }
+    this->Reload();
+}
+
+void ScriptingManager::editSelectedSc()
+{
+    QList<int> selected_sc = this->selectedRows();
+    if (selected_sc.count() != 1)
+    {
+        MessageBox::Error("Error", "Please select 1 script to edit", this);
+        return;
+    }
+    QString script_name = this->ui->tableWidget->item(selected_sc[0], 0)->text();
+    QString script_path = this->ui->tableWidget->item(selected_sc[0], 5)->text();
+
+    if (this->remoteSession)
+    {
+        ScriptForm sf(this, this->remoteSession);
+        sf.EditScript(script_path, script_name);
+        sf.exec();
+        return;
+    }
+
+    ScriptExtension *script = ScriptExtension::GetExtensionByName(script_name);
+    if (!script)
+    {
+        MessageBox::Error("Error", "Unable to edit " + script_name + " script not found in memory", this);
+        return;
+    }
+    ScriptForm sf(this);
+    sf.EditScript(script->GetPath(), script->GetName());
+    sf.exec();
     this->Reload();
 }
 

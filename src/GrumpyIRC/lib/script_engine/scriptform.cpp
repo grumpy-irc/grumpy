@@ -45,6 +45,7 @@ ScriptForm::ScriptForm(QWidget *parent, GrumpydSession *gsession) : QDialog(pare
         }
     } else
     {
+        connect(this->remoteSession, SIGNAL(Event_Error(const QHash<QString, QVariant> &)), this, SLOT(ScriptError(const QHash<QString, QVariant> &)));
         file_name = "";
     }
     this->ui->lineEdit_2->setText(file_name);
@@ -61,6 +62,24 @@ ScriptForm::~ScriptForm()
 
 void ScriptForm::EditScript(QString path, QString script_name)
 {
+    this->editing = true;
+    this->ui->pushButton->setText("Save, reload and close");
+    this->editingName = script_name;
+    this->ui->lineEdit_2->setEnabled(false);
+    // Grumpyd
+    if (this->remoteSession)
+    {
+        this->setWindowTitle("Edit script");
+        this->ui->textEdit->setText("Loading source...");
+        this->ui->textEdit->setEnabled(false);
+        this->ui->lineEdit_2->setText(path);
+        connect(this->remoteSession, SIGNAL(Event_ScriptSource(const QHash<QString, QVariant>&)), this, SLOT(ScriptGet(const QHash<QString, QVariant>&)));
+        QHash<QString, QVariant> parameters;
+        parameters.insert("name", script_name);
+        this->remoteSession->SendProtocolCommand(GP_CMD_SYS_READ_SCRIPT_SOURCE_CODE, parameters);
+        return;
+    }
+
     QFile file(path);
     if (!file.open(QIODevice::ReadWrite))
     {
@@ -68,10 +87,7 @@ void ScriptForm::EditScript(QString path, QString script_name)
         return;
     }
     this->ui->textEdit->setText(QString(file.readAll()));
-    this->editing = true;
-    this->editingName = script_name;
     this->ui->lineEdit_2->setText(path);
-    this->ui->pushButton->setText("Save, reload and close");
 }
 
 void ScriptForm::on_pushButton_2_clicked()
@@ -83,14 +99,23 @@ void ScriptForm::on_pushButton_2_clicked()
     if (file_dialog.exec() == QDialog::DialogCode::Rejected)
         return;
     QString path = file_dialog.selectedFiles().at(0);
-    if (!path.isEmpty())
+    if (!this->remoteSession && !path.isEmpty())
+    {
         this->ui->lineEdit_2->setText(path);
+    }
 }
 
 void ScriptForm::on_pushButton_clicked()
 {
     if (this->remoteSession != nullptr)
     {
+        this->ui->textEdit->setEnabled(false);
+        this->ui->pushButton->setEnabled(false);
+        if (this->editing)
+        {
+            this->dropRemote();
+            return;
+        }
         this->installRemote();
         return;
     }
@@ -133,28 +158,85 @@ void ScriptForm::on_pushButton_clicked()
     }
 }
 
-void ScriptForm::installRemote()
+void ScriptForm::ScriptError(const QHash<QString, QVariant> &info)
 {
-    QString id = this->ui->lineEdit_2->text();
-    if (id.isEmpty())
+    QString msg = info["description"].toString();
+    this->showError("Error from remote: " + msg);
+}
+
+void ScriptForm::ScriptGet(const QHash<QString, QVariant> &info)
+{
+    if (!info.contains("name") || !info.contains("source"))
     {
-        MessageBox::Error("Error", "No script name provided", this);
+        MessageBox::Error("Error", "Remote grumpyd didn't return source code for script");
+        this->close();
         return;
     }
 
-    if (id.toLower().endsWith(".js"))
-        id += ".js";
+    if (info["name"].toString() != this->editingName)
+        return;
 
-    if (!Generic::IsValidFileName(id))
+    this->ui->textEdit->setEnabled(true);
+    this->ui->textEdit->setText(info["source"].toString());
+}
+
+void ScriptForm::ScriptLoaded(const QHash<QString, QVariant> &info)
+{
+    //if (!info.contains("name"))
+    //    return;
+    //if (info["name"].toString() != this->editingName)
+    //    return;
+    this->close();
+}
+
+void ScriptForm::ScriptRm(const QHash<QString, QVariant> &info)
+{
+    if (!info.contains("name"))
+        return;
+    if (info["name"].toString() != this->editingName)
+        return;
+    this->installRemote();
+}
+
+void ScriptForm::showError(QString detail)
+{
+    this->ui->pushButton->setText("Save");
+    this->ui->pushButton->setEnabled(true);
+    this->ui->textEdit->setEnabled(true);
+    MessageBox::Error("Error", detail, this);
+}
+
+void ScriptForm::dropRemote()
+{
+    this->ui->pushButton->setText("Removing old script...");
+    connect(this->remoteSession, SIGNAL(Event_ScriptDeleted(const QHash<QString, QVariant>&)), this, SLOT(ScriptRm(const QHash<QString, QVariant>&)));
+    QHash<QString, QVariant> parameters;
+    parameters.insert("name", this->editingName);
+    this->remoteSession->SendProtocolCommand(GP_CMD_SYS_UNINST_SCRIPT, parameters);
+}
+
+void ScriptForm::installRemote()
+{
+    this->ui->pushButton->setText("Installing new script...");
+    QString path = this->ui->lineEdit_2->text();
+    if (path.isEmpty())
     {
-        MessageBox::Error("Error", "Script name is not valid", this);
+        this->showError("No script name provided");
+        return;
+    }
+
+    if (!path.toLower().endsWith(".js"))
+        path += ".js";
+
+    if (!Generic::IsValidFileName(path))
+    {
+        this->showError("Script name is not valid");
         return;
     }
     QString source = this->ui->textEdit->toPlainText();
+    connect(this->remoteSession, SIGNAL(Event_ScriptInstalled(const QHash<QString, QVariant>&)), this, SLOT(ScriptLoaded(const QHash<QString, QVariant>&)));
     QHash<QString, QVariant> parameters;
-    parameters.insert("id", QVariant(id));
+    parameters.insert("path", QVariant(path));
     parameters.insert("source", QVariant(source));
     this->remoteSession->SendProtocolCommand(GP_CMD_SYS_INSTALL_SCRIPT, parameters);
-    // TO-DO: wait for remote with response before closing
-    this->close();
 }

@@ -48,6 +48,7 @@ namespace GrumpyIRC
         private:
             void unloadSelectSc();
             void deleteSelectSc();
+            void editSelectedSc();
             void reloadSelectSc();
             QList<int> selectedRows();
             QTimer *grumpydRefresh = nullptr;

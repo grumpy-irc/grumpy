@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #include "scriptextension.h"
 #include "genericjsclass.h"
@@ -173,6 +173,11 @@ QString ScriptExtension::GetAuthor()
     return this->scriptAuthor;
 }
 
+QString ScriptExtension::GetSource()
+{
+    return this->originalSource;
+}
+
 bool ScriptExtension::IsWorking()
 {
     if (!this->isWorking || !this->isLoaded)
@@ -290,6 +295,8 @@ int ScriptExtension::GetHookID(QString hook)
 
 bool ScriptExtension::loadSource(QString source, QString *error)
 {
+    // Store orig
+    this->originalSource = source;
     // Prepend the built-in libs
     source = Resources::GetSource("/grumpy_core/scripting/ecma/libirc.js") + Resources::GetSource("/grumpy_core/scripting/ecma/grumpy.js") + source;
     this->sourceCode = source;

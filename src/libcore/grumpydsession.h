@@ -106,6 +106,7 @@
 #define GP_CMD_GET_SNIFFER                 51
 #define GP_CMD_SYS_RELOAD_SCRIPT           52
 #define GP_CMD_SYS_RELOAD_ALL_SCRIPTS      53
+#define GP_CMD_SYS_READ_SCRIPT_SOURCE_CODE 54
 
 // PACKET VERIFICATION
 // This system is used to verify if packet was delivered or not
@@ -214,6 +215,8 @@ namespace GrumpyIRC
             void Event_ScriptList(const QList<QVariant> &scripts);
             void Event_ScriptReloaded(const QHash<QString, QVariant> &info);
             void Event_ScriptsReloaded(const QHash<QString, QVariant> &info);
+            void Event_ScriptSource(const QHash<QString, QVariant> &info);
+            void Event_Error(const QHash<QString, QVariant> &info);
             //void Event_Deleted();
 
         public slots:
@@ -251,6 +254,8 @@ namespace GrumpyIRC
             void processInit(const QHash<QString, QVariant> &parameters);
             void processQuit(const QHash<QString, QVariant> &parameters);
             void processRefuse(const QHash<QString, QVariant> &parameters);
+            void processScriptSource(const QHash<QString, QVariant> &parameters);
+            void processErr(const QHash<QString, QVariant> &parameters);
             void freememory();
             void closeError(const QString &error);
             QHash<unsigned int, QList<NetworkSniffer_Item>> snifferCache;

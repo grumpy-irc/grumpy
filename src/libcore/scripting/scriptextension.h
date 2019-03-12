@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #ifndef SCRIPTEXTENSION_H
 #define SCRIPTEXTENSION_H
@@ -43,6 +43,7 @@ namespace GrumpyIRC
             QString GetVersion();
             QString GetPath();
             QString GetAuthor();
+            QString GetSource();
             bool IsWorking();
             QJSValue ExecuteFunction(QString function, QJSValueList parameters);
             virtual unsigned int GetContextID();
@@ -83,6 +84,7 @@ namespace GrumpyIRC
             QList<QString> hooksExported;
             QList<QString> functionsExported;
             QHash<QString, QString> functionsHelp;
+            QString originalSource;
             QString sourceCode;
             QString scriptPath;
             QString scriptName;
