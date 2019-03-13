@@ -11,6 +11,8 @@
 // Copyright (c) Petr Bena 2019
 
 #include "grumpydscript.h"
+#include "grumpydscrollbackjs.h"
+#include "grumpydjs.h"
 
 using namespace GrumpyIRC;
 
@@ -42,4 +44,6 @@ void GrumpydScript::registerFunctions()
 void GrumpydScript::registerClasses()
 {
     ScriptExtension::registerClasses();
+    this->registerClass("grumpyd_scrollback", new GrumpydScrollbackJS(this));
+    this->registerClass("grumpyd", new GrumpydJS(this));
 }
