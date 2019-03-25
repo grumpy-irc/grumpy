@@ -27,11 +27,12 @@ GrumpydScrollbackJS::GrumpydScrollbackJS(ScriptExtension *s) : GenericJSClass (s
 QHash<QString, QString> GrumpydScrollbackJS::GetFunctions()
 {
     QHash<QString, QString> functions_help;
-
+    functions_help.insert("get_owner_id", "(scrollback)");
+    functions_help.insert("get_owner_name", "(scrollback)");
     return functions_help;
 }
 
-int GrumpydScrollbackJS::get_owner(unsigned int scrollback)
+int GrumpydScrollbackJS::get_owner_id(unsigned int scrollback)
 {
     VirtualScrollback *w = (VirtualScrollback*)Scrollback::GetScrollbackByID(scrollback);
     if (!w)
@@ -40,5 +41,16 @@ int GrumpydScrollbackJS::get_owner(unsigned int scrollback)
         return -1;
     }
     return w->GetOwner()->GetID();
+}
+
+QString GrumpydScrollbackJS::get_owner_name(unsigned int scrollback)
+{
+    VirtualScrollback *w = (VirtualScrollback*)Scrollback::GetScrollbackByID(scrollback);
+    if (!w)
+    {
+        GRUMPY_ERROR(this->script->GetName() + ": has_network(scrollback_id): unknown scrollback");
+        return "";
+    }
+    return w->GetOwner()->GetName();
 }
 

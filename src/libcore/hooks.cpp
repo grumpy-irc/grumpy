@@ -31,3 +31,13 @@ void Hooks::OnScrollback_Destroyed(Scrollback *scrollback)
         e->Hook_OnScrollbackDestroyed(scrollback);
     }
 }
+
+void Hooks::OnNetwork_Disconnect(IRCSession *session)
+{
+    if (!Core::GrumpyCore)
+        return;
+    foreach (Extension *e, Core::GrumpyCore->GetExtensions())
+    {
+        e->Hook_OnNetworkDisconnect(session);
+    }
+}

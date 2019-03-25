@@ -20,12 +20,13 @@
 namespace GrumpyIRC
 {
     class Scrollback;
+    class IRCSession;
     class LIBCORESHARED_EXPORT Extension : public QObject
     {
             Q_OBJECT
         public:
             Extension();
-            virtual ~Extension();
+             ~Extension() override;
             virtual QString GetVersion()=0;
             virtual QString GetName()=0;
             virtual QString GetDescription()=0;
@@ -33,6 +34,7 @@ namespace GrumpyIRC
             virtual bool IsWorking()=0;
             virtual void Hook_Shutdown() {}
             virtual void Hook_OnScrollbackDestroyed(Scrollback *scrollback) {}
+            virtual void Hook_OnNetworkDisconnect(IRCSession *session) {}
 
         //signals:
 

@@ -19,64 +19,68 @@
 
 #define GRUMPY_SCRIPT_HOOK_SHUTDOWN                     0
 #define GRUMPY_SCRIPT_HOOK_SCROLLBACK_DESTROYED         1
+#define GRUMPY_SCRIPT_HOOK_SCROLLBACK_CREATED           2
+#define GRUMPY_SCRIPT_HOOK_NETWORK_DISCONNECT           3
 
 namespace GrumpyIRC
 {
     class ScriptCommand;
+    class IRCSession;
     class GenericJSClass;
     class LIBCORESHARED_EXPORT ScriptExtension : public Extension
     {
             Q_OBJECT
         public:
-            static ScriptExtension *GetExtensionByPath(QString path);
+            static ScriptExtension *GetExtensionByPath(const QString& path);
             static ScriptExtension *GetExtensionByEngine(QJSEngine *e);
-            static ScriptExtension *GetExtensionByName(QString extension_name);
+            static ScriptExtension *GetExtensionByName(const QString& extension_name);
             static QList<ScriptExtension*> GetExtensions();
 
             ScriptExtension();
-            ~ScriptExtension();
-            bool Load(QString path, QString *error);
-            bool LoadSrc(QString unique_id, QString source, QString *error);
+            ~ScriptExtension() override;
+            bool Load(const QString& path, QString *error);
+            bool LoadSrc(const QString& unique_id, const QString &source, QString *error);
             virtual void Unload();
-            QString GetDescription();
-            QString GetName();
-            QString GetVersion();
+            QString GetDescription() override;
+            QString GetName() override;
+            QString GetVersion() override;
             QString GetPath();
-            QString GetAuthor();
+            QString GetAuthor() override;
             QString GetSource();
-            bool IsWorking();
-            QJSValue ExecuteFunction(QString function, QJSValueList parameters);
+            bool IsWorking() override;
+            QJSValue ExecuteFunction(const QString &function, const QJSValueList &parameters);
             virtual unsigned int GetContextID();
             virtual QString GetContext();
             bool IsUnsafe();
-            bool SupportFunction(QString name);
-            QString GetHelpForFunc(QString name);
+            bool SupportFunction(const QString& name);
+            QString GetHelpForFunc(const QString& name);
             QList<QString> GetHooks();
             QList<QString> GetFunctions();
-            void Hook_Shutdown();
-            void Hook_OnScrollbackDestroyed(Scrollback *scrollback);
+            void Hook_Shutdown() override;
+            void Hook_OnScrollbackDestroyed(Scrollback *scrollback) override;
+            void Hook_OnNetworkDisconnect(IRCSession *session) override;
             virtual void RegisterScrollback(Scrollback *sc);
             virtual void DestroyScrollback(Scrollback *sc);
             virtual bool HasScrollback(Scrollback *sc);
-            void SubscribeHook(int hook, QString function_name);
+            void SubscribeHook(int hook, const QString& function_name);
             void UnsubscribeHook(int hook);
             bool HookSubscribed(int hook);
-            virtual int GetHookID(QString hook);
+            virtual int GetHookID(const QString &hook);
 
         protected:
             static QList<QString> loadedPaths;
             static QHash<QString, ScriptExtension*> extensions;
             bool loadSource(QString source, QString *error);
-            bool executeFunctionAsBool(QString function, QJSValueList parameters);
-            bool executeFunctionAsBool(QString function);
-            QString executeFunctionAsString(QString function);
-            QString executeFunctionAsString(QString function, QJSValueList parameters);
-            QJSValue executeFunction(QString function, QJSValueList parameters);
-            QJSValue executeFunction(QString function);
-            virtual void registerFunction(QString name, QString help = "", bool is_unsafe = false);
-            virtual void registerClass(QString name, GenericJSClass *c);
+            bool executeFunctionAsBool(const QString &function, const QJSValueList &parameters);
+            bool executeFunctionAsBool(const QString &function);
+            QString executeFunctionAsString(const QString &function);
+            QString executeFunctionAsString(const QString &function, const QJSValueList &parameters);
+            QJSValue executeFunction(const QString &function, const QJSValueList &parameters);
+            QJSValue executeFunction(const QString &function);
+            virtual void registerFunction(const QString &name, const QString &help = "", bool is_unsafe = false);
+            virtual void registerClass(const QString &name, GenericJSClass *c);
             virtual void registerClasses();
-            virtual void registerHook(QString name, int parameters, QString help = "", bool is_unsafe = false);
+            virtual void registerHook(const QString &name, int parameters, const QString &help = "", bool is_unsafe = false);
             //! Makes all functions available to ECMA
             virtual void registerFunctions();
             QJSEngine *engine;

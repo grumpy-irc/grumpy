@@ -24,7 +24,8 @@ namespace GrumpyIRC
         public:
             GrumpydScrollbackJS(ScriptExtension *s);
             QHash<QString, QString> GetFunctions();
-            Q_INVOKABLE int get_owner(unsigned int scrollback);
+            Q_INVOKABLE int get_owner_id(unsigned int scrollback);
+            Q_INVOKABLE QString get_owner_name(unsigned int scrollback);
     };
 }
 

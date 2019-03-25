@@ -23,7 +23,7 @@ namespace GrumpyIRC
     {
         public:
             CppExtension();
-            ~CppExtension();
+            ~CppExtension() override;
 
 
         public slots:

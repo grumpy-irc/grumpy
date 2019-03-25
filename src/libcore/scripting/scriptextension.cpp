@@ -24,6 +24,7 @@
 #include "../exception.h"
 #include "../eventhandler.h"
 #include "../networksession.h"
+#include "../ircsession.h"
 #include "../scrollback.h"
 #include "../resources.h"
 #include "../../libirc/libircclient/user.h"
@@ -37,7 +38,7 @@ using namespace GrumpyIRC;
 QHash<QString, ScriptExtension*>    ScriptExtension::extensions;
 QList<QString>                      ScriptExtension::loadedPaths;
 
-ScriptExtension *ScriptExtension::GetExtensionByPath(QString path)
+ScriptExtension *ScriptExtension::GetExtensionByPath(const QString& path)
 {
     foreach (ScriptExtension *extension, ScriptExtension::extensions)
     {
@@ -59,7 +60,7 @@ ScriptExtension *ScriptExtension::GetExtensionByEngine(QJSEngine *e)
     return nullptr;
 }
 
-ScriptExtension *ScriptExtension::GetExtensionByName(QString extension_name)
+ScriptExtension *ScriptExtension::GetExtensionByName(const QString& extension_name)
 {
     foreach (ScriptExtension *extension, ScriptExtension::extensions)
     {
@@ -96,7 +97,7 @@ ScriptExtension::~ScriptExtension()
         ScriptExtension::extensions.remove(this->scriptName);
 }
 
-bool ScriptExtension::Load(QString path, QString *error)
+bool ScriptExtension::Load(const QString& path, QString *error)
 {
     if (this->engine || this->isLoaded)
     {
@@ -124,7 +125,7 @@ bool ScriptExtension::Load(QString path, QString *error)
     return this->loadSource(sx, error);
 }
 
-bool ScriptExtension::LoadSrc(QString unique_id, QString source, QString *error)
+bool ScriptExtension::LoadSrc(const QString &unique_id, const QString &source, QString *error)
 {
     if (this->engine || this->isLoaded)
     {
@@ -186,7 +187,7 @@ bool ScriptExtension::IsWorking()
     return this->executeFunctionAsBool("ext_is_working");
 }
 
-QJSValue ScriptExtension::ExecuteFunction(QString function, QJSValueList parameters)
+QJSValue ScriptExtension::ExecuteFunction(const QString &function, const QJSValueList &parameters)
 {
     return this->executeFunction(function, parameters);
 }
@@ -206,12 +207,12 @@ bool ScriptExtension::IsUnsafe()
     return this->isUnsafe;
 }
 
-bool ScriptExtension::SupportFunction(QString name)
+bool ScriptExtension::SupportFunction(const QString& name)
 {
     return this->functionsExported.contains(name);
 }
 
-QString ScriptExtension::GetHelpForFunc(QString name)
+QString ScriptExtension::GetHelpForFunc(const QString& name)
 {
     if (!this->functionsHelp.contains(name))
         return QString();
@@ -246,6 +247,16 @@ void ScriptExtension::Hook_OnScrollbackDestroyed(Scrollback *scrollback)
         this->scriptScbs.removeAll(scrollback);
 }
 
+void ScriptExtension::Hook_OnNetworkDisconnect(IRCSession *session)
+{
+    if (!this->attachedHooks.contains(GRUMPY_SCRIPT_HOOK_NETWORK_DISCONNECT))
+        return;
+    QJSValueList params;
+    params.append(QJSValue(session->GetSID()));
+    params.append(QJSValue(session->GetSystemWindow()->GetID()));
+    this->executeFunction(this->attachedHooks[GRUMPY_SCRIPT_HOOK_NETWORK_DISCONNECT], params);
+}
+
 void ScriptExtension::RegisterScrollback(Scrollback *sc)
 {
     this->scriptScbs.append(sc);
@@ -264,7 +275,7 @@ bool ScriptExtension::HasScrollback(Scrollback *sc)
     return this->scriptScbs.contains(sc);
 }
 
-void ScriptExtension::SubscribeHook(int hook, QString function_name)
+void ScriptExtension::SubscribeHook(int hook, const QString& function_name)
 {
     if (this->attachedHooks.contains(hook))
         this->attachedHooks[hook] = function_name;
@@ -283,12 +294,16 @@ bool ScriptExtension::HookSubscribed(int hook)
     return this->attachedHooks.contains(hook);
 }
 
-int ScriptExtension::GetHookID(QString hook)
+int ScriptExtension::GetHookID(const QString &hook)
 {
     if (hook == "shutdown")
         return GRUMPY_SCRIPT_HOOK_SHUTDOWN;
     if (hook == "scrollback_destroyed")
         return GRUMPY_SCRIPT_HOOK_SCROLLBACK_DESTROYED;
+    if (hook == "scrollback_created")
+        return GRUMPY_SCRIPT_HOOK_SCROLLBACK_CREATED;
+    if (hook == "network_disconnect")
+        return GRUMPY_SCRIPT_HOOK_NETWORK_DISCONNECT;
 
     return -1;
 }
@@ -355,7 +370,7 @@ bool ScriptExtension::loadSource(QString source, QString *error)
 
     this->scriptName = this->scriptName.toLower();
 
-    if (this->extensions.contains(this->scriptName))
+    if (ScriptExtension::extensions.contains(this->scriptName))
     {
         *error = this->scriptName + " is already loaded";
         this->isWorking = false;
@@ -376,27 +391,27 @@ bool ScriptExtension::loadSource(QString source, QString *error)
     return true;
 }
 
-bool ScriptExtension::executeFunctionAsBool(QString function)
+bool ScriptExtension::executeFunctionAsBool(const QString &function)
 {
     return this->executeFunction(function, QJSValueList()).toBool();
 }
 
-QString ScriptExtension::executeFunctionAsString(QString function)
+QString ScriptExtension::executeFunctionAsString(const QString &function)
 {
     return this->executeFunction(function, QJSValueList()).toString();
 }
 
-QString ScriptExtension::executeFunctionAsString(QString function, QJSValueList parameters)
+QString ScriptExtension::executeFunctionAsString(const QString &function, const QJSValueList &parameters)
 {
     return this->executeFunction(function, parameters).toString();
 }
 
-QJSValue ScriptExtension::executeFunction(QString function)
+QJSValue ScriptExtension::executeFunction(const QString &function)
 {
     return this->executeFunction(function, QJSValueList());
 }
 
-QJSValue ScriptExtension::executeFunction(QString function, QJSValueList parameters)
+QJSValue ScriptExtension::executeFunction(const QString &function, const QJSValueList &parameters)
 {
     if (!this->isLoaded)
         throw new ScriptException("Call to script function of extension that isn't loaded", BOOST_CURRENT_FUNCTION, this);
@@ -427,12 +442,13 @@ void ScriptExtension::registerFunctions()
     this->registerHook("ext_init", 0, "(): called on start, must return true, otherwise load of extension is considered as failure");
     this->registerHook("shutdown", 0, "(): called on exit");
     this->registerHook("scrollback_destroyed", 1, "(int scrollback_id): called when scrollback is deleted");
+    this->registerHook("network_disconnect", 2, "(network_id, scrollback_id): called when network gets disconnected, provides network ID and system scrollback ID as parameters");
     this->registerHook("ext_get_info", 0, "(): should return version");
     this->registerHook("ext_unload", 0, "(): called when extension is being unloaded from system");
     this->registerHook("ext_is_working", 0, "(): must exist and must return true, if returns false, extension is considered crashed");
 }
 
-void ScriptExtension::registerClass(QString name, GenericJSClass *c)
+void ScriptExtension::registerClass(const QString &name, GenericJSClass *c)
 {
     QHash<QString, QString> functions = c->GetFunctions();
     foreach (QString function, functions.keys())
@@ -457,7 +473,7 @@ void ScriptExtension::registerClasses()
     this->registerClass("grumpy_network", new NetworkJS(this));
 }
 
-void ScriptExtension::registerFunction(QString name, QString help, bool is_unsafe)
+void ScriptExtension::registerFunction(const QString &name, const QString &help, bool is_unsafe)
 {
     // Check if this script is allowed to access unsafe functions
     if (is_unsafe && !this->isUnsafe)
@@ -467,13 +483,14 @@ void ScriptExtension::registerFunction(QString name, QString help, bool is_unsaf
     this->functionsHelp.insert(name, help);
 }
 
-void ScriptExtension::registerHook(QString name, int parameters, QString help, bool is_unsafe)
+void ScriptExtension::registerHook(const QString &name, int parameters, const QString &help, bool is_unsafe)
 {
+    Q_UNUSED(parameters);
     this->hooksExported.append(name);
     this->functionsHelp.insert(name, help);
 }
 
-bool ScriptExtension::executeFunctionAsBool(QString function, QJSValueList parameters)
+bool ScriptExtension::executeFunctionAsBool(const QString &function, const QJSValueList &parameters)
 {
     return this->executeFunction(function, parameters).toBool();
 }

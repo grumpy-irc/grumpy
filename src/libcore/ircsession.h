@@ -51,7 +51,7 @@ namespace GrumpyIRC
             Q_OBJECT
             friend class GrumpydSession;
         public:
-            static void Exit(QString message);
+            static void Exit(const QString& message);
             static IRCSession *Open(Scrollback *system_window, libirc::ServerAddress &server, QString network = "", QString nick = "",
                                     QString ident = "", QString username = "", libircclient::Encoding network_enc = libircclient::EncodingDefault);
             static QMutex Sessions_Lock;

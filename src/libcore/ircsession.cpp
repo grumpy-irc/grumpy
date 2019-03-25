@@ -8,12 +8,13 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #include "core.h"
 #include "configuration.h"
 #include "ircsession.h"
 #include "eventhandler.h"
+#include "hooks.h"
 #include "profiler.h"
 #include "../libirc/libircclient/generic.h"
 #include "../libirc/libircclient/parser.h"
@@ -32,11 +33,11 @@ unsigned int IRCSession::lastID = 2;
 QMutex IRCSession::Sessions_Lock;
 QList<IRCSession*> IRCSession::Sessions;
 
-void IRCSession::Exit(QString message)
+void IRCSession::Exit(const QString& message)
 {
     foreach (IRCSession *session, Sessions)
     {
-        session->RequestDisconnect(NULL, message, true);
+        session->RequestDisconnect(nullptr, message, true);
     }
 }
 
@@ -1296,6 +1297,7 @@ void IRCSession::free()
 void IRCSession::SetDisconnected()
 {
     this->SetDead();
+    Hooks::OnNetwork_Disconnect(this);
 }
 
 void IRCSession::SetDead()

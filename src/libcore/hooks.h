@@ -20,12 +20,14 @@ namespace GrumpyIRC
 {
     class Scrollback;
     class ScrollbackItem;
+    class IRCSession;
 
     class LIBCORESHARED_EXPORT Hooks
     {
         public:
             static void OnScrollback_InsertText(Scrollback *scrollback, ScrollbackItem *item);
             static void OnScrollback_Destroyed(Scrollback *scrollback);
+            static void OnNetwork_Disconnect(IRCSession *session);
     };
 }
 
