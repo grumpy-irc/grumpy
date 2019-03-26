@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2018
+// Copyright (c) Petr Bena 2018 - 2019
 
 #ifndef SCRIPTCOMMAND_H
 #define SCRIPTCOMMAND_H
@@ -22,12 +22,12 @@ namespace GrumpyIRC
     class LIBCORESHARED_EXPORT ScriptCommand : public SystemCommand
     {
         public:
-            ScriptCommand(QString name, ScriptExtension *e, QString function);
-            ~ScriptCommand();
+            ScriptCommand(const QString &name, ScriptExtension *e, const QString &function);
+            ~ScriptCommand() override;
             ScriptExtension *GetScript();
             QString GetFN();
             QJSEngine *GetEngine();
-            int Run(CommandArgs args);
+            int Run(const CommandArgs &args) override;
 
         private:
             ScriptExtension *script;

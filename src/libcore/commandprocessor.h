@@ -41,10 +41,10 @@ namespace GrumpyIRC
     class LIBCORESHARED_EXPORT SystemCommand
     {
         public:
-            SystemCommand(QString name, SC_Callback callback);
+            SystemCommand(const QString &name, SC_Callback callback);
             virtual ~SystemCommand();
             QString GetName();
-            virtual int Run(CommandArgs args);
+            virtual int Run(const CommandArgs &args);
         protected:
             SC_Callback Callback;
         private:
@@ -71,9 +71,9 @@ namespace GrumpyIRC
             QList<QString> GetCommands();
             QHash<QString, QString> GetAliasRdTable();
             QList<QString> GetAList();
-            bool Exists(QString name) const;
-            void RegisterAlias(QString name, QString target);
-            void UnregisterAlias(QString name);
+            bool Exists(const QString& name) const;
+            void RegisterAlias(const QString& name, const QString& target);
+            void UnregisterAlias(const QString& name);
             //! Whether long text message should be split
             bool SplitLong;
             bool AutoReduceMsgSize = true;

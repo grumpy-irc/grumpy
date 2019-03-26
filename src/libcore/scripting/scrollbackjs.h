@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2018
+// Copyright (c) Petr Bena 2018 - 2019
 
 #ifndef SCROLLBACKJS_H
 #define SCROLLBACKJS_H
@@ -24,7 +24,7 @@ namespace GrumpyIRC
             Q_OBJECT
         public:
             ScrollbackJS(ScriptExtension *s);
-            QHash<QString, QString> GetFunctions();
+            QHash<QString, QString> GetFunctions() override;
             Q_INVOKABLE bool write(unsigned int scrollback_id, QString text);
             Q_INVOKABLE bool has_network(unsigned int scrollback_id);
             Q_INVOKABLE bool has_network_session(unsigned int scrollback_id);
@@ -32,6 +32,8 @@ namespace GrumpyIRC
             Q_INVOKABLE QJSValue get_target(unsigned int scrollback_id);
             Q_INVOKABLE QJSValue create(unsigned int parent_id, QString name);
             Q_INVOKABLE bool remove(unsigned int scrollback_id);
+            Q_INVOKABLE void request_network_reconnect(unsigned int scrollback_id);
+            Q_INVOKABLE void request_network_disconnect(unsigned int scrollback_id, QString reason);
             Q_INVOKABLE QList<int> list();
     };
 }

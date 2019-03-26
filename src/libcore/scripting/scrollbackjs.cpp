@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2018
+// Copyright (c) Petr Bena 2018 - 2019
 
 #include "scrollbackjs.h"
 #include "scriptextension.h"
@@ -39,6 +39,8 @@ QHash<QString, QString> GrumpyIRC::ScrollbackJS::GetFunctions()
     fh.insert("write", "(scrollback_id, text): write text");
     fh.insert("get_type", "(scrollback_id): return type of scrollback; system, channel, user");
     fh.insert("get_target", "(scrollback_id): return target name of scrollback (channel name, user name)");
+    fh.insert("request_network_reconnect", "(scrollback_id): reconnect a network that belongs to this scrollback");
+    fh.insert("request_network_disconnect", "(scrollback_id): disconnects network that belongs to this scrollback");
     fh.insert("has_network", "(scrollback_id): return true if scrollback belongs to network");
     fh.insert("has_network_session", "(scrollback_id): returns true if scrollback has existing IRC session");
     return fh;
@@ -159,6 +161,38 @@ bool ScrollbackJS::remove(unsigned int scrollback_id)
 
     this->script->DestroyScrollback(w);
     return true;
+}
+
+void ScrollbackJS::request_network_reconnect(unsigned int scrollback_id)
+{
+    Scrollback *w = Scrollback::GetScrollbackByID(scrollback_id);
+    if (!w)
+    {
+        GRUMPY_ERROR(this->script->GetName() + ": request_network_reconnect(scrollback): scrollback not found");
+        return;
+    }
+    if (!w->GetSession())
+    {
+        GRUMPY_ERROR(this->script->GetName() + ": request_network_reconnect(scrollback): scrollback doesn't have a network");
+        return;
+    }
+    w->GetSession()->RequestReconnect(w);
+}
+
+void ScrollbackJS::request_network_disconnect(unsigned int scrollback_id, QString reason)
+{
+    Scrollback *w = Scrollback::GetScrollbackByID(scrollback_id);
+    if (!w)
+    {
+        GRUMPY_ERROR(this->script->GetName() + ": request_network_disconnect(scrollback): scrollback not found");
+        return;
+    }
+    if (!w->GetSession())
+    {
+        GRUMPY_ERROR(this->script->GetName() + ": request_network_disconnect(scrollback): scrollback doesn't have a network");
+        return;
+    }
+    w->GetSession()->RequestDisconnect(w, reason, false);
 }
 
 QList<int> ScrollbackJS::list()

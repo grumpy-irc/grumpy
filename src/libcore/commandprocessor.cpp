@@ -99,7 +99,7 @@ static QList<QString> Split(int size, int minimal_size, QString text)
     while (text.size() > size)
     {
         // We need to find a part of text which is divided by space
-        if (!text.mid(0, size).contains(" "))
+        if (!text.midRef(0, size).contains(" "))
         {
             QString trimmed_part = text.mid(size);
             if (trimmed_part.size() < minimal_size)
@@ -151,19 +151,19 @@ QList<QString> GrumpyIRC::CommandProcessor::GetAList()
     return this->aliasList.keys();
 }
 
-bool GrumpyIRC::CommandProcessor::Exists(QString name) const
+bool GrumpyIRC::CommandProcessor::Exists(const QString& name) const
 {
     return this->commandList.contains(name) || this->aliasList.contains(name);
 }
 
-void GrumpyIRC::CommandProcessor::RegisterAlias(QString name, QString target)
+void GrumpyIRC::CommandProcessor::RegisterAlias(const QString& name, const QString& target)
 {
     if (this->aliasList.contains(name))
         return;
     this->aliasList.insert(name, target);
 }
 
-void CommandProcessor::UnregisterAlias(QString name)
+void CommandProcessor::UnregisterAlias(const QString& name)
 {
     if (this->aliasList.contains(name))
         this->aliasList.remove(name);
@@ -287,7 +287,7 @@ int CommandProcessor::ProcessItem(QString command, Scrollback *scrollback)
     return 0;
 }
 
-SystemCommand::SystemCommand(QString name, SC_Callback callback)
+SystemCommand::SystemCommand(const QString &name, SC_Callback callback)
 {
     this->_name = name;
     this->Callback = callback;
@@ -303,7 +303,7 @@ QString SystemCommand::GetName()
     return this->_name;
 }
 
-int SystemCommand::Run(CommandArgs args)
+int SystemCommand::Run(const CommandArgs &args)
 {
     return this->Callback(this, args);
 }

@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2018
+// Copyright (c) Petr Bena 2018 - 2019
 
 #include "scriptcommand.h"
 #include "scriptextension.h"
@@ -16,7 +16,7 @@
 
 using namespace GrumpyIRC;
 
-ScriptCommand::ScriptCommand(QString name, ScriptExtension *e, QString function) : SystemCommand(name, nullptr)
+ScriptCommand::ScriptCommand(const QString &name, ScriptExtension *e, const QString &function) : SystemCommand(name, nullptr)
 {
     this->fn = function;
     this->script = e;
@@ -42,7 +42,7 @@ QJSEngine *ScriptCommand::GetEngine()
     return this->script->engine;
 }
 
-int ScriptCommand::Run(CommandArgs args)
+int ScriptCommand::Run(const CommandArgs &args)
 {
     QJSValueList parameters;
     parameters.append(QJSValue(args.SrcScrollback->GetID()));
