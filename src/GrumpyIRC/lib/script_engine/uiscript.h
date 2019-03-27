@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2018
+// Copyright (c) Petr Bena 2019
 
 #ifndef UISCRIPT_H
 #define UISCRIPT_H
@@ -31,18 +31,18 @@ namespace GrumpyIRC
     {
         public:
             UiScript();
-            QString GetContext();
-            unsigned int GetContextID();
+            QString GetContext() override;
+            unsigned int GetContextID() override;
             void Hook_OnExit();
-            void Hook_OnHistory(Scrollback *window, QString text);
+            void Hook_OnHistory(Scrollback *window, const QString& text);
             void Hook_WindowSwitch(Scrollback *window);
             void Hook_OnMainWindowStart();
             void Hook_OnScrollbackFrameCreated(Scrollback *window);
-            int GetHookID(QString hook);
+            int GetHookID(const QString &hook) override;
 
         protected:
-            void registerFunctions();
-            void registerClasses();
+            void registerFunctions() override;
+            void registerClasses() override;
     };
 }
 

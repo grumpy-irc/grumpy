@@ -32,8 +32,6 @@ namespace GrumpyIRC
             Q_INVOKABLE QJSValue get_target(unsigned int scrollback_id);
             Q_INVOKABLE QJSValue create(unsigned int parent_id, QString name);
             Q_INVOKABLE bool remove(unsigned int scrollback_id);
-            Q_INVOKABLE void request_network_reconnect(unsigned int scrollback_id);
-            Q_INVOKABLE void request_network_disconnect(unsigned int scrollback_id, QString reason);
             Q_INVOKABLE QList<int> list();
     };
 }

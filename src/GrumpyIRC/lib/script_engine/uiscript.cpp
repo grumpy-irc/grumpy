@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #include "uiscript.h"
 #include "grumpyuijs.h"
@@ -43,7 +43,7 @@ void UiScript::Hook_OnExit()
         this->executeFunction(this->attachedHooks[GRUMPY_SCRIPT_HOOK_UI_EXIT]);
 }
 
-void UiScript::Hook_OnHistory(Scrollback *window, QString text)
+void UiScript::Hook_OnHistory(Scrollback *window, const QString& text)
 {
     if (!this->attachedHooks.contains(GRUMPY_SCRIPT_HOOK_UI_HISTORY))
         return;
@@ -78,7 +78,7 @@ void UiScript::Hook_OnScrollbackFrameCreated(Scrollback *window)
     this->executeFunction(this->attachedHooks[GRUMPY_SCRIPT_HOOK_UI_SCROLLBACK_CREATED], parameters);
 }
 
-int UiScript::GetHookID(QString hook)
+int UiScript::GetHookID(const QString &hook)
 {
     if (hook == "ui_main")
         return GRUMPY_SCRIPT_HOOK_UI_MAIN_LOAD;

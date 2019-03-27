@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2018
+// Copyright (c) Petr Bena 2018 - 2019
 
 #include "scriptextension.h"
 #include "networkjs.h"
@@ -80,6 +80,8 @@ QHash<QString, QString> NetworkJS::GetFunctions()
     fh.insert("send_raw", "(scrollback_id, text): sends RAW data to network of scrollback");
     fh.insert("send_message", "(scrollback_id, target, message): sends a silent message to target for network of scrollback");
     fh.insert("get_network_name", "(scrollback_id): return network for network of scrollback");
+    fh.insert("request_network_reconnect", "(scrollback_id): reconnect a network that belongs to this scrollback");
+    fh.insert("request_network_disconnect", "(scrollback_id): disconnects network that belongs to this scrollback");
     return fh;
 }
 
@@ -170,4 +172,36 @@ bool NetworkJS::send_message(unsigned int scrollback_id, QString target, QString
     }
     w->GetSession()->SendMessage(w, target, message);
     return true;
+}
+
+void NetworkJS::request_network_reconnect(unsigned int scrollback_id)
+{
+    Scrollback *w = Scrollback::GetScrollbackByID(scrollback_id);
+    if (!w)
+    {
+        GRUMPY_ERROR(this->script->GetName() + ": request_network_reconnect(scrollback): scrollback not found");
+        return;
+    }
+    if (!w->GetSession())
+    {
+        GRUMPY_ERROR(this->script->GetName() + ": request_network_reconnect(scrollback): scrollback doesn't have a network");
+        return;
+    }
+    w->GetSession()->RequestReconnect(w);
+}
+
+void NetworkJS::request_network_disconnect(unsigned int scrollback_id, QString reason)
+{
+    Scrollback *w = Scrollback::GetScrollbackByID(scrollback_id);
+    if (!w)
+    {
+        GRUMPY_ERROR(this->script->GetName() + ": request_network_disconnect(scrollback): scrollback not found");
+        return;
+    }
+    if (!w->GetSession())
+    {
+        GRUMPY_ERROR(this->script->GetName() + ": request_network_disconnect(scrollback): scrollback doesn't have a network");
+        return;
+    }
+    w->GetSession()->RequestDisconnect(w, reason, false);
 }

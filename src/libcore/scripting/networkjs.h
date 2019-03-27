@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2018
+// Copyright (c) Petr Bena 2018 - 2019
 
 #ifndef NETWORKJS_H
 #define NETWORKJS_H
@@ -23,7 +23,9 @@ namespace GrumpyIRC
             Q_OBJECT
         public:
             NetworkJS(ScriptExtension *s);
-            QHash<QString, QString> GetFunctions();
+            QHash<QString, QString> GetFunctions() override;
+            Q_INVOKABLE void request_network_reconnect(unsigned int scrollback_id);
+            Q_INVOKABLE void request_network_disconnect(unsigned int scrollback_id, QString reason);
             Q_INVOKABLE QJSValue get_nick(unsigned int scrollback_id);
             Q_INVOKABLE QJSValue get_ident(unsigned int scrollback_id);
             Q_INVOKABLE QJSValue get_host(unsigned int scrollback_id);
