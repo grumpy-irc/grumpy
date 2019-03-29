@@ -21,6 +21,8 @@
 #define GRUMPY_SCRIPT_HOOK_SCROLLBACK_DESTROYED         1
 #define GRUMPY_SCRIPT_HOOK_SCROLLBACK_CREATED           2
 #define GRUMPY_SCRIPT_HOOK_NETWORK_DISCONNECT           3
+#define GRUMPY_SCRIPT_HOOK_NETWORK_UNKNOWN              4
+#define GRUMPY_SCRIPT_HOOK_NETWORK_GENERIC              5
 
 namespace GrumpyIRC
 {
@@ -59,10 +61,13 @@ namespace GrumpyIRC
             void Hook_Shutdown() override;
             void Hook_OnScrollbackDestroyed(Scrollback *scrollback) override;
             void Hook_OnNetworkDisconnect(IRCSession *session) override;
+            void Hook_OnNetworkUnknown(IRCSession *session, libircclient::Parser *px) override;
+            void Hook_OnNetworkGeneric(IRCSession *session, libircclient::Parser *px) override;
             virtual void RegisterScrollback(Scrollback *sc);
             virtual void DestroyScrollback(Scrollback *sc);
             virtual bool HasScrollback(Scrollback *sc);
             void SubscribeHook(int hook, const QString& function_name);
+            QJSEngine *GetEngine();
             void UnsubscribeHook(int hook);
             bool HookSubscribed(int hook);
             virtual int GetHookID(const QString &hook);

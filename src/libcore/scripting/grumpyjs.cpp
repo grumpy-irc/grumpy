@@ -19,6 +19,8 @@
 #include "../definitions.h"
 #include "../exception.h"
 #include "../eventhandler.h"
+#include "../generic.h"
+#include <QJSValueIterator>
 
 using namespace GrumpyIRC;
 
@@ -52,10 +54,16 @@ QHash<QString, QString> GrumpyJS::GetFunctions()
     fh.insert("get_context_id", "(): return execution context id, either core, grumpyd or GrumpyChat");
     fh.insert("register_hook", "(string hook, string function_id): creates a hook");
     fh.insert("unregister_hook", "(string hook): removes hook");
+    fh.insert("dump_obj", "(object): returns a string description of object");
+    fh.insert("get_startup_time_unix", "(): returns seconds in UNIX time when grumpy started");
+    fh.insert("get_uptime", "(): seconds since startup");
+    fh.insert("get_startup_date_time", "(): return time object");
+    fh.insert("get_current_time_str", "(): return current date and time in string format");
+    fh.insert("get_current_time_posix", "(): returns current POSIX time");
     return fh;
 }
 
-QString GrumpyJS::get_function_help(QString function_name)
+QString GrumpyJS::get_function_help(const QString& function_name)
 {
     return this->script->GetHelpForFunc(function_name);
 }
@@ -65,22 +73,22 @@ QList<QString> GrumpyJS::get_function_list()
     return this->script->GetFunctions();
 }
 
-void GrumpyJS::log(QString text)
+void GrumpyJS::log(const QString& text)
 {
     GRUMPY_LOG(text);
 }
 
-void GrumpyJS::error_log(QString text)
+void GrumpyJS::error_log(const QString& text)
 {
     GRUMPY_ERROR(this->script->GetName() + ": " + text);
 }
 
-void GrumpyJS::debug_log(QString text, int verbosity)
+void GrumpyJS::debug_log(const QString& text, int verbosity)
 {
     GRUMPY_DEBUG(this->script->GetName() + ": " + text, verbosity);
 }
 
-bool GrumpyJS::register_hook(QString hook, QString function_name)
+bool GrumpyJS::register_hook(const QString& hook, const QString& function_name)
 {
     int hook_id = this->script->GetHookID(hook);
     if (hook_id < 0)
@@ -92,7 +100,7 @@ bool GrumpyJS::register_hook(QString hook, QString function_name)
     return true;
 }
 
-void GrumpyJS::unregister_hook(QString hook)
+void GrumpyJS::unregister_hook(const QString& hook)
 {
     int hook_id = this->script->GetHookID(hook);
     if (hook_id < 0)
@@ -108,7 +116,7 @@ bool GrumpyJS::is_unsafe()
     return this->script->IsUnsafe();
 }
 
-bool GrumpyJS::register_cmd(QString name, QString fc)
+bool GrumpyJS::register_cmd(const QString& name, const QString& fc)
 {
     if (name.contains(" ") || name.size() > 128)
     {
@@ -131,7 +139,7 @@ QList<QString> GrumpyJS::get_hook_list()
     return this->script->GetHooks();
 }
 
-bool GrumpyJS::has_function(QString f)
+bool GrumpyJS::has_function(const QString& f)
 {
     return this->script->SupportFunction(f);
 }
@@ -146,13 +154,13 @@ int GrumpyJS::get_context_id()
     return this->script->GetContextID();
 }
 
-bool GrumpyJS::set_cfg(QString key, QJSValue value)
+bool GrumpyJS::set_cfg(const QString& key, const QJSValue& value)
 {
     Core::GrumpyCore->GetConfiguration()->Extension_SetValue(this->script->GetName(), key, value.toVariant());
     return true;
 }
 
-QVariant GrumpyJS::get_cfg(QString key)
+QVariant GrumpyJS::get_cfg(const QString& key)
 {
     return Core::GrumpyCore->GetConfiguration()->Extension_GetValue(this->script->GetName(), key);
 }
@@ -163,7 +171,7 @@ QJSValue GrumpyJS::get_version()
     int minor = 0;
     int revision = 0;
 
-    Core::GrumpyCore->GetConfiguration()->GetVersion(&major, &minor, &revision);
+    Configuration::GetVersion(&major, &minor, &revision);
 
     // Marshalling
     QJSValue version;
@@ -172,4 +180,116 @@ QJSValue GrumpyJS::get_version()
     version.setProperty("Revision", revision);
     version.setProperty("String", QString(GRUMPY_VERSION_STRING));
     return version;
+}
+
+QString GrumpyJS::dump_obj(const QJSValue& object, unsigned int indent)
+{
+    QString indent_prefix = "";
+    unsigned int pref = indent;
+    while (pref-- > 0)
+        indent_prefix += " ";
+    QString object_desc = indent_prefix;
+    if (object.isArray())
+    {
+        object_desc += "array [ \n";
+        int length = object.property("length").toInt();
+        int i = 0;
+        while (i < length)
+        {
+            object_desc += "    " + indent_prefix + dump_obj(object.property(static_cast<quint32>(i++)), indent + 4) + "\n";
+        }
+        object_desc += indent_prefix + " ]";
+    } else if (object.isBool())
+    {
+        object_desc += "bool (" + Generic::Bool2String(object.toBool()) + ")";
+    } else if (object.isCallable())
+    {
+        object_desc += "callable()";
+    } else if (object.isDate())
+    {
+        object_desc += "datetime (" + object.toDateTime().toString() + ")";
+    } else if (object.isError())
+    {
+        object_desc += "error type";
+    } else if (object.isNull())
+    {
+        object_desc += "null type";
+    } else if (object.isNumber())
+    {
+        object_desc += "int (" + QString::number(object.toInt()) + ")";
+    } else if (object.isUndefined())
+    {
+        object_desc += "undefined type";
+    } else if (object.isVariant())
+    {
+        object_desc += "variant";
+    } else if (object.isString())
+    {
+        object_desc += "string (" + object.toString() + ")";
+    } else if (object.isQObject())
+    {
+        object_desc += "qobject { \n";
+        QJSValueIterator it(object);
+        while (it.hasNext())
+        {
+            it.next();
+            object_desc += "    " + indent_prefix + it.name() + ": " + dump_obj(it.value(), indent + 4) + "\n";
+        }
+        object_desc += indent_prefix + " }";
+    } else if (object.isObject())
+    {
+        object_desc += "object { \n";
+        QJSValueIterator it(object);
+        while (it.hasNext())
+        {
+            it.next();
+            object_desc += "    " + indent_prefix + it.name() + ": " + dump_obj(it.value(), indent + 4) + "\n";
+        }
+        object_desc += indent_prefix + " }";
+    } else
+    {
+        object_desc += "unknown type";
+    }
+
+    return object_desc;
+}
+
+QJSValue GrumpyJS::seconds_to_time_span(int seconds)
+{
+    int days, hours, minutes, secs;
+    if (!Generic::SecondsToTimeSpan(seconds, &days, &hours, &minutes, &secs))
+        return QJSValue(false);
+
+    QJSValue result = this->script->GetEngine()->newObject();
+    result.setProperty("seconds", secs);
+    result.setProperty("minutes", minutes);
+    result.setProperty("hours", hours);
+    result.setProperty("days", days);
+    return result;
+}
+
+qint64 GrumpyJS::get_startup_time_unix()
+{
+    // Some older Qt versions don't have toSecsSinceEpoch
+    return Core::GrumpyCore->GetConfiguration()->GetStartupDateTime().toMSecsSinceEpoch() / 1000;
+}
+
+qint64 GrumpyJS::get_uptime()
+{
+    return Core::GrumpyCore->GetConfiguration()->GetStartupDateTime().secsTo(QDateTime::currentDateTime());
+}
+
+QDateTime GrumpyJS::get_startup_date_time()
+{
+    return Core::GrumpyCore->GetConfiguration()->GetStartupDateTime();
+}
+
+QString GrumpyJS::get_current_time_str()
+{
+    return QDateTime::currentDateTime().toString();
+}
+
+int GrumpyJS::get_current_time_posix()
+{
+    return static_cast<int>(QDateTime::currentDateTimeUtc().toTime_t());
 }

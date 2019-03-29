@@ -15,6 +15,7 @@
 #include "scriptcommand.h"
 #include "scriptexception.h"
 #include "grumpyjs_unsafe.h"
+#include "marshallinghelper.h"
 #include "scrollbackjs.h"
 #include "networkjs.h"
 #include "grumpyjs.h"
@@ -28,6 +29,7 @@
 #include "../scrollback.h"
 #include "../resources.h"
 #include "../../libirc/libircclient/user.h"
+#include "../../libirc/libircclient/parser.h"
 #include "../../libirc/libircclient/channel.h"
 #include "../../libirc/libircclient/priority.h"
 #include "../../libirc/libircclient/network.h"
@@ -257,6 +259,28 @@ void ScriptExtension::Hook_OnNetworkDisconnect(IRCSession *session)
     this->executeFunction(this->attachedHooks[GRUMPY_SCRIPT_HOOK_NETWORK_DISCONNECT], params);
 }
 
+void ScriptExtension::Hook_OnNetworkUnknown(IRCSession *session, libircclient::Parser *px)
+{
+    if (!this->attachedHooks.contains(GRUMPY_SCRIPT_HOOK_NETWORK_UNKNOWN))
+        return;
+    QJSValueList params;
+    params.append(QJSValue(session->GetSID()));
+    params.append(QJSValue(session->GetSystemWindow()->GetID()));
+    params.append(MarshallingHelper::FromParser(px, this->engine));
+    this->executeFunction(this->attachedHooks[GRUMPY_SCRIPT_HOOK_NETWORK_UNKNOWN], params);
+}
+
+void ScriptExtension::Hook_OnNetworkGeneric(IRCSession *session, libircclient::Parser *px)
+{
+    if (!this->attachedHooks.contains(GRUMPY_SCRIPT_HOOK_NETWORK_GENERIC))
+        return;
+    QJSValueList params;
+    params.append(QJSValue(session->GetSID()));
+    params.append(QJSValue(session->GetSystemWindow()->GetID()));
+    params.append(MarshallingHelper::FromParser(px, this->engine));
+    this->executeFunction(this->attachedHooks[GRUMPY_SCRIPT_HOOK_NETWORK_GENERIC], params);
+}
+
 void ScriptExtension::RegisterScrollback(Scrollback *sc)
 {
     this->scriptScbs.append(sc);
@@ -283,6 +307,11 @@ void ScriptExtension::SubscribeHook(int hook, const QString& function_name)
         this->attachedHooks.insert(hook, function_name);
 }
 
+QJSEngine *ScriptExtension::GetEngine()
+{
+    return this->engine;
+}
+
 void ScriptExtension::UnsubscribeHook(int hook)
 {
     if (this->attachedHooks.contains(hook))
@@ -304,6 +333,10 @@ int ScriptExtension::GetHookID(const QString &hook)
         return GRUMPY_SCRIPT_HOOK_SCROLLBACK_CREATED;
     if (hook == "network_disconnect")
         return GRUMPY_SCRIPT_HOOK_NETWORK_DISCONNECT;
+    if (hook == "network_unknown")
+        return GRUMPY_SCRIPT_HOOK_NETWORK_UNKNOWN;
+    if (hook == "network_generic")
+        return GRUMPY_SCRIPT_HOOK_NETWORK_GENERIC;
 
     return -1;
 }
@@ -443,6 +476,8 @@ void ScriptExtension::registerFunctions()
     this->registerHook("shutdown", 0, "(): called on exit");
     this->registerHook("scrollback_destroyed", 1, "(int scrollback_id): called when scrollback is deleted");
     this->registerHook("network_disconnect", 2, "(network_id, scrollback_id): called when network gets disconnected, provides network ID and system scrollback ID as parameters");
+    this->registerHook("network_unknown", 3, "(network_id, scrollback_id, parser): called when IRC network receives unknown message");
+    this->registerHook("network_generic", 3, "(network_id, scrollback_id, parser): called when IRC network receives generic message");
     this->registerHook("ext_get_info", 0, "(): should return version");
     this->registerHook("ext_unload", 0, "(): called when extension is being unloaded from system");
     this->registerHook("ext_is_working", 0, "(): must exist and must return true, if returns false, extension is considered crashed");

@@ -17,6 +17,11 @@
 #include "libcore_global.h"
 #include <QString>
 
+namespace libircclient
+{
+    class Parser;
+}
+
 namespace GrumpyIRC
 {
     class Scrollback;
@@ -35,6 +40,9 @@ namespace GrumpyIRC
             virtual void Hook_Shutdown() {}
             virtual void Hook_OnScrollbackDestroyed(Scrollback *scrollback) {}
             virtual void Hook_OnNetworkDisconnect(IRCSession *session) {}
+            //! When client receives unknown type of message from IRC server (most of these are sent to system window)
+            virtual void Hook_OnNetworkUnknown(IRCSession *session, libircclient::Parser *px) {}
+            virtual void Hook_OnNetworkGeneric(IRCSession *session, libircclient::Parser *px) {}
 
         //signals:
 

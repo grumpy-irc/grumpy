@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #include "core.h"
 #include "hooks.h"
@@ -39,5 +39,15 @@ void Hooks::OnNetwork_Disconnect(IRCSession *session)
     foreach (Extension *e, Core::GrumpyCore->GetExtensions())
     {
         e->Hook_OnNetworkDisconnect(session);
+    }
+}
+
+void Hooks::OnNetwork_UnknownMessage(IRCSession *session, libircclient::Parser *px)
+{
+    if (!Core::GrumpyCore)
+        return;
+    foreach (Extension *e, Core::GrumpyCore->GetExtensions())
+    {
+        e->Hook_OnNetworkUnknown(session, px);
     }
 }

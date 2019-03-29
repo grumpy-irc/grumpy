@@ -8,13 +8,18 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #ifndef HOOKS_H
 #define HOOKS_H
 
 #include "libcore_global.h"
 #include "definitions.h"
+
+namespace libircclient
+{
+    class Parser;
+}
 
 namespace GrumpyIRC
 {
@@ -28,6 +33,7 @@ namespace GrumpyIRC
             static void OnScrollback_InsertText(Scrollback *scrollback, ScrollbackItem *item);
             static void OnScrollback_Destroyed(Scrollback *scrollback);
             static void OnNetwork_Disconnect(IRCSession *session);
+            static void OnNetwork_UnknownMessage(IRCSession *session, libircclient::Parser *px);
     };
 }
 
