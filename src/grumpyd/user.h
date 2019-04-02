@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #ifndef GDUSER_H
 #define GDUSER_H
@@ -31,7 +31,7 @@ namespace GrumpyIRC
     class User
     {
         public:
-            static QString EncryptPw(QString Password);
+            static QString EncryptPw(const QString& Password);
             static QList<User*> UserInfo;
             /*!
              * \brief Login try to login user using the provided credentials, if login is successful a pointer is returned

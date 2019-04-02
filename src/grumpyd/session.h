@@ -44,15 +44,15 @@ namespace GrumpyIRC
             static QList<Session*> Sessions();
 
             Session(qintptr socket_ptr, bool ssl);
-            ~Session();
-            void run();
+            ~Session() override;
+            void run() override;
             unsigned long GetSID();
-            bool IsAuthorized(QString permission);
+            bool IsAuthorized(const QString &permission);
             //! Transfer data to every session this user has, so that every session connected as this user receives it
-            void SendToEverySession(gp_command_t command, QHash<QString, QVariant> parameters);
-            void SendToOtherSessions(gp_command_t command, QHash<QString, QVariant> parameters);
+            void SendToEverySession(gp_command_t command, const QHash<QString, QVariant>& parameters);
+            void SendToOtherSessions(gp_command_t command, const QHash<QString, QVariant>& parameters);
             Scrollback *GetScrollback(scrollback_id_t scrollback_id);
-            void TransferError(gp_command_t source, QString description, int id);
+            void TransferError(gp_command_t source, const QString& description, int id);
             void PermissionDeny(gp_command_t source);
             void Kick();
             void Shutdown();

@@ -46,7 +46,7 @@ Session::Session(qintptr socket_ptr, bool ssl)
 {
     this->IsAway = false;
     this->usingSsl = ssl;
-    this->protocol = NULL;
+    this->protocol = nullptr;
     if (ssl)
     {
         QSslSocket *ssl_socket = new QSslSocket();
@@ -70,7 +70,7 @@ Session::Session(qintptr socket_ptr, bool ssl)
     SessionList.append(this);
     sessions_lock->unlock();
     this->MaxScrollbackSyncItems = 80;
-    this->loggedUser = NULL;
+    this->loggedUser = nullptr;
     if (ssl)
     {
         // setup handshake
@@ -133,7 +133,7 @@ unsigned long Session::GetSID()
     return this->SID;
 }
 
-bool Session::IsAuthorized(QString permission)
+bool Session::IsAuthorized(const QString &permission)
 {
     if (!this->loggedUser)
         return false;
@@ -141,7 +141,7 @@ bool Session::IsAuthorized(QString permission)
     return this->loggedUser->IsAuthorized(permission);
 }
 
-void Session::SendToEverySession(gp_command_t command, QHash<QString, QVariant> parameters)
+void Session::SendToEverySession(gp_command_t command, const QHash<QString, QVariant>& parameters)
 {
     if (!this->loggedUser)
         return;
@@ -150,7 +150,7 @@ void Session::SendToEverySession(gp_command_t command, QHash<QString, QVariant> 
         xx->protocol->SendProtocolCommand(command, parameters);
 }
 
-void Session::SendToOtherSessions(gp_command_t command, QHash<QString, QVariant> parameters)
+void Session::SendToOtherSessions(gp_command_t command, const QHash<QString, QVariant>& parameters)
 {
     if (!this->loggedUser)
         return;
@@ -166,19 +166,19 @@ void Session::SendToOtherSessions(gp_command_t command, QHash<QString, QVariant>
 
 Scrollback *Session::GetScrollback(scrollback_id_t scrollback_id)
 {
-    Scrollback *result = NULL;
+    Scrollback *result = nullptr;
     if (!this->loggedUser)
-        return NULL;
+        return nullptr;
     foreach (SyncableIRCSession *session, this->loggedUser->GetSIRCSessions())
     {
         result = session->GetScrollback(scrollback_id);
         if (result)
             return result;
     }
-    return NULL;
+    return nullptr;
 }
 
-void Session::TransferError(gp_command_t source, QString description, int id)
+void Session::TransferError(gp_command_t source, const QString& description, int id)
 {
     QHash<QString, QVariant> params;
     params.insert("id", QVariant(id));
@@ -255,7 +255,7 @@ void Session::processIrcQuit(QHash<QString, QVariant> parameters)
         this->TransferError(GP_CMD_IRC_QUIT, "Network not found", GP_ENETWORKNOTFOUND);
         return;
     }
-    irc->RequestDisconnect(NULL, parameters["reason"].toString(), false);
+    irc->RequestDisconnect(nullptr, parameters["reason"].toString(), false);
     this->SendToEverySession(GP_CMD_IRC_QUIT, parameters);
 }
 
@@ -401,11 +401,11 @@ void Session::processInfo(QHash<QString, QVariant> parameters)
         return;
     QString tx = parameters["type"].toString();
     if (tx == "+b")
-        irc->RetrieveChannelBanList(NULL, parameters["channel_name"].toString());
+        irc->RetrieveChannelBanList(nullptr, parameters["channel_name"].toString());
     else if (tx == "+I")
-        irc->RetrieveChannelInviteList(NULL, parameters["channel_name"].toString());
+        irc->RetrieveChannelInviteList(nullptr, parameters["channel_name"].toString());
     else if (tx == "+e")
-        irc->RetrieveChannelExceptionList(NULL, parameters["channel_name"].toString());
+        irc->RetrieveChannelExceptionList(nullptr, parameters["channel_name"].toString());
 }
 
 void Session::processQuery(QHash<QString, QVariant> parameters)
@@ -462,7 +462,7 @@ void Session::processUserList(QHash<QString, QVariant> parameters)
         QHash<QString, QVariant> user_data;
         user_data.insert("name", user->GetName());
         user_data.insert("id", user->GetID());
-        if (user->GetRole() != NULL)
+        if (user->GetRole() != nullptr)
             user_data.insert("role", user->GetRole()->GetName());
         user_data.insert("online", user->IsOnline());
         user_data.insert("irc_session_count", user->GetIRCSessionCount());
@@ -1149,11 +1149,15 @@ void Session::processLogin(QHash<QString, QVariant> parameters)
             GRUMPY_LOG("SID " + QString::number(this->SID) + " failed to login (is locked) to name " + parameters["username"].toString());
             this->TransferError(GP_CMD_LOGIN, "Account is locked", GP_ELOCKED);
             this->protocol->SendProtocolCommand(GP_CMD_LOGIN_FAIL);
+            // Remove the pointer - we don't consider this a valid login
+            this->loggedUser = nullptr;
             return;
         }
         if (!this->IsAuthorized(PRIVILEGE_LOGIN))
         {
             this->PermissionDeny(GP_CMD_LOGIN);
+            // Remove the pointer - we don't consider this a valid login
+            this->loggedUser = nullptr;
             return;
         }
         QHash<QString, QVariant> param;

@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2019
 
 #include <QCryptographicHash>
 #include <QStringList>
@@ -30,7 +30,7 @@ using namespace GrumpyIRC;
 user_id_t User::LastID = 0;
 QList<User*> User::UserInfo;
 
-QString User::EncryptPw(QString Password)
+QString User::EncryptPw(const QString& Password)
 {
     return QString(QCryptographicHash::hash(Password.toUtf8(), QCryptographicHash::Md5).toHex());
 }
