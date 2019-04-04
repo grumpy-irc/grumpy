@@ -870,7 +870,6 @@ void Session::processInstallScript(QHash<QString, QVariant> parameters)
         }
         return;
     }
-    Core::GrumpyCore->RegisterExtension(ex);
 
     // No need to send this back
     parameters.remove("source");
@@ -919,7 +918,6 @@ void Session::processRemoveScript(QHash<QString, QVariant> parameters)
     QString name = e->GetName();
 
     e->Unload();
-    Core::GrumpyCore->UnregisterExtension(e);
     delete e;
 
     GRUMPY_DEBUG("Successfuly removed extension " + name, 1);

@@ -36,9 +36,21 @@ void Hooks::OnNetwork_Disconnect(IRCSession *session)
 {
     if (!Core::GrumpyCore)
         return;
-    foreach (Extension *e, Core::GrumpyCore->GetExtensions())
+    QList<Extension*> ext = Core::GrumpyCore->GetExtensions();
+    //  foreach (Extension *e, Core::GrumpyCore->GetExtensions())
+    foreach (Extension *e, ext)
     {
         e->Hook_OnNetworkDisconnect(session);
+    }
+}
+
+void Hooks::OnNetwork_Generic(IRCSession *session, libircclient::Parser *px)
+{
+    if (!Core::GrumpyCore)
+        return;
+    foreach (Extension *e, Core::GrumpyCore->GetExtensions())
+    {
+        e->Hook_OnNetworkGeneric(session, px);
     }
 }
 

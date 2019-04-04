@@ -20,6 +20,7 @@
 #include <QFileDialog>
 #include <QTimer>
 #include <QMenu>
+#include <libcore/core.h>
 #include <libcore/exception.h>
 #include <libcore/grumpydsession.h>
 #include <libcore/generic.h>

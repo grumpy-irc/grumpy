@@ -180,7 +180,6 @@ void Grumpyd::initScripts()
             delete ex;
             return;
         }
-        Core::GrumpyCore->RegisterExtension(ex);
     }
 }
 

@@ -232,7 +232,7 @@ namespace GrumpyIRC
             Scrollback *systemWindow;
             QList<long long> pingHistory;
         private:
-            bool isRetrievingWhoInfo(QString channel);
+            bool isRetrievingWhoInfo(const QString& channel);
             void init(bool preindexed);
             void whoisIs(libircclient::Parser *parser);
             QList<QString> retrievingWho;

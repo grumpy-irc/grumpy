@@ -290,7 +290,7 @@ Scrollback *IRCSession::GetScrollbackForChannel(QString channel)
 {
     channel = channel.toLower();
     if (!this->channels.contains(channel))
-        return NULL;
+        return nullptr;
 
     return this->channels[channel];
 }
@@ -346,7 +346,7 @@ void IRCSession::SyncWindows(QHash<QString, QVariant> scrollbacks, QHash<QString
     }
 }
 
-bool IRCSession::isRetrievingWhoInfo(QString channel)
+bool IRCSession::isRetrievingWhoInfo(const QString& channel)
 {
     return this->retrievingWho.contains(channel.toLower());
 }
@@ -354,7 +354,7 @@ bool IRCSession::isRetrievingWhoInfo(QString channel)
 void IRCSession::init(bool preindexed)
 {
     this->_autoReconnect = false;
-    this->network = NULL;
+    this->network = nullptr;
     this->AutomaticallyRetrieveBanList = true;
     if (this->systemWindow)
     {
@@ -365,7 +365,7 @@ void IRCSession::init(bool preindexed)
     }
     this->_ssl = false;
     this->snifferEnabled = true;
-    this->highlightCollector = NULL;
+    this->highlightCollector = nullptr;
     this->ulistUpdateTime = 20 * 60000;
     connect(&this->timerUL, SIGNAL(timeout()), this, SLOT(OnUpdateUserList()));
     this->maxSnifferBufferSize = 2000;
@@ -1139,6 +1139,7 @@ void IRCSession::OnGeneric(libircclient::Parser *px)
 {
     if (!this->IgnoredNums.contains(px->GetNumeric()))
         this->systemWindow->InsertText(px->GetRaw());
+    Hooks::OnNetwork_Generic(this, px);
 }
 
 void IRCSession::OnServerSideUnknown(libircclient::Parser *px)
@@ -1488,6 +1489,7 @@ void IRCSession::OnIRCJoin(libircclient::Parser *px, libircclient::User *user, l
 void IRCSession::OnUnknown(libircclient::Parser *px)
 {
     this->systemWindow->InsertText(px->GetRaw());
+    Hooks::OnNetwork_UnknownMessage(this, px);
 }
 
 void IRCSession::OnNICK(libircclient::Parser *px, QString old_, QString new_)

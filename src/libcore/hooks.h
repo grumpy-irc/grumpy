@@ -33,6 +33,7 @@ namespace GrumpyIRC
             static void OnScrollback_InsertText(Scrollback *scrollback, ScrollbackItem *item);
             static void OnScrollback_Destroyed(Scrollback *scrollback);
             static void OnNetwork_Disconnect(IRCSession *session);
+            static void OnNetwork_Generic(IRCSession *session, libircclient::Parser *px);
             static void OnNetwork_UnknownMessage(IRCSession *session, libircclient::Parser *px);
     };
 }

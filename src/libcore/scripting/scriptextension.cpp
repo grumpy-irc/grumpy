@@ -92,6 +92,9 @@ ScriptExtension::~ScriptExtension()
     while (!this->scriptScbs.isEmpty())
         this->DestroyScrollback(this->scriptScbs.first());
 
+    // Unregister extension
+    Core::GrumpyCore->UnregisterExtension(this);
+
     delete this->engine;
     if (this->isLoaded && !this->scriptPath.isEmpty())
         ScriptExtension::loadedPaths.removeAll(this->scriptPath);
@@ -421,6 +424,8 @@ bool ScriptExtension::loadSource(QString source, QString *error)
         this->isLoaded = false;
         return false;
     }
+    // Register with core to enable hooks
+    Core::GrumpyCore->RegisterExtension(this);
     return true;
 }
 

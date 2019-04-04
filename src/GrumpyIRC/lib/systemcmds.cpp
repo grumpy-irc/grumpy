@@ -612,7 +612,6 @@ int SystemCmds::Script(SystemCommand *command, CommandArgs command_args)
         GRUMPY_ERROR(error);
         return 1;
     }
-    Core::GrumpyCore->RegisterExtension(extension);
     return 0;
 }
 
@@ -632,7 +631,6 @@ int SystemCmds::RemoveScript(SystemCommand *command, CommandArgs command_args)
         return 1;
     }
     e->Unload();
-    Core::GrumpyCore->UnregisterExtension(e);
     delete e;
     return 0;
 }
@@ -664,11 +662,10 @@ static bool ReloadExtension(const QString &name)
     if (!e)
     {
         GRUMPY_ERROR("No such extension loaded, use /grumpy.script.list to list them");
-        return 1;
+        return false;
     }
     QString extension_path = e->GetPath();
     e->Unload();
-    Core::GrumpyCore->UnregisterExtension(e);
     delete e;
     UiScript *extension = new UiScript();
     QString error;
@@ -678,7 +675,6 @@ static bool ReloadExtension(const QString &name)
         GRUMPY_ERROR(error);
         return false;
     }
-    Core::GrumpyCore->RegisterExtension(extension);
     return true;
 }
 
