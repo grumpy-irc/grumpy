@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2018
+// Copyright (c) Petr Bena 2018 - 2019
 
 #ifndef GRUMPYJS_H
 #define GRUMPYJS_H
@@ -20,6 +20,7 @@
 #include <QDateTime>
 #include <QString>
 #include <QJSEngine>
+#include <QTimer>
 
 namespace GrumpyIRC
 {
@@ -50,14 +51,24 @@ namespace GrumpyIRC
             // Misc
             Q_INVOKABLE QString dump_obj(const QJSValue& object, unsigned int indent = 0);
             Q_INVOKABLE QJSValue seconds_to_time_span(int seconds);
+            // Timers
+            Q_INVOKABLE unsigned int create_timer(int interval, const QString& function, bool start = true);
+            Q_INVOKABLE bool destroy_timer(unsigned int timer);
+            Q_INVOKABLE bool start_timer(unsigned int timer, int interval);
+            Q_INVOKABLE bool stop_timer(unsigned int timer);
             // Time
             Q_INVOKABLE qint64 get_startup_time_unix();
             Q_INVOKABLE qint64 get_uptime();
             Q_INVOKABLE QDateTime get_startup_date_time();
             Q_INVOKABLE QString get_current_time_str();
             Q_INVOKABLE int get_current_time_posix();
+        private slots:
+            void OnTime();
         private:
             QList<ScriptCommand*> scriptCmds;
+            unsigned int lastTimer = 0;
+            QHash<unsigned int, QTimer*> timers;
+            QHash<QTimer*, QString> timerFunctions;
     };
 }
 

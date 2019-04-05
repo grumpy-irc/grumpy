@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2018
+// Copyright (c) Petr Bena 2018 - 2019
 
 #include "grumpyjs.h"
 #include "scriptextension.h"
@@ -54,6 +54,10 @@ QHash<QString, QString> GrumpyJS::GetFunctions()
     fh.insert("get_context_id", "(): return execution context id, either core, grumpyd or GrumpyChat");
     fh.insert("register_hook", "(string hook, string function_id): creates a hook");
     fh.insert("unregister_hook", "(string hook): removes hook");
+    fh.insert("create_timer", "(int interval, string function, [bool start = true]): creates a timer");
+    fh.insert("start_timer", "(uint timer, int interval): starts a given timer");
+    fh.insert("stop_timer", "(uint timer): stops a given timer");
+    fh.insert("destroy_timer", "(uint timer): destroys a timer");
     fh.insert("dump_obj", "(object): returns a string description of object");
     fh.insert("get_startup_time_unix", "(): returns seconds in UNIX time when grumpy started");
     fh.insert("get_uptime", "(): seconds since startup");
@@ -268,6 +272,46 @@ QJSValue GrumpyJS::seconds_to_time_span(int seconds)
     return result;
 }
 
+unsigned int GrumpyJS::create_timer(int interval, const QString &function, bool start)
+{
+    unsigned int timer_id = this->lastTimer++;
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(OnTime()));
+    this->timers.insert(timer_id, timer);
+    this->timerFunctions.insert(timer, function);
+    if (start)
+        timer->start(interval);
+    return timer_id;
+}
+
+bool GrumpyJS::destroy_timer(unsigned int timer)
+{
+    if (!this->timers.contains(timer))
+        return false;
+    delete this->timers[timer];
+    this->timerFunctions.remove(this->timers[timer]);
+    this->timers.remove(timer);
+    return true;
+}
+
+bool GrumpyJS::start_timer(unsigned int timer, int interval)
+{
+    if (!this->timers.contains(timer))
+        return false;
+    this->timers[timer]->start(interval);
+
+    return true;
+}
+
+bool GrumpyJS::stop_timer(unsigned int timer)
+{
+    if (!this->timers.contains(timer))
+        return false;
+
+    this->timers[timer]->stop();
+    return true;
+}
+
 qint64 GrumpyJS::get_startup_time_unix()
 {
     // Some older Qt versions don't have toSecsSinceEpoch
@@ -292,4 +336,12 @@ QString GrumpyJS::get_current_time_str()
 int GrumpyJS::get_current_time_posix()
 {
     return static_cast<int>(QDateTime::currentDateTimeUtc().toTime_t());
+}
+
+void GrumpyJS::OnTime()
+{
+    QTimer *timer = dynamic_cast<QTimer*>(QObject::sender());
+    if (!this->timerFunctions.contains(timer))
+        return;
+    this->GetScript()->ExecuteFunction(this->timerFunctions[timer], QJSValueList());
 }
