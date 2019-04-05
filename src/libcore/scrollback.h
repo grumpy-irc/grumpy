@@ -137,10 +137,13 @@ namespace GrumpyIRC
             //! Maximum amount of items allowed to be stored in buffer of this scrollback
             //! if exceeded, oldest items are removed
             virtual scrollback_id_t GetMaxItemsSize();
-            //! Unique ID of this scrollback for this grumpy, this is newer synced over network
+            //! Unique ID of this scrollback for this grumpy client instance, this is never synced over network,
+            //! scrollbacks loaded from remote grumpyd sessions get new ID's locally. For original ID that was
+            //! used when scrollback was created by instance that owns it, call GetOriginalID().
             scrollback_id_t GetID();
-            //! Original ID of this scrollback as it was on grumpy instance which created it
-            //! synced ower network
+            //! Original ID of this scrollback as it was on grumpy instance which created it.
+            //! Unlike actual ID, this ID is preserved when synced over network.
+            //! On local instances that don't use grumpyd, this ID is most likely identical to GetID().
             scrollback_id_t GetOriginalID();
             virtual void SetOriginalID(scrollback_id_t sid);
             void SetMaxItemsSize(scrollback_id_t size);

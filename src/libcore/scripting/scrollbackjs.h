@@ -25,13 +25,14 @@ namespace GrumpyIRC
         public:
             ScrollbackJS(ScriptExtension *s);
             QHash<QString, QString> GetFunctions() override;
-            Q_INVOKABLE bool write(unsigned int scrollback_id, QString text);
+            Q_INVOKABLE bool write(unsigned int scrollback_id, const QString& text);
             Q_INVOKABLE bool has_network(unsigned int scrollback_id);
             Q_INVOKABLE bool has_network_session(unsigned int scrollback_id);
             Q_INVOKABLE QString get_type(unsigned int scrollback_id);
             Q_INVOKABLE QJSValue get_target(unsigned int scrollback_id);
             Q_INVOKABLE QJSValue create(unsigned int parent_id, QString name);
             Q_INVOKABLE bool remove(unsigned int scrollback_id);
+            Q_INVOKABLE bool is_dead(unsigned int scrollback_id);
             Q_INVOKABLE QList<int> list();
     };
 }

@@ -18,14 +18,17 @@
 
 namespace GrumpyIRC
 {
+    class NetworkSession;
+    class IRCSession;
+    class Scrollback;
     class NetworkJS : public GenericJSClass
     {
             Q_OBJECT
         public:
             NetworkJS(ScriptExtension *s);
             QHash<QString, QString> GetFunctions() override;
-            Q_INVOKABLE void request_network_reconnect(unsigned int scrollback_id);
-            Q_INVOKABLE void request_network_disconnect(unsigned int scrollback_id, QString reason);
+            Q_INVOKABLE bool request_network_reconnect(unsigned int scrollback_id);
+            Q_INVOKABLE bool request_network_disconnect(unsigned int scrollback_id, const QString &reason);
             Q_INVOKABLE QJSValue get_nick(unsigned int scrollback_id);
             Q_INVOKABLE QJSValue get_ident(unsigned int scrollback_id);
             Q_INVOKABLE QJSValue get_host(unsigned int scrollback_id);
@@ -33,6 +36,12 @@ namespace GrumpyIRC
             Q_INVOKABLE QJSValue get_server_host(unsigned int scrollback_id);
             Q_INVOKABLE bool send_raw(unsigned int scrollback_id, QString raw);
             Q_INVOKABLE bool send_message(unsigned int scrollback_id, QString target, QString message);
+            Q_INVOKABLE QList<int> get_scrollback_list(unsigned int scrollback_id);
+            Q_INVOKABLE QList<int> get_channel_scrollback_list(unsigned int scrollback_id);
+            Q_INVOKABLE QList<int> get_query_scrollback_list(unsigned int scrollback_id);
+        private:
+            NetworkSession* getNetwork(unsigned int scrollback_id, const QString& signature, Scrollback **scrollback);
+            IRCSession* getIRC(unsigned int scrollback_id, const QString& signature, Scrollback **scrollback);
     };
 }
 

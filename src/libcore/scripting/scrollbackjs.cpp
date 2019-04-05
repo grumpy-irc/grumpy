@@ -41,10 +41,11 @@ QHash<QString, QString> GrumpyIRC::ScrollbackJS::GetFunctions()
     fh.insert("get_target", "(scrollback_id): return target name of scrollback (channel name, user name)");
     fh.insert("has_network", "(scrollback_id): return true if scrollback belongs to network");
     fh.insert("has_network_session", "(scrollback_id): returns true if scrollback has existing IRC session");
+    fh.insert("is_dead", "(scrollback_id): returns if scrollback is dead (marked gray)");
     return fh;
 }
 
-bool ScrollbackJS::write(unsigned int scrollback_id, QString text)
+bool ScrollbackJS::write(unsigned int scrollback_id, const QString& text)
 {
     Scrollback *w = Scrollback::GetScrollbackByID(scrollback_id);
     if (!w)
@@ -159,6 +160,17 @@ bool ScrollbackJS::remove(unsigned int scrollback_id)
 
     this->script->DestroyScrollback(w);
     return true;
+}
+
+bool ScrollbackJS::is_dead(unsigned int scrollback_id)
+{
+    Scrollback *w = Scrollback::GetScrollbackByID(scrollback_id);
+    if (!w)
+    {
+        GRUMPY_ERROR(this->script->GetName() + ": is_dead(scrollback_id): scrollback not found");
+        return false;
+    }
+    return w->IsDead();
 }
 
 QList<int> ScrollbackJS::list()
