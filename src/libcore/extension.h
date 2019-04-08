@@ -43,6 +43,10 @@ namespace GrumpyIRC
             //! When client receives unknown type of message from IRC server (most of these are sent to system window)
             virtual void Hook_OnNetworkUnknown(IRCSession *session, libircclient::Parser *px) {}
             virtual void Hook_OnNetworkGeneric(IRCSession *session, libircclient::Parser *px) {}
+            virtual void Hook_OnNetworkChannelJoined(IRCSession *session, const QString &channel) {}
+            virtual void Hook_OnNetworkChannelLeft(IRCSession *session, libircclient::Parser *px, const QString &channel, const QString &reason) {}
+            virtual void Hook_OnNetworkChannelParted(IRCSession *session, libircclient::Parser *px, const QString &channel, const QString &reason) {}
+            virtual void Hook_OnNetworkChannelKicked(IRCSession *session, libircclient::Parser *px, const QString &channel, const QString &reason) {}
 
         //signals:
 

@@ -757,6 +757,7 @@ void IRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
     if (this->AutomaticallyRetrieveBanList)
         this->RetrieveChannelBanList(nullptr, ln);
     this->GetNetwork()->TransferRaw("WHO " + channel->GetName(), libircclient::Priority_Low);
+    Hooks::OnNetwork_ChannelJoined(this, channel->GetName());
 }
 
 void IRCSession::OnIRCSelfNICK(libircclient::Parser *px, QString previous, QString nick)
@@ -851,6 +852,8 @@ void IRCSession::OnSelf_KICK(libircclient::Parser *px, libircclient::Channel *ch
     sc->InsertText("You were kicked from the channel by " + px->GetSourceUserInfo()->ToString() + ": " + px->GetText());
     // The channel is about to be deleted now, let's do something about it
     sc->SetDead(true);
+    Hooks::OnNetwork_ChannelLeft(this, px, channel->GetName(), px->GetText());
+    Hooks::OnNetwork_ChannelKicked(this, px, channel->GetName(), px->GetText());
 }
 
 void IRCSession::OnTimeout()
@@ -888,7 +891,7 @@ void IRCSession::OnQuit(libircclient::Parser *px, libircclient::Channel *channel
     if (!this->channels.contains(channel->GetName().toLower()))
         return;
     Scrollback *sc = this->channels[channel->GetName().toLower()];
-    sc->UserListChange(px->GetSourceUserInfo()->GetNick(), NULL, UserListChange_Remove);
+    sc->UserListChange(px->GetSourceUserInfo()->GetNick(), nullptr, UserListChange_Remove);
     sc->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Quit, px->GetSourceUserInfo()));
 }
 
@@ -901,6 +904,8 @@ void IRCSession::OnSelfPart(libircclient::Parser *px, libircclient::Channel *cha
     Scrollback *sc = this->channels[channel->GetName().toLower()];
     sc->InsertText("You left this channel");
     sc->SetDead(true);
+    Hooks::OnNetwork_ChannelLeft(this, px, channel->GetName(), px->GetText());
+    Hooks::OnNetwork_ChannelParted(this, px, channel->GetName(), px->GetText());
 }
 
 void IRCSession::OnTopicInfo(libircclient::Parser *px, libircclient::Channel *channel)

@@ -284,6 +284,56 @@ void ScriptExtension::Hook_OnNetworkGeneric(IRCSession *session, libircclient::P
     this->executeFunction(this->attachedHooks[GRUMPY_SCRIPT_HOOK_NETWORK_GENERIC], params);
 }
 
+void ScriptExtension::Hook_OnNetworkChannelJoined(IRCSession *session, const QString &channel)
+{
+    if (!this->attachedHooks.contains(GRUMPY_SCRIPT_HOOK_NETWORK_CHANNEL_JOINED))
+        return;
+    QJSValueList params;
+    params.append(QJSValue(session->GetSID()));
+    params.append(QJSValue(session->GetSystemWindow()->GetID()));
+    params.append(QJSValue(channel));
+    this->executeFunction(this->attachedHooks[GRUMPY_SCRIPT_HOOK_NETWORK_CHANNEL_JOINED], params);
+}
+
+void ScriptExtension::Hook_OnNetworkChannelLeft(IRCSession *session, libircclient::Parser *px, const QString &channel, const QString &reason)
+{
+    if (!this->attachedHooks.contains(GRUMPY_SCRIPT_HOOK_NETWORK_CHANNEL_LEFT))
+        return;
+    QJSValueList params;
+    params.append(QJSValue(session->GetSID()));
+    params.append(QJSValue(session->GetSystemWindow()->GetID()));
+    params.append(MarshallingHelper::FromParser(px, this->engine));
+    params.append(QJSValue(channel));
+    params.append(QJSValue(reason));
+    this->executeFunction(this->attachedHooks[GRUMPY_SCRIPT_HOOK_NETWORK_CHANNEL_LEFT], params);
+}
+
+void ScriptExtension::Hook_OnNetworkChannelParted(IRCSession *session, libircclient::Parser *px, const QString &channel, const QString &reason)
+{
+    if (!this->attachedHooks.contains(GRUMPY_SCRIPT_HOOK_NETWORK_CHANNEL_PARTED))
+        return;
+    QJSValueList params;
+    params.append(QJSValue(session->GetSID()));
+    params.append(QJSValue(session->GetSystemWindow()->GetID()));
+    params.append(MarshallingHelper::FromParser(px, this->engine));
+    params.append(QJSValue(channel));
+    params.append(QJSValue(reason));
+    this->executeFunction(this->attachedHooks[GRUMPY_SCRIPT_HOOK_NETWORK_CHANNEL_PARTED], params);
+}
+
+void ScriptExtension::Hook_OnNetworkChannelKicked(IRCSession *session, libircclient::Parser *px, const QString &channel, const QString &reason)
+{
+    if (!this->attachedHooks.contains(GRUMPY_SCRIPT_HOOK_NETWORK_CHANNEL_KICKED))
+        return;
+    QJSValueList params;
+    params.append(QJSValue(session->GetSID()));
+    params.append(QJSValue(session->GetSystemWindow()->GetID()));
+    params.append(MarshallingHelper::FromParser(px, this->engine));
+    params.append(QJSValue(channel));
+    params.append(QJSValue(reason));
+    this->executeFunction(this->attachedHooks[GRUMPY_SCRIPT_HOOK_NETWORK_CHANNEL_KICKED], params);
+}
+
 void ScriptExtension::RegisterScrollback(Scrollback *sc)
 {
     this->scriptScbs.append(sc);
@@ -340,6 +390,14 @@ int ScriptExtension::GetHookID(const QString &hook)
         return GRUMPY_SCRIPT_HOOK_NETWORK_UNKNOWN;
     if (hook == "network_generic")
         return GRUMPY_SCRIPT_HOOK_NETWORK_GENERIC;
+    if (hook == "network_channel_joined")
+        return GRUMPY_SCRIPT_HOOK_NETWORK_CHANNEL_JOINED;
+    if (hook == "network_channel_left")
+        return GRUMPY_SCRIPT_HOOK_NETWORK_CHANNEL_LEFT;
+    if (hook == "network_channel_parted")
+        return GRUMPY_SCRIPT_HOOK_NETWORK_CHANNEL_PARTED;
+    if (hook == "network_channel_kicked")
+        return GRUMPY_SCRIPT_HOOK_NETWORK_CHANNEL_KICKED;
 
     return -1;
 }
@@ -483,6 +541,10 @@ void ScriptExtension::registerFunctions()
     this->registerHook("network_disconnect", 2, "(network_id, scrollback_id): called when network gets disconnected, provides network ID and system scrollback ID as parameters");
     this->registerHook("network_unknown", 3, "(network_id, scrollback_id, parser): called when IRC network receives unknown message");
     this->registerHook("network_generic", 3, "(network_id, scrollback_id, parser): called when IRC network receives generic message");
+    this->registerHook("network_channel_joined", 3, "(network_id, scrollback_id, channel_name): called when channel was joined on given IRC network");
+    this->registerHook("network_channel_left", 5, "(network_id, scrollback_id, parser, channel_name, reason): called when channel was left (by kick or part) on given IRC network");
+    this->registerHook("network_channel_kicked", 5, "(network_id, scrollback_id, parser, channel_name, reason): called when you are kicked from channel on given IRC network");
+    this->registerHook("network_channel_parted", 5, "(network_id, scrollback_id, parser, channel_name, reason): called when you part channel on given IRC network");
     this->registerHook("ext_get_info", 0, "(): should return version");
     this->registerHook("ext_unload", 0, "(): called when extension is being unloaded from system");
     this->registerHook("ext_is_working", 0, "(): must exist and must return true, if returns false, extension is considered crashed");

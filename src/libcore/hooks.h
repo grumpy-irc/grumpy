@@ -35,6 +35,10 @@ namespace GrumpyIRC
             static void OnNetwork_Disconnect(IRCSession *session);
             static void OnNetwork_Generic(IRCSession *session, libircclient::Parser *px);
             static void OnNetwork_UnknownMessage(IRCSession *session, libircclient::Parser *px);
+            static void OnNetwork_ChannelJoined(IRCSession *session, const QString& channel_name);
+            static void OnNetwork_ChannelParted(IRCSession *session, libircclient::Parser *px, const QString& channel_name, const QString &reason);
+            static void OnNetwork_ChannelLeft(IRCSession *session, libircclient::Parser *px, const QString& channel_name, const QString &reason);
+            static void OnNetwork_ChannelKicked(IRCSession *session, libircclient::Parser *px, const QString& channel_name, const QString &reason);
     };
 }
 

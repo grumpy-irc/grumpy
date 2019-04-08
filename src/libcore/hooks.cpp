@@ -63,3 +63,43 @@ void Hooks::OnNetwork_UnknownMessage(IRCSession *session, libircclient::Parser *
         e->Hook_OnNetworkUnknown(session, px);
     }
 }
+
+void Hooks::OnNetwork_ChannelJoined(IRCSession *session, const QString& channel_name)
+{
+    if (!Core::GrumpyCore)
+        return;
+    foreach (Extension *e, Core::GrumpyCore->GetExtensions())
+    {
+        e->Hook_OnNetworkChannelJoined(session, channel_name);
+    }
+}
+
+void Hooks::OnNetwork_ChannelParted(IRCSession *session, libircclient::Parser *px, const QString &channel_name, const QString &reason)
+{
+    if (!Core::GrumpyCore)
+        return;
+    foreach (Extension *e, Core::GrumpyCore->GetExtensions())
+    {
+        e->Hook_OnNetworkChannelParted(session, px, channel_name, reason);
+    }
+}
+
+void Hooks::OnNetwork_ChannelLeft(IRCSession *session, libircclient::Parser *px, const QString &channel_name, const QString &reason)
+{
+    if (!Core::GrumpyCore)
+        return;
+    foreach (Extension *e, Core::GrumpyCore->GetExtensions())
+    {
+        e->Hook_OnNetworkChannelLeft(session, px, channel_name, reason);
+    }
+}
+
+void Hooks::OnNetwork_ChannelKicked(IRCSession *session, libircclient::Parser *px, const QString &channel_name, const QString &reason)
+{
+    if (!Core::GrumpyCore)
+        return;
+    foreach (Extension *e, Core::GrumpyCore->GetExtensions())
+    {
+        e->Hook_OnNetworkChannelKicked(session, px, channel_name, reason);
+    }
+}
