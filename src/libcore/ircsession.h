@@ -127,7 +127,7 @@ namespace GrumpyIRC
             Scrollback *Root;
             bool AutomaticallyRetrieveBanList;
             //! EXPERIMENTAL if set to false server-time CAP will be respected
-            bool IgnoreServerTime = true;
+            bool IgnoreServerTime = false;
         signals:
             //! Emited when a new scrollback for this session is open, needed by grumpyd for network sync
             void Event_ScrollbackIsOpen(Scrollback *scrollback);
