@@ -126,6 +126,8 @@ namespace GrumpyIRC
             QList<int> IgnoredNums;
             Scrollback *Root;
             bool AutomaticallyRetrieveBanList;
+            //! EXPERIMENTAL if set to false server-time CAP will be respected
+            bool IgnoreServerTime = true;
         signals:
             //! Emited when a new scrollback for this session is open, needed by grumpyd for network sync
             void Event_ScrollbackIsOpen(Scrollback *scrollback);
@@ -206,6 +208,8 @@ namespace GrumpyIRC
             virtual void _gs_ResyncNickChange(QString new_, QString old_);
             virtual void rmScrollback(Scrollback *scrollback);
             virtual void SyncWindows(QHash<QString, QVariant> scrollbacks, QHash<QString, Scrollback*> *hash);
+            //! Returns true time of message based on server time offset, works only with servers that support server-time
+            QDateTime getTrueTime(const QDateTime& server_time);
             QTimer timerUL;
             //! Sessions have unique ID that distinct them from sessions made to same irc network
             unsigned int SID;
@@ -230,6 +234,8 @@ namespace GrumpyIRC
             libircclient::Network *network;
             QHash<QString, Scrollback*> users;
             Scrollback *systemWindow;
+            bool timeSynchronized = false;
+            qint64 timeOffset = 0;
             QList<long long> pingHistory;
         private:
             bool isRetrievingWhoInfo(const QString& channel);

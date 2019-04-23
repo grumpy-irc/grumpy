@@ -545,6 +545,12 @@ void Scrollback::InsertText(const QString &text, ScrollbackItemType type)
     this->InsertText(item);
 }
 
+void Scrollback::InsertText(const QString &text, const QDateTime &time, ScrollbackItemType type)
+{
+    ScrollbackItem item(text, type, libircclient::User(), time);
+    this->InsertText(item);
+}
+
 ScrollbackItem::ScrollbackItem(const QHash<QString, QVariant> &hash)
 {
 #ifdef GRUMPY_PROFILER
@@ -590,7 +596,7 @@ ScrollbackItem::ScrollbackItem(const QString &text, ScrollbackItemType type, lib
     this->_text = text;
     this->_datetime = QDateTime::currentDateTime();
     if (user == nullptr)
-        this->_user = nullptr;
+        this->_user = libircclient::User();
     else
         this->_user = libircclient::User(user);
 }
@@ -703,6 +709,11 @@ void ScrollbackItem::SetType(ScrollbackItemType type)
 void ScrollbackItem::SetText(const QString &text)
 {
     this->_text = text;
+}
+
+void ScrollbackItem::SetTime(const QDateTime &t)
+{
+    this->_datetime = t;
 }
 
 void ScrollbackItem::SetUser(libircclient::User *user)

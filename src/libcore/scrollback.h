@@ -65,7 +65,7 @@ namespace GrumpyIRC
     };
 
     /*!
-     * \brief The ScrollbackItem class is a one item in scrollback buffer
+     * \brief The ScrollbackItem class represent one item in scrollback buffer
      */
     class LIBCORESHARED_EXPORT ScrollbackItem : public libirc::SerializableItem, public GrumpyObject
     {
@@ -90,6 +90,7 @@ namespace GrumpyIRC
             virtual QDateTime GetTime() const;
             virtual void SetType(ScrollbackItemType type);
             virtual void SetText(const QString &text);
+            virtual void SetTime(const QDateTime &t);
             virtual void SetUser(libircclient::User *user);
             virtual bool IsSelf() const;
             virtual libircclient::User GetUser() const;
@@ -148,6 +149,7 @@ namespace GrumpyIRC
             virtual void SetOriginalID(scrollback_id_t sid);
             void SetMaxItemsSize(scrollback_id_t size);
             virtual void InsertText(const QString &text, ScrollbackItemType type = ScrollbackItemType_System);
+            virtual void InsertText(const QString &text, const QDateTime &time, ScrollbackItemType type = ScrollbackItemType_System);
             virtual void InsertText(ScrollbackItem item);
             ScrollbackItem GetFirst();
             QString GetLTarget();

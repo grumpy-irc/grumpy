@@ -346,6 +346,20 @@ void IRCSession::SyncWindows(QHash<QString, QVariant> scrollbacks, QHash<QString
     }
 }
 
+QDateTime IRCSession::getTrueTime(const QDateTime& server_time)
+{
+    if (this->IgnoreServerTime)
+        return QDateTime::currentDateTime();
+
+    if (!this->timeSynchronized)
+    {
+        // Let's assume that server_time is current time
+        this->timeOffset = server_time.msecsTo(QDateTime::currentDateTime());
+        this->timeSynchronized = true;
+    }
+    return server_time.addMSecs(this->timeOffset);
+}
+
 bool IRCSession::isRetrievingWhoInfo(const QString& channel)
 {
     return this->retrievingWho.contains(channel.toLower());
@@ -384,7 +398,7 @@ void IRCSession::whoisIs(libircclient::Parser *parser)
     if (parser->GetParameters().count() < 2)
         return;
 
-    this->systemWindow->InsertText("WHOIS: " + parser->GetParameters()[1] + " " + parser->GetText());
+    this->systemWindow->InsertText("WHOIS: " + parser->GetParameters()[1] + " " + parser->GetText(), this->getTrueTime(parser->GetTimestamp()));
 }
 
 Scrollback *IRCSession::GetScrollbackForUser(QString user)
