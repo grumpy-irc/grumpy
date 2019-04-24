@@ -839,7 +839,7 @@ void IRCSession::OnCTCP(libircclient::Parser *px, QString ctcp, QString pars)
     {
         this->GetNetwork()->SendNotice(CTCP_SEPARATOR + "USERINFO " + this->network->GetLocalUserInfo()->GetRealname() + CTCP_SEPARATOR, px->GetSourceUserInfo()->GetNick());
     }
-    this->systemWindow->InsertText("Incoming CTCP for " + target + " from " + px->GetSourceInfo() + ": " + final_text);
+    this->systemWindow->InsertText("Incoming CTCP for " + target + " from " + px->GetSourceInfo() + ": " + final_text, this->getTrueTime(px->GetTimestamp()));
 }
 
 void IRCSession::OnMOTD(libircclient::Parser *px)
