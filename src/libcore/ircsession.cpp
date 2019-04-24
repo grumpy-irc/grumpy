@@ -346,6 +346,22 @@ void IRCSession::SyncWindows(QHash<QString, QVariant> scrollbacks, QHash<QString
     }
 }
 
+QDateTime IRCSession::getTrueTime(const QDateTime& server_time)
+{
+    if (this->IgnoreServerTime)
+        return QDateTime::currentDateTime();
+
+    if (!this->timeSynchronized)
+    {
+        // Let's assume that server_time is current time
+        this->timeOffset = server_time.msecsTo(QDateTime::currentDateTime());
+        GRUMPY_DEBUG("Network " + this->network->GetNetworkName() + " (" + QString::number(this->SID) + ") time offset set to " +
+                     QString::number(this->timeOffset) + "ms", 1);
+        this->timeSynchronized = true;
+    }
+    return server_time.addMSecs(this->timeOffset);
+}
+
 bool IRCSession::isRetrievingWhoInfo(const QString& channel)
 {
     return this->retrievingWho.contains(channel.toLower());
@@ -384,7 +400,7 @@ void IRCSession::whoisIs(libircclient::Parser *parser)
     if (parser->GetParameters().count() < 2)
         return;
 
-    this->systemWindow->InsertText("WHOIS: " + parser->GetParameters()[1] + " " + parser->GetText());
+    this->systemWindow->InsertText("WHOIS: " + parser->GetParameters()[1] + " " + parser->GetText(), this->getTrueTime(parser->GetTimestamp()));
 }
 
 Scrollback *IRCSession::GetScrollbackForUser(QString user)
@@ -763,7 +779,7 @@ void IRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
 void IRCSession::OnIRCSelfNICK(libircclient::Parser *px, QString previous, QString nick)
 {
     Q_UNUSED(px);
-    this->systemWindow->InsertText("Your nick was changed from " + previous + " to " + nick);
+    this->systemWindow->InsertText("Your nick was changed from " + previous + " to " + nick, this->getTrueTime(px->GetTimestamp()));
 }
 
 void IRCSession::OnKICK(libircclient::Parser *px, libircclient::Channel *channel)
@@ -772,7 +788,7 @@ void IRCSession::OnKICK(libircclient::Parser *px, libircclient::Channel *channel
     if (!this->channels.contains(l))
         return;
     this->channels[l]->UserListChange(px->GetParameters()[1], nullptr, UserListChange_Remove);
-    this->channels[l]->InsertText(ScrollbackItem("kicked " + px->GetParameters()[1] + " from channel: " + px->GetText(), ScrollbackItemType_Kick, px->GetSourceUserInfo()));
+    this->channels[l]->InsertText(ScrollbackItem("kicked " + px->GetParameters()[1] + " from channel: " + px->GetText(), ScrollbackItemType_Kick, px->GetSourceUserInfo(), this->getTrueTime(px->GetTimestamp())));
 }
 
 #define CTCP_SEPARATOR QString((char)1)
@@ -795,13 +811,13 @@ void IRCSession::OnCTCP(libircclient::Parser *px, QString ctcp, QString pars)
         Scrollback *sc = this->GetScrollbackForChannel(target);
         if (!sc)
         {
-            this->systemWindow->InsertText("Incoming CTCP for unknown target (" + target +  ") from " + px->GetSourceInfo() + ": " + final_text);
+            this->systemWindow->InsertText("Incoming CTCP for unknown target (" + target +  ") from " + px->GetSourceInfo() + ": " + final_text, this->getTrueTime(px->GetTimestamp()));
             return;
         }
     }
     if (!px->GetSourceUserInfo())
     {
-        this->systemWindow->InsertText("Ignoring CTCP from unknown source for " + target + " from " + px->GetSourceInfo() + ": " + final_text);
+        this->systemWindow->InsertText("Ignoring CTCP from unknown source for " + target + " from " + px->GetSourceInfo() + ": " + final_text, this->getTrueTime(px->GetTimestamp()));
         return;
     }
     if (ctcp == "CLIENTINFO")
@@ -823,12 +839,12 @@ void IRCSession::OnCTCP(libircclient::Parser *px, QString ctcp, QString pars)
     {
         this->GetNetwork()->SendNotice(CTCP_SEPARATOR + "USERINFO " + this->network->GetLocalUserInfo()->GetRealname() + CTCP_SEPARATOR, px->GetSourceUserInfo()->GetNick());
     }
-    this->systemWindow->InsertText("Incoming CTCP for " + target + " from " + px->GetSourceInfo() + ": " + final_text);
+    this->systemWindow->InsertText("Incoming CTCP for " + target + " from " + px->GetSourceInfo() + ": " + final_text, this->getTrueTime(px->GetTimestamp()));
 }
 
 void IRCSession::OnMOTD(libircclient::Parser *px)
 {
-    this->systemWindow->InsertText(ScrollbackItem(px->GetText(),ScrollbackItemType_Notice, libircclient::User("MOTD!@")));
+    this->systemWindow->InsertText(ScrollbackItem(px->GetText(),ScrollbackItemType_Notice, libircclient::User("MOTD!@"), this->getTrueTime(px->GetTimestamp())));
 }
 
 void IRCSession::OnPart(libircclient::Parser *px, libircclient::Channel *channel)
@@ -839,7 +855,7 @@ void IRCSession::OnPart(libircclient::Parser *px, libircclient::Channel *channel
     // Remove the user from scrollback's user list widget
     // we can't pass a pointer to user in a channel object here, because it was already deleted from channel
     sc->UserListChange(px->GetSourceUserInfo()->GetNick(), nullptr, UserListChange_Remove);
-    sc->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Part, px->GetSourceUserInfo()));
+    sc->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Part, px->GetSourceUserInfo(), this->getTrueTime(px->GetTimestamp())));
 }
 
 void IRCSession::OnSelf_KICK(libircclient::Parser *px, libircclient::Channel *channel)
@@ -849,7 +865,7 @@ void IRCSession::OnSelf_KICK(libircclient::Parser *px, libircclient::Channel *ch
 
     // Write information to channel scrollback
     Scrollback *sc = this->channels[channel->GetName().toLower()];
-    sc->InsertText("You were kicked from the channel by " + px->GetSourceUserInfo()->ToString() + ": " + px->GetText());
+    sc->InsertText("You were kicked from the channel by " + px->GetSourceUserInfo()->ToString() + ": " + px->GetText(), this->getTrueTime(px->GetTimestamp()));
     // The channel is about to be deleted now, let's do something about it
     sc->SetDead(true);
     Hooks::OnNetwork_ChannelLeft(this, px, channel->GetName(), px->GetText());
@@ -867,7 +883,7 @@ void IRCSession::OnTOPIC(libircclient::Parser *px, libircclient::Channel *channe
         return;
 
     Scrollback *sc = this->channels[channel->GetName().toLower()];
-    sc->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Topic, px->GetSourceUserInfo()));
+    sc->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Topic, px->GetSourceUserInfo(), this->getTrueTime(px->GetTimestamp())));
 }
 
 void IRCSession::OnTOPICWhoTime(libircclient::Parser *px, libircclient::Channel *channel)
@@ -876,14 +892,14 @@ void IRCSession::OnTOPICWhoTime(libircclient::Parser *px, libircclient::Channel 
         return;
 
     Scrollback *sc = this->channels[channel->GetName().toLower()];
-    sc->InsertText("Topic set at " + channel->GetTopicTime().toString() + " by " + channel->GetTopicUser());
+    sc->InsertText("Topic set at " + channel->GetTopicTime().toString() + " by " + channel->GetTopicUser(), this->getTrueTime(px->GetTimestamp()));
 }
 
 void IRCSession::OnNickConflict(libircclient::Parser *px)
 {
     if (px->GetParameters().size() < 2)
         return;
-    this->systemWindow->InsertText("Nick already in use: " + px->GetParameters()[1]);
+    this->systemWindow->InsertText("Nick already in use: " + px->GetParameters()[1], this->getTrueTime(px->GetTimestamp()));
 }
 
 void IRCSession::OnQuit(libircclient::Parser *px, libircclient::Channel *channel)
@@ -892,7 +908,7 @@ void IRCSession::OnQuit(libircclient::Parser *px, libircclient::Channel *channel
         return;
     Scrollback *sc = this->channels[channel->GetName().toLower()];
     sc->UserListChange(px->GetSourceUserInfo()->GetNick(), nullptr, UserListChange_Remove);
-    sc->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Quit, px->GetSourceUserInfo()));
+    sc->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Quit, px->GetSourceUserInfo(), this->getTrueTime(px->GetTimestamp())));
 }
 
 void IRCSession::OnSelfPart(libircclient::Parser *px, libircclient::Channel *channel)
@@ -902,7 +918,7 @@ void IRCSession::OnSelfPart(libircclient::Parser *px, libircclient::Channel *cha
         return;
 
     Scrollback *sc = this->channels[channel->GetName().toLower()];
-    sc->InsertText("You left this channel");
+    sc->InsertText("You left this channel", this->getTrueTime(px->GetTimestamp()));
     sc->SetDead(true);
     Hooks::OnNetwork_ChannelLeft(this, px, channel->GetName(), px->GetText());
     Hooks::OnNetwork_ChannelParted(this, px, channel->GetName(), px->GetText());
@@ -914,7 +930,7 @@ void IRCSession::OnTopicInfo(libircclient::Parser *px, libircclient::Channel *ch
         return;
 
     Scrollback *sc = this->channels[channel->GetName().toLower()];
-    sc->InsertText(ScrollbackItem("TOPIC for " + px->GetParameters()[1] + " is: " + px->GetText()));
+    sc->InsertText("TOPIC for " + px->GetParameters()[1] + " is: " + px->GetText(), this->getTrueTime(px->GetTimestamp()));
 }
 
 void IRCSession::OnEndOfNames(libircclient::Parser *px)
@@ -945,7 +961,7 @@ void IRCSession::OnWHO(libircclient::Parser *px, libircclient::Channel *channel,
     if (this->ignoringWho.contains(channel->GetName().toLower()))
         return;
     if (!this->retrievingWho.contains(channel->GetName().toLower()))
-        this->systemWindow->InsertText("WHO: " + px->GetParameterLine() + ": " + px->GetText());
+        this->systemWindow->InsertText("WHO: " + px->GetParameterLine() + ": " + px->GetText(), this->getTrueTime(px->GetTimestamp()));
     // The user in respective channel was likely updated by libirc now
     Scrollback *scrollback = this->GetScrollbackForChannel(channel->GetName());
     if (!scrollback)
@@ -979,7 +995,7 @@ void IRCSession::OnNotice(libircclient::Parser *px)
         this->systemWindow->InsertText("No target for " + target + ": " + px->GetRaw());
         return;
     }
-    sx->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Notice, px->GetSourceUserInfo()));
+    sx->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Notice, px->GetSourceUserInfo(), this->getTrueTime(px->GetTimestamp())));
 }
 
 void IRCSession::OnWhoEnd(libircclient::Parser *px)
@@ -998,7 +1014,7 @@ void IRCSession::OnWhoEnd(libircclient::Parser *px)
     if (this->retrievingWho.contains(name))
         this->retrievingWho.removeOne(name);
     else
-        this->systemWindow->InsertText("End of WHO for " + name);
+        this->systemWindow->InsertText("End of WHO for " + name, this->getTrueTime(px->GetTimestamp()));
 }
 
 void IRCSession::OnMODEInfo(libircclient::Parser *px, libircclient::Channel *channel)
@@ -1010,7 +1026,7 @@ void IRCSession::OnMODEInfo(libircclient::Parser *px, libircclient::Channel *cha
         return;
 
     Scrollback *sc = this->channels[lx[1].toLower()];
-    sc->InsertText("MODE for " + channel->GetName() + " is: " + lx[2]);
+    sc->InsertText("MODE for " + channel->GetName() + " is: " + lx[2], this->getTrueTime(px->GetTimestamp()));
 }
 
 void IRCSession::OnMODETIME(libircclient::Parser *px)
@@ -1022,7 +1038,7 @@ void IRCSession::OnMODETIME(libircclient::Parser *px)
         return;
 
     Scrollback *sc = this->channels[lx[1].toLower()];
-    sc->InsertText("Channel was created at " + QDateTime::fromTime_t(lx[2].toUInt()).toString());
+    sc->InsertText("Channel was created at " + QDateTime::fromTime_t(lx[2].toUInt()).toString(), this->getTrueTime(px->GetTimestamp()));
 }
 
 void IRCSession::OnUpdateUserList()
@@ -1045,7 +1061,7 @@ void IRCSession::OnMODE(libircclient::Parser *px)
         QString mode = px->GetText();
         if (mode.isEmpty() && px->GetParameters().count() >= 2)
             mode = px->GetParameters()[1];
-        this->systemWindow->InsertText(ScrollbackItem(px->GetSourceInfo() + " set your mode " + mode));
+        this->systemWindow->InsertText(px->GetSourceInfo() + " set your mode " + mode, this->getTrueTime(px->GetTimestamp()));
     }
 }
 
@@ -1077,7 +1093,7 @@ void IRCSession::OnChannelMODE(libircclient::Parser *px, libircclient::Channel *
         mode_string += mp + " ";
     mode_string = mode_string.trimmed();
 
-    sx->InsertText(ScrollbackItem(mode_string, ScrollbackItemType_Mode, px->GetSourceUserInfo()));
+    sx->InsertText(ScrollbackItem(mode_string, ScrollbackItemType_Mode, px->GetSourceUserInfo(), this->getTrueTime(px->GetTimestamp())));
 }
 
 void IRCSession::OnUMODE(libircclient::Parser *px, libircclient::Channel *channel, libircclient::User *user)
@@ -1143,7 +1159,7 @@ void IRCSession::OnEndOfExcepts(libircclient::Parser *px)
 void IRCSession::OnGeneric(libircclient::Parser *px)
 {
     if (!this->IgnoredNums.contains(px->GetNumeric()))
-        this->systemWindow->InsertText(px->GetRaw());
+        this->systemWindow->InsertText(px->GetRaw(), this->getTrueTime(px->GetTimestamp()));
     Hooks::OnNetwork_Generic(this, px);
 }
 
@@ -1164,8 +1180,9 @@ void IRCSession::OnINVITE(libircclient::Parser *px)
 
 void IRCSession::OnWhoisUser(libircclient::Parser *px, libircclient::User *user)
 {
-    this->systemWindow->InsertText("WHOIS  === BEGINNING ===");
-    this->systemWindow->InsertText("WHOIS: " + user->ToString() + " has realname: " + user->GetRealname());
+    QDateTime true_time = this->getTrueTime(px->GetTimestamp());
+    this->systemWindow->InsertText("WHOIS  === BEGINNING ===", true_time);
+    this->systemWindow->InsertText("WHOIS: " + user->ToString() + " has realname: " + user->GetRealname(), true_time);
 }
 
 void IRCSession::OnWhoisIdle(libircclient::Parser *px, unsigned int seconds_idle, QDateTime signon_time)
@@ -1183,7 +1200,7 @@ void IRCSession::OnWhoisIdle(libircclient::Parser *px, unsigned int seconds_idle
         connected_string = QString::number(days) + " days ";
     connected_string += Generic::DoubleDigit(hours) + ":" + Generic::DoubleDigit(minutes) + ":" + Generic::DoubleDigit(seconds);
     this->systemWindow->InsertText("WHOIS: " + px->GetParameters()[1] + " is idle " + idle_string + ". "\
-                                   "Online since " + signon_time.toString() + " " + connected_string);
+                                   "Online since " + signon_time.toString() + " " + connected_string, this->getTrueTime(px->GetTimestamp()));
 }
 
 void IRCSession::OnWhoisOperator(libircclient::Parser *px)
@@ -1200,27 +1217,27 @@ void IRCSession::OnWhoisChannels(libircclient::Parser *px)
 {
     if (px->GetParameters().count() < 2)
         return;
-    this->systemWindow->InsertText("WHOIS: " + px->GetParameters()[1] + " is on channels: " + px->GetText());
+    this->systemWindow->InsertText("WHOIS: " + px->GetParameters()[1] + " is on channels: " + px->GetText(), this->getTrueTime(px->GetTimestamp()));
 }
 
 void IRCSession::OnWhoisHost(libircclient::Parser *px)
 {
     if (px->GetParameters().count() < 3)
         return;
-    this->systemWindow->InsertText("WHOIS: " + px->GetParameters()[1] + " is connected using " + px->GetParameters()[2] + ": " + px->GetText());
+    this->systemWindow->InsertText("WHOIS: " + px->GetParameters()[1] + " is connected using " + px->GetParameters()[2] + ": " + px->GetText(), this->getTrueTime(px->GetTimestamp()));
 }
 
 void IRCSession::OnWhoisEnd(libircclient::Parser *px)
 {
     Q_UNUSED(px);
-    this->systemWindow->InsertText("WHOIS  === END ===");
+    this->systemWindow->InsertText("WHOIS  === END ===", this->getTrueTime(px->GetTimestamp()));
 }
 
 void IRCSession::OnAway(libircclient::Parser *px)
 {
     if (px->GetParameters().count() < 2)
         return;
-    this->systemWindow->InsertText(px->GetParameters()[1] + " is away: " + px->GetText());
+    this->systemWindow->InsertText(px->GetParameters()[1] + " is away: " + px->GetText(), this->getTrueTime(px->GetTimestamp()));
 }
 
 void IRCSession::OnWhoisGen(libircclient::Parser *px)
@@ -1232,7 +1249,7 @@ void IRCSession::OnWhoisAcc(libircclient::Parser *px)
 {
     if (px->GetParameters().count() < 3)
         return;
-    this->systemWindow->InsertText("WHOIS: " + px->GetParameters()[1] + " is logged in as " + px->GetParameters()[2]);
+    this->systemWindow->InsertText("WHOIS: " + px->GetParameters()[1] + " is logged in as " + px->GetParameters()[2], this->getTrueTime(px->GetTimestamp()));
 }
 
 void IRCSession::OnPong(libircclient::Parser *px)
@@ -1247,9 +1264,9 @@ void IRCSession::OnPong(libircclient::Parser *px)
 void IRCSession::OnSelfCHGH(libircclient::Parser *px, QString old_host, QString old_ident, QString new_host, QString new_ident)
 {
     if (old_host != new_host)
-        this->systemWindow->InsertText("Your hostname was changed from " + old_host + " to " + new_host);
+        this->systemWindow->InsertText("Your hostname was changed from " + old_host + " to " + new_host, this->getTrueTime(px->GetTimestamp()));
     if (old_ident != new_ident)
-        this->systemWindow->InsertText("Your ident was changed from " + old_ident + " to " + new_ident);
+        this->systemWindow->InsertText("Your ident was changed from " + old_ident + " to " + new_ident, this->getTrueTime(px->GetTimestamp()));
 }
 
 void IRCSession::OnCHGH(libircclient::Parser *px, QString old_host, QString old_ident, QString new_host, QString new_ident)
@@ -1289,7 +1306,7 @@ void IRCSession::processME(libircclient::Parser *px, QString message)
         this->systemWindow->InsertText("No target for " + target + ": " + px->GetRaw());
         return;
     }
-    sx->InsertText(ScrollbackItem(message, ScrollbackItemType_Act, px->GetSourceUserInfo()));
+    sx->InsertText(ScrollbackItem(message, ScrollbackItemType_Act, px->GetSourceUserInfo(), this->getTrueTime(px->GetTimestamp())));
 }
 
 void IRCSession::free()
@@ -1314,6 +1331,7 @@ void IRCSession::SetDead()
     foreach (Scrollback *sx, this->channels)
         sx->SetDead(true);
     this->systemWindow->SetDead(true);
+    this->timeSynchronized = false;
 }
 
 Configuration *IRCSession::GetConfiguration()
@@ -1464,7 +1482,7 @@ void IRCSession::OnMessage(libircclient::Parser *px)
         this->systemWindow->InsertText("No target for " + target + ": " + px->GetRaw());
         return;
     }
-    sx->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Message, px->GetSourceUserInfo()));
+    sx->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Message, px->GetSourceUserInfo(), this->getTrueTime(px->GetTimestamp())));
 }
 
 void IRCSession::OnFailure(QString reason, int code)
@@ -1487,7 +1505,7 @@ void IRCSession::OnIRCJoin(libircclient::Parser *px, libircclient::User *user, l
     }
     // Write a join message to scrollback for this channel
     Scrollback *scrollback = this->channels[channel->GetName().toLower()];
-    scrollback->InsertText(ScrollbackItem(user->ToString(), ScrollbackItemType_Join, user));
+    scrollback->InsertText(ScrollbackItem(user->ToString(), ScrollbackItemType_Join, user, this->getTrueTime(px->GetTimestamp())));
     scrollback->UserListChange(user->GetNick(), user, UserListChange_Insert);
 }
 
@@ -1508,7 +1526,7 @@ void IRCSession::OnNICK(libircclient::Parser *px, QString old_, QString new_)
             continue;
         // Get a scrollback window and write a nick change message to it
         Scrollback *scrollback = this->channels[channel->GetName().toLower()];
-        scrollback->InsertText(ScrollbackItem(new_, ScrollbackItemType_Nick, px->GetSourceUserInfo()));
+        scrollback->InsertText(ScrollbackItem(new_, ScrollbackItemType_Nick, px->GetSourceUserInfo(), this->getTrueTime(px->GetTimestamp())));
         scrollback->UserListChange(old_, channel->GetUser(new_), UserListChange_Alter);
     }
 }
