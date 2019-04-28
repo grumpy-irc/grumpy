@@ -15,7 +15,7 @@ Some features:
 * Modular design, you can take the core library
   and build a different interface on top of it
 * Very scalable and extendable, support for extensions
-  written in JavaScript
+  written in C++ or JavaScript
 * Support all IRC standards and networks
 * Supports IRCv3 protocol (http://ircv3.net/)
 * Extensible and very powerfull auto-completion mechanism
