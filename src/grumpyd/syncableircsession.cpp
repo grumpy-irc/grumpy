@@ -214,22 +214,22 @@ Scrollback *SyncableIRCSession::GetScrollbackForUser(QString user)
     return scrollback;
 }
 
-void SyncableIRCSession::SetHostname(QString text)
+void SyncableIRCSession::SetHostname(const QString& text)
 {
     this->_hostname = text;
 }
 
-void SyncableIRCSession::SetName(QString text)
+void SyncableIRCSession::SetName(const QString& text)
 {
     this->_name = text;
 }
 
-void SyncableIRCSession::SetNick(QString text)
+void SyncableIRCSession::SetNick(const QString& text)
 {
     this->_nick = text;
 }
 
-void SyncableIRCSession::SetIdent(QString text)
+void SyncableIRCSession::SetIdent(const QString& text)
 {
     this->_ident = text;
 }
@@ -247,11 +247,6 @@ void SyncableIRCSession::SetSSL(bool is_ssl)
 void SyncableIRCSession::SetPort(unsigned int port)
 {
     this->_port = port;
-}
-
-SyncableIRCSession::~SyncableIRCSession()
-{
-
 }
 
 Configuration *SyncableIRCSession::GetConfiguration()
@@ -277,6 +272,12 @@ void SyncableIRCSession::connInternalSocketSignals()
     connect(this->network, SIGNAL(Event_CPMInserted(libircclient::Parser*,libircclient::ChannelPMode,libircclient::Channel*)), this, SLOT(OnPModeInsert(libircclient::Parser*,libircclient::ChannelPMode,libircclient::Channel*)));
     connect(this->network, SIGNAL(Event_CPMRemoved(libircclient::Parser*,libircclient::ChannelPMode,libircclient::Channel*)), this, SLOT(OnPModeRemove(libircclient::Parser*,libircclient::ChannelPMode,libircclient::Channel*)));
     connect(this->network, SIGNAL(Event_MyInfo(libircclient::Parser*)), this, SLOT(OnInfo(libircclient::Parser*)));
+}
+
+void SyncableIRCSession::free()
+{
+    IRCSession::free();
+    this->targetAFKCache.clear();
 }
 
 void SyncableIRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
@@ -572,6 +573,16 @@ void SyncableIRCSession::OnMessage(libircclient::Parser *px)
     {
         if (this->owner->GetConfiguration()->GetValueAsBool("offline_ms_bool"))
         {
+            // Check if we didn't send this message recently
+            if (this->targetAFKCache.contains(target))
+            {
+                if (this->targetAFKCache[target].secsTo(QDateTime::currentDateTime()) < 120)
+                    return;
+                this->targetAFKCache[target] = QDateTime::currentDateTime();
+            } else
+            {
+                this->targetAFKCache.insert(target, QDateTime::currentDateTime());
+            }
             Scrollback *scrollback = this->GetScrollbackForUser(px->GetSourceUserInfo()->GetNick());
             if (!scrollback)
             {
