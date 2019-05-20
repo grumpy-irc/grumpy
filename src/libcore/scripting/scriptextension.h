@@ -27,6 +27,7 @@
 #define GRUMPY_SCRIPT_HOOK_NETWORK_CHANNEL_KICKED       7
 #define GRUMPY_SCRIPT_HOOK_NETWORK_CHANNEL_LEFT         8
 #define GRUMPY_SCRIPT_HOOK_NETWORK_CHANNEL_PARTED       9
+#define GRUMPY_SCRIPT_HOOK_NETWORK_CHANNEL_TOPIC        10
 
 namespace GrumpyIRC
 {
@@ -71,6 +72,7 @@ namespace GrumpyIRC
             void Hook_OnNetworkChannelLeft(IRCSession *session, libircclient::Parser *px, const QString &channel, const QString &reason) override;
             void Hook_OnNetworkChannelParted(IRCSession *session, libircclient::Parser *px, const QString &channel, const QString &reason) override;
             void Hook_OnNetworkChannelKicked(IRCSession *session, libircclient::Parser *px, const QString &channel, const QString &reason) override;
+            bool Hook_OnNetworkChannelTopic(IRCSession *session, Scrollback *scrollback, libircclient::Parser *px, libircclient::Channel *channel, const QString &new_topic, const QString &old_topic) override;
             virtual void RegisterScrollback(Scrollback *sc);
             virtual void DestroyScrollback(Scrollback *sc);
             virtual bool HasScrollback(Scrollback *sc);

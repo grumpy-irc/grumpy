@@ -883,6 +883,8 @@ void IRCSession::OnTOPIC(libircclient::Parser *px, libircclient::Channel *channe
         return;
 
     Scrollback *sc = this->channels[channel->GetName().toLower()];
+    if (!Hooks::OnNetwork_ChannelTopic(this, sc, px, channel, px->GetText(), previous_one))
+        return;
     sc->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Topic, px->GetSourceUserInfo(), this->getTrueTime(px->GetTimestamp())));
 }
 

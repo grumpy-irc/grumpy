@@ -103,3 +103,16 @@ void Hooks::OnNetwork_ChannelKicked(IRCSession *session, libircclient::Parser *p
         e->Hook_OnNetworkChannelKicked(session, px, channel_name, reason);
     }
 }
+
+bool Hooks::OnNetwork_ChannelTopic(IRCSession *session, Scrollback *scrollback, libircclient::Parser *px, libircclient::Channel *channel, const QString &new_topic, const QString &old_topic)
+{
+    if (!Core::GrumpyCore)
+        return true;
+    bool result = true;
+    foreach (Extension *e, Core::GrumpyCore->GetExtensions())
+    {
+        if (!e->Hook_OnNetworkChannelTopic(session, scrollback, px, channel, new_topic, old_topic))
+            result = false;
+    }
+    return result;
+}

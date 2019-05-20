@@ -334,6 +334,21 @@ void ScriptExtension::Hook_OnNetworkChannelKicked(IRCSession *session, libirccli
     this->executeFunction(this->attachedHooks[GRUMPY_SCRIPT_HOOK_NETWORK_CHANNEL_KICKED], params);
 }
 
+bool ScriptExtension::Hook_OnNetworkChannelTopic(IRCSession *session, Scrollback *scrollback, libircclient::Parser *px, libircclient::Channel *channel, const QString &new_topic, const QString &old_topic)
+{
+    if (!this->attachedHooks.contains(GRUMPY_SCRIPT_HOOK_NETWORK_CHANNEL_TOPIC))
+        return true;
+
+    QJSValueList params;
+    params.append(QJSValue(session->GetSID()));
+    params.append(QJSValue(scrollback->GetID()));
+    params.append(MarshallingHelper::FromParser(px, this->engine));
+    params.append(QJSValue(channel->GetName()));
+    params.append(QJSValue(new_topic));
+    params.append(QJSValue(old_topic));
+    return this->executeFunctionAsBool(this->attachedHooks[GRUMPY_SCRIPT_HOOK_NETWORK_CHANNEL_TOPIC], params);
+}
+
 void ScriptExtension::RegisterScrollback(Scrollback *sc)
 {
     this->scriptScbs.append(sc);
@@ -398,6 +413,8 @@ int ScriptExtension::GetHookID(const QString &hook)
         return GRUMPY_SCRIPT_HOOK_NETWORK_CHANNEL_PARTED;
     if (hook == "network_channel_kicked")
         return GRUMPY_SCRIPT_HOOK_NETWORK_CHANNEL_KICKED;
+    if (hook == "network_channel_topic")
+        return GRUMPY_SCRIPT_HOOK_NETWORK_CHANNEL_TOPIC;
 
     return -1;
 }
@@ -545,6 +562,7 @@ void ScriptExtension::registerFunctions()
     this->registerHook("network_channel_left", 5, "(network_id, scrollback_id, parser, channel_name, reason): called when channel was left (by kick or part) on given IRC network");
     this->registerHook("network_channel_kicked", 5, "(network_id, scrollback_id, parser, channel_name, reason): called when you are kicked from channel on given IRC network");
     this->registerHook("network_channel_parted", 5, "(network_id, scrollback_id, parser, channel_name, reason): called when you part channel on given IRC network");
+    this->registerHook("bool network_channel_topic", 6, "(network_id, scrollback_id, parser, channel_name, new_topic, old_topic): called when a topic is changed in a channel, must return true or false. If false is returned, information about topic change is not written to scrollback. If you want to create custom topic change message, you should return false.");
     this->registerHook("ext_get_info", 0, "(): should return version");
     this->registerHook("ext_unload", 0, "(): called when extension is being unloaded from system");
     this->registerHook("ext_is_working", 0, "(): must exist and must return true, if returns false, extension is considered crashed");

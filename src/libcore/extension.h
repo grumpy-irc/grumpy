@@ -20,6 +20,7 @@
 namespace libircclient
 {
     class Parser;
+    class Channel;
 }
 
 namespace GrumpyIRC
@@ -47,6 +48,7 @@ namespace GrumpyIRC
             virtual void Hook_OnNetworkChannelLeft(IRCSession *session, libircclient::Parser *px, const QString &channel, const QString &reason) {}
             virtual void Hook_OnNetworkChannelParted(IRCSession *session, libircclient::Parser *px, const QString &channel, const QString &reason) {}
             virtual void Hook_OnNetworkChannelKicked(IRCSession *session, libircclient::Parser *px, const QString &channel, const QString &reason) {}
+            virtual bool Hook_OnNetworkChannelTopic(IRCSession *session, Scrollback *scrollback, libircclient::Parser *px, libircclient::Channel *channel, const QString &new_topic, const QString &old_topic) { return true; }
 
         //signals:
 

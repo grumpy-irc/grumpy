@@ -19,6 +19,7 @@
 namespace libircclient
 {
     class Parser;
+    class Channel;
 }
 
 namespace GrumpyIRC
@@ -39,6 +40,7 @@ namespace GrumpyIRC
             static void OnNetwork_ChannelParted(IRCSession *session, libircclient::Parser *px, const QString& channel_name, const QString &reason);
             static void OnNetwork_ChannelLeft(IRCSession *session, libircclient::Parser *px, const QString& channel_name, const QString &reason);
             static void OnNetwork_ChannelKicked(IRCSession *session, libircclient::Parser *px, const QString& channel_name, const QString &reason);
+            static bool OnNetwork_ChannelTopic(IRCSession *session, Scrollback *scrollback, libircclient::Parser *px, libircclient::Channel *channel, const QString &new_topic, const QString &old_topic);
     };
 }
 
