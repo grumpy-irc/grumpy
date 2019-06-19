@@ -971,6 +971,39 @@ void IRCSession::OnWHO(libircclient::Parser *px, libircclient::Channel *channel,
     scrollback->UserListChange(user->GetNick(), user, UserListChange_Refresh);
 }
 
+void IRCSession::OnMessage(libircclient::Parser *px)
+{
+    Scrollback *sx = nullptr;
+    // Get the target scrollback
+    QString target = px->GetParameters()[0];
+    char target_group = 0;
+    // if target is current user we need to find target scrollback based on a user's nick
+    if (target.toLower() == this->network->GetLocalUserInfo()->GetNick().toLower())
+    {
+        sx = this->GetScrollbackForUser(px->GetSourceUserInfo()->GetNick());
+    } else
+    {
+        // target is a most likely a channel, but due to https://tools.ietf.org/html/draft-hardy-irc-isupport-00#section-4.18 we have to check if channel name
+        // is not prefixed with status mode (+ or @ etc.)
+        char first_char_channel_name = target[0].toLatin1();
+        if (this->GetNetwork()->GetSTATUSMSGModes().contains(first_char_channel_name))
+        {
+            // Yes, this is a special message directed only to certain user group that current user is a member of
+            target_group = first_char_channel_name;
+            sx = this->GetScrollbackForChannel(target.mid(1));
+        } else
+        {
+            sx = this->GetScrollbackForChannel(target);
+        }
+    }
+    if (sx == nullptr)
+    {
+        this->systemWindow->InsertText("No target for " + target + ": " + px->GetRaw());
+        return;
+    }
+    sx->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Message, px->GetSourceUserInfo(), this->getTrueTime(px->GetTimestamp())));
+}
+
 void IRCSession::OnNotice(libircclient::Parser *px)
 {
     if (px->GetParameters().count() < 1)
@@ -981,6 +1014,7 @@ void IRCSession::OnNotice(libircclient::Parser *px)
     Scrollback *sx = nullptr;
     // Get the target scrollback
     QString target = px->GetParameters()[0];
+    char target_group = 0;
     // if target is current user we need to find target scrollback based on a user's nick
     if (target.toLower() == this->network->GetLocalUserInfo()->GetNick().toLower())
     {
@@ -990,7 +1024,18 @@ void IRCSession::OnNotice(libircclient::Parser *px)
             sx = this->GetScrollbackForUser(px->GetSourceUserInfo()->GetNick());
     } else
     {
-        sx = this->GetScrollbackForChannel(target);
+        // target is a most likely a channel, but due to https://tools.ietf.org/html/draft-hardy-irc-isupport-00#section-4.18 we have to check if channel name
+        // is not prefixed with status mode (+ or @ etc.)
+        char first_char_channel_name = target[0].toLatin1();
+        if (this->GetNetwork()->GetSTATUSMSGModes().contains(first_char_channel_name))
+        {
+            // Yes, this is a special message directed only to certain user group that current user is a member of
+            target_group = first_char_channel_name;
+            sx = this->GetScrollbackForChannel(target.mid(1));
+        } else
+        {
+            sx = this->GetScrollbackForChannel(target);
+        }
     }
     if (sx == nullptr)
     {
@@ -1464,27 +1509,6 @@ void IRCSession::OnDisconnect()
 {
     this->systemWindow->InsertText("Disconnected: socket closed", ScrollbackItemType_System);
     this->SetDisconnected();
-}
-
-void IRCSession::OnMessage(libircclient::Parser *px)
-{
-    Scrollback *sx = nullptr;
-    // Get the target scrollback
-    QString target = px->GetParameters()[0];
-    // if target is current user we need to find target scrollback based on a user's nick
-    if (target.toLower() == this->network->GetLocalUserInfo()->GetNick().toLower())
-    {
-        sx = this->GetScrollbackForUser(px->GetSourceUserInfo()->GetNick());
-    } else
-    {
-        sx = this->GetScrollbackForChannel(target);
-    }
-    if (sx == nullptr)
-    {
-        this->systemWindow->InsertText("No target for " + target + ": " + px->GetRaw());
-        return;
-    }
-    sx->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Message, px->GetSourceUserInfo(), this->getTrueTime(px->GetTimestamp())));
 }
 
 void IRCSession::OnFailure(QString reason, int code)
