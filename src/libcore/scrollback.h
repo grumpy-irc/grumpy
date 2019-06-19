@@ -77,26 +77,30 @@ namespace GrumpyIRC
             ScrollbackItem(const QString &text, scrollback_id_t id=0, bool self = false);
             ScrollbackItem(const QString &text, ScrollbackItemType type, libircclient::User *user = nullptr, scrollback_id_t id=0, bool self = false);
             ScrollbackItem(const QString &text, ScrollbackItemType type, const libircclient::User &user, scrollback_id_t id=0, bool self = false);
-            ScrollbackItem(const QString &text, ScrollbackItemType type, const libircclient::User &user, const QDateTime &date, scrollback_id_t id=0, bool self = false);
+            ScrollbackItem(const QString &text, ScrollbackItemType type, const libircclient::User &user, const QDateTime &date, scrollback_id_t id=0, bool self = false, char target_group = 0);
+            ScrollbackItem(const QString &text, ScrollbackItemType type, const libircclient::User &user, const QDateTime &date, char target_group);
             ScrollbackItem(ScrollbackItem *i);
             ScrollbackItem(const ScrollbackItem &i);
              ~ScrollbackItem() override;
-            virtual void SetID(scrollback_id_t id);
-            virtual QString GetText() const;
+            void SetID(scrollback_id_t id);
+            QString GetText() const;
             //! Items in scrollback are indexed with this so that we can sync only newest items.
             //! If you need older items, request them from the lowest ID you have.
-            virtual scrollback_id_t GetID();
-            virtual ScrollbackItemType GetType() const;
-            virtual QDateTime GetTime() const;
-            virtual void SetType(ScrollbackItemType type);
-            virtual void SetText(const QString &text);
-            virtual void SetTime(const QDateTime &t);
-            virtual void SetUser(libircclient::User *user);
-            virtual bool IsSelf() const;
-            virtual libircclient::User GetUser() const;
+            scrollback_id_t GetID();
+            ScrollbackItemType GetType() const;
+            QDateTime GetTime() const;
+            void SetType(ScrollbackItemType type);
+            void SetText(const QString &text);
+            void SetTime(const QDateTime &t);
+            void SetUser(libircclient::User *user);
+            bool IsSelf() const;
+            char GetTargetGroup() const;
+            libircclient::User GetUser() const;
             void LoadHash(const QHash<QString, QVariant> &hash) override;
             QHash<QString, QVariant> ToHash() override;
+
         private:
+            char targetGroup = 0;
             scrollback_id_t _id;
             libircclient::User _user;
             QString _text;

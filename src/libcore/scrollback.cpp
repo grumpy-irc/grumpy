@@ -618,7 +618,7 @@ ScrollbackItem::ScrollbackItem(const QString &text, ScrollbackItemType type, con
     this->_user = user;
 }
 
-ScrollbackItem::ScrollbackItem(const QString &text, ScrollbackItemType type, const libircclient::User &user, const QDateTime &date, scrollback_id_t id, bool self)
+ScrollbackItem::ScrollbackItem(const QString &text, ScrollbackItemType type, const libircclient::User &user, const QDateTime &date, scrollback_id_t id, bool self, char target_group)
 {
 #ifdef GRUMPY_PROFILER
     this->setGrumpyObjectName("ScrollbackItem");
@@ -633,6 +633,23 @@ ScrollbackItem::ScrollbackItem(const QString &text, ScrollbackItemType type, con
     this->_text = text;
     this->_datetime = date;
     this->_user = user;
+    this->targetGroup = target_group;
+}
+
+ScrollbackItem::ScrollbackItem(const QString &text, ScrollbackItemType type, const libircclient::User &user, const QDateTime &date, char target_group)
+{
+#ifdef GRUMPY_PROFILER
+    this->setGrumpyObjectName("ScrollbackItem");
+    this->grumpyObjectIncrementCount();
+#endif
+#ifdef GRUMPY_EXTREME
+    ScrollbackItem::TotalIC++;
+#endif
+    this->_type = type;
+    this->_text = text;
+    this->_datetime = date;
+    this->_user = user;
+    this->targetGroup = target_group;
 }
 
 ScrollbackItem::ScrollbackItem(ScrollbackItem *i)
@@ -650,6 +667,7 @@ ScrollbackItem::ScrollbackItem(ScrollbackItem *i)
     this->_text = i->_text;
     this->_type = i->_type;
     this->_user = i->_user;
+    this->targetGroup = i->targetGroup;
 }
 
 ScrollbackItem::ScrollbackItem(const ScrollbackItem &i)
@@ -667,6 +685,7 @@ ScrollbackItem::ScrollbackItem(const ScrollbackItem &i)
     this->_text = i._text;
     this->_type = i._type;
     this->_user = i._user;
+    this->targetGroup = i.targetGroup;
 }
 
 void ScrollbackItem::SetID(scrollback_id_t id)
@@ -726,6 +745,11 @@ bool ScrollbackItem::IsSelf() const
     return this->_self;
 }
 
+char ScrollbackItem::GetTargetGroup() const
+{
+    return this->targetGroup;
+}
+
 libircclient::User ScrollbackItem::GetUser() const
 {
     return this->_user;
@@ -742,6 +766,7 @@ void ScrollbackItem::LoadHash(const QHash<QString, QVariant> &hash)
     UNSERIALIZE_UINT(_id);
     UNSERIALIZE_BOOL(_self);
     UNSERIALIZE_DATETIME(_datetime);
+    UNSERIALIZE_CCHAR(targetGroup);
 }
 
 QHash<QString, QVariant> ScrollbackItem::ToHash()
@@ -753,6 +778,7 @@ QHash<QString, QVariant> ScrollbackItem::ToHash()
     hash.insert("_user", QVariant(this->_user.ToHash()));
     SERIALIZE(_self);
     SERIALIZE(_datetime);
+    SERIALIZE(targetGroup);
     hash.insert("_type", QVariant(static_cast<int>(this->_type)));
     return hash;
 }

@@ -1001,7 +1001,7 @@ void IRCSession::OnMessage(libircclient::Parser *px)
         this->systemWindow->InsertText("No target for " + target + ": " + px->GetRaw());
         return;
     }
-    sx->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Message, px->GetSourceUserInfo(), this->getTrueTime(px->GetTimestamp())));
+    sx->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Message, px->GetSourceUserInfo(), this->getTrueTime(px->GetTimestamp()), target_group));
 }
 
 void IRCSession::OnNotice(libircclient::Parser *px)
@@ -1042,7 +1042,7 @@ void IRCSession::OnNotice(libircclient::Parser *px)
         this->systemWindow->InsertText("No target for " + target + ": " + px->GetRaw());
         return;
     }
-    sx->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Notice, px->GetSourceUserInfo(), this->getTrueTime(px->GetTimestamp())));
+    sx->InsertText(ScrollbackItem(px->GetText(), ScrollbackItemType_Notice, px->GetSourceUserInfo(), this->getTrueTime(px->GetTimestamp()), target_group));
 }
 
 void IRCSession::OnWhoEnd(libircclient::Parser *px)
