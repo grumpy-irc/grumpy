@@ -23,7 +23,7 @@ namespace GrumpyIRC
             Q_OBJECT
         public:
             GrumpyUIJS(ScriptExtension *s);
-            QHash<QString, QString> GetFunctions();
+            QHash<QString, QString> GetFunctions() override;
             Q_INVOKABLE bool load_history(unsigned int scrollback_id, QString text);
             Q_INVOKABLE bool clear_history(unsigned int scrollback_id);
             Q_INVOKABLE bool message_box(QString id, QString title, QString text);

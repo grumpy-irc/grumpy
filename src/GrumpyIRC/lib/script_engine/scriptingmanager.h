@@ -28,12 +28,12 @@ namespace GrumpyIRC
 {
     class GrumpydSession;
 
-    class ScriptingManager : public QDialog
+    class LIBGRUMPYSHARED_EXPORT ScriptingManager : public QDialog
     {
             Q_OBJECT
         public:
             explicit ScriptingManager(QWidget *parent = nullptr, GrumpydSession *remote = nullptr);
-            ~ScriptingManager();
+            ~ScriptingManager() override;
             void Reload();
             void LoadFile(QString path);
 

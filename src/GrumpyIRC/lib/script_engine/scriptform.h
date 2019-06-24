@@ -27,13 +27,13 @@ namespace GrumpyIRC
     class JSHighlighter;
     class GrumpydSession;
 
-    class ScriptForm : public QDialog
+    class LIBGRUMPYSHARED_EXPORT ScriptForm : public QDialog
     {
             Q_OBJECT
 
         public:
             explicit ScriptForm(QWidget *parent = nullptr, GrumpydSession *gsession = nullptr);
-            ~ScriptForm();
+            ~ScriptForm() override;
             void EditScript(QString path, QString script_name);
 
         private slots:

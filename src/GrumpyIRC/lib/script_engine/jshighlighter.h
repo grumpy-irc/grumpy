@@ -23,7 +23,7 @@ namespace GrumpyIRC
     {
             Q_OBJECT
         public:
-            JSHighlighter(QTextDocument *parent = 0);
+            JSHighlighter(QTextDocument *parent = nullptr);
         protected:
             void highlightBlock(const QString &text) override;
         private:
