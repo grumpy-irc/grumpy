@@ -12,6 +12,7 @@
 #define PROFILER_HPP
 
 #ifdef GRUMPY_PROFILER
+#include "libcore_global.h"
 #include <QDateTime>
 #include <QString>
 #include <QHash>
@@ -23,7 +24,7 @@
 
 namespace GrumpyIRC
 {
-    class Profiler
+    class LIBCORESHARED_EXPORT Profiler
     {
         public:
             static void Reset();

@@ -13,6 +13,7 @@
 #ifndef NETWORKSESSION_H
 #define NETWORKSESSION_H
 
+#include "libcore_global.h"
 #include <QString>
 #include <QDateTime>
 #include "../libirc/libircclient/priority.h"
@@ -35,7 +36,7 @@ namespace GrumpyIRC
 
     class Scrollback;
 
-    class NetworkSession : public QObject
+    class LIBCORESHARED_EXPORT NetworkSession : public QObject
     {
             Q_OBJECT
         public:

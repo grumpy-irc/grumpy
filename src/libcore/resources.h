@@ -11,13 +11,14 @@
 // Copyright (c) Petr Bena 2018
 
 #include "definitions.h"
+#include "libcore_global.h"
 
 #ifndef RESOURCES_H
 #define RESOURCES_H
 
 namespace GrumpyIRC
 {
-    class Resources
+    class LIBCORESHARED_EXPORT Resources
     {
         public:
             static QString GetSource(QString path);

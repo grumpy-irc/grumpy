@@ -13,18 +13,19 @@
 #ifndef QUERY_H
 #define QUERY_H
 
+#include "libcore_global.h"
 #include <QString>
 #include "../libirc/libirc/serializableitem.h"
 
 namespace GrumpyIRC
 {
     class ScrollbackItem;
-    class Query : public libirc::SerializableItem
+    class LIBCORESHARED_EXPORT Query : public libirc::SerializableItem
     {
         public:
             Query();
             bool Matches(ScrollbackItem *message);
-            virtual ~Query();
+             ~Query() override;
             QString Pattern;
             bool CS;
             bool IsRegex;
