@@ -1,0 +1,9 @@
+[Unit]
+Description=GrumpyChat Daemon - distributed IRC
+
+[Service]
+User=grumpyd
+ExecStart=/usr/local/bin/grumpyd -vd -c /etc/grumpy/grumpy.ini
+
+[Install]
+WantedBy=default.target
