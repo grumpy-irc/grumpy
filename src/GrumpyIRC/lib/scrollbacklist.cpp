@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2019
+// Copyright (c) Petr Bena 2015 - 2020
 
 #include "mainwindow.h"
 #include "scrollbacklist.h"
@@ -197,6 +197,7 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
     QAction *menuSound = nullptr;
     QAction *menuNotify = nullptr;
     QAction *menuDeaf = nullptr;
+    QAction *menuReconnectAll = nullptr;
 
     if (wx)
     {
@@ -257,6 +258,8 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
             {
                 menuReconnect = new QAction(QObject::tr("Reconnect"), &Menu);
                 Menu.addAction(menuReconnect);
+                menuReconnectAll = new QAction(QObject::tr("Reconnect all dead networks"), &Menu);
+                Menu.addAction(menuReconnectAll);
             }
             menuDisconnect = new QAction(QObject::tr("Disconnect"), &Menu);
             Menu.addAction(menuDisconnect);
@@ -353,6 +356,15 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
             if (channel->IsDead())
                 wx->TransferRaw("JOIN " + channel->GetTarget(), libircclient::Priority_Low);
         }
+    } else if (selectedItem == menuReconnectAll)
+    {
+        // Walk through all windows that exist that are system and that are dead
+        foreach (Scrollback *sx, Scrollback::ScrollbackList)
+        {
+            if (sx->GetType() == ScrollbackType_System && sx->IsDead() && sx->GetSession() != nullptr)
+                sx->GetSession()->RequestReconnect(sx);
+        }
+
     } else if (selectedItem == menuAuto)
     {
         if (wx->GetSession())
