@@ -22,11 +22,9 @@ namespace GrumpyIRC
     {
         public:
             GDEventHandler()=default;
-#ifdef __linux__
             void OnDebug(const QString &text, unsigned int verbosity = 1) override;
             void OnError(const QString &text) override;
             void OnSystemLog(const QString &text) override;
-#endif
     };
 }
 

@@ -35,7 +35,7 @@ void GDEventHandler::OnDebug(const QString &text, unsigned int verbosity)
     {
         if (CONF->Stdout)
         {
-            std::cout << get_ts() << " DEBUG: " << text.toStdString() << std::endl;
+            std::cout << get_ts().toStdString() << " DEBUG: " << text.toStdString() << std::endl;
             return;
         }
         openlog ("grumpyd", LOG_PID | LOG_DAEMON, 0);
@@ -53,7 +53,7 @@ void GDEventHandler::OnError(const QString &text)
         closelog ();
     } else
     {
-        std::cerr << get_ts() << " ERROR: " << text.toStdString() << std::endl;
+        std::cerr << get_ts().toStdString() << " ERROR: " << text.toStdString() << std::endl;
         return;
     }
 }
@@ -62,12 +62,28 @@ void GDEventHandler::OnSystemLog(const QString &text)
 {
     if (CONF->Stdout)
     {
-        std::cout << get_ts() << " " << text.toStdString() << std::endl;
+        std::cout << get_ts().toStdString() << " " << text.toStdString() << std::endl;
     } else
     {
         openlog ("grumpyd", LOG_PID | LOG_DAEMON, 0);
         syslog (LOG_INFO, "%s", text.toStdString().c_str());
         closelog ();
     }
+}
+#else
+void GDEventHandler::OnDebug(const QString &text, unsigned int verbosity)
+{
+    if (GCFG->Verbosity >= verbosity)
+        std::cout << get_ts().toStdString() << " DEBUG: " << text.toStdString() << std::endl;
+}
+
+void GDEventHandler::OnError(const QString &text)
+{
+    std::cerr << get_ts().toStdString() << " ERROR: " << text.toStdString() << std::endl;
+}
+
+void GDEventHandler::OnSystemLog(const QString &text)
+{
+    std::cout << get_ts().toStdString() << " " << text.toStdString() << std::endl;
 }
 #endif
