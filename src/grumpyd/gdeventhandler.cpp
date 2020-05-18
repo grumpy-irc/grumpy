@@ -12,6 +12,7 @@
 
 #include "gdeventhandler.h"
 #include <iostream>
+#include <QDateTime>
 #include "grumpyconf.h"
 #include "corewrapper.h"
 #include "../libcore/core.h"
@@ -22,6 +23,11 @@
 
 using namespace GrumpyIRC;
 
+QString get_ts()
+{
+    return "[" + QDateTime::currentDateTime().toString("hh:mm:ss") + "]";
+}
+
 #ifdef __linux__
 void GDEventHandler::OnDebug(const QString &text, unsigned int verbosity)
 {
@@ -29,7 +35,7 @@ void GDEventHandler::OnDebug(const QString &text, unsigned int verbosity)
     {
         if (CONF->Stdout)
         {
-            std::cout << "DEBUG: " << text.toStdString() << std::endl;
+            std::cout << get_ts() << " DEBUG: " << text.toStdString() << std::endl;
             return;
         }
         openlog ("grumpyd", LOG_PID | LOG_DAEMON, 0);
@@ -47,7 +53,7 @@ void GDEventHandler::OnError(const QString &text)
         closelog ();
     } else
     {
-        std::cerr << "ERROR: " << text.toStdString() << std::endl;
+        std::cerr << get_ts() << " ERROR: " << text.toStdString() << std::endl;
         return;
     }
 }
@@ -56,7 +62,7 @@ void GDEventHandler::OnSystemLog(const QString &text)
 {
     if (CONF->Stdout)
     {
-        std::cout << text.toStdString() << std::endl;
+        std::cout << get_ts() << " " << text.toStdString() << std::endl;
     } else
     {
         openlog ("grumpyd", LOG_PID | LOG_DAEMON, 0);
