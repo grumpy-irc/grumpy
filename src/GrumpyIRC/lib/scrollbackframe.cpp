@@ -120,7 +120,11 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     //this->textEdit->setGraphicsEffect(this->opacityEffect);
     //this->textEdit->setAutoFillBackground(true);
     this->maxItems = 200;
-    this->userFrame = new UserFrame(this);
+    // System scrollback has no user list
+    if (is_system)
+        this->userFrame = nullptr;
+    else
+        this->userFrame = new UserFrame(this);
     this->Muted = false;
     this->precachedNetwork = nullptr;
     this->isVisible = false;
@@ -217,7 +221,6 @@ static QString ItemToString(const ScrollbackItem &item, bool highlighted)
         case ScrollbackItemType_Kick:
             system = true;
             format_string.replace("$string", CONF->GetActionFormat());
-
             break;
         case ScrollbackItemType_Mode:
             system = true;
@@ -329,11 +332,15 @@ void ScrollbackFrame::_insertText_(ScrollbackItem &item)
 
 void ScrollbackFrame::UserList_Insert(libircclient::User *ux, bool bulk)
 {
+    if (this->userFrame == nullptr)
+        throw new NullPointerException("this->userFrame", BOOST_CURRENT_FUNCTION);
     this->userFrame->InsertUser(ux, bulk);
 }
 
 void ScrollbackFrame::UserList_Refresh(libircclient::User *ux)
 {
+    if (this->userFrame == nullptr)
+        throw new NullPointerException("this->userFrame", BOOST_CURRENT_FUNCTION);
     this->userFrame->RefreshUser(ux);
 }
 
@@ -346,11 +353,15 @@ void ScrollbackFrame::OnState()
 
 void ScrollbackFrame::UserList_Remove(const QString &user, bool bulk)
 {
+    if (this->userFrame == nullptr)
+        throw new NullPointerException("this->userFrame", BOOST_CURRENT_FUNCTION);
     this->userFrame->RemoveUser(user);
 }
 
 void ScrollbackFrame::UserList_Alter(const QString &old, libircclient::User *us)
 {
+    if (this->userFrame == nullptr)
+        throw new NullPointerException("this->userFrame", BOOST_CURRENT_FUNCTION);
     this->userFrame->RemoveUser(old);
     this->userFrame->InsertUser(us, false);
 }
@@ -364,6 +375,8 @@ void ScrollbackFrame::OnDead()
 
 void ScrollbackFrame::OnFinishSortBulk()
 {
+    if (this->userFrame == nullptr)
+        throw new NullPointerException("this->userFrame", BOOST_CURRENT_FUNCTION);
     this->userFrame->NeedsUpdate = true;
     this->userFrame->Sort();
 }
@@ -662,6 +675,11 @@ bool ScrollbackFrame::IsDead()
     return this->scrollback->IsDead();
 }
 
+void ScrollbackFrame::HideInput()
+{
+    this->inputBox->setVisible(false);
+}
+
 STextBox *ScrollbackFrame::GetSTextBox()
 {
     return this->textEdit;
@@ -876,6 +894,8 @@ scrollback_id_t ScrollbackFrame::GetItems()
 
 QList<QString> ScrollbackFrame::GetUsers()
 {
+    if (this->userFrame == nullptr)
+        return QList<QString>();
     return this->userFrame->GetUsers();
 }
 
@@ -917,12 +937,15 @@ int ScrollbackFrame::GetSynced()
 
 bool ScrollbackFrame::IsVisible()
 {
+    if (this->IsStandalone)
+        return true;
+
     return this->isVisible;
 }
 
 void ScrollbackFrame::SetVisible(bool is_visible)
 {
-    if (this->userFrame)
+    if (this->userFrame != nullptr)
     {
         this->userFrame->IsVisible = is_visible;
         if (is_visible && this->userFrame->NeedsUpdate)

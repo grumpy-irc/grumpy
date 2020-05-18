@@ -1206,6 +1206,11 @@ void GrumpydSession::processRemove(const QHash<QString, QVariant> &parameters)
     session->RequestRemove(scrollback);
 }
 
+void GrumpydSession::processSearch(const QHash<QString, QVariant> &parameters)
+{
+
+}
+
 void GrumpydSession::processUserList(const QHash<QString, QVariant> &parameters)
 {
     GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);

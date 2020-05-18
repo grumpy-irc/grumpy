@@ -30,6 +30,10 @@ namespace GrumpyIRC
             void RemoveNetwork(IRCSession *session) override;
             void RemoveScrollback(User *owner, Scrollback *sx) override;
             QList<QVariant> FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size) override;
+            QList<QVariant> Search(QString text, int context, bool case_sensitive = true) override;
+            QList<QVariant> SearchRegular(QString regex, int context, bool case_sensitive = true) override;
+            QList<QVariant> SearchOne(VirtualScrollback *scrollback, QString text, int context, bool case_sensitive = true) override;
+            QList<QVariant> SearchOneRegular(VirtualScrollback *scrollback, QString regex, int context, bool case_sensitive = true) override;
             void UpdateRoles() override;
             void StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem *item) override;
             void LoadSessions() override;

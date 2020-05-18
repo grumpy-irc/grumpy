@@ -94,6 +94,8 @@ namespace GrumpyIRC
             void ToggleHide();
             bool IsVisible();
             bool IsDead();
+            bool HasUserFrame() { return this->userFrame != nullptr; }
+            void HideInput();
             STextBox *GetSTextBox();
             ScrollbackFrame *GetParent();
             scrollback_id_t GetID();
@@ -138,6 +140,8 @@ namespace GrumpyIRC
             bool Refreshing = false;
             QDateTime LastMenuTooltipUpdate;
             bool IsSystem;
+            //! Change to true if this scrollback is in standalone window, not managed by tree view
+            bool IsStandalone = false;
         protected:
             static ScrollbackFrame_WorkerThread *WorkerThread;
         private slots:

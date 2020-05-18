@@ -26,6 +26,8 @@ typedef unsigned int scrollback_id_t;
 #define GRUMPY_SCRIPT_CONTEXT_GRUMPY_CHAT     1
 #define GRUMPY_SCRIPT_CONTEXT_GRUMPY_DAEMON   2
 
+#define GRUMPY_SCROLLBACK_MAX_ITEMS 800000
+
 #define GRUMPY_EXTENSION_PATH    QCoreApplication::applicationDirPath() + QDir::separator() + "extensions" + QDir::separator()
 #define GRUMPY_SCRIPT_PATH       QCoreApplication::applicationDirPath() + QDir::separator() + "scripts" + QDir::separator()
 

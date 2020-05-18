@@ -63,6 +63,30 @@ QList<QVariant> DatabaseDummy::FetchBacklog(VirtualScrollback *scrollback, scrol
     return scrollback->OriginFetchBacklog(from, size);
 }
 
+QList<QVariant> DatabaseDummy::Search(QString text, int context, bool case_sensitive)
+{
+    QList<QVariant> results;
+    return results;
+}
+
+QList<QVariant> DatabaseDummy::SearchRegular(QString regex, int context, bool case_sensitive)
+{
+    QList<QVariant> results;
+    return results;
+}
+
+QList<QVariant> DatabaseDummy::SearchOne(VirtualScrollback *scrollback, QString text, int context, bool case_sensitive)
+{
+    QList<QVariant> results;
+    return results;
+}
+
+QList<QVariant> DatabaseDummy::SearchOneRegular(VirtualScrollback *scrollback, QString regex, int context, bool case_sensitive)
+{
+    QList<QVariant> results;
+    return results;
+}
+
 void DatabaseDummy::UpdateRoles()
 {
 

@@ -40,6 +40,10 @@ namespace GrumpyIRC
             virtual void StoreUser(User *item)=0;
             virtual void StoreNetwork(IRCSession *session)=0;
             virtual QList<QVariant> FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size)=0;
+            virtual QList<QVariant> Search(QString text, int context, bool case_sensitive = true)=0;
+            virtual QList<QVariant> SearchRegular(QString regex, int context, bool case_sensitive = true)=0;
+            virtual QList<QVariant> SearchOne(VirtualScrollback *scrollback, QString text, int context, bool case_sensitive = true)=0;
+            virtual QList<QVariant> SearchOneRegular(VirtualScrollback *scrollback, QString regex, int context, bool case_sensitive = true)=0;
             virtual void UpdateUser(User *user)=0;
             virtual void RemoveNetwork(IRCSession *session)=0;
             virtual void RemoveUser(User *user)=0;

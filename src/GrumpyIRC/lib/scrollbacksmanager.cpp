@@ -136,7 +136,8 @@ void ScrollbacksManager::SwitchWindow(ScrollbackFrame *window)
 
     // Switch the user widget
     UserWidget *usrw = MainWindow::Main->GetUsers();
-    usrw->SetFrame(window->GetUserFrame());
+    if (window->HasUserFrame())
+        usrw->SetFrame(window->GetUserFrame());
     if (window->GetScrollback()->GetType() == ScrollbackType_Channel)
     {
         usrw->show();

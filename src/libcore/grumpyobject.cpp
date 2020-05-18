@@ -35,6 +35,8 @@ GrumpyObject::GrumpyObject(QString name)
         return;
     this->grumpyObjectName = name;
     this->grumpyObjectIncrementCount();
+#else
+    Q_UNUSED(name);
 #endif
 }
 
@@ -63,5 +65,7 @@ void GrumpyObject::setGrumpyObjectName(QString name)
 {
 #ifdef GRUMPY_PROFILER
     this->grumpyObjectName = name;
+#else
+    Q_UNUSED(name);
 #endif
 }

@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2019
+// Copyright (c) Petr Bena 2015 - 2020
 
 #ifdef GRUMPY_SQLITE
 
@@ -268,7 +268,7 @@ void DatabaseLite::Maintenance()
                     return;
                 }
 
-                if (scrollback_last_item->Count() < min_rows)
+                if (scrollback_last_item->Count() < static_cast<unsigned int>(min_rows))
                 {
                     GRUMPY_ERROR("Unable to fetch last item id of scrollback " + QString::number(scrollback->GetOriginalID()) + " <" + scrollback->GetTarget() + ">: too few rows");
                     return;
@@ -719,6 +719,30 @@ void DatabaseLite::UpdateNetwork(IRCSession *session)
     std::shared_ptr<SqlResult> qx = this->database->ExecuteQuery_Bind(sql, hash);
     if (qx->InError)
         throw new Exception("SQL: " + this->LastError, BOOST_CURRENT_FUNCTION);
+}
+
+QList<QVariant> DatabaseLite::Search(QString text, int context, bool case_sensitive)
+{
+    QList<QVariant> results;
+    return results;
+}
+
+QList<QVariant> DatabaseLite::SearchRegular(QString regex, int context, bool case_sensitive)
+{
+    QList<QVariant> results;
+    return results;
+}
+
+QList<QVariant> DatabaseLite::SearchOne(VirtualScrollback *scrollback, QString text, int context, bool case_sensitive)
+{
+    QList<QVariant> results;
+    return results;
+}
+
+QList<QVariant> DatabaseLite::SearchOneRegular(VirtualScrollback *scrollback, QString regex, int context, bool case_sensitive)
+{
+    QList<QVariant> results;
+    return results;
 }
 
 void DatabaseLite::RemoveScrollback(User *owner, Scrollback *sx)

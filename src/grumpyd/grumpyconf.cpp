@@ -65,6 +65,16 @@ unsigned int GrumpyConf::GetMaxSnifferSize()
     return GCFG->GetValueAsUInt("max_sniffer_size", 200);
 }
 
+unsigned int GrumpyConf::GetMaxSearchSize()
+{
+    return GCFG->GetValueAsUInt("max_search_size", 1000);
+}
+
+void GrumpyConf::SetMaxSearchSize(unsigned int size)
+{
+    GCFG->SetValue("max_search_size", size);
+}
+
 QString GrumpyConf::GetStorage()
 {
     if (this->StorageDummy)

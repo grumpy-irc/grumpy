@@ -142,6 +142,30 @@ QList<QVariant> DatabaseBin::FetchBacklog(VirtualScrollback *scrollback, scrollb
     return results;
 }
 
+QList<QVariant> DatabaseBin::Search(QString text, int context, bool case_sensitive)
+{
+    QList<QVariant> results;
+    return results;
+}
+
+QList<QVariant> DatabaseBin::SearchRegular(QString regex, int context, bool case_sensitive)
+{
+    QList<QVariant> results;
+    return results;
+}
+
+QList<QVariant> DatabaseBin::SearchOne(VirtualScrollback *scrollback, QString text, int context, bool case_sensitive)
+{
+    QList<QVariant> results;
+    return results;
+}
+
+QList<QVariant> DatabaseBin::SearchOneRegular(VirtualScrollback *scrollback, QString regex, int context, bool case_sensitive)
+{
+    QList<QVariant> results;
+    return results;
+}
+
 void DatabaseBin::UpdateRoles()
 {
 

@@ -45,6 +45,7 @@ namespace GrumpyIRC
             virtual void SetValue(const QString &key, const QVariant &value);
             virtual void SetValue(QString key, bool value);
             virtual void SetValue(QString key, int value);
+            virtual void SetValue(QString key, unsigned int value);
             virtual void SetValue(QString key, QString value);
             virtual void SetHomePath(const QString &path);
 
@@ -90,6 +91,7 @@ namespace GrumpyIRC
     };
 
     inline void Configuration::SetValue(QString key, bool value) { this->SetValue(key, QVariant(value)); }
+    inline void Configuration::SetValue(QString key, unsigned int value) { this->SetValue(key, QVariant(value)); }
     inline void Configuration::SetValue(QString key, int value) { this->SetValue(key, QVariant(value)); }
     inline void Configuration::SetValue(QString key, QString value) { this->SetValue(key, QVariant(value)); }
 }

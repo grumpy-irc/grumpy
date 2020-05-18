@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2019
+// Copyright (c) Petr Bena 2015 - 2020
 
 #ifndef SYSTEMCMDS
 #define SYSTEMCMDS
@@ -48,6 +48,7 @@ namespace GrumpyIRC
         int Script(SystemCommand *command, CommandArgs command_args);
         int ScriptReload(SystemCommand *command, CommandArgs command_args);
         int ScriptReloadAll(SystemCommand *command, CommandArgs command_args);
+        int RegSearch(SystemCommand *command, CommandArgs command_args);
         int RemoveScript(SystemCommand *command, CommandArgs command_args);
         int ScriptList(SystemCommand *command, CommandArgs command_args);
         int Profiler(SystemCommand *command, CommandArgs command_args);

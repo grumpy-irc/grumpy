@@ -8,11 +8,12 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2019
+// Copyright (c) Petr Bena 2015 - 2020
 
 #include "systemcmds.h"
 #include "mainwindow.h"
 #include "grumpyconf.h"
+#include "scrollbackwindow.h"
 #include "scrollbacksmanager.h"
 #include "scrollbackframe.h"
 #include "corewrapper.h"
@@ -767,5 +768,21 @@ int SystemCmds::Close(SystemCommand *command, CommandArgs command_args)
     (void)command;
     ScrollbackFrame *sx = MainWindow::Main->GetCurrentScrollbackFrame();
     sx->RequestClose();
+    return 0;
+}
+
+int SystemCmds::RegSearch(SystemCommand *command, CommandArgs command_args)
+{
+    (void)command;
+    if (command_args.ParameterLine.isEmpty())
+    {
+        GRUMPY_ERROR("You need to provide regular expression to search for");
+        return 1;
+    }
+    ScrollbackFrame *sx = MainWindow::Main->GetCurrentScrollbackFrame();
+    ScrollbackWindow *results = new ScrollbackWindow("Search results for " + sx->GetWindowName());
+    results->GetScrollbackFrame()->HideInput();
+    results->show();
+    results->GetScrollback()->InsertText("Looking for: /" + command_args.ParameterLine + "/");
     return 0;
 }

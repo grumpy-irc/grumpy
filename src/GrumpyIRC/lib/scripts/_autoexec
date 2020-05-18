@@ -20,6 +20,7 @@
 /grumpy.alias kick grumpy.kick
 /grumpy.alias ban grumpy.ban
 /grumpy.alias kb grumpy.kickban
+/grumpy.alias grep grumpy.regsearch
 
 # These lines can be safely removed
 /echo Welcome to GrumpyChat v. $grumpy.version

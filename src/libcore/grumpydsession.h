@@ -107,6 +107,7 @@
 #define GP_CMD_SYS_RELOAD_SCRIPT           52
 #define GP_CMD_SYS_RELOAD_ALL_SCRIPTS      53
 #define GP_CMD_SYS_READ_SCRIPT_SOURCE_CODE 54
+#define GP_CMD_SEARCH                      60
 
 // PACKET VERIFICATION
 // This system is used to verify if packet was delivered or not
@@ -247,6 +248,7 @@ namespace GrumpyIRC
             void processAck(const QHash<QString, QVariant> &parameters);
             void processPSResync(const QHash<QString, QVariant> &parameters);
             void processRemove(const QHash<QString, QVariant> &parameters);
+            void processSearch(const QHash<QString, QVariant> &parameters);
             void processUserList(const QHash<QString, QVariant> &parameters);
             void processSniffer(const QHash<QString, QVariant> &parameters);
             void processHello(const QHash<QString, QVariant> &parameters);
