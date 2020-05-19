@@ -24,6 +24,7 @@
 #include <libgp/gp.h>
 #include <libcore/core.h>
 #include <libcore/configuration.h>
+#include <libcore/grep.h>
 #include <libcore/eventhandler.h>
 #include <libcore/exception.h>
 #include <libcore/generic.h>
@@ -784,5 +785,17 @@ int SystemCmds::RegSearch(SystemCommand *command, CommandArgs command_args)
     results->GetScrollbackFrame()->HideInput();
     results->show();
     results->GetScrollback()->InsertText("Looking for: /" + command_args.ParameterLine + "/");
+    GREP grep(command_args.ParameterLine);
+    if (!grep.IsValid())
+    {
+        results->GetScrollback()->InsertText("Invalid regex");
+        return 2;
+    }
+    QList<ScrollbackItem> text = grep.Exec(sx->GetScrollback()->GetItems());
+    foreach (ScrollbackItem item, text)
+    {
+        results->GetScrollback()->InsertText(item);
+    }
+    results->GetScrollback()->InsertText("Found " + QString::number(text.size()) + " items including context lines");
     return 0;
 }

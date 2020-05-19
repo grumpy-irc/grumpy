@@ -24,6 +24,7 @@ namespace GrumpyIRC
         public:
             GREP(QString regex, bool case_sensitive = true);
             ~GREP();
+            bool IsValid();
             QList<ScrollbackItem> Exec(QList<ScrollbackItem> buff);
             int Context = 3;
 
