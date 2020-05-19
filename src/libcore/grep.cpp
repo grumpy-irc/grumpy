@@ -18,10 +18,10 @@ using namespace GrumpyIRC;
 GREP::GREP(QString regex, bool case_sensitive)
 {
     this->regex = regex;
-    if (!this->regex.startsWith("^") && !this->regex.startsWith(".*"))
+    /*if (!this->regex.startsWith("^") && !this->regex.startsWith(".*"))
         this->regex = ".*" + this->regex;
     if (!this->regex.endsWith(".*") && !this->regex.endsWith("$"))
-        this->regex += ".*";
+        this->regex += ".*";*/
     this->caseSensitive = case_sensitive;
 }
 
@@ -46,8 +46,20 @@ QList<ScrollbackItem> GREP::Exec(QList<ScrollbackItem> buff)
     int remaining_buffer = 0;
     foreach (ScrollbackItem item, buff)
     {
-        if (regexp.exactMatch(item.GetText()))
+        // dummy call to fill in all the stuff
+        QString original_text = item.GetText();
+        if (regexp.indexIn(original_text) != -1)
         {
+            if (this->Highlight)
+            {
+                QStringList strings = regexp.capturedTexts();
+
+                // Highlight each matched part
+                foreach (QString matched_text, strings)
+                    original_text.replace(matched_text, QString((char)2) + QString((char)3) + "4" + matched_text + QString((char)3) + QString((char)2));
+
+                item.SetText(original_text);
+            }
             // we got results, append the context buffer here
             results.append(context_buffer);
             context_buffer.clear();
