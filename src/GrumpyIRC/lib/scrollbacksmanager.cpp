@@ -134,10 +134,12 @@ void ScrollbacksManager::SwitchWindow(ScrollbackFrame *window)
         this->ui->verticalLayout_2->addWidget(window);
     }
 
-    // Switch the user widget
+    // Switch the user widget, if the window we are switching to has no user frame, we just delete it
     UserWidget *usrw = MainWindow::Main->GetUsers();
     if (window->HasUserFrame())
         usrw->SetFrame(window->GetUserFrame());
+    else
+        usrw->SetFrame(nullptr);
     if (window->GetScrollback()->GetType() == ScrollbackType_Channel)
     {
         usrw->show();

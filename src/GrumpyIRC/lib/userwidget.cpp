@@ -29,6 +29,16 @@ UserWidget::~UserWidget()
 
 void UserWidget::SetFrame(QFrame *frame)
 {
+    if (frame == nullptr && currentWidget != nullptr)
+    {
+        QLayoutItem *container = this->ui->verticalLayout_2->itemAt(0);
+        this->ui->verticalLayout_2->removeItem(this->ui->verticalLayout_2->itemAt(0));
+        this->ui->verticalLayout_2->removeWidget(currentWidget);
+        currentWidget->hide();
+        delete container;
+        currentWidget = nullptr;
+        return;
+    }
     if (currentWidget != nullptr)
     {
         QLayoutItem *container = this->ui->verticalLayout_2->itemAt(0);
