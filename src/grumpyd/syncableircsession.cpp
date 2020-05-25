@@ -567,6 +567,7 @@ void SyncableIRCSession::OnMessage(libircclient::Parser *px)
 
     // In case we have this feature available and current user is offline, we send AFK message
     QString target = px->GetParameters()[0];
+    QString source = px->GetSourceUserInfo()->GetNick();
 
     // Check if this isn't a channel message, we don't respond to these
     if (target.toLower() == this->network->GetLocalUserInfo()->GetNick().toLower())
@@ -574,23 +575,25 @@ void SyncableIRCSession::OnMessage(libircclient::Parser *px)
         if (this->owner->GetConfiguration()->GetValueAsBool("offline_ms_bool"))
         {
             // Check if we didn't send this message recently
-            if (this->targetAFKCache.contains(target))
+            if (this->targetAFKCache.contains(source))
             {
-                if (this->targetAFKCache[target].secsTo(QDateTime::currentDateTime()) < 120)
+                if (this->targetAFKCache[source].secsTo(QDateTime::currentDateTime()) < 120)
                     return;
-                this->targetAFKCache[target] = QDateTime::currentDateTime();
+                this->targetAFKCache[source] = QDateTime::currentDateTime();
             } else
             {
-                this->targetAFKCache.insert(target, QDateTime::currentDateTime());
+                this->targetAFKCache.insert(source, QDateTime::currentDateTime());
             }
-            Scrollback *scrollback = this->GetScrollbackForUser(px->GetSourceUserInfo()->GetNick());
+            Scrollback *scrollback = this->GetScrollbackForUser(source);
             if (!scrollback)
             {
-                GRUMPY_DEBUG("Not sending AFK message to nonexistent scrollback: " + px->GetSourceUserInfo()->GetNick(), 2);
+                GRUMPY_DEBUG("Not sending AFK message to nonexistent scrollback: " + source, 2);
                 return;
             }
             // Message
-            this->SendMessage(scrollback, this->owner->GetConfiguration()->GetValueAsString("offline_ms_text"));
+            QString message = this->owner->GetConfiguration()->GetValueAsString("offline_ms_text");
+            message.replace("$target_nick", source);
+            this->SendMessage(scrollback, message);
         }
     }
 }
