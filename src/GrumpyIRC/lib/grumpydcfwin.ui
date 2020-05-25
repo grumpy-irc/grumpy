@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>907</width>
-    <height>523</height>
+    <height>570</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -40,7 +40,7 @@
          <item row="1" column="1">
           <widget class="QLineEdit" name="lineEdit">
            <property name="text">
-            <string>Hello, I am not here, the message was logged and I will read it when I get online!</string>
+            <string>Hello $target_nick! Thank you for your message. I am not here right now, so the message was logged and I will read it when I get online!</string>
            </property>
           </widget>
          </item>
