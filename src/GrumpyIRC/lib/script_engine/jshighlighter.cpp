@@ -43,12 +43,12 @@ JSHighlighter::JSHighlighter(QTextDocument *parent) : QSyntaxHighlighter(parent)
     rule.format = this->classFormat;
     this->highlightingRules.append(rule);
 
-    this->singleLineCommentFormat.setForeground(Qt::green);
+    this->singleLineCommentFormat.setForeground(Qt::darkBlue);
     rule.pattern = QRegularExpression("//[^\n]*");
     rule.format = this->singleLineCommentFormat;
     this->highlightingRules.append(rule);
 
-    this->multiLineCommentFormat.setForeground(Qt::green);
+    this->multiLineCommentFormat.setForeground(Qt::darkBlue);
 
     this->quotationFormat.setForeground(Qt::darkGreen);
     rule.pattern = QRegularExpression("\".*\"");
