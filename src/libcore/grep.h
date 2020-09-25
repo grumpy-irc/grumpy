@@ -27,6 +27,7 @@ namespace GrumpyIRC
             bool IsValid();
             QList<ScrollbackItem> Exec(QList<ScrollbackItem> buff);
             int Context = 3;
+            bool MatchNick = true;
             bool Highlight = true;
 
         private:

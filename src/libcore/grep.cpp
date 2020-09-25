@@ -65,6 +65,13 @@ QList<ScrollbackItem> GREP::Exec(QList<ScrollbackItem> buff)
             context_buffer.clear();
             results.append(item);
             remaining_buffer = this->Context;
+        } else if (this->MatchNick && regexp.indexIn(item.GetUser().GetNick()))
+        {
+            // Nickname matches the regex
+            results.append(context_buffer);
+            context_buffer.clear();
+            results.append(item);
+            remaining_buffer = this->Context;
         } else
         {
             if (remaining_buffer > 0)
