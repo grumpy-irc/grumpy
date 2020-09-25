@@ -11,15 +11,18 @@
 // Copyright (c) Petr Bena 2015 - 2018
 
 #include "databasedummy.h"
+#include "grumpyconf.h"
 #include "virtualscrollback.h"
 #include "security.h"
 #include "user.h"
+#include "../libcore/core.h"
+#include "../libcore/eventhandler.h"
 
 using namespace GrumpyIRC;
 
 DatabaseDummy::DatabaseDummy()
 {
-
+    CONF->Init = true;
 }
 
 void DatabaseDummy::LoadRoles()
@@ -31,7 +34,7 @@ void DatabaseDummy::LoadUsers()
 {
     Q_ASSERT(User::UserInfo.size() == 0);
     User::UserInfo.clear();
-    User *test = new User("user", "pw", 0);
+    User *test = new User("user", User::EncryptPw("pw"), 0);
     test->SetRole(Role::Roles["root"]);
     User::UserInfo.append(test);
 }
