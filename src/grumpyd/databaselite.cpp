@@ -55,7 +55,7 @@ static QList<scrollback_id_t> StringToList(const QString& list)
 
 QString DatabaseLite::GetSource(const QString& name)
 {
-    QFile file(":/sql/" + name);
+    QFile file(":/sql/sqlite/" + name);
     if (!file.open(QIODevice::ReadOnly))
         throw new Exception("Unable to open internal resource: " + name, BOOST_CURRENT_FUNCTION);
 
