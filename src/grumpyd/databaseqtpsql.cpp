@@ -54,7 +54,7 @@ void DatabaseQtPsql::updateDB(unsigned int patch)
 void DatabaseQtPsql::init()
 {
     GRUMPY_DEBUG("PSQL: checking if meta table exists", 1);
-    QSqlQuery result = this->db.exec("SELECT value from META where key = 'version';");
+    QSqlQuery result = this->db.exec("SELECT value FROM meta WHERE key = 'version';");
     if (!result.isActive())
     {
         GRUMPY_LOG("PSQL database contains no meta table, probably not installed? Creating database schemas now...");
@@ -66,6 +66,7 @@ void DatabaseQtPsql::init()
     } else
     {
         // Check database version
+        result.first();
         QString version_info = result.value(0).toString();
 
         unsigned int version = version_info.toUInt();
@@ -84,6 +85,7 @@ void DatabaseQtPsql::init()
     result = this->db.exec("SELECT COUNT(1) FROM users;");
     if (!result.isActive())
         this->fail("DB corrupted: Unable to select count of users");
+    result.first();
     if (result.value(0).toInt() == 0)
     {
         GRUMPY_LOG("PSQL: table users contains no user accounts, setting grumpyd to init mode");
