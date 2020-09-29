@@ -206,7 +206,7 @@ bool DatabaseQtSQL::ExecuteFile(QString file_src, QString *error)
     QList<QString> statements = file_src.split(";");
     foreach (QString sx, statements)
     {
-        if (sx.isEmpty())
+        if (sx.replace("\n", "").replace(" ", "").isEmpty())
             continue;
         QSqlQuery q(this->db);
         if (!q.exec(sx))
