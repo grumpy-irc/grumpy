@@ -206,7 +206,9 @@ bool DatabaseQtSQL::ExecuteFile(QString file_src, QString *error)
     QList<QString> statements = file_src.split(";");
     foreach (QString sx, statements)
     {
-        if (sx.replace("\n", "").replace(" ", "").isEmpty())
+        // Qt perform replace on current string instance, instead of copy, so we need to explicitly copy it to test it
+        QString sx_copy = sx;
+        if (sx_copy.replace("\n", "").replace(" ", "").isEmpty())
             continue;
         QSqlQuery q(this->db);
         if (!q.exec(sx))
