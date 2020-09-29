@@ -356,12 +356,7 @@ void DatabaseQtSQL::Maintenance()
                 GRUMPY_LOG("Skipping cleanup of scrollback " + QString::number(scrollback->GetOriginalID()) + " <" + scrollback->GetTarget() + "> because it has only " + QString::number(count) + " items");
             }
         }
-        GRUMPY_LOG("Performing database optimization");
-        if (!this->ExecuteNonQuery("VACUUM ANALYZE;"))
-        {
-            GRUMPY_ERROR("Failed to vacuum: " + this->db.lastError().text());
-            return;
-        }
+        this->Maintenance_Specific();
     }
 }
 
@@ -381,12 +376,84 @@ void DatabaseQtSQL::StoreUser(User *item)
 
 void DatabaseQtSQL::StoreNetwork(IRCSession *session)
 {
+    QSqlQuery query(this->db);
+    SyncableIRCSession *sx = dynamic_cast<SyncableIRCSession*>(session);
 
+    query.prepare("INSERT INTO networks (user_id, network_id, hostname, port, ssl, nick, ident, password, system_id, scrollback_list, autoreconnect, autoidentify, autorejoin, name) "\
+                  "VALUES (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14);");
+
+    query.bindValue(":1", QVariant(sx->GetOwner()->GetID()));
+    query.bindValue(":2", QVariant(sx->GetSID()));
+    query.bindValue(":3", QVariant(sx->GetHostname()));
+    query.bindValue(":4", QVariant(sx->GetPort()));
+    query.bindValue(":5", QVariant(sx->UsingSSL()));
+    query.bindValue(":6", QVariant(sx->GetNick()));
+    query.bindValue(":7", QVariant(sx->GetIdent()));
+    query.bindValue(":8", QVariant(sx->GetPassword()));
+    query.bindValue(":9", QVariant(sx->GetSystemWindow()->GetOriginalID()));
+    query.bindValue(":10", QVariant(ListToString(sx->GetScrollbacks())));
+    query.bindValue(":11", false);
+    query.bindValue(":12", false);
+    query.bindValue(":13", false);
+    query.bindValue(":14", QVariant(sx->GetName()));
+
+    if (!query.exec())
+        throw new Exception("Unable to insert data to db: " + query.lastError().text(), BOOST_CURRENT_FUNCTION);
 }
 
 QList<QVariant> DatabaseQtSQL::FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size)
 {
-    return scrollback->OriginFetchBacklog(from, size);
+    QDateTime t = QDateTime::currentDateTime();
+    QList<QVariant> result;
+
+    if (from > scrollback->GetLastID())
+        return result;
+
+    if (size > from)
+    {
+        size = from;
+    }
+
+    scrollback_id_t first;
+    if (((long)from - (long)size) < 0)
+        first = 0;
+    else
+        first = from - size;
+
+    scrollback_id_t last_item = 0;
+
+    QSqlQuery text(this->db);
+    text.setForwardOnly(true);
+    text.prepare("SELECT id, item_id, user_id, scrollback_id, date, type, nick, ident, host, text, self "\
+                                                        "FROM scrollback_items "\
+                                                        "WHERE user_id = :user_id AND scrollback_id = :scrollback_id AND item_id < :item_id_max AND item_id >= :item_id_min "\
+                                                        "ORDER BY item_id ASC;");
+    text.bindValue(":user_id", scrollback->GetOwner()->GetID());
+    text.bindValue(":scrollback_id", (scrollback->GetOriginalID()));
+    text.bindValue(":item_id_max", from);
+    text.bindValue("item_id_min", first);
+
+    if (!text.exec())
+        throw new Exception("Unable to fetch: " + text.lastError().text(), BOOST_CURRENT_FUNCTION);
+
+    while (text.next())
+    {
+        last_item = text.value(1).toUInt();
+        QString item_text = text.value(9).toString();
+        ScrollbackItemType type = static_cast<ScrollbackItemType>(text.value(5).toInt());
+        QDateTime date = QDateTime::fromMSecsSinceEpoch(text.value(4).toLongLong());
+        bool self = Generic::Int2Bool(text.value(10).toInt());
+        libircclient::User user;
+        user.SetNick(text.value(6).toString());
+        user.SetIdent(text.value(7).toString());
+        user.SetHost(text.value(8).toString());
+        ScrollbackItem tm(item_text, type, user, date, last_item, self);
+        result.append(tm.ToHash());
+    }
+
+    GRUMPY_DEBUG("Execution of FetchBacklog took " + QString::number(t.secsTo(QDateTime::currentDateTime())) + " seconds.", 1);
+
+    return result;
 }
 
 QList<QVariant> DatabaseQtSQL::Search(QString text, int context, bool case_sensitive)
@@ -435,7 +502,13 @@ void DatabaseQtSQL::RemoveScrollback(unsigned int id)
 
 void DatabaseQtSQL::RemoveScrollback(User *owner, Scrollback *sx)
 {
-
+    this->ClearScrollback(owner, sx);
+    QSqlQuery q(this->db);
+    q.prepare("DELETE FROM scrollbacks WHERE original_id = :original_id AND user_id = :user_id;");
+    q.bindValue(":original_id", sx->GetOriginalID());
+    q.bindValue(":user_id", owner->GetID());
+    if (!q.exec())
+        throw new Exception("Unable to remove scrollback from db: " + q.lastError().text(), BOOST_CURRENT_FUNCTION);
 }
 
 void DatabaseQtSQL::LockUser(User *user)
@@ -465,12 +538,34 @@ void DatabaseQtSQL::StoreScrollback(User *owner, Scrollback *sx)
 
 void DatabaseQtSQL::UpdateNetwork(IRCSession *session)
 {
-
+    QSqlQuery sql(this->db);
+    sql.prepare("UPDATE networks SET scrollback_list = :1, nick = :2 WHERE network_id = :3 AND user_id = :4;");
+    sql.bindValue(":1", QVariant(ListToString(session->GetScrollbacks())));
+    sql.bindValue(":2", QVariant(session->GetNick()));
+    sql.bindValue(":3", QVariant(session->GetSID()));
+    sql.bindValue(":4", QVariant((((SyncableIRCSession*)session))->GetOwner()->GetID()));
+    if (!sql.exec())
+        throw new Exception("SQL: " + sql.lastError().text(), BOOST_CURRENT_FUNCTION);
 }
 
 void DatabaseQtSQL::StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem *item)
 {
+    QSqlQuery q(this->db);
+    q.prepare("INSERT INTO scrollback_items (user_id, scrollback_id, date, type, nick, ident, host, text, item_id, self) VALUES "\
+              "(:1, :2, :3, :4, :5, :6, :7, :8, :9, :10);");
+    q.bindValue(":1", QVariant(owner->GetID()));
+    q.bindValue(":2", QVariant(scrollback->GetOriginalID()));
+    q.bindValue(":3", QVariant(item->GetTime().toMSecsSinceEpoch()));
+    q.bindValue(":4", QVariant(static_cast<int>(item->GetType())));
+    q.bindValue(":5", QVariant(item->GetUser().GetNick()));
+    q.bindValue(":6", QVariant(item->GetUser().GetIdent()));
+    q.bindValue(":7", QVariant(item->GetUser().GetHost()));
+    q.bindValue(":8", QVariant(item->GetText()));
+    q.bindValue(":9", QVariant(item->GetID()));
+    q.bindValue(":10", QVariant(item->IsSelf()));
 
+    if (!q.exec())
+        throw new Exception("Unable to insert data to db: " + this->db.lastError().text(), BOOST_CURRENT_FUNCTION);
 }
 
 void DatabaseQtSQL::UpdateRoles()
@@ -491,22 +586,59 @@ void DatabaseQtSQL::SetConfiguration(user_id_t user, QHash<QString, QVariant> da
 
 QHash<QString, QByteArray> DatabaseQtSQL::GetStorage(user_id_t user)
 {
-    return QHash<QString, QByteArray>();
+    QHash<QString, QByteArray> result;
+    QSqlQuery q(this->db);
+    q.prepare("SELECT key, data FROM user_data WHERE user_id = :1;");
+    q.bindValue(":1", user);
+    if (!q.exec())
+        throw new Exception("Unable to fetch user data: " + q.lastError().text(), BOOST_CURRENT_FUNCTION);
+
+    while (q.next())
+    {
+        QString key = q.value(0).toString();
+        QByteArray value = q.value(1).toByteArray();
+        if (!result.contains(key))
+            result.insert(key, value);
+    }
+    return result;
 }
 
 void DatabaseQtSQL::InsertStorage(user_id_t user, QString key, QByteArray data)
 {
-
+    QSqlQuery query(this->db);
+    query.prepare("INSERT INTO user_data (user_id, key, data) VALUES (:1, :2, :3);");
+    query.bindValue(":1", user);
+    query.bindValue(":2", key);
+    query.bindValue(":3", data);
+    if (!query.exec())
+    {
+        throw new Exception("Unable to store user data: " + query.lastError().text(), BOOST_CURRENT_FUNCTION);
+    }
 }
 
 void DatabaseQtSQL::UpdateStorage(user_id_t user, QString key, QByteArray data)
 {
-
+    QSqlQuery query(this->db);
+    query.prepare("UPDATE user_data SET data = :3 WHERE user_id = :1 AND key = :2;");
+    query.bindValue(":1", user);
+    query.bindValue(":2", key);
+    query.bindValue(":3", data);
+    if (!query.exec())
+    {
+        throw new Exception("Unable to update user data: " + query.lastError().text(), BOOST_CURRENT_FUNCTION);
+    }
 }
 
 void DatabaseQtSQL::RemoveStorage(user_id_t user, QString key)
 {
-
+    QSqlQuery query(this->db);
+    query.prepare("DELETE FROM user_data WHERE user_id = :1 AND key = :2;");
+    query.bindValue(":1", user);
+    query.bindValue(":2", key);
+    if (!query.exec())
+    {
+        throw new Exception("Unable to remove user data: " + query.lastError().text(), BOOST_CURRENT_FUNCTION);
+    }
 }
 
 bool DatabaseQtSQL::ExecuteNonQuery(QString sql)
@@ -556,7 +688,7 @@ QString DatabaseQtSQL::GetLastErrorText()
 
 void DatabaseQtSQL::fail(QString reason)
 {
-    GRUMPY_ERROR("PSQL driver failed: " + reason);
+    GRUMPY_ERROR("SQL failed: " + reason);
     this->isFailed = true;
     this->failureReason = reason;
 }

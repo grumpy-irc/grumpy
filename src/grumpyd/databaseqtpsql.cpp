@@ -43,6 +43,17 @@ DatabaseQtPsql::~DatabaseQtPsql()
     this->db.close();
 }
 
+void DatabaseQtPsql::Maintenance_Specific()
+{
+    GRUMPY_LOG("Performing database optimization");
+    QString e;
+    if (!this->ExecuteFile("psql/vacuum.sql", &e))
+    {
+        GRUMPY_ERROR("Failed to vacuum: " + e);
+        return;
+    }
+}
+
 void DatabaseQtPsql::updateDB(unsigned int patch)
 {
     GRUMPY_LOG("PSQL: Updating schema to version " + QString::number(patch));

@@ -67,7 +67,7 @@ void DatabaseQtSqlite::init()
 bool DatabaseQtSqlite::install()
 {
     QString error;
-    if (!this->ExecuteFile(GetSource("install.sql"), &error))
+    if (!this->ExecuteFile(GetSource("sqlite/install.sql"), &error))
         throw new Exception("Failed to initialize SQL storage: " + error, BOOST_CURRENT_FUNCTION);
 
     // Let's set grumpy to init mode
@@ -79,7 +79,7 @@ void DatabaseQtSqlite::UpdateDB(unsigned int patch)
 {
     GRUMPY_LOG("Updating schema to version " + QString::number(patch));
     QString error;
-    if (!this->ExecuteFile(GetSource("patch_sql_" + QString::number(patch) + ".sql"), &error))
+    if (!this->ExecuteFile(GetSource("sqlite/patch_sql_" + QString::number(patch) + ".sql"), &error))
     {
         throw new Exception("Failed to upgrade DB to version " + QString::number(patch) + ", error: " + error, BOOST_CURRENT_FUNCTION);
     }
