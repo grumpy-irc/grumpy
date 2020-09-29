@@ -21,9 +21,28 @@
 #include "user.h"
 #include "security.h"
 #include "syncableircsession.h"
+#include <QDataStream>
 #include <QtSql>
 
 using namespace GrumpyIRC;
+
+static QByteArray ToArray(const QHash<QString, QVariant>& data)
+{
+    QByteArray result;
+    QDataStream stream(&result, QIODevice::ReadWrite);
+    stream.setVersion(QDataStream::Qt_4_2);
+    stream << data;
+    return result;
+}
+
+static QHash<QString, QVariant> FromArray(QByteArray data)
+{
+    QDataStream stream(&data, QIODevice::ReadWrite);
+    stream.setVersion(QDataStream::Qt_4_2);
+    QHash<QString, QVariant> rx;
+    stream >> rx;
+    return rx;
+}
 
 static QString ListToString(QList<Scrollback*> list)
 {
@@ -487,7 +506,12 @@ void DatabaseQtSQL::UpdateUser(User *user)
 
 void DatabaseQtSQL::RemoveNetwork(IRCSession *session)
 {
-
+    if (!this->ExecuteNonQuery("DELETE FROM networks WHERE user_id = " +
+                               QString::number(((SyncableIRCSession*)session)->GetOwner()->GetID()) +
+                               " AND network_id = " + QString::number(session->GetSID()) + ";"))
+    {
+        throw new Exception("Unable to remove network: " + this->db.lastError().text(), BOOST_CURRENT_FUNCTION);
+    }
 }
 
 void DatabaseQtSQL::RemoveUser(User *user)
@@ -528,12 +552,36 @@ void DatabaseQtSQL::ClearScrollback(User *owner, Scrollback *sx)
 
 void DatabaseQtSQL::ClearScrollback(unsigned int id, unsigned int user_id)
 {
-
+    if (!this->ExecuteNonQuery("DELETE FROM scrollback_items WHERE scrollback_id = " +
+                               QString::number(id) +
+                               " AND user_id = " + QString::number(user_id) +
+                               ";"))
+    {
+        throw new Exception("Unable to remove items from db: " + this->db.lastError().text(), BOOST_CURRENT_FUNCTION);
+    }
 }
 
 void DatabaseQtSQL::StoreScrollback(User *owner, Scrollback *sx)
 {
-
+    QSqlQuery q(this->db);
+    Scrollback *parent = sx->GetParentScrollback();
+    if (parent)
+        q.prepare("INSERT INTO scrollbacks (original_id, user_id, target, type, virtual_state, last_item, parent, is_hidden) VALUES (:1,:2,:3,:4,:5,:6,:8,:7);");
+    else
+        q.prepare("INSERT INTO scrollbacks (original_id, user_id, target, type, virtual_state, last_item, is_hidden) VALUES (:1,:2,:3,:4,:5,:6,:7);");
+    q.bindValue(":1", sx->GetOriginalID());
+    q.bindValue(":2", owner->GetID());
+    q.bindValue(":3", sx->GetTarget());
+    q.bindValue(":4", static_cast<int>(sx->GetType()));
+    q.bindValue(":5", static_cast<int>(sx->GetState()));
+    q.bindValue(":6", sx->GetLastID());
+    q.bindValue(":7", Generic::Bool2Int(sx->IsHidden()));
+    if (parent)
+        q.bindValue(":8", parent->GetOriginalID());
+    if (!q.exec())
+    {
+        throw new Exception("Unable to insert scrollback to db: " + q.lastError().text(), BOOST_CURRENT_FUNCTION);
+    }
 }
 
 void DatabaseQtSQL::UpdateNetwork(IRCSession *session)
@@ -581,7 +629,33 @@ QHash<QString, QVariant> DatabaseQtSQL::GetConfiguration(user_id_t user)
 
 void DatabaseQtSQL::SetConfiguration(user_id_t user, QHash<QString, QVariant> data)
 {
+    // First we need to check if there is a record for this user
+    QSqlQuery exists = this->db.exec("SELECT COUNT(1) FROM settings where user_id = " + QString::number(user) + ";");
+    if (!exists.isActive())
+        throw new Exception("Unable to store user settings to sql: " + this->db.lastError().text(), BOOST_CURRENT_FUNCTION);
 
+    exists.first();
+
+    int results = exists.value(0).toInt();
+    if (results > 1)
+    {
+        throw new Exception("User " + QString::number(user) + " has more than 1 blob hash", BOOST_CURRENT_FUNCTION);
+    }
+
+    QSqlQuery q(this->db);
+
+    if (!results)
+        q.prepare("INSERT INTO settings(user_id, value) VALUES (:1, :2);");
+    else
+        q.prepare("UPDATE settings SET value = :2 WHERE user_id = :1;");
+
+    q.bindValue(":1", user);
+    q.bindValue(":2", ToArray(data));
+
+    if (!q.exec())
+    {
+        throw new Exception("Unable to store user data to sql: " + q.lastError().text(), BOOST_CURRENT_FUNCTION);
+    }
 }
 
 QHash<QString, QByteArray> DatabaseQtSQL::GetStorage(user_id_t user)
