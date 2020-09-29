@@ -7,7 +7,7 @@ CREATE TABLE public.users (
     name text NOT NULL,
     password text NOT NULL,
     last_login numeric,
-    role numeric NOT NULL,
+    role text NOT NULL,
     is_locked boolean DEFAULT false NOT NULL
 );
 

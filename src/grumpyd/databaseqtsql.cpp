@@ -90,7 +90,16 @@ void DatabaseQtSQL::Maintenance()
 
 void DatabaseQtSQL::StoreUser(User *item)
 {
+    QSqlQuery query(this->db);
+    query.prepare("INSERT INTO users (id, name, password, is_locked, role) VALUES (:id, :name, :password, :locked, :role)");
+    query.bindValue(":id", item->GetID());
+    query.bindValue(":name", item->GetName());
+    query.bindValue(":password", item->GetPassword());
+    query.bindValue(":locked", item->IsLocked());
+    query.bindValue(":role", item->GetRole()->GetName());
 
+    if (!query.exec())
+        throw new Exception("Unable to store user record: " + query.lastError().text(), BOOST_CURRENT_FUNCTION);
 }
 
 void DatabaseQtSQL::StoreNetwork(IRCSession *session)
