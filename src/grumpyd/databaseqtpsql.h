@@ -15,8 +15,6 @@
 
 #include "databaseqtsql.h"
 
-#define GRUMPYD_SCHEMA_VERSION 1
-
 namespace GrumpyIRC
 {
     class DatabaseQtPsql : public DatabaseQtSQL

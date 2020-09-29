@@ -122,6 +122,11 @@ void Grumpyd::Main()
     DatabaseQtSQL::CheckDriver();
     GRUMPY_LOG("Loading storage: " + CONF->GetStorage());
     this->databaseBackend = InstantiateStorage(CONF->GetStorage());
+    if (this->databaseBackend->IsFailed())
+    {
+        throw new Exception("Database backend failed to initialize: " + this->databaseBackend->GetLastErrorText(), BOOST_CURRENT_FUNCTION);
+        return;
+    }
     if (CONF->DBMaint)
     {
         GRUMPY_LOG("Performing database maintenance");

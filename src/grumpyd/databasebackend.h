@@ -60,6 +60,8 @@ namespace GrumpyIRC
             virtual void InsertStorage(user_id_t user, QString key, QByteArray data)=0;
             virtual void UpdateStorage(user_id_t user, QString key, QByteArray data)=0;
             virtual void RemoveStorage(user_id_t user, QString key)=0;
+            virtual bool IsFailed() { return false; }
+            virtual QString GetLastErrorText() { return ""; }
     };
 }
 

@@ -62,6 +62,8 @@ namespace GrumpyIRC
             //!
             virtual bool ExecuteFile(QString file_src, QString *error);
             virtual QString GetSource(QString name);
+            bool IsFailed() override;
+            QString GetLastErrorText() override;
 
         protected:
             virtual void init()=0;

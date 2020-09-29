@@ -20,6 +20,8 @@
 #include "../libcore/core.h"
 #include "../libcore/exception.h"
 
+#define GRUMPYD_SCHEMA_VERSION 1
+
 using namespace GrumpyIRC;
 
 DatabaseQtPsql::DatabaseQtPsql()
@@ -29,6 +31,7 @@ DatabaseQtPsql::DatabaseQtPsql()
     this->db.setDatabaseName(CONF->GetPSQL_Name());
     this->db.setUserName(CONF->GetPSQL_User());
     this->db.setPassword(CONF->GetPSQL_Pass());
+    GRUMPY_DEBUG("PSQL: opening primary connection to server", 1);
     if (!this->db.open())
         this->fail("Unable to open connection: " + this->db.lastError().text());
     else
@@ -42,7 +45,7 @@ DatabaseQtPsql::~DatabaseQtPsql()
 
 void DatabaseQtPsql::init()
 {
-    // Check if meta table exists
+    GRUMPY_DEBUG("PSQL: checking if meta table exists", 1);
     QSqlQuery result = this->db.exec("SELECT value from META where key = 'version';");
     if (!result.isActive())
     {

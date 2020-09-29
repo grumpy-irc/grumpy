@@ -29,6 +29,8 @@
 #include <QStringList>
 #include "syncableircsession.h"
 
+#define GRUMPYD_SCHEMA_VERSION 3
+
 using namespace GrumpyIRC;
 
 static QString ListToString(QList<Scrollback*> list)

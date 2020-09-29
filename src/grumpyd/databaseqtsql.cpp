@@ -227,8 +227,19 @@ QString DatabaseQtSQL::GetSource(QString name)
     return QString(file.readAll());
 }
 
+bool DatabaseQtSQL::IsFailed()
+{
+    return this->isFailed;
+}
+
+QString DatabaseQtSQL::GetLastErrorText()
+{
+    return this->failureReason;
+}
+
 void DatabaseQtSQL::fail(QString reason)
 {
+    GRUMPY_ERROR("PSQL driver failed: " + reason);
     this->isFailed = true;
     this->failureReason = reason;
 }
