@@ -43,12 +43,29 @@ void DatabaseQtSQL::CheckDriver()
 
 void DatabaseQtSQL::LoadRoles()
 {
-
+    Role::Defaults();
 }
 
 void DatabaseQtSQL::LoadUsers()
 {
+    Q_ASSERT(User::UserInfo.empty());
+    QSqlQuery userlist = this->db.exec("SELECT id, name, password, role, is_locked FROM users;");
+    userlist.setForwardOnly(true);
 
+    if (!userlist.isActive())
+    {
+        this->fail("DB corrupted, can't select from users table: " + userlist.lastError().text());
+        return;
+    }
+
+    while (userlist.next())
+    {
+        User *ux = new User(userlist.value(1).toString(), userlist.value(2).toString(), userlist.value(0).toInt(), userlist.value(4).toBool());
+        User::UserInfo.append(ux);
+        if (Role::Roles.contains(userlist.value(3).toString()))
+            ux->SetRole(Role::Roles[userlist.value(3).toString()]);
+        ux->StorageLoad();
+    }
 }
 
 void DatabaseQtSQL::LoadSessions()
