@@ -23,6 +23,7 @@ namespace GrumpyIRC
             DatabaseQtPsql();
             ~DatabaseQtPsql();
         protected:
+            void updateDB(unsigned int patch);
             void init() override;
             bool install() override;
     };

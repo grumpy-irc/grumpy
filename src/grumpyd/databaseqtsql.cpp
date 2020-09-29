@@ -41,16 +41,6 @@ void DatabaseQtSQL::CheckDriver()
     }
 }
 
-DatabaseQtSQL::DatabaseQtSQL()
-{
-
-}
-
-DatabaseQtSQL::~DatabaseQtSQL()
-{
-
-}
-
 void DatabaseQtSQL::LoadRoles()
 {
 

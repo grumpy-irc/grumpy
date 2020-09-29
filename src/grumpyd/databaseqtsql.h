@@ -24,8 +24,8 @@ namespace GrumpyIRC
     {
         public:
             static void CheckDriver();
-            DatabaseQtSQL();
-            ~DatabaseQtSQL() override;
+            DatabaseQtSQL() = default;
+            ~DatabaseQtSQL() = default;
             void LoadRoles() override;
             void LoadUsers() override;
             void LoadSessions() override;
