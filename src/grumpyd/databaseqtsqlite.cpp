@@ -24,10 +24,10 @@ DatabaseQtSqlite::DatabaseQtSqlite()
 {
     this->datafile = Grumpyd::GetDFPath() + "sqlite.dat";
     bool install = !QFile::exists(this->datafile);
-    this->database = new QSqlDatabase(QSqlDatabase::addDatabase("SQLITE"));
-    this->database->setDatabaseName(this->datafile);
-    if (!this->database->open())
-        throw new Exception("Failed to open SQL storage: " + this->database->lastError().text(), BOOST_CURRENT_FUNCTION);
+    this->db = QSqlDatabase::addDatabase("SQLITE");
+    this->db.setDatabaseName(this->datafile);
+    if (!this->db.open())
+        throw new Exception("Failed to open SQL storage: " + this->db.lastError().text(), BOOST_CURRENT_FUNCTION);
 
     if (install)
     {

@@ -8,12 +8,13 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2018
+// Copyright (c) Petr Bena 2018 - 2020
 
 #ifndef DATABASEQTSQL_H
 #define DATABASEQTSQL_H
 
 #include "databasebackend.h"
+#include <QSqlDatabase>
 
 class QSqlDatabase;
 
@@ -25,31 +26,35 @@ namespace GrumpyIRC
             static void CheckDriver();
             DatabaseQtSQL();
             ~DatabaseQtSQL() override;
-            void LoadRoles() override=0;
-            void LoadUsers() override=0;
-            void LoadSessions() override=0;
-            void LoadWindows() override=0;
-            void LoadText() override=0;
-            void Maintenance() override=0;
-            void StoreUser(User *item) override=0;
-            void StoreNetwork(IRCSession *session) override=0;
-            QList<QVariant> FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size) override=0;
-            void UpdateUser(User *user) override=0;
-            void RemoveNetwork(IRCSession *session) override=0;
-            void RemoveUser(User *user) override=0;
-            void RemoveScrollback(User *owner, Scrollback *sx) override=0;
-            void LockUser(User *user) override=0;
-            void UnlockUser(User *user) override=0;
-            void StoreScrollback(User *owner, Scrollback *sx) override=0;
-            void UpdateNetwork(IRCSession *session) override=0;
-            void StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem *item) override=0;
-            void UpdateRoles() override=0;
-            QHash<QString, QVariant> GetConfiguration(user_id_t user) override=0;
-            void SetConfiguration(user_id_t user, QHash<QString, QVariant> data) override=0;
-            QHash<QString, QByteArray> GetStorage(user_id_t user) override=0;
-            void InsertStorage(user_id_t user, QString key, QByteArray data) override=0;
-            void UpdateStorage(user_id_t user, QString key, QByteArray data) override=0;
-            void RemoveStorage(user_id_t user, QString key) override=0;
+            void LoadRoles() override;
+            void LoadUsers() override;
+            void LoadSessions() override;
+            void LoadWindows() override;
+            void LoadText() override;
+            void Maintenance() override;
+            void StoreUser(User *item) override;
+            void StoreNetwork(IRCSession *session) override;
+            QList<QVariant> FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size) override;
+            QList<QVariant> Search(QString text, int context, bool case_sensitive = true) override;
+            QList<QVariant> SearchRegular(QString regex, int context, bool case_sensitive = true) override;
+            QList<QVariant> SearchOne(VirtualScrollback *scrollback, QString text, int context, bool case_sensitive = true) override;
+            QList<QVariant> SearchOneRegular(VirtualScrollback *scrollback, QString regex, int context, bool case_sensitive = true) override;
+            void UpdateUser(User *user) override;
+            void RemoveNetwork(IRCSession *session) override;
+            void RemoveUser(User *user) override;
+            void RemoveScrollback(User *owner, Scrollback *sx) override;
+            void LockUser(User *user) override;
+            void UnlockUser(User *user) override;
+            void StoreScrollback(User *owner, Scrollback *sx) override;
+            void UpdateNetwork(IRCSession *session) override;
+            void StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem *item) override;
+            void UpdateRoles() override;
+            QHash<QString, QVariant> GetConfiguration(user_id_t user) override;
+            void SetConfiguration(user_id_t user, QHash<QString, QVariant> data) override;
+            QHash<QString, QByteArray> GetStorage(user_id_t user) override;
+            void InsertStorage(user_id_t user, QString key, QByteArray data) override;
+            void UpdateStorage(user_id_t user, QString key, QByteArray data) override;
+            void RemoveStorage(user_id_t user, QString key) override;
             //!
             //! \brief ExecuteFile this function implements missing Qt functionality to execute SQL files
             //!        it requires the file to contain semicolons only as final characters separating stmts
@@ -61,7 +66,10 @@ namespace GrumpyIRC
         protected:
             virtual void init()=0;
             virtual bool install()=0;
-            QSqlDatabase *database = nullptr;
+            void fail(QString reason);
+            bool isFailed = false;
+            QString failureReason;
+            QSqlDatabase db;
     };
 }
 

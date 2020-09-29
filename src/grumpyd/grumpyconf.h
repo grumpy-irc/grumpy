@@ -52,6 +52,11 @@ namespace GrumpyIRC
             unsigned int GetMaxSnifferSize();
             unsigned int GetMaxSearchSize();
             void SetMaxSearchSize(unsigned int size);
+            int GetPSQL_Port();
+            QString GetPSQL_Host();
+            QString GetPSQL_User();
+            QString GetPSQL_Pass();
+            QString GetPSQL_Name();
             QString etc = "etc";
             QString var = "var";
             bool Upgrade = false;
@@ -65,6 +70,8 @@ namespace GrumpyIRC
             QString PID;
             bool Daemon;
             bool StorageDummy;
+            bool SQLite_Enabled = true;
+            bool PSQL_Enabled = true;
             //! This is maximum allowed size of personal storage per user (for BLOB storage, not scrollback storage)
             unsigned long long MaxPersonalStorageSize = 1048576;
     };

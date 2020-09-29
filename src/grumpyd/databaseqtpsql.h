@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2018
+// Copyright (c) Petr Bena 2018 - 2020
 
 #ifndef DATABASEQTPSQL_H
 #define DATABASEQTPSQL_H
@@ -23,6 +23,10 @@ namespace GrumpyIRC
     {
         public:
             DatabaseQtPsql();
+            ~DatabaseQtPsql();
+        protected:
+            void init() override;
+            bool install() override;
     };
 }
 

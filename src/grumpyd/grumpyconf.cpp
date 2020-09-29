@@ -75,6 +75,31 @@ void GrumpyConf::SetMaxSearchSize(unsigned int size)
     GCFG->SetValue("max_search_size", size);
 }
 
+int GrumpyConf::GetPSQL_Port()
+{
+    return GCFG->GetValueAsInt("psql_port", 5432);
+}
+
+QString GrumpyConf::GetPSQL_Host()
+{
+    return GCFG->GetValueAsString("psql_host", "localhost");
+}
+
+QString GrumpyConf::GetPSQL_User()
+{
+    return GCFG->GetValueAsString("psql_user", "");
+}
+
+QString GrumpyConf::GetPSQL_Pass()
+{
+    return GCFG->GetValueAsString("psql_pass", "");
+}
+
+QString GrumpyConf::GetPSQL_Name()
+{
+    return GCFG->GetValueAsString("psql_name", "grumpyd");
+}
+
 QString GrumpyConf::GetStorage()
 {
     if (this->StorageDummy)

@@ -8,10 +8,11 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2018
+// Copyright (c) Petr Bena 2018 - 2020
 
 #include "databaseqtsql.h"
 #include "grumpyconf.h"
+#include "virtualscrollback.h"
 #include "../libcore/core.h"
 #include "../libcore/generic.h"
 #include "../libcore/exception.h"
@@ -28,10 +29,14 @@ void DatabaseQtSQL::CheckDriver()
 {
     if (!QSqlDatabase::drivers().contains("QSQLITE"))
     {
+        // This is only affecting work-in-progress Qt rewrite of this driver, so in fact doesn't do much now
+        // generic sqlite driver will still work when this is false
+        CONF->SQLite_Enabled = false;
         GRUMPY_LOG("WARNING: SqlLite driver is not available, support for sqlite disabled");
     }
     if (!QSqlDatabase::drivers().contains("QPSQL"))
     {
+        CONF->PSQL_Enabled = false;
         GRUMPY_LOG("WARNING: psql driver is not available, support for PostgreSQL disabled");
     }
 }
@@ -43,7 +48,157 @@ DatabaseQtSQL::DatabaseQtSQL()
 
 DatabaseQtSQL::~DatabaseQtSQL()
 {
-    delete this->database;
+
+}
+
+void DatabaseQtSQL::LoadRoles()
+{
+
+}
+
+void DatabaseQtSQL::LoadUsers()
+{
+
+}
+
+void DatabaseQtSQL::LoadSessions()
+{
+
+}
+
+void DatabaseQtSQL::LoadWindows()
+{
+
+}
+
+void DatabaseQtSQL::LoadText()
+{
+
+}
+
+void DatabaseQtSQL::Maintenance()
+{
+
+}
+
+void DatabaseQtSQL::StoreUser(User *item)
+{
+
+}
+
+void DatabaseQtSQL::StoreNetwork(IRCSession *session)
+{
+
+}
+
+QList<QVariant> DatabaseQtSQL::FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size)
+{
+    return scrollback->OriginFetchBacklog(from, size);
+}
+
+QList<QVariant> DatabaseQtSQL::Search(QString text, int context, bool case_sensitive)
+{
+    QList<QVariant> results;
+    return results;
+}
+
+QList<QVariant> DatabaseQtSQL::SearchRegular(QString regex, int context, bool case_sensitive)
+{
+    QList<QVariant> results;
+    return results;
+}
+
+QList<QVariant> DatabaseQtSQL::SearchOne(VirtualScrollback *scrollback, QString text, int context, bool case_sensitive)
+{
+    QList<QVariant> results;
+    return results;
+}
+
+QList<QVariant> DatabaseQtSQL::SearchOneRegular(VirtualScrollback *scrollback, QString regex, int context, bool case_sensitive)
+{
+    QList<QVariant> results;
+    return results;
+}
+
+void DatabaseQtSQL::UpdateUser(User *user)
+{
+
+}
+
+void DatabaseQtSQL::RemoveNetwork(IRCSession *session)
+{
+
+}
+
+void DatabaseQtSQL::RemoveUser(User *user)
+{
+
+}
+
+void DatabaseQtSQL::RemoveScrollback(User *owner, Scrollback *sx)
+{
+
+}
+
+void DatabaseQtSQL::LockUser(User *user)
+{
+
+}
+
+void DatabaseQtSQL::UnlockUser(User *user)
+{
+
+}
+
+void DatabaseQtSQL::StoreScrollback(User *owner, Scrollback *sx)
+{
+
+}
+
+void DatabaseQtSQL::UpdateNetwork(IRCSession *session)
+{
+
+}
+
+void DatabaseQtSQL::StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem *item)
+{
+
+}
+
+void DatabaseQtSQL::UpdateRoles()
+{
+
+}
+
+QHash<QString, QVariant> DatabaseQtSQL::GetConfiguration(user_id_t user)
+{
+    QHash<QString, QVariant> hash;
+    return hash;
+}
+
+void DatabaseQtSQL::SetConfiguration(user_id_t user, QHash<QString, QVariant> data)
+{
+
+}
+
+QHash<QString, QByteArray> DatabaseQtSQL::GetStorage(user_id_t user)
+{
+    return QHash<QString, QByteArray>();
+}
+
+void DatabaseQtSQL::InsertStorage(user_id_t user, QString key, QByteArray data)
+{
+
+}
+
+void DatabaseQtSQL::UpdateStorage(user_id_t user, QString key, QByteArray data)
+{
+
+}
+
+void DatabaseQtSQL::RemoveStorage(user_id_t user, QString key)
+{
+
 }
 
 bool DatabaseQtSQL::ExecuteFile(QString file_src, QString *error)
@@ -53,7 +208,7 @@ bool DatabaseQtSQL::ExecuteFile(QString file_src, QString *error)
     {
         if (sx.isEmpty())
             continue;
-        QSqlQuery q;
+        QSqlQuery q(this->db);
         if (!q.exec(sx))
         {
             *error = q.lastError().text();
@@ -70,5 +225,11 @@ QString DatabaseQtSQL::GetSource(QString name)
         throw new Exception("Unable to open internal resource: " + name, BOOST_CURRENT_FUNCTION);
 
     return QString(file.readAll());
+}
+
+void DatabaseQtSQL::fail(QString reason)
+{
+    this->isFailed = true;
+    this->failureReason = reason;
 }
 

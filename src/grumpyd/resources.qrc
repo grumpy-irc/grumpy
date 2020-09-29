@@ -3,5 +3,6 @@
         <file>sqlite/install.sql</file>
         <file>sqlite/patch_sql_2.sql</file>
         <file>sqlite/patch_sql_3.sql</file>
+        <file>psql/install.sql</file>
     </qresource>
 </RCC>

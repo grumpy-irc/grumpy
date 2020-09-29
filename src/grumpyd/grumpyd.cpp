@@ -23,6 +23,7 @@
 #include "sleeper.h"
 #include "listener.h"
 #include "databaseqtsql.h"
+#include "databaseqtpsql.h"
 #include "databasebin.h"
 #include "script_engine/grumpydscript.h"
 #include "../libcore/core.h"
@@ -109,6 +110,8 @@ static DatabaseBackend *InstantiateStorage(QString type)
 #endif
     else if (type == "DatabaseBin")
         return new DatabaseBin();
+    else if (type == "DatabasePostgre")
+        return new DatabaseQtPsql();
     else
         throw new Exception("Unknown database: " + type, BOOST_CURRENT_FUNCTION);
 }
