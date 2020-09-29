@@ -211,7 +211,7 @@ bool DatabaseQtSQL::ExecuteFile(QString file_src, QString *error)
         QSqlQuery q(this->db);
         if (!q.exec(sx))
         {
-            *error = q.lastError().text();
+            *error = q.lastError().text() + " (query: " + sx + ")";
             return false;
         }
     }
