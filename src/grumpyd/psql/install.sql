@@ -135,6 +135,8 @@ ALTER TABLE ONLY public.scrollbacks ALTER COLUMN id SET DEFAULT nextval('public.
 ALTER TABLE ONLY public.scrollbacks
     ADD CONSTRAINT scrollbacks_pkey PRIMARY KEY (id);
 
+CREATE INDEX scrollbacks_user_idx ON scrollbacks USING btree (user_id)
+
 /******** networks ********/
 
 CREATE TABLE public.networks (
@@ -198,6 +200,10 @@ ALTER TABLE ONLY public.scrollback_items ALTER COLUMN id SET DEFAULT nextval('pu
 
 ALTER TABLE ONLY public.scrollback_items
     ADD CONSTRAINT scrollback_items_pkey PRIMARY KEY (id);
+
+CREATE INDEX scrollback_items_user_idx ON public.scrollback_items USING btree (user_id);
+CREATE INDEX scrollback_items_user_scrollback_idx ON public.scrollback_items USING btree (user_id, scrollback_id);
+CREATE INDEX scrollback_items_user_scrollback_item_idx ON public.scrollback_items USING btree (item_id, user_id, scrollback_id);
 
 /******** settings ********/
 

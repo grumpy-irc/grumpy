@@ -79,6 +79,8 @@ void DatabaseMigration::SQLite2PSQL()
         }
     }
 
+    GRUMPY_LOG("DB migration finished successfuly");
+
     exit:
         delete source;
 }
