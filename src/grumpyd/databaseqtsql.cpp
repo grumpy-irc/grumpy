@@ -211,7 +211,7 @@ void DatabaseQtSQL::LoadSessions()
 void DatabaseQtSQL::LoadWindows()
 {
     scrollback_id_t max_id = 0;
-    QSqlQuery windows = this->db.exec("SELECT original_id, user_id, target, type, virtual_state, last_item, parent, id, is_hidden FROM scrollbacks ORDER BY id;");
+    QSqlQuery windows = this->db.exec("SELECT original_id, user_id, target, type, virtual_state, last_item, parent, id, is_hidden FROM scrollbacks ORDER BY original_id;");
     windows.setForwardOnly(true);
 
     if (!windows.isActive())
