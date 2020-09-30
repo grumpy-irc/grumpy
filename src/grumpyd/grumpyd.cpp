@@ -137,7 +137,10 @@ void Grumpyd::Main()
     }
     if (CONF->DBMove)
     {
-        DatabaseMigration::SQLite2PSQL();
+        if (CONF->DBTarget == "psql")
+            DatabaseMigration::SQLite2PSQL();
+        else
+            DatabaseMigration::PSQL2SQLite();
         QCoreApplication::exit(0);
         return;
     }

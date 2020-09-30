@@ -15,10 +15,14 @@
 
 namespace GrumpyIRC
 {
+    class DatabaseBackend;
     class DatabaseMigration
     {
         public:
             static void SQLite2PSQL();
+            static void PSQL2SQLite();
+        private:
+            static void migrate(DatabaseBackend *source, DatabaseBackend *target);
     };
 }
 

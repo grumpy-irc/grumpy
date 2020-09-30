@@ -163,10 +163,17 @@ int dbcl(GrumpyIRC::TerminalParser *parser, QStringList params)
 
 int migrate(GrumpyIRC::TerminalParser *parser, QStringList params)
 {
-    (void)params;
     (void)parser;
     CONF->Stdout = true;
     CONF->DBMove = true;
+    QString target_db = params[0].toLower();
+    if (target_db != "sqlite" && target_db != "psql")
+    {
+        err("Migrate expects parameters sqlite or psql, you provided: " + target_db);
+        return TP_RESULT_SHUT;
+    }
+    CONF->DBTarget = target_db;
+
     return TP_RESULT_OK;
 }
 
@@ -281,7 +288,7 @@ int main(int argc, char *argv[])
         tp->Register('s', "log-stdout", "Use current tty for logging instead of syslog", 0, (GrumpyIRC::TP_Callback)log_stdout);
         tp->Register('p', "port", "Change the listener port", 1, (GrumpyIRC::TP_Callback)default_port);
         tp->Register('w', "secured-port", "Change the SSL port", 1, (GrumpyIRC::TP_Callback)secured_port);
-        tp->Register('m', "migrate", "Migrate from SQLite to PostgreSQL", 0, (GrumpyIRC::TP_Callback)migrate);
+        tp->Register('m', "migrate", "Migrate database between SQLite and PostgreSQL, you must provide parameter of target DB type (either sqlite or psql)", 1, (GrumpyIRC::TP_Callback)migrate);
 
         if (!tp->Parse(argc, argv))
         {

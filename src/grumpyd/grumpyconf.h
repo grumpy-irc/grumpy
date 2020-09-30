@@ -62,6 +62,7 @@ namespace GrumpyIRC
             bool Upgrade = false;
             bool DBMaint = false;
             bool DBMove = false;
+            QString DBTarget;
             bool DBTrim = false;
             bool Init;
             bool Stdout = false;

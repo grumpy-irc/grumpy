@@ -34,11 +34,23 @@ void DatabaseMigration::SQLite2PSQL()
     GRUMPY_LOG("Migrating database from SQLite backend to PostgreSQL...");
     DatabaseBackend *target = Grumpyd::GetBackend();
     DatabaseBackend *source = new DatabaseLite();
+    DatabaseMigration::migrate(source, target);
+}
 
-    // Check if target is postgres
-    if (target->GetType() != "DatabaseQtSQL")
+void DatabaseMigration::PSQL2SQLite()
+{
+    GRUMPY_LOG("Migrating database from PostgreSQL backend to SQLite...");
+    DatabaseBackend *target = Grumpyd::GetBackend();
+    DatabaseBackend *source = new DatabaseQtPsql();
+    DatabaseMigration::migrate(source, target);
+}
+
+void DatabaseMigration::migrate(DatabaseBackend *source, DatabaseBackend *target)
+{
+    // Check if target is not same as source
+    if (target->GetType() == source->GetType())
     {
-        GRUMPY_ERROR("Target database is not PostgreSQL, make sure you change grumpy.ini and set storage to DatabasePostgre, refer to https://github.com/grumpy-irc/grumpy/wiki/Grumpyd for more help");
+        GRUMPY_ERROR("Target database is same type as source database, refer to https://github.com/grumpy-irc/grumpy/wiki/Grumpyd for more help");
         goto exit;
     }
 

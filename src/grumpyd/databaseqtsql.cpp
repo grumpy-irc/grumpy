@@ -82,11 +82,6 @@ void DatabaseQtSQL::CheckDriver()
     }
 }
 
-QString DatabaseQtSQL::GetType()
-{
-    return "DatabaseQtSQL";
-}
-
 int DatabaseQtSQL::GetUserCount()
 {
     QSqlQuery q = this->db.exec("SELECT COUNT(1) FROM users;");

@@ -43,6 +43,11 @@ DatabaseQtPsql::~DatabaseQtPsql()
     this->db.close();
 }
 
+QString DatabaseQtPsql::GetType()
+{
+    return "DatabaseQtPsql";
+}
+
 void DatabaseQtPsql::Maintenance_Specific()
 {
     GRUMPY_LOG("PSQL: Performing optimization on database");

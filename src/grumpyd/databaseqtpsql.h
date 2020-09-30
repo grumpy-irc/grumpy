@@ -22,6 +22,7 @@ namespace GrumpyIRC
         public:
             DatabaseQtPsql();
             ~DatabaseQtPsql();
+            QString GetType() override;
             void Maintenance_Specific() override;
             bool SupportsMultithreading() override { return true; };
         protected:
