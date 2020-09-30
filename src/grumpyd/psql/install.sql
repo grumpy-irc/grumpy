@@ -135,7 +135,7 @@ ALTER TABLE ONLY public.scrollbacks ALTER COLUMN id SET DEFAULT nextval('public.
 ALTER TABLE ONLY public.scrollbacks
     ADD CONSTRAINT scrollbacks_pkey PRIMARY KEY (id);
 
-CREATE INDEX scrollbacks_user_idx ON scrollbacks USING btree (user_id)
+CREATE INDEX scrollbacks_user_idx ON scrollbacks USING btree (user_id);
 
 /******** networks ********/
 
