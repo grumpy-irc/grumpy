@@ -24,8 +24,8 @@ namespace GrumpyIRC
     {
         public:
             static void CheckDriver();
-            DatabaseQtSQL();
-            ~DatabaseQtSQL() override;
+            DatabaseQtSQL() = default;
+            ~DatabaseQtSQL() = default;
             void LoadRoles() override;
             void LoadUsers() override;
             void LoadSessions() override;
@@ -42,9 +42,12 @@ namespace GrumpyIRC
             void UpdateUser(User *user) override;
             void RemoveNetwork(IRCSession *session) override;
             void RemoveUser(User *user) override;
+            void RemoveScrollback(unsigned int id);
             void RemoveScrollback(User *owner, Scrollback *sx) override;
             void LockUser(User *user) override;
             void UnlockUser(User *user) override;
+            void ClearScrollback(User *owner, Scrollback *sx);
+            void ClearScrollback(unsigned int id, unsigned int user_id);
             void StoreScrollback(User *owner, Scrollback *sx) override;
             void UpdateNetwork(IRCSession *session) override;
             void StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem *item) override;
@@ -55,6 +58,8 @@ namespace GrumpyIRC
             void InsertStorage(user_id_t user, QString key, QByteArray data) override;
             void UpdateStorage(user_id_t user, QString key, QByteArray data) override;
             void RemoveStorage(user_id_t user, QString key) override;
+            virtual void Maintenance_Specific() {}
+            bool ExecuteNonQuery(QString sql);
             //!
             //! \brief ExecuteFile this function implements missing Qt functionality to execute SQL files
             //!        it requires the file to contain semicolons only as final characters separating stmts
@@ -62,11 +67,14 @@ namespace GrumpyIRC
             //!
             virtual bool ExecuteFile(QString file_src, QString *error);
             virtual QString GetSource(QString name);
+            bool IsFailed() override;
+            QString GetLastErrorText() override;
 
         protected:
             virtual void init()=0;
             virtual bool install()=0;
             void fail(QString reason);
+            int lastNumRowsAffected = 0;
             bool isFailed = false;
             QString failureReason;
             QSqlDatabase db;

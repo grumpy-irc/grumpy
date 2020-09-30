@@ -15,8 +15,6 @@
 
 #include "databaseqtsql.h"
 
-#define GRUMPYD_SCHEMA_VERSION 1
-
 namespace GrumpyIRC
 {
     class DatabaseQtPsql : public DatabaseQtSQL
@@ -24,7 +22,9 @@ namespace GrumpyIRC
         public:
             DatabaseQtPsql();
             ~DatabaseQtPsql();
+            void Maintenance_Specific() override;
         protected:
+            void updateDB(unsigned int patch);
             void init() override;
             bool install() override;
     };
