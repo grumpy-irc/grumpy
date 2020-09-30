@@ -458,9 +458,9 @@ QList<QVariant> DatabaseQtSQL::FetchBacklog(VirtualScrollback *scrollback, scrol
                                                         "WHERE user_id = :user_id AND scrollback_id = :scrollback_id AND item_id < :item_id_max AND item_id >= :item_id_min "\
                                                         "ORDER BY item_id ASC;");
     text.bindValue(":user_id", scrollback->GetOwner()->GetID());
-    text.bindValue(":scrollback_id", (scrollback->GetOriginalID()));
+    text.bindValue(":scrollback_id", scrollback->GetOriginalID());
     text.bindValue(":item_id_max", from);
-    text.bindValue("item_id_min", first);
+    text.bindValue(":item_id_min", first);
 
     if (!text.exec())
         throw new Exception("Unable to fetch: " + text.lastError().text(), BOOST_CURRENT_FUNCTION);
@@ -594,26 +594,16 @@ void DatabaseQtSQL::UnlockUser(User *user)
 
 void DatabaseQtSQL::ClearScrollback(User *owner, Scrollback *sx)
 {
-    QSqlQuery q(this->db);
-    q.prepare("DELETE FROM scrollback_items WHERE scrollback_id = :scrollback_id AND user_id = :user_id;");
-    q.bindValue(":scrollback_id", sx->GetOriginalID());
-    q.bindValue(":user_id", owner->GetID());
-
-    if (!q.exec())
-    {
-        throw new Exception("Unable to remove items from db: " + this->db.lastError().text(), BOOST_CURRENT_FUNCTION);
-    }
+    this->OffloadSQL("DELETE FROM scrollback_items WHERE scrollback_id = " + QString::number(sx->GetOriginalID()) +
+                     " AND user_id = " + QString::number(owner->GetID()) + ";", true);
 }
 
 void DatabaseQtSQL::ClearScrollback(unsigned int id, unsigned int user_id)
 {
-    if (!this->ExecuteNonQuery("DELETE FROM scrollback_items WHERE scrollback_id = " +
+    this->OffloadSQL("DELETE FROM scrollback_items WHERE scrollback_id = " +
                                QString::number(id) +
                                " AND user_id = " + QString::number(user_id) +
-                               ";"))
-    {
-        throw new Exception("Unable to remove items from db: " + this->db.lastError().text(), BOOST_CURRENT_FUNCTION);
-    }
+                               ";", true);
 }
 
 void DatabaseQtSQL::StoreScrollback(User *owner, Scrollback *sx)
@@ -781,6 +771,13 @@ void DatabaseQtSQL::RemoveStorage(user_id_t user, QString key)
     {
         throw new Exception("Unable to remove user data: " + query.lastError().text(), BOOST_CURRENT_FUNCTION);
     }
+}
+
+void DatabaseQtSQL::OffloadSQL(QString sql, bool crash_on_fail)
+{
+    bool result = this->ExecuteNonQuery(sql);
+    if (crash_on_fail && !result)
+        throw new Exception("Offloaded SQL failed: " + this->db.lastError().text(), BOOST_CURRENT_FUNCTION);
 }
 
 bool DatabaseQtSQL::ExecuteNonQuery(QString sql)

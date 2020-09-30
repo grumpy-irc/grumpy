@@ -60,6 +60,10 @@ namespace GrumpyIRC
             void UpdateStorage(user_id_t user, QString key, QByteArray data) override;
             void RemoveStorage(user_id_t user, QString key) override;
             virtual void Maintenance_Specific() {}
+            //! Run an offloaded non-query SQL statement via dedicated thread
+            //! on database backend that doesn't support multithreading this
+            //! will execute it immediately
+            virtual void OffloadSQL(QString sql, bool crash_on_fail = false);
             bool ExecuteNonQuery(QString sql);
             //!
             //! \brief ExecuteFile this function implements missing Qt functionality to execute SQL files
