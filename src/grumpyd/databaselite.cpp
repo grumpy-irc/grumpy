@@ -129,6 +129,17 @@ DatabaseLite::~DatabaseLite()
     this->database = nullptr;
 }
 
+QString DatabaseLite::GetType()
+{
+    return "DatabaseLite";
+}
+
+int DatabaseLite::GetUserCount()
+{
+    std::shared_ptr<SqlResult> userlist = this->database->ExecuteQuery("SELECT id FROM users;");
+    return userlist->Count();
+}
+
 void DatabaseLite::LoadRoles()
 {
     Role::Defaults();

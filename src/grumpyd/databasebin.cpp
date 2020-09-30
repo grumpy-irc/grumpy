@@ -84,6 +84,16 @@ DatabaseBin::~DatabaseBin()
 
 }
 
+QString DatabaseBin::GetType()
+{
+    return "DatabaseBin";
+}
+
+int DatabaseBin::GetUserCount()
+{
+    return User::UserInfo.count();
+}
+
 void DatabaseBin::LoadRoles()
 {
     Role::Defaults();

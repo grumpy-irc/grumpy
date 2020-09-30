@@ -25,6 +25,7 @@
 #include "databaseqtsql.h"
 #include "databaseqtpsql.h"
 #include "databasebin.h"
+#include "databasemigration.h"
 #include "script_engine/grumpydscript.h"
 #include "../libcore/core.h"
 #include "../libcore/configuration.h"
@@ -131,6 +132,12 @@ void Grumpyd::Main()
     {
         GRUMPY_LOG("Performing database maintenance");
         this->databaseBackend->Maintenance();
+        QCoreApplication::exit(0);
+        return;
+    }
+    if (CONF->DBMove)
+    {
+        DatabaseMigration::SQLite2PSQL();
         QCoreApplication::exit(0);
         return;
     }

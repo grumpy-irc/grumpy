@@ -82,6 +82,21 @@ void DatabaseQtSQL::CheckDriver()
     }
 }
 
+QString DatabaseQtSQL::GetType()
+{
+    return "DatabaseQtSQL";
+}
+
+int DatabaseQtSQL::GetUserCount()
+{
+    QSqlQuery q = this->db.exec("SELECT COUNT(1) FROM users;");
+    if (!q.isActive())
+        throw new Exception("Failed to obtain users: " + this->db.lastError().text(), BOOST_CURRENT_FUNCTION);
+
+    q.first();
+    return q.value(0).toInt();
+}
+
 void DatabaseQtSQL::LoadRoles()
 {
     Role::Defaults();

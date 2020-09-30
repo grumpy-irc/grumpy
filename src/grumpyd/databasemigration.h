@@ -10,25 +10,16 @@
 
 // Copyright (c) Petr Bena 2018 - 2020
 
-#ifndef DATABASEQTPSQL_H
-#define DATABASEQTPSQL_H
-
-#include "databaseqtsql.h"
+#ifndef DATABASEMIGRATION_H
+#define DATABASEMIGRATION_H
 
 namespace GrumpyIRC
 {
-    class DatabaseQtPsql : public DatabaseQtSQL
+    class DatabaseMigration
     {
         public:
-            DatabaseQtPsql();
-            ~DatabaseQtPsql();
-            void Maintenance_Specific() override;
-            bool SupportsMultithreading() override { return true; };
-        protected:
-            void updateDB(unsigned int patch);
-            void init() override;
-            bool install() override;
+            static void SQLite2PSQL();
     };
 }
 
-#endif // DATABASEQTPSQL_H
+#endif // DATABASEMIGRATION_H

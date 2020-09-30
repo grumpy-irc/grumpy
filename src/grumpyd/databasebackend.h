@@ -31,6 +31,8 @@ namespace GrumpyIRC
         public:
             DatabaseBackend();
             virtual ~DatabaseBackend();
+            virtual QString GetType()=0;
+            virtual int GetUserCount()=0;
             virtual void LoadRoles()=0;
             virtual void LoadUsers()=0;
             virtual void LoadSessions()=0;

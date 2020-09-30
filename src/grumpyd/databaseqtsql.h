@@ -26,6 +26,8 @@ namespace GrumpyIRC
             static void CheckDriver();
             DatabaseQtSQL() = default;
             ~DatabaseQtSQL() = default;
+            QString GetType() override;
+            int GetUserCount() override;
             void LoadRoles() override;
             void LoadUsers() override;
             void LoadSessions() override;
@@ -69,6 +71,7 @@ namespace GrumpyIRC
             virtual QString GetSource(QString name);
             bool IsFailed() override;
             QString GetLastErrorText() override;
+            virtual bool SupportsMultithreading() { return false; }
 
         protected:
             virtual void init()=0;

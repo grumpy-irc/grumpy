@@ -33,6 +33,8 @@ namespace GrumpyIRC
 
             DatabaseLite();
             ~DatabaseLite() override;
+            QString GetType() override;
+            int GetUserCount() override;
             void LoadRoles() override;
             void LoadUsers() override;
             void LoadSessions() override;

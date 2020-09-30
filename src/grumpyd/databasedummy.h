@@ -22,6 +22,8 @@ namespace GrumpyIRC
         public:
             DatabaseDummy();
 
+            int GetUserCount() override;
+            QString GetType() override;
             void LoadRoles() override;
             void LoadUsers() override;
             void Maintenance() override {}

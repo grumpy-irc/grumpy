@@ -161,6 +161,14 @@ int dbcl(GrumpyIRC::TerminalParser *parser, QStringList params)
     return TP_RESULT_OK;
 }
 
+int migrate(GrumpyIRC::TerminalParser *parser, QStringList params)
+{
+    (void)params;
+    (void)parser;
+    CONF->DBMove = true;
+    return TP_RESULT_SHUT;
+}
+
 int trim(GrumpyIRC::TerminalParser *parser, QStringList params)
 {
     (void)parser;
@@ -271,6 +279,7 @@ int main(int argc, char *argv[])
         tp->Register('s', "log-stdout", "Use current tty for logging instead of syslog", 0, (GrumpyIRC::TP_Callback)log_stdout);
         tp->Register('p', "port", "Change the listener port", 1, (GrumpyIRC::TP_Callback)default_port);
         tp->Register('w', "secured-port", "Change the SSL port", 1, (GrumpyIRC::TP_Callback)secured_port);
+        tp->Register('m', "migrate", "Migrate from SQLite to PostgreSQL", 0, (GrumpyIRC::TP_Callback)migrate);
 
         if (!tp->Parse(argc, argv))
         {

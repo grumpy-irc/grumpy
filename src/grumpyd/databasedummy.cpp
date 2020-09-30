@@ -25,6 +25,16 @@ DatabaseDummy::DatabaseDummy()
     CONF->Init = true;
 }
 
+int DatabaseDummy::GetUserCount()
+{
+    return User::UserInfo.count();
+}
+
+QString DatabaseDummy::GetType()
+{
+    return "DatabaseDummy";
+}
+
 void DatabaseDummy::LoadRoles()
 {
     Role::Defaults();
