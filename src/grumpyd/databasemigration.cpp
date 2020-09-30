@@ -74,16 +74,22 @@ void DatabaseMigration::migrate(DatabaseBackend *source, DatabaseBackend *target
         GRUMPY_LOG("Migrating user: " + user->GetName())
         target->StoreUser(user);
         target->SetConfiguration(user->GetID(), user->GetConfiguration()->ToHash());
+        QList<QString> storage_items = user->StorageList();
+        foreach (QString item, storage_items)
+        {
+            GRUMPY_LOG("Migrating user: " + user->GetName() + " / storage: " + item);
+            target->InsertStorage(user->GetID(), item, user->StorageGet(item));
+        }
 
         foreach (IRCSession *session, user->GetSIRCSessions())
         {
-            GRUMPY_LOG("Migrating session: " + session->GetName())
+            GRUMPY_LOG("Migrating user: " + user->GetName() + " / session: " + session->GetName())
             target->StoreNetwork(session);
         }
 
         foreach (Scrollback *scrollback, user->GetScrollbacks())
         {
-            GRUMPY_LOG("Migrating " + scrollback->GetTarget());
+            GRUMPY_LOG("Migrating user: " + user->GetName() + " / scrollback: " + scrollback->GetTarget());
             target->StoreScrollback(user, scrollback);
 
             QList<ScrollbackItem> items = scrollback->GetItems();
