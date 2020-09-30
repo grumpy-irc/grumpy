@@ -165,6 +165,7 @@ int migrate(GrumpyIRC::TerminalParser *parser, QStringList params)
 {
     (void)params;
     (void)parser;
+    CONF->Stdout = true;
     CONF->DBMove = true;
     return TP_RESULT_OK;
 }
@@ -174,6 +175,7 @@ int trim(GrumpyIRC::TerminalParser *parser, QStringList params)
     (void)parser;
     CONF->DBTrim = true;
     CONF->DBMaint = true;
+    CONF->Stdout = true;
     return TP_RESULT_OK;
 }
 
