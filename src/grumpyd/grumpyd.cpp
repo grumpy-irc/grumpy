@@ -101,6 +101,14 @@ DatabaseBackend *Grumpyd::GetBackend()
     return grumpyd->databaseBackend;
 }
 
+void Grumpyd::OverrideBackend(DatabaseBackend *backend)
+{
+    if (!CONF->DBMove)
+        throw new Exception("Can't override DB backend, not migrating", BOOST_CURRENT_FUNCTION);
+
+    this->databaseBackend = backend;
+}
+
 static DatabaseBackend *InstantiateStorage(QString type)
 {
     if (type == "DatabaseDummy")

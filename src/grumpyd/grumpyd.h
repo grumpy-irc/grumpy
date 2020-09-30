@@ -37,6 +37,9 @@ namespace GrumpyIRC
 
             Grumpyd();
             ~Grumpyd();
+            //! Forcefully override internal database backend, this is only used for DB migration,
+            //! this function will not work if you aren't migrating DB
+            void OverrideBackend(DatabaseBackend *backend);
             void Kill();
 
         public slots:

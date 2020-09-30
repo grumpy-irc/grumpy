@@ -60,6 +60,8 @@ void DatabaseMigration::migrate(DatabaseBackend *source, DatabaseBackend *target
         goto exit;
     }
 
+    Grumpyd::grumpyd->OverrideBackend(source);
+
     GRUMPY_LOG("Loading data from source database");
     source->LoadRoles();
     source->LoadUsers();
