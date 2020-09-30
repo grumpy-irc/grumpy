@@ -516,12 +516,43 @@ void DatabaseQtSQL::RemoveNetwork(IRCSession *session)
 
 void DatabaseQtSQL::RemoveUser(User *user)
 {
+    user_id_t id = user->GetID();
+    QList<QVariant> params;
 
+    if (!this->db.transaction())
+        goto error;
+
+    if (!this->ExecuteNonQuery("DELETE FROM scrollback_items WHERE user_id = " + QString::number(id) + ";"))
+        goto error;
+    if (!this->ExecuteNonQuery("DELETE FROM networks WHERE user_id = " + QString::number(id) + ";"))
+        goto error;
+    if (!this->ExecuteNonQuery("DELETE FROM settings WHERE user_id = " + QString::number(id) + ";"))
+        goto error;
+    if (!this->ExecuteNonQuery("DELETE FROM users WHERE id = " + QString::number(id) + ";"))
+        goto error;
+    if (!this->ExecuteNonQuery("DELETE FROM scrollbacks WHERE user_id = " + QString::number(id) + ";"))
+        goto error;
+    if (!this->ExecuteNonQuery("DELETE FROM user_data WHERE user_id = " + QString::number(id) + ";"))
+        goto error;
+
+
+    if (!this->db.commit())
+        goto error;
+
+    return;
+
+    error:
+        GRUMPY_ERROR("SQL BUG: " + this->db.lastError().text());
+        if (!this->db.rollback())
+            GRUMPY_ERROR("SQL ROLLBACK FAIL: " + this->db.lastError().text());
+        throw new Exception("Unable to remove user using sql: " + this->db.lastError().text(), BOOST_CURRENT_FUNCTION);
 }
 
 void DatabaseQtSQL::RemoveScrollback(unsigned int id)
 {
-
+    QSqlQuery q(this->db);
+    if (!q.exec("DELETE FROM scrollbacks WHERE id = " + QString::number(id) + ";"))
+        throw new Exception("Unable to remove scrollback from db: " + q.lastError().text(), BOOST_CURRENT_FUNCTION);
 }
 
 void DatabaseQtSQL::RemoveScrollback(User *owner, Scrollback *sx)
@@ -537,17 +568,31 @@ void DatabaseQtSQL::RemoveScrollback(User *owner, Scrollback *sx)
 
 void DatabaseQtSQL::LockUser(User *user)
 {
-
+    user_id_t id = user->GetID();
+    QSqlQuery q = this->db.exec("UPDATE users SET is_locked = true WHERE id = " + QString::number(id) + ";");
+    if (!q.isActive())
+        throw new Exception("Unable to lock user using sql: " + this->db.lastError().text(), BOOST_CURRENT_FUNCTION);
 }
 
 void DatabaseQtSQL::UnlockUser(User *user)
 {
-
+    user_id_t id = user->GetID();
+    QSqlQuery q = this->db.exec("UPDATE users SET is_locked = false WHERE id = " + QString::number(id) + ";");
+    if (!q.isActive())
+        throw new Exception("Unable to unlock user using sql: " + this->db.lastError().text(), BOOST_CURRENT_FUNCTION);
 }
 
 void DatabaseQtSQL::ClearScrollback(User *owner, Scrollback *sx)
 {
+    QSqlQuery q(this->db);
+    q.prepare("DELETE FROM scrollback_items WHERE scrollback_id = :scrollback_id AND user_id = :user_id;");
+    q.bindValue(":scrollback_id", sx->GetOriginalID());
+    q.bindValue(":user_id", owner->GetID());
 
+    if (!q.exec())
+    {
+        throw new Exception("Unable to remove items from db: " + this->db.lastError().text(), BOOST_CURRENT_FUNCTION);
+    }
 }
 
 void DatabaseQtSQL::ClearScrollback(unsigned int id, unsigned int user_id)
@@ -623,7 +668,20 @@ void DatabaseQtSQL::UpdateRoles()
 
 QHash<QString, QVariant> DatabaseQtSQL::GetConfiguration(user_id_t user)
 {
-    QHash<QString, QVariant> hash;
+    QSqlQuery q(this->db);
+    q.prepare("SELECT value FROM settings WHERE user_id = :user_id;");
+    q.bindValue(":user_id", user);
+
+    if (!q.exec())
+    {
+        throw new Exception("Unable to retrieve user settings from sql: " + q.lastError().text(), BOOST_CURRENT_FUNCTION);
+    }
+    if (q.size() == 0)
+    {
+        return QHash<QString, QVariant>();
+    }
+    q.first();
+    QHash<QString, QVariant> hash = FromArray(q.value(0).toByteArray());
     return hash;
 }
 
