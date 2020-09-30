@@ -45,9 +45,9 @@ DatabaseQtPsql::~DatabaseQtPsql()
 
 void DatabaseQtPsql::Maintenance_Specific()
 {
-    GRUMPY_LOG("Performing database optimization");
+    GRUMPY_LOG("PSQL: Performing optimization on database");
     QString e;
-    if (!this->ExecuteFile("psql/vacuum.sql", &e))
+    if (!this->ExecuteFile(GetSource("psql/vacuum.sql"), &e))
     {
         GRUMPY_ERROR("Failed to vacuum: " + e);
         return;
