@@ -620,7 +620,7 @@ void DatabaseQtSQL::StoreScrollback(User *owner, Scrollback *sx)
     q.bindValue(":4", static_cast<int>(sx->GetType()));
     q.bindValue(":5", static_cast<int>(sx->GetState()));
     q.bindValue(":6", sx->GetLastID());
-    q.bindValue(":7", Generic::Bool2Int(sx->IsHidden()));
+    q.bindValue(":7", sx->IsHidden());
     if (parent)
         q.bindValue(":8", parent->GetOriginalID());
     if (!q.exec())
