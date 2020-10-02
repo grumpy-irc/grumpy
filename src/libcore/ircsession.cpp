@@ -317,7 +317,7 @@ void IRCSession::SyncWindows(QHash<QString, QVariant> scrollbacks, QHash<QString
     // deserialize it, but just to be sure we check once more and grab the pointer to grumpyd
     // in case it really is that
     NetworkSession *scrollback_session = this;
-    if (this->Root && GrumpyIRC::Generic::IsGrumpy(this->Root))
+    if (this->Root && GrumpyIRC::Generic::IsGrumpyd(this->Root))
         scrollback_session = this->Root->GetSession();
     foreach (QVariant xx, scrollbacks.values())
     {

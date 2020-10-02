@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2019
+// Copyright (c) Petr Bena 2015 - 2020
 
 #include "definitions.h"
 
@@ -43,14 +43,11 @@ bool GrumpyIRC::Generic::Int2Bool(int integer)
     return integer != 0;
 }
 
-bool Generic::IsGrumpy(Scrollback *window)
+bool Generic::IsGrumpyd(Scrollback *window)
 {
-    if (!window)
-        return false;
-    if (window->GetSession())
-    {
+    if (window && window->GetSession())
         return window->GetSession()->GetType() == SessionType_Grumpyd;
-    }
+
     return false;
 }
 

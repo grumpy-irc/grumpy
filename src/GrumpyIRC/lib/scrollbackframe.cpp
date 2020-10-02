@@ -302,7 +302,7 @@ void ScrollbackFrame::_insertText_(ScrollbackItem &item)
     }
     int highlighted = GRUMPY_H_NOT;
     bool is_opening = this->Refreshing;
-    if (!is_opening && Generic::IsGrumpy(this->scrollback))
+    if (!is_opening && Generic::IsGrumpyd(this->scrollback))
         is_opening = (dynamic_cast<GrumpydSession*>(this->scrollback->GetSession()))->IsOpening;
     if (Highlighter::IsMatch(&item, this->GetNetwork()))
     {
@@ -625,7 +625,7 @@ bool ScrollbackFrame::IsGrumpy()
 {
     if (!this->scrollback)
         return false;
-    return Generic::IsGrumpy(this->scrollback);
+    return Generic::IsGrumpyd(this->scrollback);
 }
 
 bool GrumpyIRC::ScrollbackFrame::IsHidden()
@@ -638,7 +638,7 @@ void ScrollbackFrame::ToggleHide()
     if (!this->scrollback->IsHideable())
         return;
 
-    if (Generic::IsGrumpy(this->scrollback))
+    if (Generic::IsGrumpyd(this->scrollback))
     {
 
         return;
@@ -779,7 +779,7 @@ void ScrollbackFrame::RequestDisconnect()
 
 void ScrollbackFrame::RequestMore(unsigned int count)
 {
-    if (!Generic::IsGrumpy(this->GetScrollback()))
+    if (!Generic::IsGrumpyd(this->GetScrollback()))
     {
         MessageBox::Display("only-grumpy", "Error", "This function is available only for use with grumpyd.", MainWindow::Main);
         return;
@@ -851,7 +851,7 @@ void ScrollbackFrame::SetProperty(const QString &name, const QVariant &value)
     this->scrollback->SetProperty(name, value);
     // now, if this is grumpy scrollback we need to share this option with others
 
-    if (!Generic::IsGrumpy(this->scrollback))
+    if (!Generic::IsGrumpyd(this->scrollback))
         return;
 
     GrumpydSession *session = dynamic_cast<GrumpydSession*>(this->GetSession());

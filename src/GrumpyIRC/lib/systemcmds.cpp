@@ -192,7 +192,7 @@ int SystemCmds::Netstat(SystemCommand *command, CommandArgs command_args)
     Q_UNUSED(command_args);
     Q_UNUSED(command);
     Scrollback *sx = MainWindow::Main->GetCurrentScrollbackFrame()->GetScrollback();
-    if (!sx->GetSession() || !Generic::IsGrumpy(sx))
+    if (!sx->GetSession() || !Generic::IsGrumpyd(sx))
         return 2;
     GrumpydSession *session = (GrumpydSession*)sx->GetSession();
     unsigned long long cr, cs, ur, us;

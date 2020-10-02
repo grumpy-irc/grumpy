@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2019
+// Copyright (c) Petr Bena 2015 - 2020
 
 #ifndef GENERIC_H
 #define GENERIC_H
@@ -52,7 +52,8 @@ namespace GrumpyIRC
         LIBCORESHARED_EXPORT QStringList Trim(QStringList list);
         LIBCORESHARED_EXPORT int Bool2Int(bool value);
         LIBCORESHARED_EXPORT bool Int2Bool(int integer);
-        LIBCORESHARED_EXPORT bool IsGrumpy(Scrollback *window);
+        //! Returns true if this scrollback is belonging to grumpy server, instead of local instance
+        LIBCORESHARED_EXPORT bool IsGrumpyd(Scrollback *window);
         //! \todo No unit test
         LIBCORESHARED_EXPORT QHash<QString, QVariant> MergeHash(QHash<QString, QVariant> &x, const QHash<QString, QVariant> &y);
         //! \todo No unit test
