@@ -323,7 +323,7 @@ QHash<QString, QVariant> Scrollback::ToPartialHash()
     return hash;
 }
 
-bool Scrollback::IsHidable()
+bool Scrollback::IsHideable()
 {
     return this->_hidable;
 }

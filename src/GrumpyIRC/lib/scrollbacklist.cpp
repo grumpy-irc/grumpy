@@ -204,7 +204,7 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
         menuClose = new QAction(QObject::tr("Close"), &Menu);
         Menu.addAction(menuClose);
         menuHide = new QAction(QObject::tr("Hide window"), &Menu);
-        menuHide->setEnabled(wx->GetScrollback()->IsHidable());
+        menuHide->setEnabled(wx->GetScrollback()->IsHideable());
         menuHide->setCheckable(true);
         menuHide->setChecked(wx->IsHidden());
         Menu.addAction(menuHide);

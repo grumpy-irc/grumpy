@@ -635,7 +635,7 @@ bool GrumpyIRC::ScrollbackFrame::IsHidden()
 
 void ScrollbackFrame::ToggleHide()
 {
-    if (!this->scrollback->IsHidable())
+    if (!this->scrollback->IsHideable())
         return;
 
     if (Generic::IsGrumpy(this->scrollback))

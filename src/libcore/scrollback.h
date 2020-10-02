@@ -124,7 +124,7 @@ namespace GrumpyIRC
             virtual QList<QVariant> FetchBacklog(scrollback_id_t from, unsigned int size);
             QHash<QString, QVariant> ToHash(int max = 200);
             QHash<QString, QVariant> ToPartialHash();
-            virtual bool IsHidable();
+            virtual bool IsHideable();
             void LoadHash(const QHash<QString, QVariant> &hash) override;
             //! Used to resync most of attributes with target
             void Resync(Scrollback *target);
