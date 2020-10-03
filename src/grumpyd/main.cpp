@@ -19,6 +19,7 @@
 #include "corewrapper.h"
 #include "scrollbackfactory.h"
 #include "gdeventhandler.h"
+#include "grumpydapp.h"
 #include "grumpyconf.h"
 #include "grumpyd.h"
 #include "../libcore/configuration.h"
@@ -270,7 +271,7 @@ int main(int argc, char *argv[])
 {
     try
     {
-        QCoreApplication a(argc, argv);
+        GrumpyIRC::GrumpydApp a(argc, argv);
         QCoreApplication::setApplicationName("grumpyd");
         // This is just a wrapper around libcore configuration system so that we can easily access some global config options
         CONF = new GrumpyIRC::GrumpyConf();

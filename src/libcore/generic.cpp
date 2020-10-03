@@ -307,3 +307,4 @@ bool Generic::IsValidFileName(QString file)
         return false;
     return true;
 }
+

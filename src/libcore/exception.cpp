@@ -36,5 +36,6 @@ QString GrumpyIRC::Exception::GetMessage()
 
 GrumpyIRC::NullPointerException::NullPointerException(QString pointer, QString signature) : GrumpyIRC::Exception(pointer, signature)
 {
+    this->errc = 2;
     this->message = "Null pointer " + pointer;
 }
