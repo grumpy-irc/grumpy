@@ -614,9 +614,10 @@ void DatabaseQtSQL::StoreScrollback(User *owner, Scrollback *sx)
 void DatabaseQtSQL::UpdateScrollback(User *owner, Scrollback *sx)
 {
     QSqlQuery update_sb(this->db);
-    update_sb.prepare("UPDATE scrollbacks SET last_id = :last_id, is_hidden = :is_hidden, virtual_state = :virtual_state "\
-                      "WHERE user_id = :user_id AND original_id = :original_id;");
-    update_sb.bindValue(":last_id", sx->GetLastID());
+    if (!update_sb.prepare("UPDATE scrollbacks SET last_item = :last_item, is_hidden = :is_hidden, virtual_state = :virtual_state "\
+                      "WHERE user_id = :user_id AND original_id = :original_id;"))
+        throw new Exception("Unable to prepare update for scrollback: " + update_sb.lastError().text(), BOOST_CURRENT_FUNCTION);
+    update_sb.bindValue(":last_item", sx->GetLastID());
     update_sb.bindValue(":user_id", owner->GetID());
     update_sb.bindValue(":original_id", sx->GetOriginalID());
     update_sb.bindValue(":is_hidden", sx->IsHidden());
@@ -695,8 +696,8 @@ void DatabaseQtSQL::StoreItem(User *owner, Scrollback *scrollback, ScrollbackIte
     if (update_last_id)
     {
         QSqlQuery update_sb(this->db);
-        update_sb.prepare("UPDATE scrollbacks SET last_id = :last_id WHERE user_id = :user_id AND original_id = :original_id;");
-        update_sb.bindValue(":last_id", item->GetID());
+        update_sb.prepare("UPDATE scrollbacks SET last_item = :last_item WHERE user_id = :user_id AND original_id = :original_id;");
+        update_sb.bindValue(":last_item", item->GetID());
         update_sb.bindValue(":user_id", owner->GetID());
         update_sb.bindValue(":original_id", scrollback->GetOriginalID());
         if (!update_sb.exec())
