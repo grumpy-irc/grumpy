@@ -622,7 +622,7 @@ void DatabaseQtSQL::UpdateScrollback(User *owner, Scrollback *sx)
     update_sb.bindValue(":is_hidden", sx->IsHidden());
     update_sb.bindValue(":virtual_state", static_cast<int>(sx->GetState()));
     if (!update_sb.exec())
-        throw new Exception("Unable to update scrollback: " + this->db.lastError().text(), BOOST_CURRENT_FUNCTION);
+        throw new Exception("Unable to update scrollback: " + update_sb.lastError().text(), BOOST_CURRENT_FUNCTION);
 }
 
 void DatabaseQtSQL::RemoveScrollback(unsigned int id)
