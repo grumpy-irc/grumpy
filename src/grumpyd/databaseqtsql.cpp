@@ -664,9 +664,11 @@ void DatabaseQtSQL::StoreItem(User *owner, Scrollback *scrollback, ScrollbackIte
     // When we store new item, we should update last ID as well, but only in case this item is actually higher than last ID,
     // otherwise it's probably a bug or DB is already corrupted, so we just issue a warning without any real update
     bool update_last_id = true;
-    if ((scrollback->GetLastID()-1) >= item->GetID())
+    if ((scrollback->GetLastID()-1) > item->GetID())
     {
-        GRUMPY_DEBUG("Warning, scrollback " + QString::number(scrollback->GetID()) + " storing item_id that is LOWER than last_id of scrollback", 1);
+        GRUMPY_DEBUG("Warning, scrollback " + QString::number(scrollback->GetID()) + " storing item_id that is LOWER than last_id of scrollback"\
+                                                                                     " (" + QString::number(scrollback->GetLastID()-1) +
+                                                                                     " > " + QString::number(item->GetID()) + ")", 1);
         update_last_id = false;
     }
     QSqlQuery q(this->db);
