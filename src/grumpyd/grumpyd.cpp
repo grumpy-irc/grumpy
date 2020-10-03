@@ -18,7 +18,7 @@
 #include "corewrapper.h"
 #include "grumpyconf.h"
 #include "databasedummy.h"
-#include "databaselite.h"
+#include "databaseqtsqlite.h"
 #include "user.h"
 #include "sleeper.h"
 #include "listener.h"
@@ -112,17 +112,29 @@ void Grumpyd::OverrideBackend(DatabaseBackend *backend)
 static DatabaseBackend *InstantiateStorage(QString type)
 {
     if (type == "DatabaseDummy")
+    {
         return new DatabaseDummy();
-#ifdef GRUMPY_SQLITE
+    }
     else if (type == "DatabaseLite")
-        return new DatabaseLite();
-#endif
+    {
+        if (!CONF->SQLite_Enabled)
+            throw new Exception("Requested database type SQLite, which is not enabled - you need to install missing Qt libraries for support of SQLite", BOOST_CURRENT_FUNCTION);
+        return new DatabaseQtSqlite();
+    }
     else if (type == "DatabaseBin")
+    {
         return new DatabaseBin();
+    }
     else if (type == "DatabasePostgre")
+    {
+        if (!CONF->PSQL_Enabled)
+            throw new Exception("Requested database type Postgre, which is not enabled - you need to install missing Qt libraries for support of Postgre", BOOST_CURRENT_FUNCTION);
         return new DatabaseQtPsql();
+    }
     else
+    {
         throw new Exception("Unknown database: " + type, BOOST_CURRENT_FUNCTION);
+    }
 }
 
 void Grumpyd::Main()

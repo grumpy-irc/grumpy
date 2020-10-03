@@ -13,9 +13,8 @@
 #include "grumpyd.h"
 #include "databasebackend.h"
 #include "databasemigration.h"
-#include "databaselite.h"
+#include "databaseqtsqlite.h"
 #include "databaseqtpsql.h"
-#include "databaseqtsql.h"
 #include "grumpyconf.h"
 #include "syncableircsession.h"
 #include "virtualscrollback.h"
@@ -33,7 +32,7 @@ void DatabaseMigration::SQLite2PSQL()
 {
     GRUMPY_LOG("Migrating database from SQLite backend to PostgreSQL...");
     DatabaseBackend *target = Grumpyd::GetBackend();
-    DatabaseBackend *source = new DatabaseLite();
+    DatabaseBackend *source = new DatabaseQtSqlite();
     DatabaseMigration::migrate(source, target);
 }
 

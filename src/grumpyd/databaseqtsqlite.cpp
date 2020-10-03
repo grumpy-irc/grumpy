@@ -48,6 +48,11 @@ void DatabaseQtSqlite::Maintenance_Specific()
     }
 }
 
+QString DatabaseQtSqlite::GetType()
+{
+    return "DatabaseQtSqlite";
+}
+
 void DatabaseQtSqlite::init()
 {
     // Check if datafile is OK

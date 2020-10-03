@@ -24,6 +24,7 @@ namespace GrumpyIRC
         public:
             DatabaseQtSqlite();
             void Maintenance_Specific() override;
+            QString GetType() override;
         protected:
             void init() override;
             bool install() override;

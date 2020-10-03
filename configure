@@ -66,7 +66,7 @@ do
         echo " --no-colors: suppress colors"
         echo " --version: show version"
         echo
-        echo "Copyright (c) 2013 - 2018 Petr Bena. This script is licensed under the BSD license."
+        echo "Copyright (c) 2013 - 2020 Petr Bena. This script is licensed under the BSD license."
         exit 0
     fi
     if [ "$_BUILD" = "1" ];then
@@ -237,15 +237,6 @@ if [ -d "../.git" ];then
     echo "This is a git repository, updating modules..."
     git submodule init
     git submodule update
-fi
-
-if [ ! -f "src/sqlite/sqlite3.h" ];then
-    echo "The sqlite files are missing! Fixing by using a backup file..."
-    cd "src/sqlite" || exit 1
-    unzip sqlite-amalgamation-3220000.zip || exit 1
-    mv sqlite-amalgamation-3220000/* . || exit 1
-    rm -rf sqlite-amalgamation-3220000 || exit 1
-    cd - || exit 1
 fi
 
 if [ ! -d "src/libirc/libirc" ];then
