@@ -104,11 +104,11 @@ QString GrumpyConf::GetStorage()
 {
     if (this->StorageDummy)
         return "DatabaseDummy";
-#ifdef GRUMPY_SQLITE
-    return GCFG->GetValueAsString("storage", "DatabaseLite");
-#else
-    return GCFG->GetValueAsString("storage", "DatabaseDummy");
-#endif
+
+    if (!this->SQLite_Enabled)
+        return GCFG->GetValueAsString("storage", "DatabaseDummy");
+    else
+        return GCFG->GetValueAsString("storage", "DatabaseLite");
 }
 
 void GrumpyConf::SetStorage(QString name)
