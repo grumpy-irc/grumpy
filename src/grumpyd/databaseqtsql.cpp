@@ -129,8 +129,8 @@ void DatabaseQtSQL::LoadSessions()
     unsigned int lnid = 0;
     while (networks.next())
     {
-        unsigned int nid = networks.value(1).toUInt();
-        User *user = User::GetUser(networks.value(2).toUInt());
+        unsigned int nid = static_cast<unsigned int>(networks.value(1).toInt());
+        User *user = User::GetUser(networks.value(2).toInt());
         if (!user)
         {
             if (!CONF->AutoFix)
@@ -145,7 +145,7 @@ void DatabaseQtSQL::LoadSessions()
             }
             continue;
         }
-        Scrollback *system = user->GetScrollback(networks.value(8).toUInt());
+        Scrollback *system = user->GetScrollback(networks.value(8).toInt());
         if (!system)
         {
             if (!CONF->AutoFix)
@@ -190,7 +190,7 @@ void DatabaseQtSQL::LoadSessions()
         session->SetIdent(networks.value(7).toString());
         session->SetNick(networks.value(6).toString());
         session->SetSSL(Generic::Int2Bool(networks.value(5).toInt()));
-        session->SetPort(networks.value(4).toUInt());
+        session->SetPort(networks.value(4).toInt());
         session->SetName(networks.value(11).toString());
         if (lnid < nid)
             lnid = nid;
@@ -239,7 +239,7 @@ void DatabaseQtSQL::LoadText()
                 if (!text.seek((unsigned int)item--))
                     throw new Exception("Unable to seek: " + text.lastError().text(), BOOST_CURRENT_FUNCTION);
 
-                last_item = text.value(1).toUInt();
+                last_item = text.value(1).toInt();
                 QDateTime date = QDateTime::fromMSecsSinceEpoch(text.value(4).toLongLong());
                 QString item_text = text.value(9).toString();
                 ScrollbackItemType type = static_cast<ScrollbackItemType>(text.value(5).toInt());
@@ -410,7 +410,7 @@ QList<QVariant> DatabaseQtSQL::FetchBacklog(VirtualScrollback *scrollback, scrol
 
     while (text.next())
     {
-        last_item = text.value(1).toUInt();
+        last_item = text.value(1).toInt();
         QString item_text = text.value(9).toString();
         ScrollbackItemType type = static_cast<ScrollbackItemType>(text.value(5).toInt());
         QDateTime date = QDateTime::fromMSecsSinceEpoch(text.value(4).toLongLong());
@@ -535,7 +535,7 @@ void DatabaseQtSQL::LoadWindows()
 {
     scrollback_id_t max_id = 0;
     QSqlQuery windows = this->db.exec("SELECT original_id, user_id, target, type, virtual_state, last_item, parent, id, is_hidden FROM scrollbacks ORDER BY original_id;");
-    windows.setForwardOnly(true);
+    //windows.setForwardOnly(true);
 
     if (!windows.isActive())
         throw new Exception("Unable to recover scrollbacks from sql: " + windows.lastError().text(), BOOST_CURRENT_FUNCTION);
@@ -548,12 +548,12 @@ void DatabaseQtSQL::LoadWindows()
     {
         //! \todo We assume that parent scrollbacks were registered BEFORE the scrollbacks that were inherited
         //! from them, but that doesn't need to be true and could cause troubles
-        scrollback_id_t scrollback_id = windows.value(0).toUInt();
+        scrollback_id_t scrollback_id = static_cast<scrollback_id_t>(windows.value(0).toInt());
         scrollback_id_t parent_id = 0;
         if (!windows.value(6).isNull())
-            parent_id = windows.value(6).toUInt();
+            parent_id = static_cast<scrollback_id_t>(windows.value(6).toInt());
         Scrollback *parent_ptr = nullptr;
-        User *user = User::GetUser(windows.value(1).toUInt());
+        User *user = User::GetUser(windows.value(1).toInt());
         if (!user)
         {
             if (!CONF->AutoFix)
@@ -562,8 +562,8 @@ void DatabaseQtSQL::LoadWindows()
             } else
             {
                 GRUMPY_LOG("Removing scrollback with no owner: " + QString::number(scrollback_id));
-                this->ClearScrollback(scrollback_id, windows.value(1).toUInt());
-                this->RemoveScrollback(windows.value(7).toUInt());
+                this->ClearScrollback(scrollback_id, windows.value(1).toInt());
+                this->RemoveScrollback(windows.value(7).toInt());
             }
             continue;
         }
@@ -664,7 +664,7 @@ void DatabaseQtSQL::StoreItem(User *owner, Scrollback *scrollback, ScrollbackIte
     // When we store new item, we should update last ID as well, but only in case this item is actually higher than last ID,
     // otherwise it's probably a bug or DB is already corrupted, so we just issue a warning without any real update
     bool update_last_id = true;
-    if (scrollback->GetLastID() >= item->GetID())
+    if ((scrollback->GetLastID()-1) >= item->GetID())
     {
         GRUMPY_DEBUG("Warning, scrollback " + QString::number(scrollback->GetID()) + " storing item_id that is LOWER than last_id of scrollback", 1);
         update_last_id = false;

@@ -77,6 +77,9 @@ void DatabaseQtSqlite::init()
     {
         GRUMPY_LOG("Database seems to belong to grumpyd that is newer than this version, it may not work");
     }
+
+    if (this->GetUserCount() == 0)
+        CONF->Init = true;
 }
 
 bool DatabaseQtSqlite::install()
