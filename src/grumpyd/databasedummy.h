@@ -46,6 +46,7 @@ namespace GrumpyIRC
             void LoadWindows() override;
             void LoadText() override;
             void StoreScrollback(User *owner, Scrollback *sx) override;
+            void UpdateScrollback(User *owner, Scrollback *sx) override;
             void StoreNetwork(IRCSession *session) override;
             void StoreUser(User *item) override;
             void UpdateUser(User *user) override;

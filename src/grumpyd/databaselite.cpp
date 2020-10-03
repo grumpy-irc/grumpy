@@ -666,6 +666,11 @@ void DatabaseLite::UnlockUser(User *user)
         throw new Exception("Unable to unlock user using sql: " + this->LastError, BOOST_CURRENT_FUNCTION);
 }
 
+void DatabaseLite::UpdateScrollback(User *owner, Scrollback *sx)
+{
+
+}
+
 QList<QVariant> DatabaseLite::FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size)
 {
     QDateTime t = QDateTime::currentDateTime();

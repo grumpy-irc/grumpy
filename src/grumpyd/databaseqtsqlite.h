@@ -23,6 +23,7 @@ namespace GrumpyIRC
     {
         public:
             DatabaseQtSqlite();
+            void Maintenance_Specific() override;
         protected:
             void init() override;
             bool install() override;

@@ -136,6 +136,7 @@ ALTER TABLE ONLY public.scrollbacks
     ADD CONSTRAINT scrollbacks_pkey PRIMARY KEY (id);
 
 CREATE INDEX scrollbacks_user_idx ON scrollbacks USING btree (user_id);
+CREATE UNIQUE INDEX scrollbacks_original_id_user_id_idx ON scrollbacks USING btree (original_id, user_id);
 
 /******** networks ********/
 

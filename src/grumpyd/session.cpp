@@ -1107,6 +1107,8 @@ void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
         case GP_CMD_GET_SNIFFER:
             this->processSniffer(parameters);
             break;
+        case GP_CMD_HIDE_SB:
+            this->processHideSB(parameters);
         default:
         {
             // We received some unknown packet, send it back to client so that it at least knows we don't support this
@@ -1252,6 +1254,7 @@ void Session::processResync(QHash<QString, QVariant> parameters)
     }
     // let's resync most of the stuff
     origin->LoadHash(parameters["scrollback"].toHash());
+    Grumpyd::GetBackend()->UpdateScrollback(this->loggedUser, origin);
     // we need to resync this with other clients as well
     // let's just forward this
     this->SendToOtherSessions(GP_CMD_SCROLLBACK_PARTIAL_RESYNC, parameters);
@@ -1398,4 +1401,38 @@ void Session::processPBResync(QHash<QString, QVariant> parameters)
 
     // Now we need to notify all clients about this change as well
     this->SendToOtherSessions(GP_CMD_RESYNC_SCROLLBACK_PB, parameters);
+}
+
+void Session::processHideSB(QHash<QString, QVariant> parameters)
+{
+    if (!this->IsAuthorized(PRIVILEGE_USE_IRC))
+    {
+        this->PermissionDeny(GP_CMD_HIDE_SB);
+        return;
+    }
+
+    if (!parameters.contains("scrollback_id"))
+        return;
+    Scrollback *scrollback = this->GetScrollback(parameters["scrollback_id"].toUInt());
+    if (!scrollback)
+        return;
+    if (!parameters.contains("hide"))
+        return;
+
+    if (!scrollback->IsHideable())
+    {
+        this->TransferError(GP_CMD_HIDE_SB, "Scrollback is not hideable", GP_ERROR);
+        return;
+    }
+
+    bool hide = parameters["hide"].toBool();
+    if (hide)
+        scrollback->Hide();
+    else
+        scrollback->Show();
+
+    // Store this in DB
+    Grumpyd::GetBackend()->UpdateScrollback(this->loggedUser, scrollback);
+
+    this->SendToEverySession(GP_CMD_HIDE_SB, parameters);
 }

@@ -38,6 +38,16 @@ DatabaseQtSqlite::DatabaseQtSqlite()
     }
 }
 
+void DatabaseQtSqlite::Maintenance_Specific()
+{
+    GRUMPY_LOG("Performing database optimization");
+    if (!this->ExecuteNonQuery("VACUUM;"))
+    {
+        GRUMPY_ERROR("Failed to vacuum: " + this->db.lastError().text());
+        return;
+    }
+}
+
 void DatabaseQtSqlite::init()
 {
     // Check if datafile is OK

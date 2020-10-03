@@ -56,6 +56,7 @@ namespace GrumpyIRC
             void RemoveUser(User *user) override;
             void LockUser(User *user) override;
             void UnlockUser(User *user) override;
+            void UpdateScrollback(User *owner, Scrollback *sx) override;
             QList<QVariant> FetchBacklog(VirtualScrollback *scrollback, scrollback_id_t from, unsigned int size) override;
             void UpdateNetwork(IRCSession *session) override;
             QList<QVariant> Search(QString text, int context, bool case_sensitive = true) override;

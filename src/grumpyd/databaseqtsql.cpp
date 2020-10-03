@@ -203,63 +203,6 @@ void DatabaseQtSQL::LoadSessions()
     SyncableIRCSession::SetLastNID(lnid);
 }
 
-void DatabaseQtSQL::LoadWindows()
-{
-    scrollback_id_t max_id = 0;
-    QSqlQuery windows = this->db.exec("SELECT original_id, user_id, target, type, virtual_state, last_item, parent, id, is_hidden FROM scrollbacks ORDER BY original_id;");
-    windows.setForwardOnly(true);
-
-    if (!windows.isActive())
-        throw new Exception("Unable to recover scrollbacks from sql: " + windows.lastError().text(), BOOST_CURRENT_FUNCTION);
-
-    // Let's instantiate all loaded scrollbacks, this is actually pretty dangerous, we need to make sure that they are properly registered
-    // so that we prevent some horrid memory leak
-
-    QHash<scrollback_id_t, Scrollback*> scrollbacks;
-    while (windows.next())
-    {
-        //! \todo We assume that parent scrollbacks were registered BEFORE the scrollbacks that were inherited
-        //! from them, but that doesn't need to be true and could cause troubles
-        scrollback_id_t scrollback_id = windows.value(0).toUInt();
-        scrollback_id_t parent_id = 0;
-        if (!windows.value(6).isNull())
-            parent_id = windows.value(6).toUInt();
-        Scrollback *parent_ptr = nullptr;
-        User *user = User::GetUser(windows.value(1).toUInt());
-        if (!user)
-        {
-            if (!CONF->AutoFix)
-            {
-                GRUMPY_ERROR("Missing owner for a scrollback, skipping initialization of scrollback, please run grumpyd with --cleanup parameter to fix this issue permanently");
-            } else
-            {
-                GRUMPY_LOG("Removing scrollback with no owner: " + QString::number(scrollback_id));
-                this->ClearScrollback(scrollback_id, windows.value(1).toUInt());
-                this->RemoveScrollback(windows.value(7).toUInt());
-            }
-            continue;
-        }
-        if (parent_id && scrollbacks.contains(parent_id))
-            parent_ptr = scrollbacks[parent_id];
-        QString target = windows.value(2).toString();
-        if (max_id < scrollback_id)
-            max_id = scrollback_id + 1;
-        ScrollbackType st = static_cast<ScrollbackType>(windows.value(3).toInt());
-        VirtualScrollback *sx = (VirtualScrollback*)Core::GrumpyCore->NewScrollback(parent_ptr, target, st);
-        if (Generic::Int2Bool(windows.value(8).toInt()))
-            sx->Hide();
-        sx->SetOriginalID(scrollback_id);
-        sx->SetLastItemID(windows.value(5).toInt());
-        sx->SetOwner(user, true);
-        if (!sx->PropertyBag.contains("initialized"))
-            sx->PropertyBag.insert("initialized", QVariant(true));
-        if (scrollbacks.contains(scrollback_id))
-            throw new Exception("Multiple scrollbacks with same ID", BOOST_CURRENT_FUNCTION);
-        scrollbacks.insert(scrollback_id, sx);
-    }
-    VirtualScrollback::SetLastID(++max_id);
-}
-
 void DatabaseQtSQL::LoadText()
 {
     foreach (User *user, User::UserInfo)
@@ -558,24 +501,6 @@ void DatabaseQtSQL::RemoveUser(User *user)
         throw new Exception("Unable to remove user using sql: " + this->db.lastError().text(), BOOST_CURRENT_FUNCTION);
 }
 
-void DatabaseQtSQL::RemoveScrollback(unsigned int id)
-{
-    QSqlQuery q(this->db);
-    if (!q.exec("DELETE FROM scrollbacks WHERE id = " + QString::number(id) + ";"))
-        throw new Exception("Unable to remove scrollback from db: " + q.lastError().text(), BOOST_CURRENT_FUNCTION);
-}
-
-void DatabaseQtSQL::RemoveScrollback(User *owner, Scrollback *sx)
-{
-    this->ClearScrollback(owner, sx);
-    QSqlQuery q(this->db);
-    q.prepare("DELETE FROM scrollbacks WHERE original_id = :original_id AND user_id = :user_id;");
-    q.bindValue(":original_id", sx->GetOriginalID());
-    q.bindValue(":user_id", owner->GetID());
-    if (!q.exec())
-        throw new Exception("Unable to remove scrollback from db: " + q.lastError().text(), BOOST_CURRENT_FUNCTION);
-}
-
 void DatabaseQtSQL::LockUser(User *user)
 {
     user_id_t id = user->GetID();
@@ -606,6 +531,63 @@ void DatabaseQtSQL::ClearScrollback(unsigned int id, unsigned int user_id)
                                ";", true);
 }
 
+void DatabaseQtSQL::LoadWindows()
+{
+    scrollback_id_t max_id = 0;
+    QSqlQuery windows = this->db.exec("SELECT original_id, user_id, target, type, virtual_state, last_item, parent, id, is_hidden FROM scrollbacks ORDER BY original_id;");
+    windows.setForwardOnly(true);
+
+    if (!windows.isActive())
+        throw new Exception("Unable to recover scrollbacks from sql: " + windows.lastError().text(), BOOST_CURRENT_FUNCTION);
+
+    // Let's instantiate all loaded scrollbacks, this is actually pretty dangerous, we need to make sure that they are properly registered
+    // so that we prevent some horrid memory leak
+
+    QHash<scrollback_id_t, Scrollback*> scrollbacks;
+    while (windows.next())
+    {
+        //! \todo We assume that parent scrollbacks were registered BEFORE the scrollbacks that were inherited
+        //! from them, but that doesn't need to be true and could cause troubles
+        scrollback_id_t scrollback_id = windows.value(0).toUInt();
+        scrollback_id_t parent_id = 0;
+        if (!windows.value(6).isNull())
+            parent_id = windows.value(6).toUInt();
+        Scrollback *parent_ptr = nullptr;
+        User *user = User::GetUser(windows.value(1).toUInt());
+        if (!user)
+        {
+            if (!CONF->AutoFix)
+            {
+                GRUMPY_ERROR("Missing owner for a scrollback, skipping initialization of scrollback, please run grumpyd with --cleanup parameter to fix this issue permanently");
+            } else
+            {
+                GRUMPY_LOG("Removing scrollback with no owner: " + QString::number(scrollback_id));
+                this->ClearScrollback(scrollback_id, windows.value(1).toUInt());
+                this->RemoveScrollback(windows.value(7).toUInt());
+            }
+            continue;
+        }
+        if (parent_id && scrollbacks.contains(parent_id))
+            parent_ptr = scrollbacks[parent_id];
+        QString target = windows.value(2).toString();
+        if (max_id < scrollback_id)
+            max_id = scrollback_id + 1;
+        ScrollbackType st = static_cast<ScrollbackType>(windows.value(3).toInt());
+        VirtualScrollback *sx = (VirtualScrollback*)Core::GrumpyCore->NewScrollback(parent_ptr, target, st);
+        if (Generic::Int2Bool(windows.value(8).toInt()))
+            sx->Hide();
+        sx->SetOriginalID(scrollback_id);
+        sx->SetLastItemID(windows.value(5).toInt());
+        sx->SetOwner(user, true);
+        if (!sx->PropertyBag.contains("initialized"))
+            sx->PropertyBag.insert("initialized", QVariant(true));
+        if (scrollbacks.contains(scrollback_id))
+            throw new Exception("Multiple scrollbacks with same ID", BOOST_CURRENT_FUNCTION);
+        scrollbacks.insert(scrollback_id, sx);
+    }
+    VirtualScrollback::SetLastID(++max_id);
+}
+
 void DatabaseQtSQL::StoreScrollback(User *owner, Scrollback *sx)
 {
     QSqlQuery q(this->db);
@@ -629,6 +611,38 @@ void DatabaseQtSQL::StoreScrollback(User *owner, Scrollback *sx)
     }
 }
 
+void DatabaseQtSQL::UpdateScrollback(User *owner, Scrollback *sx)
+{
+    QSqlQuery update_sb(this->db);
+    update_sb.prepare("UPDATE scrollbacks SET last_id = :last_id, is_hidden = :is_hidden, virtual_state = :virtual_state "\
+                      "WHERE user_id = :user_id AND original_id = :original_id;");
+    update_sb.bindValue(":last_id", sx->GetLastID());
+    update_sb.bindValue(":user_id", owner->GetID());
+    update_sb.bindValue(":original_id", sx->GetOriginalID());
+    update_sb.bindValue(":is_hidden", sx->IsHidden());
+    update_sb.bindValue(":virtual_state", static_cast<int>(sx->GetState()));
+    if (!update_sb.exec())
+        throw new Exception("Unable to update scrollback: " + this->db.lastError().text(), BOOST_CURRENT_FUNCTION);
+}
+
+void DatabaseQtSQL::RemoveScrollback(unsigned int id)
+{
+    QSqlQuery q(this->db);
+    if (!q.exec("DELETE FROM scrollbacks WHERE id = " + QString::number(id) + ";"))
+        throw new Exception("Unable to remove scrollback from db: " + q.lastError().text(), BOOST_CURRENT_FUNCTION);
+}
+
+void DatabaseQtSQL::RemoveScrollback(User *owner, Scrollback *sx)
+{
+    this->ClearScrollback(owner, sx);
+    QSqlQuery q(this->db);
+    q.prepare("DELETE FROM scrollbacks WHERE original_id = :original_id AND user_id = :user_id;");
+    q.bindValue(":original_id", sx->GetOriginalID());
+    q.bindValue(":user_id", owner->GetID());
+    if (!q.exec())
+        throw new Exception("Unable to remove scrollback from db: " + q.lastError().text(), BOOST_CURRENT_FUNCTION);
+}
+
 void DatabaseQtSQL::UpdateNetwork(IRCSession *session)
 {
     QSqlQuery sql(this->db);
@@ -643,6 +657,17 @@ void DatabaseQtSQL::UpdateNetwork(IRCSession *session)
 
 void DatabaseQtSQL::StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem *item)
 {
+    //! \todo Updating last_id is probably not necessary, whole column could be dropped as last ID is updated when
+    //! items are being loaded anyway, updating last_id wasn't implemented for long time and barely caused
+    //! visible problems
+    // When we store new item, we should update last ID as well, but only in case this item is actually higher than last ID,
+    // otherwise it's probably a bug or DB is already corrupted, so we just issue a warning without any real update
+    bool update_last_id = true;
+    if (scrollback->GetLastID() >= item->GetID())
+    {
+        GRUMPY_DEBUG("Warning, scrollback " + QString::number(scrollback->GetID()) + " storing item_id that is LOWER that last_id of scrollback", 1);
+        update_last_id = false;
+    }
     QSqlQuery q(this->db);
     q.prepare("INSERT INTO scrollback_items (user_id, scrollback_id, date, type, nick, ident, host, text, item_id, self) VALUES "\
               "(:1, :2, :3, :4, :5, :6, :7, :8, :9, :10);");
@@ -657,8 +682,31 @@ void DatabaseQtSQL::StoreItem(User *owner, Scrollback *scrollback, ScrollbackIte
     q.bindValue(":9", QVariant(item->GetID()));
     q.bindValue(":10", QVariant(item->IsSelf()));
 
+    if (update_last_id)
+        this->db.transaction();
+
     if (!q.exec())
+    {
+        if (update_last_id)
+            this->db.rollback();
         throw new Exception("Unable to insert data to db: " + this->db.lastError().text(), BOOST_CURRENT_FUNCTION);
+    }
+
+    if (update_last_id)
+    {
+        QSqlQuery update_sb(this->db);
+        update_sb.prepare("UPDATE scrollbacks SET last_id = :last_id WHERE user_id = :user_id AND original_id = :original_id;");
+        update_sb.bindValue(":last_id", item->GetID());
+        update_sb.bindValue(":user_id", owner->GetID());
+        update_sb.bindValue(":original_id", scrollback->GetOriginalID());
+        if (!update_sb.exec())
+        {
+            this->db.rollback();
+            throw new Exception("Unable to update scrollback last_id: " + this->db.lastError().text(), BOOST_CURRENT_FUNCTION);
+        }
+    }
+    if (update_last_id && !this->db.commit())
+        throw new Exception("Failed to commit insertion of new item: " + this->db.lastError().text(), BOOST_CURRENT_FUNCTION);
 }
 
 void DatabaseQtSQL::UpdateRoles()

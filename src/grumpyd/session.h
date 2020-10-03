@@ -88,6 +88,7 @@ namespace GrumpyIRC
             void processOptions(QHash<QString, QVariant> parameters);
             void processRemove(QHash<QString, QVariant> parameters);
             void processPBResync(QHash<QString, QVariant> parameters);
+            void processHideSB(QHash<QString, QVariant> parameters);
             void processMessage(QHash<QString, QVariant> parameters);
             void processCommand(QHash<QString, QVariant> parameters);
             //! Called when user wants to connect to new IRC server

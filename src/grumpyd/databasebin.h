@@ -48,6 +48,7 @@ namespace GrumpyIRC
             void StoreScrollback(User *owner, Scrollback *sx) override;
             void StoreNetwork(IRCSession *session) override;
             void StoreUser(User *item) override;
+            void UpdateScrollback(User *owner, Scrollback *sx) override;
             void UpdateUser(User *user) override;
             QHash<QString, QByteArray> GetStorage(user_id_t user) override;
             void InsertStorage(user_id_t user, QString key, QByteArray data) override;

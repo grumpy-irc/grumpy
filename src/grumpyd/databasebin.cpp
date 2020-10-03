@@ -242,6 +242,11 @@ void DatabaseBin::StoreUser(User *item)
     this->writeUser(item);
 }
 
+void DatabaseBin::UpdateScrollback(User *owner, Scrollback *sx)
+{
+
+}
+
 void DatabaseBin::UpdateUser(User *user)
 {
     this->writeUser(user);

@@ -150,6 +150,11 @@ void DatabaseDummy::StoreScrollback(User *owner, Scrollback *sx)
 
 }
 
+void DatabaseDummy::UpdateScrollback(User *owner, Scrollback *sx)
+{
+
+}
+
 void DatabaseDummy::StoreNetwork(IRCSession *session)
 {
 

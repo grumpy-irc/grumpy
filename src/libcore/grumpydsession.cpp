@@ -718,6 +718,9 @@ void GrumpydSession::OnIncomingCommand(gp_command_t text, const QHash<QString, Q
         case GP_CMD_SYS_INSTALL_SCRIPT:
             this->processIScript(parameters);
             break;
+        case GP_CMD_HIDE_SB:
+            this->processHideSB(parameters);
+            break;
         case GP_CMD_SYS_UNINST_SCRIPT:
             this->processUScript(parameters);
             break;
@@ -1333,6 +1336,29 @@ void GrumpydSession::processErr(const QHash<QString, QVariant> &parameters)
 {
     this->systemWindow->InsertText("Error: " + parameters["description"].toString(), ScrollbackItemType_SystemError);
     emit this->Event_Error(parameters);
+}
+
+void GrumpydSession::processHideSB(const QHash<QString, QVariant> &parameters)
+{
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
+    if (!parameters.contains("scrollback_id"))
+        return;
+    Scrollback *scrollback = this->GetScrollback(parameters["scrollback_id"].toUInt());
+    if (!scrollback)
+        return;
+    if (!parameters.contains("hide"))
+        return;
+    bool is_hidden = parameters["hide"].toBool();
+    if (!scrollback->IsHideable())
+    {
+        GRUMPY_DEBUG("Ignoring request to toggle scrollback hide status, as scrollback is not hideable: " + QString::number(scrollback->GetID()), 1);
+        return;
+    }
+
+    if (is_hidden)
+        scrollback->Hide();
+    else
+        scrollback->Show();
 }
 
 void GrumpydSession::freememory()

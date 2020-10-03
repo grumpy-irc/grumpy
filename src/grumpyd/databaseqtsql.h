@@ -50,6 +50,7 @@ namespace GrumpyIRC
             void ClearScrollback(User *owner, Scrollback *sx);
             void ClearScrollback(unsigned int id, unsigned int user_id);
             void StoreScrollback(User *owner, Scrollback *sx) override;
+            void UpdateScrollback(User *owner, Scrollback *sx) override;
             void UpdateNetwork(IRCSession *session) override;
             void StoreItem(User *owner, Scrollback *scrollback, ScrollbackItem *item) override;
             void UpdateRoles() override;

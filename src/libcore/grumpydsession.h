@@ -92,6 +92,7 @@
 #define GP_CMD_STORAGE_GET                 33 // Used to read data from personal BLOB storage
 #define GP_CMD_STORAGE_DEL                 34
 #define GP_CMD_AWAY                        35 // Change status
+#define GP_CMD_HIDE_SB                     36 // Toggle hide status of a scrollback
 #define GP_CMD_SYS_LIST_USER               40 // List grumpyd users
 #define GP_CMD_SYS_CREATE_USER             41 // Create a new user
 #define GP_CMD_SYS_REMOVE_USER             42 // Removes a user
@@ -258,6 +259,7 @@ namespace GrumpyIRC
             void processRefuse(const QHash<QString, QVariant> &parameters);
             void processScriptSource(const QHash<QString, QVariant> &parameters);
             void processErr(const QHash<QString, QVariant> &parameters);
+            void processHideSB(const QHash<QString, QVariant> &parameters);
             void freememory();
             void closeError(const QString &error);
             QHash<unsigned int, QList<NetworkSniffer_Item>> snifferCache;
