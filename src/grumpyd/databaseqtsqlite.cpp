@@ -24,7 +24,7 @@ DatabaseQtSqlite::DatabaseQtSqlite()
 {
     this->datafile = Grumpyd::GetDFPath() + "sqlite.dat";
     bool install = !QFile::exists(this->datafile);
-    this->db = QSqlDatabase::addDatabase("SQLITE");
+    this->db = QSqlDatabase::addDatabase("QSQLITE");
     this->db.setDatabaseName(this->datafile);
     if (!this->db.open())
         throw new Exception("Failed to open SQL storage: " + this->db.lastError().text(), BOOST_CURRENT_FUNCTION);
