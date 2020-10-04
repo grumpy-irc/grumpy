@@ -110,6 +110,8 @@ ScrollbackFrame::ScrollbackFrame(ScrollbackFrame *parentWindow, QWidget *parent,
     connect(this->scrollback, SIGNAL(Event_InsertText(ScrollbackItem&)), this, SLOT(_insertText_(ScrollbackItem&)));
     connect(this->scrollback, SIGNAL(Event_Closed()), this, SLOT(OnClosed()));
     connect(this->scrollback, SIGNAL(Event_UserListBulkDone()), this, SLOT(OnFinishSortBulk()));
+    connect(this->scrollback, SIGNAL(Event_Show()), this, SLOT(OnShow()));
+    connect(this->scrollback, SIGNAL(Event_Hide()), this, SLOT(OnHidden()));
     connect(this->scrollback, SIGNAL(Event_UserRefresh(libircclient::User*)), this, SLOT(UserList_Refresh(libircclient::User*)));
     connect(this->scrollback, SIGNAL(Event_Resync()), this, SLOT(OnDead()));
     connect(this->scrollback, SIGNAL(Event_StateModified()), this, SLOT(OnState()));
@@ -482,6 +484,16 @@ void ScrollbackFrame::Menu(QPoint pn)
     }
 }
 
+void ScrollbackFrame::OnHidden()
+{
+    this->SetHidden();
+}
+
+void ScrollbackFrame::OnShow()
+{
+    this->UnsetHidden();
+}
+
 void ScrollbackFrame::OnClosed()
 {
     // The wrapped scrollback is being closed, we must unregister this frame and delete it,
@@ -640,33 +652,41 @@ void ScrollbackFrame::ToggleHide()
 
     if (Generic::IsGrumpyd(this->scrollback))
     {
-
+        dynamic_cast<GrumpydSession*>(this->GetSession())->RequestHide(this->scrollback, !this->scrollback->IsHidden());
         return;
     }
 
     if (!this->scrollback->IsHidden())
     {
-        // Remove from tree list
-        if (!ScrollbackList::GetScrollbackList()->ShowHidden && this->TreeNode)
-        {
-            ScrollbackList_Node *parent = nullptr;
-            if (this->GetParent())
-                parent = this->GetParent()->TreeNode;
-            ScrollbackList::GetScrollbackList()->UnregisterWindow(this->TreeNode, parent);
-            this->TreeNode = nullptr;
-        }
         this->scrollback->Hide();
     }
     else
     {
-        if (!ScrollbackList::GetScrollbackList()->ShowHidden)
-        {
-            ScrollbackList_Node *parent_tree = nullptr;
-            if (this->GetParent())
-                parent_tree = this->GetParent()->TreeNode;
-            ScrollbackList::GetScrollbackList()->RegisterWindow(this, parent_tree);
-        }
         this->scrollback->Show();
+    }
+}
+
+void ScrollbackFrame::SetHidden()
+{
+    // Remove from tree list
+    if (!ScrollbackList::GetScrollbackList()->ShowHidden && this->TreeNode)
+    {
+        ScrollbackList_Node *parent = nullptr;
+        if (this->GetParent())
+            parent = this->GetParent()->TreeNode;
+        ScrollbackList::GetScrollbackList()->UnregisterWindow(this->TreeNode, parent);
+        this->TreeNode = nullptr;
+    }
+}
+
+void ScrollbackFrame::UnsetHidden()
+{
+    if (!ScrollbackList::GetScrollbackList()->ShowHidden)
+    {
+        ScrollbackList_Node *parent_tree = nullptr;
+        if (this->GetParent())
+            parent_tree = this->GetParent()->TreeNode;
+        ScrollbackList::GetScrollbackList()->RegisterWindow(this, parent_tree);
     }
 }
 

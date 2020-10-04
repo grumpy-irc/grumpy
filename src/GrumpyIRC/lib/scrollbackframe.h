@@ -92,6 +92,8 @@ namespace GrumpyIRC
             bool IsGrumpy();
             bool IsHidden();
             void ToggleHide();
+            void SetHidden();
+            void UnsetHidden();
             bool IsVisible();
             bool IsDead();
             bool HasUserFrame() { return this->userFrame != nullptr; }
@@ -157,6 +159,8 @@ namespace GrumpyIRC
             void OnScroll();
             void Refresh();
             void Menu(QPoint pn);
+            void OnHidden();
+            void OnShow();
             void OnClosed();
             void NetworkChanged(libircclient::Network *network);
         private:

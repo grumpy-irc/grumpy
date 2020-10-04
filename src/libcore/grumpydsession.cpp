@@ -179,6 +179,15 @@ void GrumpydSession::RequestRemove(Scrollback *scrollback)
     this->SendProtocolCommand(GP_CMD_REMOVE, parameters);
 }
 
+void GrumpydSession::RequestHide(Scrollback *scrollback, bool hide)
+{
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
+    QHash<QString, QVariant> parameters;
+    parameters.insert("scrollback_id", scrollback->GetOriginalID());
+    parameters.insert("hide", hide);
+    this->gp->SendProtocolCommand(GP_CMD_HIDE_SB, parameters);
+}
+
 QList<QString> GrumpydSession::GetChannels(Scrollback *scrollback)
 {
     GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);

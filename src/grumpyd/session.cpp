@@ -1109,6 +1109,7 @@ void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
             break;
         case GP_CMD_HIDE_SB:
             this->processHideSB(parameters);
+            break;
         default:
         {
             // We received some unknown packet, send it back to client so that it at least knows we don't support this

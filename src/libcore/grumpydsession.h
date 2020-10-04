@@ -174,6 +174,7 @@ namespace GrumpyIRC
             QString GetLocalUserModeAsString(Scrollback *scrollback) override;
             void RetrieveChannelBanList(Scrollback *scrollback, QString channel_name) override;
             void RequestRemove(Scrollback *scrollback) override;
+            void RequestHide(Scrollback *scrollback, bool hide);
             void RequestDisconnect(Scrollback *scrollback, QString reason, bool auto_delete) override;
             void ResyncPB(Scrollback *scrollback);
             void ResyncSingleItemPB(Scrollback *scrollback, const QString &name);
