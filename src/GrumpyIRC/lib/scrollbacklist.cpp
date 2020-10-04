@@ -248,7 +248,7 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
             if (wx->IsDead())
                 menuPart->setEnabled(false);
             Menu.addAction(menuPart);
-            menuJoinAll = new QAction(QObject::tr("Rejoin all dead channels on this network"), &Menu);
+            menuJoinAll = new QAction(QObject::tr("Rejoin all visible dead channels on this network"), &Menu);
             Menu.addAction(menuJoinAll);
         }
         if (wx->IsNetwork())
@@ -353,7 +353,8 @@ void GrumpyIRC::ScrollbackList::on_treeView_customContextMenuRequested(const QPo
             throw new NullPointerException("irc_session", BOOST_CURRENT_FUNCTION);
         foreach (Scrollback *channel, irc_session->GetChannelScrollbacks())
         {
-            if (channel->IsDead())
+            // We rejoin all dead channels that are visible in menu
+            if (channel->IsDead() && (this->ShowHidden || !channel->IsHidden()))
                 wx->TransferRaw("JOIN " + channel->GetTarget(), libircclient::Priority_Low);
         }
     } else if (selectedItem == menuReconnectAll)
