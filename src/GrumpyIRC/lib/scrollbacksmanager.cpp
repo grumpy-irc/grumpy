@@ -57,6 +57,9 @@ ScrollbackFrame *ScrollbacksManager::CreateWindow(QString name, ScrollbackFrame 
         parent_tree = parent->TreeNode;
     if (scrollbacks)
         scrollbacks->RegisterWindow(window, parent_tree);
+    // If scrollback is already hidden, remove it from tree view
+    if (scrollback && scrollback->IsHidden())
+        window->SetHidden();
     UiHooks::OnNewScrollbackFrame(window);
     return window;
 }

@@ -353,6 +353,9 @@ void Scrollback::LoadHash(const QHash<QString, QVariant> &hash)
         emit this->Event_Reload();
     }
     UNSERIALIZE_BOOL(_hidable);
+    // if the scrollback is hidden, we need to emit event so that containers that host this scrollback are aware of this
+    if (this->_sbHidden)
+        emit this->Event_Hide();
 }
 
 void Scrollback::Resync(Scrollback *target)

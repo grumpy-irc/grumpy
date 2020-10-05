@@ -998,8 +998,7 @@ void Session::OnCommand(gp_command_t text, QHash<QString, QVariant> parameters)
         {
             if (parameters.contains("version"))
                 GRUMPY_DEBUG(QString("SID ") + QString::number(this->SID) + QString(" version ") + parameters["version"].toString(), 1);
-            // respond to HELLO which is a first command that is meant to be sent by a client to server and only server
-            // can respond to it
+            // respond to HELLO which is a first command that is meant to be sent by a client to server and only server can respond to it
             QHash<QString, QVariant> params;
             params.insert("version", QVariant(QString("Grumpyd ") + GRUMPY_VERSION_STRING));
             if (CONF->Init)
