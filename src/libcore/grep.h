@@ -19,7 +19,7 @@
 
 namespace GrumpyIRC
 {
-    class GREP
+    class LIBCORESHARED_EXPORT GREP
     {
         public:
             GREP(QString regex, bool case_sensitive = true);
