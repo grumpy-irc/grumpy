@@ -83,7 +83,7 @@ namespace GrumpyIRC
             scrollback_id_t _id;
             libircclient::User _user;
             QString _text;
-            bool _self;
+            bool _self = false;
             QDateTime _datetime;
             ScrollbackItemType _type;
     };
