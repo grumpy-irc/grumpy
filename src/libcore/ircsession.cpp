@@ -489,7 +489,7 @@ void IRCSession::SendAction(Scrollback *scrollback, QString text)
         throw new GrumpyIRC::Exception("scrollback->GetTarget() contains empty string", BOOST_CURRENT_FUNCTION);
     this->GetNetwork()->SendAction(text, scrollback->GetTarget());
     // Write the message to active scrollback
-    scrollback->InsertText(ScrollbackItem(text, ScrollbackItemType_Act, this->GetNetwork()->GetLocalUserInfo()));
+    scrollback->InsertText(ScrollbackItem(text, ScrollbackItemType_Act, this->GetNetwork()->GetLocalUserInfo(), 0, true));
 }
 
 void IRCSession::SendRaw(Scrollback *scrollback, QString raw, libircclient::Priority pr)
