@@ -36,7 +36,8 @@ QHash<QString, QString> GrumpyIRC::ScrollbackJS::GetFunctions()
     fh.insert("create", "(parent, name): creates a new scrollback, parent can be 0 if this should be root scrollback, "\
                         "returns false on error otherwise scrollback_id");
     fh.insert("remove", "(scrollback_id): destroy scrollback, can be only used for scrollbacks created with this script");
-    fh.insert("write", "(scrollback_id, text): write text");
+    fh.insert("write", "(scrollback_id, text): just write text (system style) to scrollback");
+    fh.insert("process_text", "(scrollback_id, text): run CommandProcessor on text, identical to putting a text into input box and hitting enter, you can send messages this way, or execute commands if you prefix them");
     fh.insert("get_type", "(scrollback_id): return type of scrollback; system, channel, user");
     fh.insert("get_target", "(scrollback_id): return target name of scrollback (channel name, user name)");
     fh.insert("has_network", "(scrollback_id): return true if scrollback belongs to network");
@@ -54,6 +55,18 @@ bool ScrollbackJS::write(unsigned int scrollback_id, const QString& text)
         return false;
     }
     w->InsertText(text);
+    return true;
+}
+
+bool ScrollbackJS::process_text(unsigned int scrollback_id, const QString &text)
+{
+    Scrollback *w = Scrollback::GetScrollbackByID(scrollback_id);
+    if (!w)
+    {
+        GRUMPY_ERROR(this->script->GetName() + ": process_text(scrollback_id, text): unknown scrollback");
+        return false;
+    }
+    Core::GrumpyCore->GetCommandProcessor()->ProcessText(text, w);
     return true;
 }
 
