@@ -228,7 +228,7 @@ void IRCSession::Connect(libircclient::Network *Network)
     this->network = Network;
     this->connInternalSocketSignals();
     this->network->Connect();
-    this->timerULQueue.start(20000);
+    this->timerULQueue.start(this->autoSyncULRateLimit);
     if (this->autoSyncUserList)
         this->timerUL.start(this->ulistUpdateTime);
 }
@@ -384,6 +384,7 @@ void IRCSession::init(bool preindexed)
     this->_ssl = false;
     this->snifferEnabled = true;
     this->highlightCollector = nullptr;
+    this->lastWHO = QDateTime::currentDateTime();
     this->ulistUpdateTime = 20 * 60000;
     connect(&this->timerULQueue, SIGNAL(timeout()), this, SLOT(OnProcessULQueue()));
     connect(&this->timerUL, SIGNAL(timeout()), this, SLOT(OnUpdateUserList()));
@@ -798,9 +799,8 @@ void IRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
         scrollback->SetSession(this);
     }
     // Request some information about users in the channel
-    if (!this->syncULQueue.contains(channel->GetName()))
-        this->syncULQueue.append(channel->GetName());
     this->GetNetwork()->TransferRaw("MODE " + channel->GetName(), libircclient::Priority_Low);
+    this->ResyncUL(channel->GetName());
     if (this->AutomaticallyRetrieveBanList)
         this->RetrieveChannelBanList(nullptr, ln);
     Hooks::OnNetwork_ChannelJoined(this, channel->GetName());
@@ -1118,14 +1118,26 @@ void IRCSession::OnMODETIME(libircclient::Parser *px)
     sc->InsertText("Channel was created at " + QDateTime::fromTime_t(lx[2].toUInt()).toString(), this->getTrueTime(px->GetTimestamp()));
 }
 
+void IRCSession::ResyncUL(QString channel_name)
+{
+    if (this->lastWHO.msecsTo(QDateTime::currentDateTime()) > this->autoSyncULRateLimit)
+    {
+        this->GetNetwork()->TransferRaw("WHO " + channel_name, libircclient::Priority_Low);
+        this->lastWHO = QDateTime::currentDateTime();
+    } else
+    {
+        if (!this->syncULQueue.contains(channel_name))
+            this->syncULQueue.append(channel_name);
+    }
+}
+
 void IRCSession::OnUpdateUserList()
 {
     if (!this->network)
         return;
     foreach (libircclient::Channel *channel, this->network->GetChannels())
     {
-        if (!this->syncULQueue.contains(channel->GetName()))
-            this->syncULQueue.append(channel->GetName());
+        this->ResyncUL(channel->GetName());
     }
 }
 
@@ -1139,6 +1151,7 @@ void IRCSession::OnProcessULQueue()
         return;
     this->retrievingWho.append(channel.toLower());
     this->GetNetwork()->TransferRaw("WHO " + channel, libircclient::Priority_Low);
+    this->lastWHO = QDateTime::currentDateTime();
 }
 
 void IRCSession::OnMODE(libircclient::Parser *px)

@@ -131,6 +131,10 @@ namespace GrumpyIRC
             void DisableAutoULSync();
             //! Returns true if we are inside of this channel (if channel is parted or inactive returns false)
             bool InChannel(QString name);
+            //! Send a request to resync user list (via WHO) - this is done right after joining the channel, so that
+            //! we know more about users than their nicknames, and also periodically to keep it synced as many networks
+            //! have all sorts of glitches that lead to inconsistencies over time (mostly non IRCv3 networks)
+            void ResyncUL(QString channel_name);
             QList<int> IgnoredNums;
             Scrollback *Root;
             bool AutomaticallyRetrieveBanList;
@@ -219,12 +223,6 @@ namespace GrumpyIRC
             virtual void SyncWindows(QHash<QString, QVariant> scrollbacks, QHash<QString, Scrollback*> *hash);
             //! Returns true time of message based on server time offset, works only with servers that support server-time
             QDateTime getTrueTime(const QDateTime& server_time);
-            QTimer timerUL;
-            //! In past we were "blast" syncing userlist for all channels, that works on most networks, but isn't ircd friendly when
-            //! you are in too many channels, as it essentialy runs WHO on all channels you are in on same time.
-            //! To avoid such DDoS of ircd, we are now enqueuing the WHO requests instead, and run them after 20 seconds each.
-            QList<QString> syncULQueue;
-            QTimer timerULQueue;
             //! Sessions have unique ID that distinct them from sessions made to same irc network
             unsigned int SID;
             unsigned int _port;
@@ -241,7 +239,19 @@ namespace GrumpyIRC
             QList<QString> ignoringExceptions;
             QList<QString> ignoringInvites;
             QHash<QString, Scrollback*> channels;
+            //! On most networks it's useful to auto sync userlists using WHO requests, to keep the userlists fresh even when
+            //! user status or hostname is silently changed
             bool autoSyncUserList = true;
+            QTimer timerUL;
+            //! In past we were "blast" syncing userlist for all channels, that works on most networks, but isn't ircd friendly when
+            //! you are in too many channels, as it essentialy runs WHO on all channels you are in on same time.
+            //! To avoid such DDoS of ircd, we are now enqueuing the WHO requests instead, and run them after 20 seconds each.
+            QList<QString> syncULQueue;
+            QTimer timerULQueue;
+            //! Send only 1 WHO within this interval to avoid spamming the ircd
+            int autoSyncULRateLimit = 10000;
+            //! When was the last WHO request to any channel made (only auto-sync WHO requests count here)
+            QDateTime lastWHO;
             //! Hide extras of WHO listing (ending message denoting end of listing)
             //! this is useful on networks like solanum, where rate limiting is producing these extras and they are annoying in system window
             bool hideWHOExtras = false;
