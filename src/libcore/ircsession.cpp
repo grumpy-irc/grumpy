@@ -1120,9 +1120,12 @@ void IRCSession::OnMODETIME(libircclient::Parser *px)
 
 void IRCSession::ResyncUL(QString channel_name)
 {
+    if (!this->IsConnected())
+        return;
     if (this->lastWHO.msecsTo(QDateTime::currentDateTime()) > this->autoSyncULRateLimit)
     {
         this->GetNetwork()->TransferRaw("WHO " + channel_name, libircclient::Priority_Low);
+        this->retrievingWho.append(channel_name.toLower());
         this->lastWHO = QDateTime::currentDateTime();
     } else
     {
