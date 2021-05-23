@@ -129,6 +129,8 @@ namespace GrumpyIRC
             //! this will lead to eventual inconsistencies between reality, as hostname changes and away changes
             //! may be unnoticed by the client
             void DisableAutoULSync();
+            //! Returns true if we are inside of this channel (if channel is parted or inactive returns false)
+            bool InChannel(QString name);
             QList<int> IgnoredNums;
             Scrollback *Root;
             bool AutomaticallyRetrieveBanList;

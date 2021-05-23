@@ -739,6 +739,13 @@ void IRCSession::DisableAutoULSync()
     this->autoSyncUserList = false;
 }
 
+bool IRCSession::InChannel(QString name)
+{
+    if (!this->IsConnected())
+        return false;
+    return this->network->GetChannel(name) != nullptr;
+}
+
 void IRCSession::OnOutgoingRawMessage(QByteArray message)
 {
     if (!this->snifferEnabled)
@@ -1128,9 +1135,9 @@ void IRCSession::OnProcessULQueue()
         return;
     QString channel = this->syncULQueue.first();
     this->syncULQueue.removeFirst();
-    if (!this->channels.contains(channel))
+    if (!this->InChannel(channel))
         return;
-    this->ignoringWho.append(channel.toLower());
+    this->retrievingWho.append(channel.toLower());
     this->GetNetwork()->TransferRaw("WHO " + channel, libircclient::Priority_Low);
 }
 
