@@ -1134,7 +1134,7 @@ void IRCSession::OnProcessULQueue()
     if (this->syncULQueue.isEmpty())
         return;
     QString channel = this->syncULQueue.first();
-    this->syncULQueue.removeFirst();
+    this->syncULQueue.removeAll(channel);
     if (!this->InChannel(channel))
         return;
     this->retrievingWho.append(channel.toLower());
