@@ -228,7 +228,9 @@ void IRCSession::Connect(libircclient::Network *Network)
     this->network = Network;
     this->connInternalSocketSignals();
     this->network->Connect();
-    this->timerUL.start(this->ulistUpdateTime);
+    this->timerULQueue.start(20000);
+    if (this->autoSyncUserList)
+        this->timerUL.start(this->ulistUpdateTime);
 }
 
 void GrumpyIRC::IRCSession::SendMessage(Scrollback *scrollback, QString target, QString text)
@@ -383,6 +385,7 @@ void IRCSession::init(bool preindexed)
     this->snifferEnabled = true;
     this->highlightCollector = nullptr;
     this->ulistUpdateTime = 20 * 60000;
+    connect(&this->timerULQueue, SIGNAL(timeout()), this, SLOT(OnProcessULQueue()));
     connect(&this->timerUL, SIGNAL(timeout()), this, SLOT(OnUpdateUserList()));
     this->maxSnifferBufferSize = 2000;
     if (!preindexed)
@@ -429,7 +432,9 @@ QHash<QString, QVariant> IRCSession::ToHash(int max_items)
     SERIALIZE(_autoReconnect);
     SERIALIZE(_port);
     SERIALIZE(_ssl);
+    SERIALIZE(hideWHOExtras);
     SERIALIZE(createdOn);
+    SERIALIZE(autoSyncUserList);
     SERIALIZE(connectedOn);
     if (this->network)
         hash.insert("network", QVariant(this->network->ToHash()));
@@ -450,6 +455,7 @@ QHash<QString, QVariant> IRCSession::ToHash(int max_items)
 void IRCSession::LoadHash(const QHash<QString, QVariant> &hash)
 {
     UNSERIALIZE_UINT(SID);
+    UNSERIALIZE_BOOL(hideWHOExtras);
     UNSERIALIZE_BOOL(_autoReconnect);
     UNSERIALIZE_STRING(_nick);
     UNSERIALIZE_BOOL(_ssl);
@@ -459,6 +465,7 @@ void IRCSession::LoadHash(const QHash<QString, QVariant> &hash)
     UNSERIALIZE_STRING(_hostname);
     UNSERIALIZE_DATETIME(createdOn);
     UNSERIALIZE_DATETIME(connectedOn);
+    UNSERIALIZE_BOOL(autoSyncUserList);
     if (hash.contains("network"))
         this->network = new libircclient::Network(hash["network"].toHash());
 
@@ -715,6 +722,23 @@ void IRCSession::SetSniffer(bool enabled, int size)
     this->maxSnifferBufferSize = size;
 }
 
+void IRCSession::ShowWhoExtras()
+{
+    this->hideWHOExtras = false;
+}
+
+void IRCSession::HideWhoExtras()
+{
+    this->hideWHOExtras = true;
+}
+
+void IRCSession::DisableAutoULSync()
+{
+    if (this->timerUL.isActive())
+        this->timerUL.stop();
+    this->autoSyncUserList = false;
+}
+
 void IRCSession::OnOutgoingRawMessage(QByteArray message)
 {
     if (!this->snifferEnabled)
@@ -767,12 +791,11 @@ void IRCSession::OnIRCSelfJoin(libircclient::Channel *channel)
         scrollback->SetSession(this);
     }
     // Request some information about users in the channel
-    if (!this->retrievingWho.contains(ln))
-        this->retrievingWho.append(ln);
+    if (!this->syncULQueue.contains(channel->GetName()))
+        this->syncULQueue.append(channel->GetName());
     this->GetNetwork()->TransferRaw("MODE " + channel->GetName(), libircclient::Priority_Low);
     if (this->AutomaticallyRetrieveBanList)
         this->RetrieveChannelBanList(nullptr, ln);
-    this->GetNetwork()->TransferRaw("WHO " + channel->GetName(), libircclient::Priority_Low);
     Hooks::OnNetwork_ChannelJoined(this, channel->GetName());
 }
 
@@ -1060,7 +1083,7 @@ void IRCSession::OnWhoEnd(libircclient::Parser *px)
 
     if (this->retrievingWho.contains(name))
         this->retrievingWho.removeOne(name);
-    else
+    else if (!this->hideWHOExtras)
         this->systemWindow->InsertText("End of WHO for " + name, this->getTrueTime(px->GetTimestamp()));
 }
 
@@ -1094,9 +1117,21 @@ void IRCSession::OnUpdateUserList()
         return;
     foreach (libircclient::Channel *channel, this->network->GetChannels())
     {
-        this->ignoringWho.append(channel->GetName().toLower());
-        this->GetNetwork()->TransferRaw("WHO " + channel->GetName(), libircclient::Priority_Low);
+        if (!this->syncULQueue.contains(channel->GetName()))
+            this->syncULQueue.append(channel->GetName());
     }
+}
+
+void IRCSession::OnProcessULQueue()
+{
+    if (this->syncULQueue.isEmpty())
+        return;
+    QString channel = this->syncULQueue.first();
+    this->syncULQueue.removeFirst();
+    if (!this->channels.contains(channel))
+        return;
+    this->ignoringWho.append(channel.toLower());
+    this->GetNetwork()->TransferRaw("WHO " + channel, libircclient::Priority_Low);
 }
 
 void IRCSession::OnMODE(libircclient::Parser *px)

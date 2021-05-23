@@ -123,6 +123,12 @@ namespace GrumpyIRC
             bool IsAutoreconnect(Scrollback *scrollback) override;
             void SetAutoreconnect(Scrollback *scrollback, bool reconnect) override;
             void SetSniffer(bool enabled, int size);
+            void ShowWhoExtras();
+            void HideWhoExtras();
+            //! Disables automatic syncing of user list, on some IRCv3 this is not needed, but on older networks
+            //! this will lead to eventual inconsistencies between reality, as hostname changes and away changes
+            //! may be unnoticed by the client
+            void DisableAutoULSync();
             QList<int> IgnoredNums;
             Scrollback *Root;
             bool AutomaticallyRetrieveBanList;
@@ -164,6 +170,7 @@ namespace GrumpyIRC
             virtual void OnMODEInfo(libircclient::Parser *px, libircclient::Channel *channel);
             virtual void OnMODETIME(libircclient::Parser *px);
             virtual void OnUpdateUserList();
+            virtual void OnProcessULQueue();
             virtual void OnMODE(libircclient::Parser *px);
             virtual void OnUserAwayStatusChange(libircclient::Parser *px, libircclient::Channel *ch, libircclient::User *ux);
             virtual void OnChannelMODE(libircclient::Parser *px, libircclient::Channel *channel);
@@ -211,6 +218,11 @@ namespace GrumpyIRC
             //! Returns true time of message based on server time offset, works only with servers that support server-time
             QDateTime getTrueTime(const QDateTime& server_time);
             QTimer timerUL;
+            //! In past we were "blast" syncing userlist for all channels, that works on most networks, but isn't ircd friendly when
+            //! you are in too many channels, as it essentialy runs WHO on all channels you are in on same time.
+            //! To avoid such DDoS of ircd, we are now enqueuing the WHO requests instead, and run them after 20 seconds each.
+            QList<QString> syncULQueue;
+            QTimer timerULQueue;
             //! Sessions have unique ID that distinct them from sessions made to same irc network
             unsigned int SID;
             unsigned int _port;
@@ -227,6 +239,10 @@ namespace GrumpyIRC
             QList<QString> ignoringExceptions;
             QList<QString> ignoringInvites;
             QHash<QString, Scrollback*> channels;
+            bool autoSyncUserList = true;
+            //! Hide extras of WHO listing (ending message denoting end of listing)
+            //! this is useful on networks like solanum, where rate limiting is producing these extras and they are annoying in system window
+            bool hideWHOExtras = false;
             bool snifferEnabled;
             Scrollback *highlightCollector;
             int ulistUpdateTime;

@@ -116,7 +116,11 @@ void SyncableIRCSession::Connect()
     this->network->SetDefaultUsername(this->owner->GetConfiguration()->GetValueAsString("user", "GrumpyChat https://github.com/grumpy-irc/grumpy"));
     this->network->Connect();
     (((VirtualScrollback*)this->systemWindow)->PartialSync());
-    this->timerUL.start(this->ulistUpdateTime);
+    this->timerULQueue.start(20000);
+    if (this->autoSyncUserList)
+    {
+        this->timerUL.start(this->ulistUpdateTime);
+    }
 }
 
 void SyncableIRCSession::ResyncChannel(libircclient::Channel *channel)
