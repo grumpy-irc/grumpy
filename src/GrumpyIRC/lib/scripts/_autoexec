@@ -29,7 +29,7 @@
 /echo Some tips for easy start:
 /echo * Change the default nickname: /nick <default nickname> (in this window)
 /echo * Connect to an IRC server: /server [irc(s)://] hostname [:port]
-/echo   For example: /server ircs://chat.freenode.net
+/echo   For example: /server ircs://irc.libera.chat
 /echo * Connect to grumpyd: /grumpyd hostname username password
 /echo Full manual at https://github.com/grumpy-irc/grumpy/wiki
 /echo For support click here: ircs://irc.tm-irc.org/#GrumpyChat
