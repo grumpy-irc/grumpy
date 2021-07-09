@@ -198,6 +198,7 @@ namespace GrumpyIRC
             virtual void OnWhoisHost(libircclient::Parser *px);
             virtual void OnWhoisEnd(libircclient::Parser *px);
             virtual void OnAway(libircclient::Parser *px);
+            virtual void OnCAP_ACK(libircclient::Parser *px);
             // Generic whois
             virtual void OnWhoisGen(libircclient::Parser *px);
             virtual void OnWhoisAcc(libircclient::Parser *px);

@@ -1345,6 +1345,17 @@ void IRCSession::OnAway(libircclient::Parser *px)
     this->systemWindow->InsertText(px->GetParameters()[1] + " is away: " + px->GetText(), this->getTrueTime(px->GetTimestamp()));
 }
 
+void IRCSession::OnCAP_ACK(libircclient::Parser *px)
+{
+    OnGeneric(px);
+    if (this->network->CapabilityEnabled("away-notify"))
+    {
+        // Since this network supports away-notify we don't need to periodically sync the user list in channels using WHO hacks
+        GRUMPY_DEBUG("Disabling auto usersync for network " + this->GetName() + " because it supports away-notify / IRCv3", 1);
+        this->DisableAutoULSync();
+    }
+}
+
 void IRCSession::OnWhoisGen(libircclient::Parser *px)
 {
     this->whoisIs(px);
@@ -1507,6 +1518,7 @@ void IRCSession::connInternalSocketSignals()
     connect(this->network, SIGNAL(Event_WhoisSecure(libircclient::Parser*)), this, SLOT(OnWhoisGen(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_WhoisHost(libircclient::Parser*)), this, SLOT(OnWhoisGen(libircclient::Parser*)));
     connect(this->network, SIGNAL(Event_WhoisModes(libircclient::Parser*)), this, SLOT(OnWhoisGen(libircclient::Parser*)));
+    connect(this->network, SIGNAL(Event_CAP_ACK(libircclient::Parser*)), this, SLOT(OnCAP_ACK(libircclient::Parser*)));
 }
 
 void IRCSession::_gs_ResyncNickChange(QString new_, QString old_)
