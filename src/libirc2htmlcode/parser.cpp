@@ -261,19 +261,19 @@ QString Parser::replaceSpecials(QString source)
                     close_k = !close_k;
                     source.insert(current_pos, "</font>");
                 }
-            } else if (source.size() > current_pos + 2)
+            } else if (source.size() > current_pos)
             {
                 // Check if next 2 are numbers
                 QString color_scode;
                 // How many characters we need to remove from original string,
                 // this varies on size of color code string
                 int replace_len = 1;
-                if (isNumber(source[current_pos + 1]))
+                if ((source.size() > current_pos + 1) && isNumber(source[current_pos + 1]))
                 {
                     replace_len++;
                     color_scode += source[current_pos + 1];
                 }
-                if (isNumber(source[current_pos + 2]))
+                if ((source.size() > current_pos + 2) && isNumber(source[current_pos + 2]))
                 {
                     replace_len++;
                     color_scode += source[current_pos + 2];
@@ -307,7 +307,6 @@ QString Parser::replaceSpecials(QString source)
                     source.insert(current_pos, "</font>");
                 }
             }
-
         } else if (current_symbol == italic)
         {
             source = source.remove(current_pos, 1);
