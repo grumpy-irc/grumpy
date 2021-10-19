@@ -44,10 +44,14 @@ namespace GrumpyIRC
 
         public slots:
             void Main();
+            //! Executed by timer - some objects (threads) can't delete themselves, due to Qt bug, this timer will check if threads are terminated
+            //! and deletes them from memory periodically
+            void MemoryCleanup();
 
         private:
             void initScripts();
             DatabaseBackend *databaseBackend;
+            QTimer *tClean;
             Listener *listener;
             Listener *listenerSSL;
             bool running;

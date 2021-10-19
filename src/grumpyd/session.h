@@ -42,6 +42,9 @@ namespace GrumpyIRC
             Q_OBJECT
         public:
             static QList<Session*> Sessions();
+            //! Cleanup all terminated sessions from memory, this used to be part of control thread, but clearly it was leading to segfaults randomly
+            //! so this central function was created instead that needs to run from main loop
+            static void DeleteOffline();
 
             Session(qintptr socket_ptr, bool ssl);
             ~Session() override;
@@ -113,6 +116,7 @@ namespace GrumpyIRC
             QTcpSocket *socket;
             QString peer;
             bool usingSsl;
+            bool threadRunning = true;
             User *loggedUser;
             libgp::GP *protocol;
             unsigned long SID;

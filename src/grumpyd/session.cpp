@@ -42,6 +42,20 @@ QList<Session *> Session::Sessions()
     return SessionList;
 }
 
+void Session::DeleteOffline()
+{
+    sessions_lock->lock();
+    // Create a copy of session list, we can't use the main one because sessions need to access it when
+    // they are being deleted
+    QList<Session*> sl = QList<Session*>(SessionList);
+    sessions_lock->unlock();
+    foreach (Session *s, sl)
+    {
+        if (s->SessionState == State_Offline && !s->threadRunning)
+            delete s;
+    }
+}
+
 Session::Session(qintptr socket_ptr, bool ssl)
 {
     this->IsAway = false;
@@ -117,7 +131,7 @@ void Session::run()
 {
     if (this->SessionState == State_Offline)
     {
-        this->deleteLater();
+        this->threadRunning = false;
         return;
     }
     while(this->IsRunning)
@@ -125,7 +139,7 @@ void Session::run()
 
     // exit the session
     this->SessionState = State_Offline;
-    this->deleteLater();
+    this->threadRunning = false;
 }
 
 unsigned long Session::GetSID()

@@ -27,7 +27,7 @@ Parser::Parser()
     this->LinkColor = "#94D7F2";
     this->cacheMiss = 0;
     this->Protocols << "http" << "https" << "ftp" << "irc" << "ircs";
-    this->Punctuation << '?' << '!' << ';' << ':' << ',';
+    this->Punctuation << '?' << '!' << ';' << ':' << ',' << '&';
     this->LinkSeparators << ' ' << ',' << '(' << ')';
     this->Separators << ' ' << ',' << ':' << ';' << '!' << '(' << ')';
     this->SeparatorsPriv << ' ' << '(' << ',' << '+' << '%' << '@' << '&' << '~';

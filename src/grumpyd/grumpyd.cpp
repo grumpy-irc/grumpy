@@ -21,6 +21,7 @@
 #include "databaseqtsqlite.h"
 #include "user.h"
 #include "sleeper.h"
+#include "session.h"
 #include "listener.h"
 #include "databaseqtsql.h"
 #include "databaseqtpsql.h"
@@ -82,6 +83,9 @@ Grumpyd::Grumpyd()
     grumpyd = this;
     this->listener = new Listener();
     this->listenerSSL = new Listener(true);
+    this->tClean = new QTimer(this);
+    connect(this->tClean, SIGNAL(timeout()), this, SLOT(MemoryCleanup()));
+    this->tClean->start(10000);
 }
 
 Grumpyd::~Grumpyd()
@@ -189,6 +193,11 @@ void Grumpyd::Main()
             GRUMPY_LOG("Listener (SSL) open on port " + QString::number(CONF->SecuredPort));
         }
     }
+}
+
+void Grumpyd::MemoryCleanup()
+{
+    Session::DeleteOffline();
 }
 
 void Grumpyd::initScripts()
