@@ -48,6 +48,8 @@ namespace GrumpyIRC
         LIBCORESHARED_EXPORT bool String2Bool(const QString &string, bool invalid = false);
         LIBCORESHARED_EXPORT QString Bool2String(bool boolean);
         LIBCORESHARED_EXPORT bool IsValidFileName(QString file);
+        //! Replaces all special symbols that would prevent this file from being used in path
+        LIBCORESHARED_EXPORT QString String2ValidPath(QString path);
         //! \todo No unit test
         LIBCORESHARED_EXPORT QStringList Trim(QStringList list);
         LIBCORESHARED_EXPORT int Bool2Int(bool value);

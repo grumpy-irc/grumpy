@@ -396,6 +396,26 @@ QString GrumpyConf::GetLastSavePath()
     return GCFG->GetValueAsString("save_path");
 }
 
+bool GrumpyConf::GetContinuousLoggingEnabled()
+{
+    return GCFG->GetValueAsBool("continuous_logging");
+}
+
+void GrumpyConf::SetContinuousLoggingEnabled(bool enabled)
+{
+    GCFG->SetValue("continuous_logging", enabled);
+}
+
+QString GrumpyConf::GetContinuousLoggingPath()
+{
+    return GCFG->GetValueAsString("continuous_logging_path", GCFG->GetHomePath() + "logs/");
+}
+
+void GrumpyConf::SetContinuousLoggingPath(QString path)
+{
+    GCFG->SetValue("continuous_logging_path", path);
+}
+
 void GrumpyConf::SetProxy(int proxy)
 {
     GCFG->SetValue("proxy", proxy);

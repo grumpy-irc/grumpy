@@ -308,3 +308,8 @@ bool Generic::IsValidFileName(QString file)
     return true;
 }
 
+
+QString Generic::String2ValidPath(QString path)
+{
+    return path.replace("/", "_slash_").replace("\\", "_bslash_").replace(":", "_colon_").replace(" ", "_");
+}

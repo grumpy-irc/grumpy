@@ -28,6 +28,7 @@
 #include "messagebox.h"
 #include "inputbox.h"
 #include "ui_scrollbackframe.h"
+#include <libcore/eventhandler.h>
 #include <libcore/exception.h>
 #include <libcore/configuration.h>
 #include <libcore/generic.h>
@@ -182,7 +183,7 @@ static QString FormatAction(const libircclient::User &user, const QString &actio
     return result;
 }
 
-static QString ItemToString(const ScrollbackItem &item, bool highlighted)
+static QString ItemToHTMLString(const ScrollbackItem &item, bool highlighted)
 {
     GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
     // Render the text according to our formatting
@@ -265,6 +266,84 @@ static QString ItemToString(const ScrollbackItem &item, bool highlighted)
         color = Skin::GetCurrent()->SystemInfo;
     irc2htmlcode::FormattedItem results = ScrollbackFrame::parser.Process(format_string, item.GetTime(), user, text, color.name());
     return results.source;
+}
+
+static QString ItemToTXTString(const ScrollbackItem &item)
+{
+    GRUMPY_PROFILER_INCRCALL(BOOST_CURRENT_FUNCTION);
+    // Render the text according to our formatting
+    //! \todo This needs to be precached otherwise we need to build this string every fucking time
+    QString format_string = CONF->GetLineFormat();
+    QString text = item.GetText();
+    QString user = item.GetUser().GetNick();
+    bool system = false;
+    switch (item.GetType())
+    {
+        case ScrollbackItemType_Act:
+            //result = FormatAction(item.GetUser(), item.GetText(), false);
+            format_string.replace("$string", CONF->GetActionFormat());
+            break;
+        case ScrollbackItemType_Join:
+            system = true;
+            format_string.replace("$string", CONF->GetActionFormat());
+            user = item.GetUser().ToString();
+            text = "joined channel";
+            //result = FormatAction(item.GetUser(), "joined channel", true);
+            break;
+        case ScrollbackItemType_Part:
+            system = true;
+            format_string.replace("$string", CONF->GetActionFormat());
+            user = item.GetUser().ToString();
+            if (item.GetText().isEmpty())
+                text = "left channel";
+            else
+                text = "left channel (" + item.GetText() + ")";
+            break;
+        case ScrollbackItemType_Quit:
+            system = true;
+            format_string.replace("$string", CONF->GetActionFormat());
+            user = item.GetUser().ToString();
+            text = "quit (" + item.GetText() + ")";
+            break;
+        case ScrollbackItemType_Kick:
+            system = true;
+            format_string.replace("$string", CONF->GetActionFormat());
+            break;
+        case ScrollbackItemType_Mode:
+            system = true;
+            format_string.replace("$string", CONF->GetActionFormat());
+            text = "set mode " + item.GetText();
+            break;
+        case ScrollbackItemType_Nick:
+            system = true;
+            format_string.replace("$string", CONF->GetActionFormat());
+            text = "changed nick to " + item.GetText();
+            break;
+        case ScrollbackItemType_Notice:
+            format_string.replace("$string", CONF->GetNoticeFormat());
+            break;
+        case ScrollbackItemType_Message:
+            format_string.replace("$string", CONF->GetMessageFormat());
+            break;
+        case ScrollbackItemType_System:
+        case ScrollbackItemType_Unknown:
+            //result = item.GetText();
+            break;
+        case ScrollbackItemType_SystemError:
+            break;
+        case ScrollbackItemType_SystemWarning:
+            break;
+        case ScrollbackItemType_Topic:
+            system = true;
+            format_string.replace("$string", CONF->GetActionFormat());
+            text = "changed topic to: " + item.GetText();
+            break;
+    }
+    QString results = format_string;
+    results.replace("$time", item.GetTime().toString());
+    results.replace("$nick", user);
+    results.replace("$string", text);
+    return results;
 }
 
 static QString ItemToPlainText(const ScrollbackItem &item)
@@ -527,10 +606,11 @@ void ScrollbackFrame::writeText(ScrollbackItem &item, int highlighted)
         is_hg = Highlighter::IsMatch(&item, this->GetNetwork());
     else if (highlighted == GRUMPY_H_YES)
         is_hg = true;
-    QString line = ItemToString(item, is_hg);
+    QString line = ItemToHTMLString(item, is_hg);
     this->buffer += line;
     this->textEdit->AppendHtml(line);
     this->isClean = false;
+    this->logItem(item);
 }
 
 QString ScrollbackFrame::itemsToString(QList<ScrollbackItem> items)
@@ -545,11 +625,48 @@ QString ScrollbackFrame::itemsToString(QList<ScrollbackItem> items)
         if (!is_first)
             temp.append("<br>\n");
         is_first = false;
-        temp.append(ItemToString(item, is_hg));
+        temp.append(ItemToHTMLString(item, is_hg));
         //this->writeText(this->unwritten.at(0));
         items.removeAt(0);
     }
     return temp;
+}
+
+void ScrollbackFrame::logItem(const ScrollbackItem &item)
+{
+    if (this->loggingDisabled)
+        return;
+    if (!this->IsGrumpy() && CONF->GetContinuousLoggingEnabled())
+    {
+        QString target_dir = this->cachedLogDirPath;
+        if (target_dir.isEmpty())
+        {
+            // Logging to text files is enabled, construct the path and verify it's actually existing
+            target_dir = CONF->GetContinuousLoggingPath() + Generic::String2ValidPath(this->GetWindowName());
+            if (!QDir().exists(target_dir))
+            {
+                GRUMPY_DEBUG("Creating path: " + target_dir, 1);
+                if (!QDir().mkpath(target_dir))
+                {
+                    GRUMPY_ERROR("Unable to create path: " + target_dir);
+                    this->loggingDisabled = true;
+                    return;
+                }
+            }
+            this->cachedLogDirPath = target_dir + QDir().separator() + QDate::currentDate().toString("yyyy_MM_dd.txt");
+        }
+        // Append text to file
+        QFile log_file(this->cachedLogDirPath);
+        if (!log_file.open(QIODevice::WriteOnly | QIODevice::Append))
+        {
+            GRUMPY_ERROR("Unable to open file for writing: " + this->cachedLogDirPath);
+            this->loggingDisabled = true;
+            return;
+        }
+        QString text = ItemToTXTString(item) + "\n";
+        log_file.write(text.toUtf8());
+        log_file.close();
+    }
 }
 
 void ScrollbackFrame::SetWindowName(const QString &title)

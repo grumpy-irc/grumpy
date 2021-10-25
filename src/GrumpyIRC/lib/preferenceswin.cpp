@@ -111,6 +111,9 @@ PreferencesWin::PreferencesWin(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
             this->ui->comboBox_Enc->setCurrentIndex(4);
             break;
     }
+
+    this->ui->lineEdit_LoggingPath->setText(CONF->GetContinuousLoggingPath());
+    this->ui->checkBox_ContinuousLogging->setChecked(CONF->GetContinuousLoggingEnabled());
 }
 
 PreferencesWin::~PreferencesWin()
@@ -149,6 +152,8 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
     CONF->SetAutoAwayMsg(this->ui->lineEdit_Away->text());
     CONF->SetAutoAway(this->ui->checkBox_AutoAway->isChecked());
     CONF->SetAutoAwayTime(this->ui->lineEdit_AutoAway->text().toInt());
+    CONF->SetContinuousLoggingPath(this->ui->lineEdit_LoggingPath->text());
+    CONF->SetContinuousLoggingEnabled(this->ui->checkBox_ContinuousLogging->isChecked());
     QList<int> ignored_nums;
     QList<QString> ignored = this->ui->lineEdit_4->text().split(",");
     foreach (QString numeric, ignored)

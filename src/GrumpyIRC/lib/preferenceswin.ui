@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>827</width>
-    <height>640</height>
+    <height>647</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -272,6 +272,23 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_ContinuousLogging">
+         <property name="text">
+          <string>Enable continuous logging of scrollback text (doesn't work with grumpyd)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_ContinuousLogging">
+         <property name="text">
+          <string>Path where to store logs:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_LoggingPath"/>
        </item>
        <item>
         <spacer name="verticalSpacer_2">

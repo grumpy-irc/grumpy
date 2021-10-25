@@ -74,6 +74,11 @@ void UiHooks::OnInput()
     MainWindow::Main->ResetAutoAway();
 }
 
+void UiHooks::OnInputText(ScrollbackFrame *scrollback, QString text)
+{
+
+}
+
 void UiHooks::OnInputHistInsert(ScrollbackFrame *scrollback, QString text)
 {
     foreach (ScriptExtension *script, UiScript::GetExtensions())

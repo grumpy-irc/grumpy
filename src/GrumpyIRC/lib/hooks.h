@@ -31,6 +31,8 @@ namespace GrumpyIRC
             static void OnNewScrollbackFrame(ScrollbackFrame *scrollback);
             //! Called anytime user generates some sort of user input - click a window, write into console, whatever
             static void OnInput();
+            //! When user enters anything into the text box
+            static void OnInputText(ScrollbackFrame *scrollback, QString text);
             //! Called when something is added to input box history
             static void OnInputHistInsert(ScrollbackFrame *scrollback, QString text);
     };

@@ -106,7 +106,10 @@ namespace GrumpyIRC
             Scrollback *GetScrollback();
             UserFrame *GetUserFrame();
             QString GetTitle();
+            //! Export whole scrollback buffer as text
             QString ToString();
+            //! Export whole scrollback buffer as HTML
+            QString ToHtml();
             void UpdateColor();
             void Focus();
             void RequestClose();
@@ -120,7 +123,6 @@ namespace GrumpyIRC
             void RequestDisconnect();
             void RequestMore(unsigned int count);
             void RefreshHtml();
-            QString ToHtml();
             void SendCtcp(const QString &target, const QString &ctcp, const QString &text);
             void RefreshHtmlIfNeeded();
             void SetProperty(const QString &name, const QVariant &value);
@@ -168,6 +170,10 @@ namespace GrumpyIRC
             void clearItems();
             void writeText(ScrollbackItem &item, int highlighted = 0);
             QString itemsToString(QList<ScrollbackItem> items);
+            void logItem(const ScrollbackItem &item);
+            QString cachedLogDirPath;
+            //! Overrides global settings for logging - if this is set, then text of window is not logged even if logging is enabled
+            bool loggingDisabled = false;
             bool isVisible;
             // Doesn't work :(
             //QGraphicsOpacityEffect *opacityEffect;

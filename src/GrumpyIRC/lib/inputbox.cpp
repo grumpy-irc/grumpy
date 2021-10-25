@@ -221,5 +221,6 @@ void GrumpyIRC::InputBox::on_lineEdit_returnPressed()
     UiHooks::OnInput();
     QString text = this->ui->lineEdit->text();
     this->ui->lineEdit->setText("");
+    UiHooks::OnInputText(this->parent, text);
     CoreWrapper::GrumpyCore->GetCommandProcessor()->ProcessText(text, this->parent->GetScrollback());
 }

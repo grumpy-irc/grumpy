@@ -108,6 +108,10 @@ namespace GrumpyIRC
             void SetAutoAwayTime(int time);
             void SetLastSavePath(const QString &path);
             QString GetLastSavePath();
+            bool GetContinuousLoggingEnabled();
+            void SetContinuousLoggingEnabled(bool enabled);
+            QString GetContinuousLoggingPath();
+            void SetContinuousLoggingPath(QString path);
 
             /////////////////////////////////////////////////////////////////////////
             // Proxy
