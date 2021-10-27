@@ -375,6 +375,7 @@ void ScrollbackFrame::_insertText_(ScrollbackItem &item)
             case ScrollbackItemType_Nick:
             case ScrollbackItemType_Quit:
             case ScrollbackItemType_Part:
+                this->logItem(item);
                 return;
 
             default:
