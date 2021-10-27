@@ -409,6 +409,7 @@ void ScrollbackFrame::_insertText_(ScrollbackItem &item)
     {
         this->writeText(item, highlighted);
     }
+    this->logItem(item);
 }
 
 void ScrollbackFrame::UserList_Insert(libircclient::User *ux, bool bulk)
@@ -610,7 +611,6 @@ void ScrollbackFrame::writeText(ScrollbackItem &item, int highlighted)
     this->buffer += line;
     this->textEdit->AppendHtml(line);
     this->isClean = false;
-    this->logItem(item);
 }
 
 QString ScrollbackFrame::itemsToString(QList<ScrollbackItem> items)
