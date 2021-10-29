@@ -406,11 +406,13 @@ void MainWindow::OpenServer(libirc::ServerAddress server)
         }
         server.SetNick(nick);
     }
+    if (server.GetIdent().isEmpty())
+        server.SetIdent(CONF->GetIdent());
     QString network_name = server.GetHost();
     // We need to create a new scrollback for system window
     ScrollbackFrame *system = this->GetScrollbackManager()->CreateWindow(network_name, nullptr, true);
     // Nick override is empty here as it's obtained from server info
-    IRCSession *sx = IRCSession::Open(system->GetScrollback(), server, network_name, "", CONF->GetIdent(), CONF->GetName(), CONF->GetEncoding());
+    IRCSession *sx = IRCSession::Open(system->GetScrollback(), server, network_name, "", "", CONF->GetName(), CONF->GetEncoding());
     sx->IgnoredNums = CONF->IgnoredNums();
 }
 
