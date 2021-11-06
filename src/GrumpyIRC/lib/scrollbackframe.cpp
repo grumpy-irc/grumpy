@@ -276,7 +276,6 @@ static QString ItemToTXTString(const ScrollbackItem &item)
     QString format_string = CONF->GetLineFormat();
     QString text = item.GetText();
     QString user = item.GetUser().GetNick();
-    bool system = false;
     switch (item.GetType())
     {
         case ScrollbackItemType_Act:
@@ -284,14 +283,12 @@ static QString ItemToTXTString(const ScrollbackItem &item)
             format_string.replace("$string", CONF->GetActionFormat());
             break;
         case ScrollbackItemType_Join:
-            system = true;
             format_string.replace("$string", CONF->GetActionFormat());
             user = item.GetUser().ToString();
             text = "joined channel";
             //result = FormatAction(item.GetUser(), "joined channel", true);
             break;
         case ScrollbackItemType_Part:
-            system = true;
             format_string.replace("$string", CONF->GetActionFormat());
             user = item.GetUser().ToString();
             if (item.GetText().isEmpty())
@@ -300,22 +297,18 @@ static QString ItemToTXTString(const ScrollbackItem &item)
                 text = "left channel (" + item.GetText() + ")";
             break;
         case ScrollbackItemType_Quit:
-            system = true;
             format_string.replace("$string", CONF->GetActionFormat());
             user = item.GetUser().ToString();
             text = "quit (" + item.GetText() + ")";
             break;
         case ScrollbackItemType_Kick:
-            system = true;
             format_string.replace("$string", CONF->GetActionFormat());
             break;
         case ScrollbackItemType_Mode:
-            system = true;
             format_string.replace("$string", CONF->GetActionFormat());
             text = "set mode " + item.GetText();
             break;
         case ScrollbackItemType_Nick:
-            system = true;
             format_string.replace("$string", CONF->GetActionFormat());
             text = "changed nick to " + item.GetText();
             break;
@@ -334,7 +327,6 @@ static QString ItemToTXTString(const ScrollbackItem &item)
         case ScrollbackItemType_SystemWarning:
             break;
         case ScrollbackItemType_Topic:
-            system = true;
             format_string.replace("$string", CONF->GetActionFormat());
             text = "changed topic to: " + item.GetText();
             break;

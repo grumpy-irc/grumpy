@@ -8,32 +8,30 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2021
+// Copyright (c) Petr Bena 2021
 
-#ifndef FAVORITESWIN_H
-#define FAVORITESWIN_H
+#ifndef IDENTITYEDITORWIN_H
+#define IDENTITYEDITORWIN_H
 
-#include "grumpy_global.h"
 #include <QDialog>
 
 namespace Ui
 {
-    class FavoritesWin;
+    class IdentityEditorWin;
 }
 
 namespace GrumpyIRC
 {
-    class LIBGRUMPYSHARED_EXPORT FavoritesWin : public QDialog
+    class IdentityEditorWin : public QDialog
     {
             Q_OBJECT
-
         public:
-            explicit FavoritesWin(QWidget *parent = 0);
-            ~FavoritesWin();
+            explicit IdentityEditorWin(QWidget *parent = nullptr);
+            ~IdentityEditorWin();
 
         private:
-            Ui::FavoritesWin *ui;
+            Ui::IdentityEditorWin *ui;
     };
 }
 
-#endif // FAVORITESWIN_H
+#endif // IDENTITYEDITORWIN_H

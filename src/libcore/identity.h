@@ -8,31 +8,31 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2021
 
-#ifndef QUERY_H
-#define QUERY_H
+#ifndef IDENTITY_H
+#define IDENTITY_H
 
-#include "libcore_global.h"
 #include <QString>
+#include "libcore_global.h"
 #include "../libirc/libirc/serializableitem.h"
 
 namespace GrumpyIRC
 {
-    class ScrollbackItem;
-
-    //! This is unused work in progress
-    //! query for matching text, used by searching feature which is to be implemented
-    class LIBCORESHARED_EXPORT Query : public libirc::SerializableItem
+    class LIBCORESHARED_EXPORT Identity : public libirc::SerializableItem
     {
         public:
-            Query();
-            bool Matches(ScrollbackItem *message);
-             ~Query() override;
-            QString Pattern;
-            bool CS;
-            bool IsRegex;
+            static int LastID;
+
+            Identity(QString nick, QString ident, QString real_name, QString away_msg = "", int id = -1);
+            QHash<QString, QVariant> ToHash() override;
+            void LoadHash(const QHash<QString, QVariant> &hash) override;
+            int ID;
+            QString Nick;
+            QString Ident;
+            QString RealName;
+            QString AwayMessage;
     };
 }
 
-#endif // QUERY_H
+#endif // IDENTITY_H

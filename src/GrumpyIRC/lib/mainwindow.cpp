@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2020
+// Copyright (c) Petr Bena 2015 - 2021
 
 #include "aboutwin.h"
 #include "corewrapper.h"

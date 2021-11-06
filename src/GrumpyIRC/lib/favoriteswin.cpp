@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2021
 
 #include "favoriteswin.h"
 #include "ui_favoriteswin.h"
@@ -18,8 +18,6 @@ using namespace GrumpyIRC;
 FavoritesWin::FavoritesWin(QWidget *parent) :  QDialog(parent), ui(new Ui::FavoritesWin)
 {
     this->ui->setupUi(this);
-    this->ui->comboBox->addItem("Local");
-    this->ui->comboBox->setCurrentIndex(0);
 }
 
 FavoritesWin::~FavoritesWin()
@@ -27,7 +25,3 @@ FavoritesWin::~FavoritesWin()
     delete this->ui;
 }
 
-void GrumpyIRC::FavoritesWin::on_tableWidget_customContextMenuRequested(const QPoint &pos)
-{
-
-}
