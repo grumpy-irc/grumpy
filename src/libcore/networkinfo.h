@@ -10,33 +10,37 @@
 
 // Copyright (c) Petr Bena 2021
 
-#ifndef IDENTITY_H
-#define IDENTITY_H
+#ifndef NETWORKINFO_H
+#define NETWORKINFO_H
 
 #include <QString>
 #include <QHash>
 #include "libcore_global.h"
 #include "../libirc/libirc/serializableitem.h"
+#include "../libirc/libirc/irc_standards.h"
 
 namespace GrumpyIRC
 {
-    class LIBCORESHARED_EXPORT Identity : public libirc::SerializableItem
+    class NetworkInfo : public libirc::SerializableItem
     {
         public:
             static void Clear();
             static int LastID;
-            static QHash<int, Identity*> Identities;
+            static QHash<int, NetworkInfo*> NetworksInfo;
 
-            Identity(QString nick, QString ident, QString real_name, QString away_msg = "", int id = -1);
+            NetworkInfo();
+            NetworkInfo(QString name, QString host, int port, int identity, int id = -1);
+            NetworkInfo(const QHash<QString, QVariant> &hash);
             QHash<QString, QVariant> ToHash() override;
             void LoadHash(const QHash<QString, QVariant> &hash) override;
-            void ToString();
             int ID;
-            QString Nick;
-            QString Ident;
-            QString RealName;
-            QString AwayMessage;
+            QString NetworkName;
+            QString Hostname;
+            int Port = IRC_STANDARD_PORT;
+            int PreferredIdentity = -1;
+            bool AutoReconnect = false;
+            bool SSL = false;
     };
 }
 
-#endif // IDENTITY_H
+#endif // NETWORKINFO_H

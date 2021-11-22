@@ -25,3 +25,38 @@ IdentityEditorWin::~IdentityEditorWin()
 {
     delete this->ui;
 }
+
+void IdentityEditorWin::Load(int id)
+{
+    if (!Identity::Identities.contains(id))
+        return;
+
+    Identity *x = Identity::Identities[id];
+    this->identID = id;
+    this->ui->le_RealName->setText(x->RealName);
+    this->ui->le_Nick->setText(x->Nick);
+    this->ui->le_Ident->setText(x->Ident);
+    this->ui->le_AwayMsg->setText(x->AwayMessage);
+}
+
+void GrumpyIRC::IdentityEditorWin::on_pbSave_clicked()
+{
+    if (this->identID < 0)
+    {
+        Identity *i = new Identity(this->ui->le_Nick->text(), this->ui->le_Ident->text(), this->ui->le_RealName->text(), this->ui->le_AwayMsg->text());
+        Identity::Identities.insert(i->ID, i);
+        this->close();
+        return;
+    }
+    Identity *x = Identity::Identities[this->identID];
+    x->Nick = this->ui->le_Nick->text();
+    x->Ident = this->ui->le_Ident->text();
+    x->RealName = this->ui->le_RealName->text();
+    x->AwayMessage = this->ui->le_AwayMsg->text();
+    this->close();
+}
+
+void GrumpyIRC::IdentityEditorWin::on_pbCancel_clicked()
+{
+    this->close();
+}

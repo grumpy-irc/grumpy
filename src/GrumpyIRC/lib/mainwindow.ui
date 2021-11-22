@@ -35,9 +35,9 @@
     <addaction name="actionPreferences"/>
     <addaction name="actionProxy"/>
     <addaction name="actionEnable_proxy"/>
+    <addaction name="actionFavorites"/>
     <addaction name="separator"/>
     <addaction name="actionConnect"/>
-    <addaction name="actionFavorites"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -134,7 +134,7 @@
     <string>&amp;Favorites</string>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionToggle_secret">

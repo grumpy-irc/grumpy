@@ -30,8 +30,16 @@ namespace GrumpyIRC
         public:
             explicit FavoritesWin(QWidget *parent = 0);
             ~FavoritesWin();
+            void RefreshNetworks();
+            void RefreshIdentities();
+
+        private slots:
+            void on_tv_IdentityList_customContextMenuRequested(const QPoint &pos);
+            void on_tv_NetworkList_customContextMenuRequested(const QPoint &pos);
 
         private:
+            QList<int> selectedNetworks();
+            QList<int> selectedIdents();
             Ui::FavoritesWin *ui;
     };
 }

@@ -8,34 +8,35 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015
+// Copyright (c) Petr Bena 2021
 
-#ifndef FAVORITE_H
-#define FAVORITE_H
+#ifndef NETWORKWIN_H
+#define NETWORKWIN_H
 
-#include "definitions.h"
-#include "../libirc/libirc/serializableitem.h"
-#include "libcore_global.h"
+#include <QDialog>
 
-#include <QList>
-#include <QString>
+namespace Ui {
+    class NetworkWin;
+}
 
 namespace GrumpyIRC
 {
-    class LIBCORESHARED_EXPORT Favorite : public libirc::SerializableItem
+    class NetworkWin : public QDialog
     {
-        public:
-            Favorite();
+            Q_OBJECT
 
+        public:
+            explicit NetworkWin(QWidget *parent = nullptr);
+            ~NetworkWin();
+
+        private slots:
+            void on_pushSave_clicked();
+            void on_pushExit_clicked();
 
         private:
-            QString name;
-            QString host;
-            QString nick;
-            QString username;
-            QString password;
-
+            Ui::NetworkWin *ui;
+            int networkID = -1;
     };
 }
 
-#endif // FAVORITE_H
+#endif // NETWORKWIN_H

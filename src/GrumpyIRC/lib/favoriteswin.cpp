@@ -12,12 +12,34 @@
 
 #include "favoriteswin.h"
 #include "ui_favoriteswin.h"
+#include "networkwin.h"
+#include "identityeditorwin.h"
+#include "../../libcore/generic.h"
+#include "../../libcore/networkinfo.h"
+#include "../../libcore/identity.h"
+#include <QMenu>
 
 using namespace GrumpyIRC;
 
 FavoritesWin::FavoritesWin(QWidget *parent) :  QDialog(parent), ui(new Ui::FavoritesWin)
 {
     this->ui->setupUi(this);
+
+    QStringList heading_1;
+    heading_1 << "ID" << "Network name" << "Hostname";
+    this->ui->tv_NetworkList->verticalHeader()->setVisible(false);
+    this->ui->tv_NetworkList->setColumnCount(heading_1.size());
+    this->ui->tv_NetworkList->setShowGrid(false);
+    this->ui->tv_NetworkList->setHorizontalHeaderLabels(heading_1);
+
+    QStringList heading_2;
+    heading_2 << "ID" << "Nick" << "Ident" << "Real Name" << "Auto connect";
+    this->ui->tv_IdentityList->verticalHeader()->setVisible(false);
+    this->ui->tv_IdentityList->setColumnCount(heading_2.size());
+    this->ui->tv_IdentityList->setShowGrid(false);
+    this->ui->tv_IdentityList->setHorizontalHeaderLabels(heading_2);
+
+    this->RefreshIdentities();
 }
 
 FavoritesWin::~FavoritesWin()
@@ -25,3 +47,144 @@ FavoritesWin::~FavoritesWin()
     delete this->ui;
 }
 
+void FavoritesWin::RefreshNetworks()
+{
+    while (this->ui->tv_NetworkList->rowCount())
+        this->ui->tv_NetworkList->removeRow(0);
+
+    int row = 0;
+    QList<int> network_list = NetworkInfo::NetworksInfo.keys();
+    qSort(network_list);
+
+    foreach (int id, network_list)
+    {
+        NetworkInfo *network = NetworkInfo::NetworksInfo[id];
+        this->ui->tv_NetworkList->insertRow(row);
+        this->ui->tv_NetworkList->setItem(row, 0, new QTableWidgetItem(QString::number(network->ID)));
+        this->ui->tv_NetworkList->setItem(row, 1, new QTableWidgetItem(network->NetworkName));
+        this->ui->tv_NetworkList->setItem(row, 2, new QTableWidgetItem(network->Hostname));
+        this->ui->tv_NetworkList->setItem(row, 3, new QTableWidgetItem(Generic::Bool2String(network->AutoReconnect)));
+        row++;
+    }
+}
+
+void FavoritesWin::RefreshIdentities()
+{
+    while(this->ui->tv_IdentityList->rowCount())
+        this->ui->tv_IdentityList->removeRow(0);
+
+    int row = 0;
+    QList<int> identity_list = Identity::Identities.keys();
+    qSort(identity_list);
+
+    foreach (int id, identity_list)
+    {
+        Identity *identity = Identity::Identities[id];
+        this->ui->tv_IdentityList->insertRow(row);
+        this->ui->tv_IdentityList->setItem(row, 0, new QTableWidgetItem(QString::number(identity->ID)));
+        this->ui->tv_IdentityList->setItem(row, 1, new QTableWidgetItem(identity->Nick));
+        this->ui->tv_IdentityList->setItem(row, 2, new QTableWidgetItem(identity->Ident));
+        this->ui->tv_IdentityList->setItem(row, 3, new QTableWidgetItem(identity->RealName));
+        row++;
+    }
+}
+
+void GrumpyIRC::FavoritesWin::on_tv_IdentityList_customContextMenuRequested(const QPoint &pos)
+{
+    QPoint globalPos = this->ui->tv_IdentityList->viewport()->mapToGlobal(pos);
+    QMenu Menu;
+    // Items
+    QAction *menuInsert = new QAction("Insert", &Menu);
+    Menu.addAction(menuInsert);
+    QAction *menuEdit = new QAction("Edit", &Menu);
+    Menu.addAction(menuEdit);
+    QAction *menuRemove = new QAction("Remove", &Menu);
+    Menu.addAction(menuRemove);
+
+    QAction* selectedItem = Menu.exec(globalPos);
+    if (!selectedItem)
+        return;
+    if (selectedItem == menuInsert)
+    {
+        IdentityEditorWin iw;
+        iw.exec();
+        this->RefreshIdentities();
+    } else if (selectedItem == menuRemove)
+    {
+        QList<int> selected = this->selectedIdents();
+        foreach (int id, selected)
+        {
+            if (Identity::Identities.contains(id))
+            {
+                delete Identity::Identities[id];
+                Identity::Identities.remove(id);
+            }
+        }
+        this->RefreshIdentities();
+    }
+}
+
+void GrumpyIRC::FavoritesWin::on_tv_NetworkList_customContextMenuRequested(const QPoint &pos)
+{
+    QPoint globalPos = this->ui->tv_NetworkList->viewport()->mapToGlobal(pos);
+    QMenu Menu;
+    // Items
+    QAction *menuInsert = new QAction("Insert", &Menu);
+    Menu.addAction(menuInsert);
+    QAction *menuRemove = new QAction("Remove", &Menu);
+    Menu.addAction(menuRemove);
+
+    QAction* selectedItem = Menu.exec(globalPos);
+    if (!selectedItem)
+        return;
+    if (selectedItem == menuInsert)
+    {
+        NetworkWin nx;
+        nx.exec();
+        this->RefreshNetworks();
+    } else if (selectedItem == menuRemove)
+    {
+        QList<int> selected = this->selectedNetworks();
+        foreach (int id, selected)
+        {
+            if (NetworkInfo::NetworksInfo.contains(id))
+            {
+                delete NetworkInfo::NetworksInfo[id];
+                NetworkInfo::NetworksInfo.remove(id);
+            }
+        }
+        this->RefreshNetworks();
+    }
+}
+
+QList<int> FavoritesWin::selectedNetworks()
+{
+    QList<int> results;
+    QList<QTableWidgetItem*> items = this->ui->tv_NetworkList->selectedItems();
+    foreach (QTableWidgetItem *xx, items)
+    {
+        if (xx->column() > 0)
+            continue;
+        int id = xx->text().toInt();
+        if (!results.contains(id))
+            results.append(id);
+    }
+
+    return results;
+}
+
+QList<int> FavoritesWin::selectedIdents()
+{
+    QList<int> results;
+    QList<QTableWidgetItem*> items = this->ui->tv_IdentityList->selectedItems();
+    foreach (QTableWidgetItem *xx, items)
+    {
+        if (xx->column() > 0)
+            continue;
+        int id = xx->text().toInt();
+        if (!results.contains(id))
+            results.append(id);
+    }
+
+    return results;
+}

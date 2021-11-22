@@ -28,8 +28,15 @@ namespace GrumpyIRC
         public:
             explicit IdentityEditorWin(QWidget *parent = nullptr);
             ~IdentityEditorWin();
+            void Load(int id);
+
+        private slots:
+            void on_pbSave_clicked();
+
+            void on_pbCancel_clicked();
 
         private:
+            int identID = -1;
             Ui::IdentityEditorWin *ui;
     };
 }

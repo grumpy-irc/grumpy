@@ -1,3 +1,10 @@
+# Releases
+release/
+macos/package/
+macos/release/
+macos/grumpy.icns
+macos/grumpy_logo.png
+
 # C++ objects and libs
 *.slo
 *.lo

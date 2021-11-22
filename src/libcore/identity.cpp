@@ -15,6 +15,18 @@
 using namespace GrumpyIRC;
 
 int Identity::LastID = 0;
+QHash<int, Identity*> Identity::Identities;
+
+void Identity::Clear()
+{
+    QList<Identity*> list = Identity::Identities.values();
+    foreach (Identity *identity, list)
+    {
+        delete identity;
+    }
+    Identity::Identities.clear();
+    Identity::LastID = 0;
+}
 
 Identity::Identity(QString nick, QString ident, QString real_name, QString away_msg, int id)
 {
@@ -50,4 +62,11 @@ void Identity::LoadHash(const QHash<QString, QVariant> &hash)
     UNSERIALIZE_STRING(Ident);
     UNSERIALIZE_STRING(RealName);
     UNSERIALIZE_STRING(AwayMessage);
+}
+
+void Identity::ToString()
+{
+    QString result = this->Nick;
+    if (!this->Ident.isEmpty())
+        result += "@" + this->Ident;
 }
