@@ -28,7 +28,6 @@ namespace GrumpyIRC
             static int LastID;
             static QHash<int, NetworkInfo*> NetworksInfo;
 
-            NetworkInfo();
             NetworkInfo(QString name, QString host, int port, int identity, int id = -1);
             NetworkInfo(const QHash<QString, QVariant> &hash);
             QHash<QString, QVariant> ToHash() override;

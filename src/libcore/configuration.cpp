@@ -80,6 +80,14 @@ QString Configuration::GetValueAsString(const QString &key, const QString &defau
     return this->Options[key].toString();
 }
 
+QHash<QString, QVariant> Configuration::GetValueAsHash(const QString &key, const QHash<QString, QVariant> &default_value)
+{
+    if (!this->Options.contains(key))
+        return default_value;
+
+    return this->Options[key].toHash();
+}
+
 int Configuration::GetValueAsInt(const QString &key, int none)
 {
     if (!this->Options.contains(key))

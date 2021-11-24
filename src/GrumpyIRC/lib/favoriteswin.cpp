@@ -11,15 +11,28 @@
 // Copyright (c) Petr Bena 2015 - 2021
 
 #include "favoriteswin.h"
+#include "grumpyconf.h"
 #include "ui_favoriteswin.h"
 #include "networkwin.h"
 #include "identityeditorwin.h"
-#include "../../libcore/generic.h"
-#include "../../libcore/networkinfo.h"
-#include "../../libcore/identity.h"
+#include <libcore/generic.h>
+#include <libcore/networkinfo.h>
+#include <libcore/identity.h>
 #include <QMenu>
 
 using namespace GrumpyIRC;
+
+void FavoritesWin::Load()
+{
+    FavoritesWin::loadIdentities();
+    FavoritesWin::loadNetworks();
+}
+
+void FavoritesWin::Save()
+{
+    FavoritesWin::saveIdentities();
+    FavoritesWin::saveNetworks();
+}
 
 FavoritesWin::FavoritesWin(QWidget *parent) :  QDialog(parent), ui(new Ui::FavoritesWin)
 {
@@ -31,6 +44,8 @@ FavoritesWin::FavoritesWin(QWidget *parent) :  QDialog(parent), ui(new Ui::Favor
     this->ui->tv_NetworkList->setColumnCount(heading_1.size());
     this->ui->tv_NetworkList->setShowGrid(false);
     this->ui->tv_NetworkList->setHorizontalHeaderLabels(heading_1);
+
+    this->RefreshNetworks();
 
     QStringList heading_2;
     heading_2 << "ID" << "Nick" << "Ident" << "Real Name" << "Auto connect";
@@ -154,6 +169,50 @@ void GrumpyIRC::FavoritesWin::on_tv_NetworkList_customContextMenuRequested(const
             }
         }
         this->RefreshNetworks();
+    }
+}
+
+void FavoritesWin::saveNetworks()
+{
+    QList<int> networks = NetworkInfo::NetworksInfo.keys();
+    QHash<QString, QVariant> list;
+    foreach (int id, networks)
+    {
+        list.insert(QString::number(id), QVariant(NetworkInfo::NetworksInfo[id]->ToHash()));
+    }
+    CONF->SetNetworks(list);
+}
+
+void FavoritesWin::loadNetworks()
+{
+    QHash<QString, QVariant> nl = CONF->GetNetworks();
+    foreach (QString key, nl.keys())
+    {
+        QHash<QString, QVariant> network_data = nl[key].toHash();
+        NetworkInfo *network_info = new NetworkInfo(network_data);
+        NetworkInfo::NetworksInfo.insert(network_info->ID, network_info);
+    }
+}
+
+void FavoritesWin::saveIdentities()
+{
+    QList<int> identities = Identity::Identities.keys();
+    QHash<QString, QVariant> list;
+    foreach (int id, identities)
+    {
+        list.insert(QString::number(id), QVariant(Identity::Identities[id]->ToHash()));
+    }
+    CONF->SetIdentities(list);
+}
+
+void FavoritesWin::loadIdentities()
+{
+    QHash<QString, QVariant> nl = CONF->GetNetworks();
+    foreach (QString key, nl.keys())
+    {
+        QHash<QString, QVariant> identity_hash = nl[key].toHash();
+        Identity *identity = new Identity(identity_hash);
+        Identity::Identities.insert(identity->ID, identity);
     }
 }
 

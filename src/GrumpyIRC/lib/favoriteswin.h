@@ -28,6 +28,9 @@ namespace GrumpyIRC
             Q_OBJECT
 
         public:
+            static void Load();
+            static void Save();
+
             explicit FavoritesWin(QWidget *parent = 0);
             ~FavoritesWin();
             void RefreshNetworks();
@@ -38,6 +41,11 @@ namespace GrumpyIRC
             void on_tv_NetworkList_customContextMenuRequested(const QPoint &pos);
 
         private:
+            static void saveNetworks();
+            static void loadNetworks();
+            static void saveIdentities();
+            static void loadIdentities();
+
             QList<int> selectedNetworks();
             QList<int> selectedIdents();
             Ui::FavoritesWin *ui;

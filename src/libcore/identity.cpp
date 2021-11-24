@@ -28,6 +28,13 @@ void Identity::Clear()
     Identity::LastID = 0;
 }
 
+Identity::Identity(QHash<QString, QVariant> hash)
+{
+    this->LoadHash(hash);
+    if (this->ID > Identity::LastID)
+        Identity::LastID = this->ID + 1;
+}
+
 Identity::Identity(QString nick, QString ident, QString real_name, QString away_msg, int id)
 {
     if (id < 0)

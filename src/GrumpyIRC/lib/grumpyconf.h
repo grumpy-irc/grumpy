@@ -112,6 +112,10 @@ namespace GrumpyIRC
             void SetContinuousLoggingEnabled(bool enabled);
             QString GetContinuousLoggingPath();
             void SetContinuousLoggingPath(QString path);
+            QHash<QString, QVariant> GetIdentities();
+            QHash<QString, QVariant> GetNetworks();
+            void SetIdentities(const QHash<QString, QVariant> &list);
+            void SetNetworks(const QHash<QString, QVariant> &hash);
 
             /////////////////////////////////////////////////////////////////////////
             // Proxy

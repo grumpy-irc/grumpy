@@ -28,11 +28,6 @@ void NetworkInfo::Clear()
     NetworkInfo::LastID = 0;
 }
 
-NetworkInfo::NetworkInfo()
-{
-
-}
-
 NetworkInfo::NetworkInfo(QString name, QString host, int port, int identity, int id)
 {
     if (id < 0)
@@ -54,11 +49,14 @@ NetworkInfo::NetworkInfo(QString name, QString host, int port, int identity, int
 NetworkInfo::NetworkInfo(const QHash<QString, QVariant> &hash)
 {
     this->LoadHash(hash);
+    if (this->ID > LastID)
+        LastID = this->ID + 1;
 }
 
 QHash<QString, QVariant> NetworkInfo::ToHash()
 {
     QHash<QString, QVariant> hash;
+    SERIALIZE(ID);
     SERIALIZE(NetworkName);
     SERIALIZE(Hostname);
     SERIALIZE(PreferredIdentity);
@@ -71,6 +69,7 @@ QHash<QString, QVariant> NetworkInfo::ToHash()
 void NetworkInfo::LoadHash(const QHash<QString, QVariant> &hash)
 {
     UNSERIALIZE_STRING(NetworkName);
+    UNSERIALIZE_INT(ID);
     UNSERIALIZE_STRING(Hostname);
     UNSERIALIZE_INT(PreferredIdentity);
     UNSERIALIZE_BOOL(SSL);

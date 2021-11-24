@@ -416,6 +416,26 @@ void GrumpyConf::SetContinuousLoggingPath(QString path)
     GCFG->SetValue("continuous_logging_path", path);
 }
 
+QHash<QString, QVariant> GrumpyConf::GetIdentities()
+{
+    return GCFG->GetValueAsHash("identities");
+}
+
+QHash<QString, QVariant> GrumpyConf::GetNetworks()
+{
+    return GCFG->GetValueAsHash("networks");
+}
+
+void GrumpyConf::SetIdentities(const QHash<QString, QVariant> &list)
+{
+    GCFG->SetValue("identities", list);
+}
+
+void GrumpyConf::SetNetworks(const QHash<QString, QVariant> &hash)
+{
+    GCFG->SetValue("networks", hash);
+}
+
 void GrumpyConf::SetProxy(int proxy)
 {
     GCFG->SetValue("proxy", proxy);

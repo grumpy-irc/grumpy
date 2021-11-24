@@ -39,14 +39,16 @@ namespace GrumpyIRC
             virtual bool GetValueAsBool(const QString &key, bool none = false);
             virtual unsigned int GetValueAsUInt(const QString &key, unsigned int none = 0);
             virtual QString GetValueAsString(const QString &key, const QString &default_value = "");
+            virtual QHash<QString, QVariant> GetValueAsHash(const QString &key, const QHash<QString, QVariant> &default_value = QHash<QString, QVariant>());
             virtual int GetValueAsInt(const QString &key, int none = 0);
             virtual float GetValueAsFloat(const QString &key, float none = 0);
             virtual void RemoveValue(const QString &key);
             virtual void SetValue(const QString &key, const QVariant &value);
-            virtual void SetValue(QString key, bool value);
-            virtual void SetValue(QString key, int value);
-            virtual void SetValue(QString key, unsigned int value);
-            virtual void SetValue(QString key, QString value);
+            virtual void SetValue(const QString &key, bool value);
+            virtual void SetValue(const QString &ey, int value);
+            virtual void SetValue(const QString &key, unsigned int value);
+            virtual void SetValue(const QString &key, const QString &value);
+            virtual void SetValue(const QString &ey, const QHash<QString, QVariant> &hash);
             virtual void SetHomePath(const QString &path);
 
             // Extension config
@@ -90,10 +92,11 @@ namespace GrumpyIRC
             inline QString mkExt(QString e, QString k) { return "ext_" + e + "/" + k; }
     };
 
-    inline void Configuration::SetValue(QString key, bool value) { this->SetValue(key, QVariant(value)); }
-    inline void Configuration::SetValue(QString key, unsigned int value) { this->SetValue(key, QVariant(value)); }
-    inline void Configuration::SetValue(QString key, int value) { this->SetValue(key, QVariant(value)); }
-    inline void Configuration::SetValue(QString key, QString value) { this->SetValue(key, QVariant(value)); }
+    inline void Configuration::SetValue(const QString &key, bool value) { this->SetValue(key, QVariant(value)); }
+    inline void Configuration::SetValue(const QString &key, unsigned int value) { this->SetValue(key, QVariant(value)); }
+    inline void Configuration::SetValue(const QString &key, int value) { this->SetValue(key, QVariant(value)); }
+    inline void Configuration::SetValue(const QString &key, const QString &value) { this->SetValue(key, QVariant(value)); }
+    inline void Configuration::SetValue(const QString &key, const QHash<QString, QVariant> &hash) { this->SetValue(key, QVariant(hash)); }
 }
 
 #endif // CONFIGURATION_H
