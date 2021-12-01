@@ -16,6 +16,7 @@
 #include <QString>
 #include <QHash>
 #include "libcore_global.h"
+#include "../libirc/libirc/serveraddress.h"
 #include "../libirc/libirc/serializableitem.h"
 #include "../libirc/libirc/irc_standards.h"
 
@@ -28,8 +29,9 @@ namespace GrumpyIRC
             static int LastID;
             static QHash<int, NetworkInfo*> NetworksInfo;
 
-            NetworkInfo(QString name, QString host, int port, int identity, int id = -1);
+            NetworkInfo(QString name, QString host, int port, int identity, bool ssl, int id = -1);
             NetworkInfo(const QHash<QString, QVariant> &hash);
+            libirc::ServerAddress ToServerAddress();
             QHash<QString, QVariant> ToHash() override;
             void LoadHash(const QHash<QString, QVariant> &hash) override;
             int ID;

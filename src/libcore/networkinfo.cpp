@@ -11,6 +11,7 @@
 // Copyright (c) Petr Bena 2021
 
 #include "networkinfo.h"
+#include "identity.h"
 
 using namespace GrumpyIRC;
 
@@ -28,7 +29,7 @@ void NetworkInfo::Clear()
     NetworkInfo::LastID = 0;
 }
 
-NetworkInfo::NetworkInfo(QString name, QString host, int port, int identity, int id)
+NetworkInfo::NetworkInfo(QString name, QString host, int port, int identity, bool ssl, int id)
 {
     if (id < 0)
     {
@@ -36,21 +37,34 @@ NetworkInfo::NetworkInfo(QString name, QString host, int port, int identity, int
     } else
     {
         this->ID = id;
-        if (id > NetworkInfo::LastID)
+        if (id >= NetworkInfo::LastID)
             NetworkInfo::LastID = id + 1;
     }
 
     this->NetworkName = name;
     this->Hostname = host;
     this->Port = port;
+    this->SSL = ssl;
     this->PreferredIdentity = identity;
 }
 
 NetworkInfo::NetworkInfo(const QHash<QString, QVariant> &hash)
 {
     this->LoadHash(hash);
-    if (this->ID > LastID)
+    if (this->ID >= LastID)
         LastID = this->ID + 1;
+}
+
+libirc::ServerAddress NetworkInfo::ToServerAddress()
+{
+    libirc::ServerAddress addr(this->Hostname, this->SSL, this->Port);
+    if (this->PreferredIdentity >= 0 && Identity::Identities.contains(this->PreferredIdentity))
+    {
+        Identity *identity = Identity::Identities[this->PreferredIdentity];
+        addr.SetNick(identity->Nick);
+        addr.SetIdent(identity->Ident);
+    }
+    return addr;
 }
 
 QHash<QString, QVariant> NetworkInfo::ToHash()

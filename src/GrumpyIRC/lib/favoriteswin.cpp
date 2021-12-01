@@ -15,6 +15,7 @@
 #include "ui_favoriteswin.h"
 #include "networkwin.h"
 #include "identityeditorwin.h"
+#include "mainwindow.h"
 #include <libcore/generic.h>
 #include <libcore/networkinfo.h>
 #include <libcore/identity.h>
@@ -116,6 +117,13 @@ void GrumpyIRC::FavoritesWin::on_tv_IdentityList_customContextMenuRequested(cons
     QAction *menuRemove = new QAction("Remove", &Menu);
     Menu.addAction(menuRemove);
 
+    QList<int> selected = this->selectedIdents();
+    if (selected.count() != 1)
+    {
+        menuEdit->setEnabled(false);
+    }
+
+
     QAction* selectedItem = Menu.exec(globalPos);
     if (!selectedItem)
         return;
@@ -126,16 +134,27 @@ void GrumpyIRC::FavoritesWin::on_tv_IdentityList_customContextMenuRequested(cons
         this->RefreshIdentities();
     } else if (selectedItem == menuRemove)
     {
-        QList<int> selected = this->selectedIdents();
         foreach (int id, selected)
         {
             if (Identity::Identities.contains(id))
             {
+                // Remove reference to this identity from all networks
+                foreach (int network_id, NetworkInfo::NetworksInfo.keys())
+                {
+                    if (NetworkInfo::NetworksInfo[network_id]->PreferredIdentity == id)
+                        NetworkInfo::NetworksInfo[network_id]->PreferredIdentity = -1;
+                }
+
                 delete Identity::Identities[id];
                 Identity::Identities.remove(id);
             }
         }
         this->RefreshIdentities();
+    } else if (selectedItem == menuEdit)
+    {
+        IdentityEditorWin iw;
+        iw.Load(selected[0]);
+        iw.exec();
     }
 }
 
@@ -144,10 +163,23 @@ void GrumpyIRC::FavoritesWin::on_tv_NetworkList_customContextMenuRequested(const
     QPoint globalPos = this->ui->tv_NetworkList->viewport()->mapToGlobal(pos);
     QMenu Menu;
     // Items
+    QAction *menuConnect = new QAction("Connect", &Menu);
+    Menu.addAction(menuConnect);
+    Menu.addSeparator();
     QAction *menuInsert = new QAction("Insert", &Menu);
     Menu.addAction(menuInsert);
+    QAction *menuEdit = new QAction("Edit", &Menu);
+    Menu.addAction(menuEdit);
     QAction *menuRemove = new QAction("Remove", &Menu);
     Menu.addAction(menuRemove);
+
+    QList<int> selected = this->selectedNetworks();
+
+    if (selected.count() != 1)
+    {
+        menuConnect->setEnabled(false);
+        menuEdit->setEnabled(false);
+    }
 
     QAction* selectedItem = Menu.exec(globalPos);
     if (!selectedItem)
@@ -159,7 +191,6 @@ void GrumpyIRC::FavoritesWin::on_tv_NetworkList_customContextMenuRequested(const
         this->RefreshNetworks();
     } else if (selectedItem == menuRemove)
     {
-        QList<int> selected = this->selectedNetworks();
         foreach (int id, selected)
         {
             if (NetworkInfo::NetworksInfo.contains(id))
@@ -169,6 +200,17 @@ void GrumpyIRC::FavoritesWin::on_tv_NetworkList_customContextMenuRequested(const
             }
         }
         this->RefreshNetworks();
+    } else if (selectedItem == menuEdit)
+    {
+        NetworkWin nx;
+        nx.Load(selected[0]);
+        nx.exec();
+        this->RefreshNetworks();
+    } else if (selectedItem == menuConnect)
+    {
+        NetworkInfo *network = NetworkInfo::NetworksInfo[selected[0]];
+        MainWindow::Main->OpenServer(network->ToServerAddress());
+        this->close();
     }
 }
 
@@ -207,7 +249,7 @@ void FavoritesWin::saveIdentities()
 
 void FavoritesWin::loadIdentities()
 {
-    QHash<QString, QVariant> nl = CONF->GetNetworks();
+    QHash<QString, QVariant> nl = CONF->GetIdentities();
     foreach (QString key, nl.keys())
     {
         QHash<QString, QVariant> identity_hash = nl[key].toHash();

@@ -481,6 +481,7 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    (void) event;
     Exit();
 }
 
@@ -518,6 +519,7 @@ void MainWindow::on_actionFavorites_triggered()
     FavoritesWin favorites(this);
     favorites.exec();
     FavoritesWin::Save();
+    CONF->Save();
 }
 
 void MainWindow::on_actionToggle_secret_triggered()

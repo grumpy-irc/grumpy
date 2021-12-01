@@ -31,7 +31,7 @@ namespace GrumpyIRC
             Identity(QString nick, QString ident, QString real_name, QString away_msg = "", int id = -1);
             QHash<QString, QVariant> ToHash() override;
             void LoadHash(const QHash<QString, QVariant> &hash) override;
-            void ToString();
+            QString ToString();
             int ID;
             QString Nick;
             QString Ident;

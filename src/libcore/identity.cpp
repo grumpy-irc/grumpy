@@ -31,7 +31,7 @@ void Identity::Clear()
 Identity::Identity(QHash<QString, QVariant> hash)
 {
     this->LoadHash(hash);
-    if (this->ID > Identity::LastID)
+    if (this->ID >= Identity::LastID)
         Identity::LastID = this->ID + 1;
 }
 
@@ -43,7 +43,7 @@ Identity::Identity(QString nick, QString ident, QString real_name, QString away_
     } else
     {
         this->ID = id;
-        if (id > Identity::LastID)
+        if (id >= Identity::LastID)
             Identity::LastID = id + 1;
     }
 
@@ -56,6 +56,7 @@ Identity::Identity(QString nick, QString ident, QString real_name, QString away_
 QHash<QString, QVariant> Identity::ToHash()
 {
     QHash<QString, QVariant> hash;
+    SERIALIZE(ID);
     SERIALIZE(Nick);
     SERIALIZE(Ident);
     SERIALIZE(RealName);
@@ -65,15 +66,18 @@ QHash<QString, QVariant> Identity::ToHash()
 
 void Identity::LoadHash(const QHash<QString, QVariant> &hash)
 {
+    UNSERIALIZE_INT(ID);
     UNSERIALIZE_STRING(Nick);
     UNSERIALIZE_STRING(Ident);
     UNSERIALIZE_STRING(RealName);
     UNSERIALIZE_STRING(AwayMessage);
 }
 
-void Identity::ToString()
+QString Identity::ToString()
 {
     QString result = this->Nick;
     if (!this->Ident.isEmpty())
-        result += "@" + this->Ident;
+        result += "!" + this->Ident;
+
+    return result;
 }

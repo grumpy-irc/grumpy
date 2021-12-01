@@ -28,12 +28,14 @@ namespace GrumpyIRC
         public:
             explicit NetworkWin(QWidget *parent = nullptr);
             ~NetworkWin();
+            void Load(int network_id);
 
         private slots:
             void on_pushSave_clicked();
             void on_pushExit_clicked();
 
         private:
+            QHash<int, int> identityMap;
             Ui::NetworkWin *ui;
             int networkID = -1;
     };
