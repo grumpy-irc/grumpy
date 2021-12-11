@@ -22,7 +22,7 @@
 
 namespace GrumpyIRC
 {
-    class NetworkInfo : public libirc::SerializableItem
+    class LIBCORESHARED_EXPORT NetworkInfo : public libirc::SerializableItem
     {
         public:
             static void Clear();

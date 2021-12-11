@@ -14,6 +14,7 @@
 #define IDENTITYEDITORWIN_H
 
 #include <QDialog>
+#include "grumpy_global.h"
 
 namespace Ui
 {
@@ -22,7 +23,7 @@ namespace Ui
 
 namespace GrumpyIRC
 {
-    class IdentityEditorWin : public QDialog
+    class LIBGRUMPYSHARED_EXPORT IdentityEditorWin : public QDialog
     {
             Q_OBJECT
         public:

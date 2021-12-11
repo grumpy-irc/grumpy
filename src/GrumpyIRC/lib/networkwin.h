@@ -14,6 +14,7 @@
 #define NETWORKWIN_H
 
 #include <QDialog>
+#include "grumpy_global.h"
 
 namespace Ui {
     class NetworkWin;
@@ -21,7 +22,7 @@ namespace Ui {
 
 namespace GrumpyIRC
 {
-    class NetworkWin : public QDialog
+    class LIBGRUMPYSHARED_EXPORT NetworkWin : public QDialog
     {
             Q_OBJECT
 
