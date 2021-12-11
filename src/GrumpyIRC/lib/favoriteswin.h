@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2018
+// Copyright (c) Petr Bena 2015 - 2021
 
 #ifndef FAVORITESWIN_H
 #define FAVORITESWIN_H
@@ -28,13 +28,26 @@ namespace GrumpyIRC
             Q_OBJECT
 
         public:
+            static void Load();
+            static void Save();
+
             explicit FavoritesWin(QWidget *parent = 0);
             ~FavoritesWin();
+            void RefreshNetworks();
+            void RefreshIdentities();
 
         private slots:
-            void on_tableWidget_customContextMenuRequested(const QPoint &pos);
+            void on_tv_IdentityList_customContextMenuRequested(const QPoint &pos);
+            void on_tv_NetworkList_customContextMenuRequested(const QPoint &pos);
 
         private:
+            static void saveNetworks();
+            static void loadNetworks();
+            static void saveIdentities();
+            static void loadIdentities();
+
+            QList<int> selectedNetworks();
+            QList<int> selectedIdents();
             Ui::FavoritesWin *ui;
     };
 }

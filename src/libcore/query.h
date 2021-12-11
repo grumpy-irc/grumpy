@@ -20,6 +20,9 @@
 namespace GrumpyIRC
 {
     class ScrollbackItem;
+
+    //! This is unused work in progress
+    //! query for matching text, used by searching feature which is to be implemented
     class LIBCORESHARED_EXPORT Query : public libirc::SerializableItem
     {
         public:

@@ -8,7 +8,7 @@
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU Lesser General Public License for more details.
 
-// Copyright (c) Petr Bena 2015 - 2020
+// Copyright (c) Petr Bena 2015 - 2021
 
 #include "aboutwin.h"
 #include "corewrapper.h"
@@ -157,6 +157,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     Proxy::Init();
     this->SetupAutoAway();
 
+    // Load identities and favorite networks
+    FavoritesWin::Load();
+
     if (!CONF->SafeMode)
         this->Execute(CONF->GetAutorun());
 
@@ -180,7 +183,6 @@ MainWindow::MainWindow(bool fork, MainWindow *parent)
     // Try to restore geometry
     this->restoreGeometry(GCFG->GetValue("mainwindow_geometry").toByteArray());
     this->restoreState(GCFG->GetValue("mainwindow_state").toByteArray());
-    this->ui->actionFavorites->setVisible(false);
 }
 
 MainWindow::~MainWindow()
@@ -479,6 +481,7 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    (void) event;
     Exit();
 }
 
@@ -513,9 +516,10 @@ void MainWindow::on_actionOpen_window_triggered()
 
 void MainWindow::on_actionFavorites_triggered()
 {
-    FavoritesWin *favorites = new FavoritesWin(this);
-    favorites->setAttribute(Qt::WA_DeleteOnClose);
-    favorites->show();
+    FavoritesWin favorites(this);
+    favorites.exec();
+    FavoritesWin::Save();
+    CONF->Save();
 }
 
 void MainWindow::on_actionToggle_secret_triggered()
@@ -525,13 +529,13 @@ void MainWindow::on_actionToggle_secret_triggered()
 
 void MainWindow::on_actionProxy_triggered()
 {
-    Proxy p;
+    Proxy p(this);
     p.exec();
 }
 
 void MainWindow::on_actionEnable_proxy_toggled(bool arg1)
 {
-    Proxy p;
+    Proxy p(this);
     p.Enable(arg1);
 }
 
