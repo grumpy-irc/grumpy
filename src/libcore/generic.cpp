@@ -263,7 +263,13 @@ Generic::HostInfo Generic::GetHostPortInfo(QString target, int default_port)
 
     // This is either IPv4 or string
     info.Host = target.mid(0, target.indexOf(":"));
+#ifdef QT_VERSION
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    p = target.mid(target.indexOf(":") + 1).toInt(&success);
+#else
     p = target.midRef(target.indexOf(":") + 1).toInt(&success);
+#endif
+#endif
     if (!success)
     {
         info.Invalid = true;

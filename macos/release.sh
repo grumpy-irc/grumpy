@@ -22,12 +22,12 @@ fi
 QTVERSION=`${QTDIR}/bin/qtpaths --qt-version`
 version_array=( ${QTVERSION//./ } )
 EXTRA_FLAGS=""
-if [ ${version_array[0]} -eq 5 ]; then
+if [ ${version_array[0]} -eq 6 ]; then
+    EXTRA_FLAGS="--qt6"
+elif [ ${version_array[0]} -eq 5 ]; then
     EXTRA_FLAGS="--qt5"
-elif [ ${version_array[0]} -eq 4 ];then
-    EXTRA_FLAGS="--qt4"
 else
-    echo "Unsupported Qt version ${QTVERSION}, must be 4.x or 5.x"
+    echo "Unsupported Qt version ${QTVERSION}, must be 5.x or 6.x"
     exit 1
 fi
 echo "Checking sanity of system..."

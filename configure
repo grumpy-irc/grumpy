@@ -254,11 +254,6 @@ if [ ! -d "src/libirc/libirc" ];then
     cd - || exit 1
 fi
 
-if [ "$QT5" -eq 10 ];then
-    QT5=1
-    echo $WARN"WARNING: No version of QT was explicitly specified, assuming you want to use QT5 (use --qt4 if not)"$NORMAL
-fi
-
 if [ "$QT6" -eq 1 ];then
     CMAKE_ARGS="$CMAKE_ARGS -DQT6_BUILD=true"
 else

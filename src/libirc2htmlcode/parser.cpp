@@ -106,7 +106,14 @@ QString Parser::linkUrl(QString source, QString protocol)
 {
     int position = 0;
     protocol = protocol + "://";
-    while (position < source.size() && source.midRef(position).contains(protocol))
+    while (position < source.size() && 
+#ifdef QT_VERSION
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+           source.mid(position).contains(protocol))
+#else
+           source.midRef(position).contains(protocol))
+#endif
+#endif
     {
         position = source.indexOf(protocol, position);
         // find the end of link

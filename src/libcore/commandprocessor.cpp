@@ -99,7 +99,13 @@ static QList<QString> Split(int size, int minimal_size, QString text)
     while (text.size() > size)
     {
         // We need to find a part of text which is divided by space
+#ifdef QT_VERSION
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        if (!text.mid(0, size).contains(" "))
+#else
         if (!text.midRef(0, size).contains(" "))
+#endif
+#endif
         {
             QString trimmed_part = text.mid(size);
             if (trimmed_part.size() < minimal_size)
