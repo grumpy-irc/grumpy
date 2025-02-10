@@ -1,7 +1,13 @@
 PROJECT (irc2htmlcode)
 SET(CMAKE_AUTOMOC ON)
 
-if(QT5_BUILD)
+option(QT6_BUILD "Build with Qt6" false)
+
+if(QT6_BUILD)
+  find_package(Qt6Core REQUIRED)
+  set(QT_INCLUDES ${Qt6Core_INCLUDE_DIRS})
+  include_directories(${QT_INCLUDES})
+elif(QT5_BUILD)
   find_package(Qt5Core REQUIRED)
   set(QT_INCLUDES ${Qt5Core_INCLUDE_DIRS})
   include_directories(${QT_INCLUDES})
@@ -13,7 +19,10 @@ file (GLOB src "*.cpp")
 file (GLOB headers "*.h")
 file (GLOB resources "*.qrc")
 
-if(QT5_BUILD)
+if(QT6_BUILD)
+    QT6_WRAP_CPP(irc2htmlcode_HEADERS_MOC ${irc2htmlcode_HEADERS})
+    QT6_ADD_RESOURCES(irc2htmlcode_RESOURCES_RCC ${resources})
+elif(QT5_BUILD)
     QT5_WRAP_CPP(irc2htmlcode_HEADERS_MOC ${irc2htmlcode_HEADERS})
     QT5_ADD_RESOURCES(irc2htmlcode_RESOURCES_RCC ${resources})
 else()
@@ -30,7 +39,9 @@ ADD_DEFINITIONS( -DLIBIRC2HTMLCODE_LIBRARY -DQT_USE_QSTRINGBUILDER )
 
 ADD_LIBRARY(irc2htmlcode SHARED ${src} ${headers})
 
-if (QT5_BUILD)
+if (QT6_BUILD)
+  TARGET_LINK_LIBRARIES(irc2htmlcode Qt6::Core)
+elif (QT5_BUILD)
   TARGET_LINK_LIBRARIES(irc2htmlcode Qt5::Core)
 endif()
 

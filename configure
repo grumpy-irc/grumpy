@@ -1,5 +1,5 @@
 #!/bin/bash
-#  Copyright (c) 2013 - 2015, Petr Bena
+#  Copyright (c) 2013 - 2025, Petr Bena
 #  All rights reserved.
 
 #  Redistribution and use in source and binary forms, with
@@ -35,6 +35,7 @@ WARN=$(tput setaf 3)
 GREEN=$(tput setaf 2)
 NORMAL=$(tput sgr0)
 QT5=1
+QT6=0
 USEDEBUG=0
 UNIT_TESTS=''
 CMAKE_ARGS=''
@@ -61,12 +62,14 @@ do
         echo " --unit-test: will build unit tests"
         echo " --qtpath: path to Qt (for example C:\\Qt\\5.4\\mingw\\"
         echo " --profiler: enable profiler"
+        echo " --qt5: use Qt5 (default)"
+        echo " --qt6: use Qt6"
         echo " --prefix: specify prefix for installation path"
         echo " --folder <folder>: change the default build folder"
         echo " --no-colors: suppress colors"
         echo " --version: show version"
         echo
-        echo "Copyright (c) 2013 - 2020 Petr Bena. This script is licensed under the BSD license."
+        echo "Copyright (c) 2013 - 2025 Petr Bena. This script is licensed under the BSD license."
         exit 0
     fi
     if [ "$_BUILD" = "1" ];then
@@ -108,6 +111,11 @@ do
     fi
     if [ "$var" = "--qt5" ];then
         QT5=1
+        continue
+    fi
+    if [ "$var" = "--qt6" ];then
+        QT6=1
+        QT5=0
         continue
     fi
     if [ "$var" = "--folder" ];then
@@ -251,10 +259,14 @@ if [ "$QT5" -eq 10 ];then
     echo $WARN"WARNING: No version of QT was explicitly specified, assuming you want to use QT5 (use --qt4 if not)"$NORMAL
 fi
 
-if [ "$QT5" -eq 1 ];then
-    CMAKE_ARGS="$CMAKE_ARGS -DQT5_BUILD=true"
+if [ "$QT6" -eq 1 ];then
+    CMAKE_ARGS="$CMAKE_ARGS -DQT6_BUILD=true"
 else
-    CMAKE_ARGS="$CMAKE_ARGS -DQT5_BUILD=false"
+    if [ "$QT5" -eq 1 ];then
+        CMAKE_ARGS="$CMAKE_ARGS -DQT5_BUILD=true"
+    else
+        CMAKE_ARGS="$CMAKE_ARGS -DQT5_BUILD=false"
+    fi
 fi
 
 #text "Executing update.sh... "
