@@ -16,6 +16,9 @@
 #include "grumpy_global.h"
 #include <libcore/grumpyobject.h>
 #include <QListWidgetItem>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QColor>
+#endif
 
 namespace libircclient
 {
@@ -30,6 +33,9 @@ namespace GrumpyIRC
             UserFrameItem(const QString &text, libircclient::Network *nt);
             bool operator<(const QListWidgetItem &other) const override;
             bool lowerThan(const QListWidgetItem &other) const;
+            #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+            void setTextColor(const QColor &color);
+            #endif
             libircclient::Network *network;
     };
 }

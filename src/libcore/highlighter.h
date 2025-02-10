@@ -16,7 +16,11 @@
 #include "libcore_global.h"
 #include "definitions.h"
 #include "../libirc/libirc/serializableitem.h"
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QRegularExpression>
+#else
 #include <QRegExp>
+#endif
 #include <QList>
 
 namespace libircclient
@@ -53,7 +57,11 @@ namespace GrumpyIRC
             bool IsRegex;
         private:
             QString definition;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+            QRegularExpression regex;
+#else
             QRegExp regex;
+#endif
     };
 }
 

@@ -21,6 +21,7 @@
 #include <libcore/core.h>
 #include <libcore/autocompletionengine.h>
 #include <libcore/commandprocessor.h>
+#include <algorithm> // Add this include for std::sort
 
 using namespace GrumpyIRC;
 
@@ -125,7 +126,7 @@ void InputBox::Complete()
     if (result.Suggestions.count())
     {
         QString suggestions;
-        qSort(result.Suggestions);
+        std::sort(result.Suggestions.begin(), result.Suggestions.end());
         foreach(QString sx, result.Suggestions)
             suggestions += sx + ", ";
         if (suggestions.endsWith(", "))

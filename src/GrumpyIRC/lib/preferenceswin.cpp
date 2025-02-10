@@ -11,6 +11,7 @@
 // Copyright (c) Petr Bena 2015 - 2018
 
 #include <libcore/definitions.h>
+#include <algorithm>  // Add at top with other includes
 
 #include "preferenceswin.h"
 #include "skin.h"
@@ -340,7 +341,11 @@ void PreferencesWin::on_tableWidget_customContextMenuRequested(const QPoint &pos
     {
         // We need to remove them from last to first
         QList<int> items = this->selectedHLRows();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        std::sort(items.begin(), items.end());
+#else
         qSort(items);
+#endif
         while (!items.isEmpty())
         {
             int row = items.last();

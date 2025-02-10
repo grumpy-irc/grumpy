@@ -48,3 +48,10 @@ bool UserFrameItem::lowerThan(const QListWidgetItem &other) const
     return QString::localeAwareCompare(username1.toLower(), username2.toLower()) < 0;
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void UserFrameItem::setTextColor(const QColor &color)
+{
+    this->setForeground(color);
+}
+#endif
+

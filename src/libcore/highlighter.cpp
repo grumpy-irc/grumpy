@@ -99,7 +99,20 @@ bool Highlighter::IsMatching(ScrollbackItem *text, libircclient::Network *networ
     if (this->Messages && !(text->GetType() == ScrollbackItemType_Notice || text->GetType() == ScrollbackItemType_Message))
         return false;
 
-    if (!this->IsRegex)
+    if (this->IsRegex)
+    {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        this->regex.setPattern(this->definition);
+        if (!this->CaseSensitive)
+            this->regex.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
+        return this->regex.match(text->GetText()).hasMatch();
+#else
+        this->regex.setPattern(this->definition);
+        if (!this->CaseSensitive)
+            this->regex.setCaseSensitivity(Qt::CaseInsensitive);
+        return this->regex.indexIn(text->GetText()) != -1;
+#endif
+    } else
     {
         QString string = this->definition;
         if (network)

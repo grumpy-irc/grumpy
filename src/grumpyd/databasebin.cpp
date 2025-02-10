@@ -26,7 +26,11 @@
 #include <QFile>
 #include <QByteArray>
 #include <QDataStream>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QRegularExpression>
+#else
 #include <QRegExp>
+#endif
 #include <QDir>
 
 using namespace GrumpyIRC;
@@ -351,12 +355,22 @@ QHash<QString, QVariant> DatabaseBin::loadSingleQHash(QString path)
 
 bool DatabaseBin::isLegal(QString name)
 {
-    return name.contains(QRegExp( "[" + QRegExp::escape( "\\/:*?\"<>|" ) + "]" ));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QRegularExpression regex("[" + QRegularExpression::escape("\\/:*?\"<>|") + "]");
+    return name.contains(regex);
+#else
+    return name.contains(QRegExp("[" + QRegExp::escape("\\/:*?\"<>|") + "]"));
+#endif
 }
 
 QString DatabaseBin::normalizePath(QString path)
 {
-    return path.replace(QRegExp( "[" + QRegExp::escape( "\\/:*?\"<>|" ) + "]" ), QString( "_" ));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QRegularExpression regex("[" + QRegularExpression::escape("\\/:*?\"<>|") + "]");
+    return path.replace(regex, QString("_"));
+#else
+    return path.replace(QRegExp("[" + QRegExp::escape("\\/:*?\"<>|") + "]"), QString("_"));
+#endif
 }
 
 QString DatabaseBin::GetRootPath()

@@ -22,6 +22,11 @@
 #include "../generic.h"
 #include <QJSValueIterator>
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#define fromTime_t fromSecsSinceEpoch
+#define toTime_t toSecsSinceEpoch
+#endif
+
 using namespace GrumpyIRC;
 
 GrumpyJS::GrumpyJS(ScriptExtension *s) : GenericJSClass(s)

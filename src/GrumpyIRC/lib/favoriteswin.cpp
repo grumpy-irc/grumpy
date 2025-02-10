@@ -20,6 +20,7 @@
 #include <libcore/networkinfo.h>
 #include <libcore/identity.h>
 #include <QMenu>
+#include <algorithm> // Add this include for std::sort
 
 using namespace GrumpyIRC;
 
@@ -70,7 +71,7 @@ void FavoritesWin::RefreshNetworks()
 
     int row = 0;
     QList<int> network_list = NetworkInfo::NetworksInfo.keys();
-    qSort(network_list);
+    std::sort(network_list.begin(), network_list.end());
 
     foreach (int id, network_list)
     {
@@ -91,7 +92,7 @@ void FavoritesWin::RefreshIdentities()
 
     int row = 0;
     QList<int> identity_list = Identity::Identities.keys();
-    qSort(identity_list);
+    std::sort(identity_list.begin(), identity_list.end());
 
     foreach (int id, identity_list)
     {

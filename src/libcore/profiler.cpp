@@ -9,6 +9,7 @@
 //GNU General Public License for more details.
 
 #include "profiler.h"
+#include <algorithm> // Add this include for std::sort
 
 #ifdef GRUMPY_PROFILER
 using namespace GrumpyIRC;
@@ -45,7 +46,7 @@ QList<QString> Profiler::GetRegisteredCounterFunctions()
     // sort the list by number of calls
     QHash<QString, unsigned long long> temp = callCounter;
     QList<unsigned long long> Numbers = temp.values();
-    qSort(Numbers);
+    std::sort(Numbers.begin(), Numbers.end());
     QList<QString> Functions;
     foreach(unsigned long long n, Numbers)
     {

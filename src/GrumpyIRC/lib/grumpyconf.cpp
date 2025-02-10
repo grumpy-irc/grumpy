@@ -522,7 +522,7 @@ void GrumpyConf::Save()
     GCFG->SetValue("highlights", ql);
     if (!sl.isEmpty())
         GCFG->SetValue("skins", sl);
-    GCFG->SetValue("skin", Skin::SkinList.indexOf(Skin::GetCurrent()));
+    GCFG->SetValue("skin", static_cast<int>(Skin::SkinList.indexOf(Skin::GetCurrent())));
     GCFG->Save();
 }
 

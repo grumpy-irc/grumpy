@@ -117,7 +117,9 @@ int main(int argc, char *argv[])
 
         // Initialize core first
         QString home_path;
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        home_path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+#elif QT_VERSION >= 0x050000
         home_path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
 #else
         home_path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);

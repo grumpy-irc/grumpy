@@ -26,6 +26,10 @@
 #include "scrollback.h"
 #include "exception.h"
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#define fromTime_t fromSecsSinceEpoch
+#endif
+
 using namespace GrumpyIRC;
 
 // ID of network, we start with 2 for debugging purposes as missing id would result in 0 so that we know if it was missing or is proper id
