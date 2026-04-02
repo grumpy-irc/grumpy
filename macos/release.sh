@@ -32,6 +32,10 @@ else
 fi
 echo "Checking sanity of system..."
 of=`pwd`
+MAKE_JOBS=`sysctl -n hw.ncpu 2>/dev/null`
+if [ -z "$MAKE_JOBS" ];then
+    MAKE_JOBS=4
+fi
 if [ -d release ];then
     echo "Release folder is already in folder, you need to delete it"
     exit 1
@@ -39,7 +43,7 @@ fi
 cd .. || exit 1
 ./configure ${EXTRA_FLAGS} --qtpath "$QTDIR" --extension || exit 1
 cd release || exit 1
-make || exit 1
+make -j"$MAKE_JOBS" || exit 1
 cd "$of"
 cp -r ../release "$of/release" || exit 1
 mkdir package || exit 1
