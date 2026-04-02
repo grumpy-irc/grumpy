@@ -183,6 +183,8 @@ void Skin::setDefaults()
         this->FontFamily = "Consolas";
     else
         this->FontFamily = "Courier New";
+#elif defined(Q_OS_MACOS)
+    this->FontFamily = "Menlo";
 #else
     this->FontFamily = "Monospace";
 #endif
