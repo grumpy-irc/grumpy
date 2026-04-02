@@ -1,8 +1,27 @@
-# So that MacOS builds are working on older versions as well
-set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
+# Qt 6 requires a modern CMake, and current CMake versions no longer accept
+# compatibility settings this old.
+cmake_minimum_required(VERSION 3.16)
+
+# Settings
+option(LINUX_SNAP "Build using snap" false)
+option(QT5_BUILD "Build with Qt5" true)
+option(QT6_BUILD "Build with Qt6" false)
+option(EXTREME_DEBUG "Enable some resource expensive and slowing debug info" false)
+option(UNIT_TESTS "Enable unit tests" false)
+option(GRUMPY_PROFILER "Build internal profiler (extreme slowdown)" false)
+
+if(APPLE)
+    if(QT6_BUILD)
+        # Qt 6 headers rely on std::filesystem APIs that are only available in
+        # newer macOS SDK targets.
+        set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15)
+    else()
+        # Keep the older deployment target for legacy Qt 5 builds.
+        set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
+    endif()
+endif()
 
 project(GrumpyIRC)
-cmake_minimum_required (VERSION 2.8.0)
 if(WIN32)
     if (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 3.0)
         add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/MP>)
@@ -24,14 +43,6 @@ else()
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++11")
     endif()
 endif()
-
-# Settings
-option(LINUX_SNAP "Build using snap" false)
-option(QT5_BUILD "Build with Qt5" true)
-option(QT6_BUILD "Build with Qt6" false)
-option(EXTREME_DEBUG "Enable some resource expensive and slowing debug info" false)
-option(UNIT_TESTS "Enable unit tests" false)
-option(GRUMPY_PROFILER "Build internal profiler (extreme slowdown)" false)
 
 # Configuration
 if (GRUMPY_PROFILER)
