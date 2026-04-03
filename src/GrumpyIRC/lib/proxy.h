@@ -33,9 +33,10 @@ namespace GrumpyIRC
             void Enable(bool b);
             ~Proxy();
 
+        public slots:
+            void accept() override;
+
         private slots:
-            void on_buttonBox_accepted();
-            void on_buttonBox_rejected();
             void on_comboBox_currentIndexChanged(int index);
 
         private:

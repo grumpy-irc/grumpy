@@ -97,7 +97,7 @@ Proxy::~Proxy()
     delete this->ui;
 }
 
-void Proxy::on_buttonBox_accepted()
+void Proxy::accept()
 {
     QNetworkProxy proxy = SetProxy(this->ui->comboBox->currentIndex(), this->ui->lineEdit->text(), this->ui->lineEdit_2->text().toUInt(),
                this->ui->lineEdit_3->text(), this->ui->lineEdit_4->text());
@@ -106,11 +106,8 @@ void Proxy::on_buttonBox_accepted()
         CONF->SetProxy(this->ui->comboBox->currentIndex());
         CONF->SetProxy(proxy);
     }
-}
 
-void Proxy::on_buttonBox_rejected()
-{
-    this->close();
+    QDialog::accept();
 }
 
 void Proxy::on_comboBox_currentIndexChanged(int index)

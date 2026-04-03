@@ -22,6 +22,7 @@
 #include "grumpyconf.h"
 #include <QMenu>
 #include <QColorDialog>
+#include <QMessageBox>
 #include <libcore/autocompletionengine.h>
 #include <libcore/commandprocessor.h>
 #include <libcore/exception.h>
@@ -38,13 +39,13 @@ PreferencesWin::PreferencesWin(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
     this->ui->leIdent->setText(CONF->GetIdent());
     this->ui->leNick->setText(CONF->GetNick());
     this->ui->leNickFix->setText(CONF->GetAlterNick());
-    this->ui->lineEdit->setText(CONF->GetRawQuitMessage());
-    this->ui->lineEdit_2->setText(CONF->GetName());
-    this->ui->lineEdit_3->setText(QString::number(CONF->GetSplitMaxSize()));
-    this->ui->checkBox->setChecked(CONF->GetIgnoreSSLProblems());
-    this->ui->checkBox_Trim->setChecked(CONF->GetAutoReduceMaxSendSize());
-    this->ui->checkBoxSplitMs->setChecked(CONF->GetSplit());
-    this->ui->checkBox_Colors->setChecked(CONF->GetColorBoxShow());
+    this->ui->lineEditQuitMessage->setText(CONF->GetRawQuitMessage());
+    this->ui->lineEditRealName->setText(CONF->GetName());
+    this->ui->lineEditSplitMaxSize->setText(QString::number(CONF->GetSplitMaxSize()));
+    this->ui->checkBoxIgnoreInvalidSsl->setChecked(CONF->GetIgnoreSSLProblems());
+    this->ui->checkBoxAutoReduceSplitSize->setChecked(CONF->GetAutoReduceMaxSendSize());
+    this->ui->checkBoxSplitLongMessages->setChecked(CONF->GetSplit());
+    this->ui->checkBoxShowColorPreview->setChecked(CONF->GetColorBoxShow());
     this->ui->plainTextEditAutorun->setPlainText(CONF->GetAutorun());
     this->ui->lineEdit_ChannelH->setText(CONF->GetChannelHeader());
     this->ui->lineEdit_LabeledH->setText(CONF->GetLabeledHeader());
@@ -53,34 +54,34 @@ PreferencesWin::PreferencesWin(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
     this->ui->lineEdit_Kick->setText(CONF->GetDefaultKickReason());
     this->ui->lineEdit_AutoAway->setText(QString::number(CONF->GetAutoAwayTime()));
     this->ui->lineEdit_Away->setText(CONF->GetAutoAwayMsg());
-    this->ui->checkBox_AutoAway->setChecked(CONF->GetAutoAway());
-    this->ui->checkBox_UnsafeScript->setChecked(CONF->GetConfiguration()->GetUnsafeScriptFc());
+    this->ui->checkBoxAutoAwayEnabled->setChecked(CONF->GetAutoAway());
+    this->ui->checkBoxAllowUnsafeScripts->setChecked(CONF->GetConfiguration()->GetUnsafeScriptFc());
     QString ignored;
     foreach (int numeric, CONF->IgnoredNums())
     {
         ignored += QString::number(numeric) + ", ";
     }
     ignored = ignored.trimmed();
-    this->ui->lineEdit_4->setText(ignored);
+    this->ui->lineEditIgnoredNumerics->setText(ignored);
 
     QStringList heading_1;
     heading_1 << "Highlighted text" << "Is regex" << "Matching" << "Enabled";
-    this->ui->tableWidget->verticalHeader()->setVisible(false);
-    this->ui->tableWidget->setColumnCount(heading_1.size());
-    this->ui->tableWidget->setShowGrid(false);
-    this->ui->tableWidget->setHorizontalHeaderLabels(heading_1);
+    this->ui->tableWidgetHighlights->verticalHeader()->setVisible(false);
+    this->ui->tableWidgetHighlights->setColumnCount(heading_1.size());
+    this->ui->tableWidgetHighlights->setShowGrid(false);
+    this->ui->tableWidgetHighlights->setHorizontalHeaderLabels(heading_1);
 
     QStringList heading_2;
     heading_2 << "Ignored text" << "Is regex" << "Matching" << "Enabled";
-    this->ui->tableWidget_2->verticalHeader()->setVisible(false);
-    this->ui->tableWidget_2->setColumnCount(heading_2.size());
-    this->ui->tableWidget_2->setShowGrid(false);
-    this->ui->tableWidget_2->setHorizontalHeaderLabels(heading_2);
+    this->ui->tableWidgetIgnoredText->verticalHeader()->setVisible(false);
+    this->ui->tableWidgetIgnoredText->setColumnCount(heading_2.size());
+    this->ui->tableWidgetIgnoredText->setShowGrid(false);
+    this->ui->tableWidgetIgnoredText->setHorizontalHeaderLabels(heading_2);
 
     this->highlights_reload();
-    this->ui->tableWidget->resizeColumnsToContents();
-    this->ui->tableWidget->resizeRowsToContents();
-    this->ui->tableWidget_2->resizeColumnsToContents();
+    this->ui->tableWidgetHighlights->resizeColumnsToContents();
+    this->ui->tableWidgetHighlights->resizeRowsToContents();
+    this->ui->tableWidgetIgnoredText->resizeColumnsToContents();
     this->updateSkin();
 
     this->ui->lineEdit_FormatActn->setText(CONF->GetActionFormat());
@@ -88,33 +89,33 @@ PreferencesWin::PreferencesWin(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
     this->ui->lineEdit_FormatNt->setText(CONF->GetNoticeFormat());
     this->ui->lineEdit_FormatText->setText(CONF->GetLineFormat());
 
-    this->ui->comboBox_Enc->addItem("Default");
-    this->ui->comboBox_Enc->addItem("ASCII");
-    this->ui->comboBox_Enc->addItem("UTF-8");
-    this->ui->comboBox_Enc->addItem("UTF-16");
-    this->ui->comboBox_Enc->addItem("Latin");
+    this->ui->comboBoxEncoding->addItem("Default");
+    this->ui->comboBoxEncoding->addItem("ASCII");
+    this->ui->comboBoxEncoding->addItem("UTF-8");
+    this->ui->comboBoxEncoding->addItem("UTF-16");
+    this->ui->comboBoxEncoding->addItem("Latin");
 
     switch (CONF->GetEncoding())
     {
         case libircclient::EncodingDefault:
-            this->ui->comboBox_Enc->setCurrentIndex(0);
+            this->ui->comboBoxEncoding->setCurrentIndex(0);
             break;
         case libircclient::EncodingASCII:
-            this->ui->comboBox_Enc->setCurrentIndex(1);
+            this->ui->comboBoxEncoding->setCurrentIndex(1);
             break;
         case libircclient::EncodingUTF8:
-            this->ui->comboBox_Enc->setCurrentIndex(2);
+            this->ui->comboBoxEncoding->setCurrentIndex(2);
             break;
         case libircclient::EncodingUTF16:
-            this->ui->comboBox_Enc->setCurrentIndex(3);
+            this->ui->comboBoxEncoding->setCurrentIndex(3);
             break;
         case libircclient::EncodingLatin:
-            this->ui->comboBox_Enc->setCurrentIndex(4);
+            this->ui->comboBoxEncoding->setCurrentIndex(4);
             break;
     }
 
-    this->ui->lineEdit_LoggingPath->setText(CONF->GetContinuousLoggingPath());
-    this->ui->checkBox_ContinuousLogging->setChecked(CONF->GetContinuousLoggingEnabled());
+    this->ui->lineEditContinuousLoggingPath->setText(CONF->GetContinuousLoggingPath());
+    this->ui->checkBoxContinuousLogging->setChecked(CONF->GetContinuousLoggingEnabled());
 }
 
 PreferencesWin::~PreferencesWin()
@@ -122,23 +123,21 @@ PreferencesWin::~PreferencesWin()
     delete this->ui;
 }
 
-void GrumpyIRC::PreferencesWin::on_buttonBox_rejected()
+void PreferencesWin::accept()
 {
-    this->close();
-}
+    if (!this->confirmPendingSkinChanges())
+        return;
 
-void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
-{
     CONF->SetAlterNick(this->ui->leNickFix->text());
     CONF->SetNick(this->ui->leNick->text());
     CONF->SetIdent(this->ui->leIdent->text());
-    CONF->SetQuitMessage(this->ui->lineEdit->text());
-    CONF->SetName(this->ui->lineEdit_2->text());
-    CONF->SetIgnoreSSLProblems(this->ui->checkBox->isChecked());
-    CONF->SetSplitMaxSize(this->ui->lineEdit_3->text().toInt());
-    CONF->SetSplit(this->ui->checkBoxSplitMs->isChecked());
+    CONF->SetQuitMessage(this->ui->lineEditQuitMessage->text());
+    CONF->SetName(this->ui->lineEditRealName->text());
+    CONF->SetIgnoreSSLProblems(this->ui->checkBoxIgnoreInvalidSsl->isChecked());
+    CONF->SetSplitMaxSize(this->ui->lineEditSplitMaxSize->text().toInt());
+    CONF->SetSplit(this->ui->checkBoxSplitLongMessages->isChecked());
     CONF->SetAutorun(this->ui->plainTextEditAutorun->toPlainText());
-    CONF->SetAutoReduceMaxSendSize(this->ui->checkBox_Trim->isChecked());
+    CONF->SetAutoReduceMaxSendSize(this->ui->checkBoxAutoReduceSplitSize->isChecked());
     CoreWrapper::GrumpyCore->GetCommandProcessor()->LongSize = CONF->GetSplitMaxSize();
     CoreWrapper::GrumpyCore->GetCommandProcessor()->SplitLong = CONF->GetSplit();
     CoreWrapper::GrumpyCore->GetCommandProcessor()->AutoReduceMsgSize = CONF->GetAutoReduceMaxSendSize();
@@ -147,16 +146,16 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
     CONF->SetStandardH(this->ui->lineEdit_StandardH->text());
     CONF->SetMessageFormat(this->ui->lineEdit_FormatMsg->text());
     CONF->SetLineFormat(this->ui->lineEdit_FormatText->text());
-    CONF->SetColorBoxShow(this->ui->checkBox_Colors->isChecked());
+    CONF->SetColorBoxShow(this->ui->checkBoxShowColorPreview->isChecked());
     CONF->SetDefaultBanMask(this->ui->le_Mask->text());
     CONF->SetDefaultKickReason(this->ui->lineEdit_Kick->text());
     CONF->SetAutoAwayMsg(this->ui->lineEdit_Away->text());
-    CONF->SetAutoAway(this->ui->checkBox_AutoAway->isChecked());
+    CONF->SetAutoAway(this->ui->checkBoxAutoAwayEnabled->isChecked());
     CONF->SetAutoAwayTime(this->ui->lineEdit_AutoAway->text().toInt());
-    CONF->SetContinuousLoggingPath(this->ui->lineEdit_LoggingPath->text());
-    CONF->SetContinuousLoggingEnabled(this->ui->checkBox_ContinuousLogging->isChecked());
+    CONF->SetContinuousLoggingPath(this->ui->lineEditContinuousLoggingPath->text());
+    CONF->SetContinuousLoggingEnabled(this->ui->checkBoxContinuousLogging->isChecked());
     QList<int> ignored_nums;
-    QList<QString> ignored = this->ui->lineEdit_4->text().split(",");
+    QList<QString> ignored = this->ui->lineEditIgnoredNumerics->text().split(",");
     foreach (QString numeric, ignored)
     {
         numeric = numeric.trimmed();
@@ -167,7 +166,7 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
     Skin::Current = this->highlighted_skin;
     CONF->SetIRCIgnoredNumerics(ignored_nums);
     ScrollbackFrame::UpdateSkins();
-    switch(this->ui->comboBox_Enc->currentIndex())
+    switch(this->ui->comboBoxEncoding->currentIndex())
     {
         case 0:
             CONF->SetEncoding(libircclient::EncodingDefault);
@@ -185,11 +184,58 @@ void GrumpyIRC::PreferencesWin::on_buttonBox_accepted()
             CONF->SetEncoding(libircclient::EncodingLatin);
             break;
     }
-    CONF->GetConfiguration()->SetUnsafeScriptFc(this->ui->checkBox_UnsafeScript->isChecked());
+    CONF->GetConfiguration()->SetUnsafeScriptFc(this->ui->checkBoxAllowUnsafeScripts->isChecked());
     CONF->Save();
     MainWindow::Main->SetupAutoAway();
     MainWindow::Main->UpdateSkin();
-    this->close();
+
+    QDialog::accept();
+}
+
+bool PreferencesWin::hasPendingSkinChanges() const
+{
+    if (!this->highlighted_skin || this->highlighted_skin->IsDefault())
+        return false;
+
+    return this->ui->lineEditSkinName->text() != this->highlighted_skin->Name
+            || this->ui->lineEditSkinTextSize->text().toInt() != this->highlighted_skin->TextSize
+            || this->ui->lineEditSkinFontFamily->text() != this->highlighted_skin->FontFamily
+            || this->ui->lineEditSkinBackgroundImage->text() != this->highlighted_skin->BackgroundImage
+            || this->ui->sliderSkinOpacity->value() != this->highlighted_skin->Opacity;
+}
+
+bool PreferencesWin::confirmPendingSkinChanges()
+{
+    if (!this->hasPendingSkinChanges())
+        return true;
+
+    this->ui->tabWidgetPreferences->setCurrentWidget(this->ui->tabSkinColors);
+    this->ui->pushButtonSaveSkin->setFocus();
+
+    QMessageBox messageBox;
+    messageBox.setWindowTitle("Unsaved skin changes");
+    messageBox.setText("The selected skin has unsaved changes.");
+    messageBox.setInformativeText("Do you want to abort saving Preferences and return to the skin editor?");
+    messageBox.setIcon(QMessageBox::Warning);
+    messageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    messageBox.setDefaultButton(QMessageBox::Yes);
+    messageBox.button(QMessageBox::Yes)->setText("Abort saving");
+    messageBox.button(QMessageBox::No)->setText("Continue");
+
+    int result = messageBox.exec();
+    return result == QMessageBox::No;
+}
+
+void PreferencesWin::saveSkinChanges()
+{
+    if (!this->highlighted_skin || this->highlighted_skin->IsDefault())
+        return;
+
+    this->highlighted_skin->Name = this->ui->lineEditSkinName->text();
+    this->highlighted_skin->TextSize = this->ui->lineEditSkinTextSize->text().toInt();
+    this->highlighted_skin->FontFamily = this->ui->lineEditSkinFontFamily->text();
+    this->highlighted_skin->BackgroundImage = this->ui->lineEditSkinBackgroundImage->text();
+    this->highlighted_skin->Opacity = this->ui->sliderSkinOpacity->value();
 }
 
 void PreferencesWin::highlights_reload()
@@ -207,16 +253,16 @@ void PreferencesWin::highlights_reload()
 
 void PreferencesWin::highlights_append_row(int row, Highlighter *hl)
 {
-    this->ui->tableWidget->insertRow(row);
+    this->ui->tableWidgetHighlights->insertRow(row);
     QTableWidgetItem *item = new QTableWidgetItem(hl->GetDefinition());
     this->highlights_source.insert(item, hl);
-    this->ui->tableWidget->setItem(row, 0, item);
+    this->ui->tableWidgetHighlights->setItem(row, 0, item);
 
     // Create a check box for regex item
     QCheckBox *regex = new QCheckBox(this);
     regex->setChecked(hl->IsRegex);
     this->highlights_regex.insert(regex, hl);
-    this->ui->tableWidget->setCellWidget(row, 1, regex);
+    this->ui->tableWidgetHighlights->setCellWidget(row, 1, regex);
     connect(regex, SIGNAL(toggled(bool)), this, SLOT(OnHLRegex(bool)));
 
     // Combo box for highlight type
@@ -224,20 +270,20 @@ void PreferencesWin::highlights_append_row(int row, Highlighter *hl)
     hlt->addItem("Text of message");
     hlt->setCurrentIndex(0);
     this->highlights_type.insert(hlt, hl);
-    this->ui->tableWidget->setCellWidget(row, 2, hlt);
+    this->ui->tableWidgetHighlights->setCellWidget(row, 2, hlt);
 
     QCheckBox *enabled = new QCheckBox(this);
     enabled->setChecked(hl->Enabled);
     this->highlights_enabled.insert(enabled, hl);
     connect(enabled, SIGNAL(toggled(bool)), this, SLOT(OnHLEnable(bool)));
-    this->ui->tableWidget->setCellWidget(row, 3, enabled);
-    this->ui->tableWidget->resizeRowToContents(row);
+    this->ui->tableWidgetHighlights->setCellWidget(row, 3, enabled);
+    this->ui->tableWidgetHighlights->resizeRowToContents(row);
 }
 
 QList<int> PreferencesWin::selectedHLRows()
 {
     QList<int> results;
-    QList<QTableWidgetItem*> items = this->ui->tableWidget->selectedItems();
+    QList<QTableWidgetItem*> items = this->ui->tableWidgetHighlights->selectedItems();
     foreach (QTableWidgetItem *xx, items)
     {
         if (!results.contains(xx->row()))
@@ -250,77 +296,77 @@ QList<int> PreferencesWin::selectedHLRows()
 void PreferencesWin::updateSkin()
 {
     int selectedSkin = Skin::SkinList.indexOf(Skin::GetCurrent());
-    if (this->ui->comboBox->count() > 0)
-        selectedSkin = this->ui->comboBox->currentIndex();
-    this->ui->comboBox->clear();
+    if (this->ui->comboBoxSkin->count() > 0)
+        selectedSkin = this->ui->comboBoxSkin->currentIndex();
+    this->ui->comboBoxSkin->clear();
     foreach (Skin *skin, Skin::SkinList)
     {
-        this->ui->comboBox->addItem(skin->Name);
+        this->ui->comboBoxSkin->addItem(skin->Name);
     }
-    while (selectedSkin >= this->ui->comboBox->count())
+    while (selectedSkin >= this->ui->comboBoxSkin->count())
         selectedSkin -= 1;
-    this->ui->comboBox->setCurrentIndex(selectedSkin);
+    this->ui->comboBoxSkin->setCurrentIndex(selectedSkin);
 }
 
 void PreferencesWin::refreshSkin(bool enabled)
 {
-    this->ui->pushButton_4->setEnabled(enabled);
-    this->ui->lineEdit_SkinFont->setEnabled(enabled);
-    this->ui->lineEdit_SkinName->setEnabled(enabled);
-    this->ui->pushButton_5->setEnabled(enabled);
-    this->ui->lineEdit_SkinSz->setEnabled(enabled);
-    this->ui->pushButton_AC->setEnabled(enabled);
-    this->ui->pushButton_C1->setEnabled(enabled);
-    this->ui->pushButton_C2->setEnabled(enabled);
-    this->ui->pushButton_C3->setEnabled(enabled);
-    this->ui->pushButton_C4->setEnabled(enabled);
-    this->ui->pushButton_C5->setEnabled(enabled);
-    this->ui->pushButton_C6->setEnabled(enabled);
-    this->ui->pushButton_C7->setEnabled(enabled);
-    this->ui->pushButton_C8->setEnabled(enabled);
-    this->ui->pushButton_C9->setEnabled(enabled);
-    this->ui->pushButton_C10->setEnabled(enabled);
-    this->ui->pushButton_C11->setEnabled(enabled);
-    this->ui->pushButton_C12->setEnabled(enabled);
-    this->ui->pushButton_C13->setEnabled(enabled);
-    this->ui->pushButton_C14->setEnabled(enabled);
-    this->ui->pushButton_C15->setEnabled(enabled);
+    this->ui->pushButtonSkinBackgroundColor->setEnabled(enabled);
+    this->ui->lineEditSkinFontFamily->setEnabled(enabled);
+    this->ui->lineEditSkinName->setEnabled(enabled);
+    this->ui->pushButtonSkinTextColor->setEnabled(enabled);
+    this->ui->lineEditSkinTextSize->setEnabled(enabled);
+    this->ui->pushButtonSkinAwayColor->setEnabled(enabled);
+    this->ui->pushButtonSkinPaletteColor1->setEnabled(enabled);
+    this->ui->pushButtonSkinPaletteColor2->setEnabled(enabled);
+    this->ui->pushButtonSkinPaletteColor3->setEnabled(enabled);
+    this->ui->pushButtonSkinPaletteColor4->setEnabled(enabled);
+    this->ui->pushButtonSkinPaletteColor5->setEnabled(enabled);
+    this->ui->pushButtonSkinPaletteColor6->setEnabled(enabled);
+    this->ui->pushButtonSkinPaletteColor7->setEnabled(enabled);
+    this->ui->pushButtonSkinPaletteColor8->setEnabled(enabled);
+    this->ui->pushButtonSkinPaletteColor9->setEnabled(enabled);
+    this->ui->pushButtonSkinPaletteColor10->setEnabled(enabled);
+    this->ui->pushButtonSkinPaletteColor11->setEnabled(enabled);
+    this->ui->pushButtonSkinPaletteColor12->setEnabled(enabled);
+    this->ui->pushButtonSkinPaletteColor13->setEnabled(enabled);
+    this->ui->pushButtonSkinPaletteColor14->setEnabled(enabled);
+    this->ui->pushButtonSkinPaletteColor15->setEnabled(enabled);
 
-    this->ui->pushButton_CA->setEnabled(enabled);
-    this->ui->pushButton_CH->setEnabled(enabled);
-    this->ui->pushButton_CO->setEnabled(enabled);
-    this->ui->pushButton_CQ->setEnabled(enabled);
-    this->ui->pushButton_CV->setEnabled(enabled);
-    this->ui->pushButton_EC->setEnabled(enabled);
-    this->ui->pushButton_HC->setEnabled(enabled);
-    this->ui->pushButton_IC->setEnabled(enabled);
-    this->ui->pushButton_WC->setEnabled(enabled);
-    this->ui->pushButton_SC->setEnabled(enabled);
-    this->ui->pushButton_UC->setEnabled(enabled);
-    this->ui->pushButton_TC->setEnabled(enabled);
-    this->ui->pushButton_UC_2->setEnabled(enabled);
-    this->ui->pushButton_LC->setEnabled(enabled);
-    this->ui->horizontalSlider->setEnabled(enabled);
-    this->ui->lineEdit_Image->setEnabled(enabled);
+    this->ui->pushButtonSkinModeAColor->setEnabled(enabled);
+    this->ui->pushButtonSkinModeHColor->setEnabled(enabled);
+    this->ui->pushButtonSkinModeOColor->setEnabled(enabled);
+    this->ui->pushButtonSkinModeQColor->setEnabled(enabled);
+    this->ui->pushButtonSkinModeVColor->setEnabled(enabled);
+    this->ui->pushButtonSkinErrorColor->setEnabled(enabled);
+    this->ui->pushButtonSkinHighlightColor->setEnabled(enabled);
+    this->ui->pushButtonSkinSystemInfoColor->setEnabled(enabled);
+    this->ui->pushButtonSkinWarningColor->setEnabled(enabled);
+    this->ui->pushButtonSkinSystemColor->setEnabled(enabled);
+    this->ui->pushButtonSkinUnreadColor->setEnabled(enabled);
+    this->ui->pushButtonSkinTimestampColor->setEnabled(enabled);
+    this->ui->pushButtonSkinUserColor->setEnabled(enabled);
+    this->ui->pushButtonSkinLinkColor->setEnabled(enabled);
+    this->ui->sliderSkinOpacity->setEnabled(enabled);
+    this->ui->lineEditSkinBackgroundImage->setEnabled(enabled);
 }
 
-void PreferencesWin::on_tableWidget_cellChanged(int row, int column)
+void PreferencesWin::on_tableWidgetHighlights_cellChanged(int row, int column)
 {
-    QTableWidgetItem *item = this->ui->tableWidget->item(row, column);
+    QTableWidgetItem *item = this->ui->tableWidgetHighlights->item(row, column);
     if (!this->highlights_source.contains(item))
         return;
 
     this->highlights_source[item]->SetDefinition(item->text());
 }
 
-void PreferencesWin::on_tableWidget_2_cellChanged(int row, int column)
+void PreferencesWin::on_tableWidgetIgnoredText_cellChanged(int row, int column)
 {
 
 }
 
-void PreferencesWin::on_tableWidget_customContextMenuRequested(const QPoint &pos)
+void PreferencesWin::on_tableWidgetHighlights_customContextMenuRequested(const QPoint &pos)
 {
-    QPoint globalPos = this->ui->tableWidget->viewport()->mapToGlobal(pos);
+    QPoint globalPos = this->ui->tableWidgetHighlights->viewport()->mapToGlobal(pos);
     QMenu Menu;
     // Items
     QAction *menuInsert = new QAction("Insert", &Menu);
@@ -335,7 +381,7 @@ void PreferencesWin::on_tableWidget_customContextMenuRequested(const QPoint &pos
     {
         Highlighter *hx = new Highlighter("");
         hx->Enabled = false;
-        this->highlights_append_row(this->ui->tableWidget->rowCount(), hx);
+        this->highlights_append_row(this->ui->tableWidgetHighlights->rowCount(), hx);
     }
     else if (selectedItem == menuRemove)
     {
@@ -350,12 +396,12 @@ void PreferencesWin::on_tableWidget_customContextMenuRequested(const QPoint &pos
         {
             int row = items.last();
             items.removeLast();
-            QTableWidgetItem *item = this->ui->tableWidget->item(row, 0);
+            QTableWidgetItem *item = this->ui->tableWidgetHighlights->item(row, 0);
             if (this->highlights_source.contains(item))
             {
                 Highlighter *highlight_sel = this->highlights_source[item];
                 // Remove the row
-                this->ui->tableWidget->removeRow(row);
+                this->ui->tableWidgetHighlights->removeRow(row);
                 // Nuke the highlight
                 delete highlight_sel;
             }
@@ -393,7 +439,7 @@ void PreferencesWin::OnHLRegex(bool checked)
     this->highlights_regex[source]->IsRegex = checked;
 }
 
-void GrumpyIRC::PreferencesWin::on_comboBox_currentIndexChanged(int index)
+void GrumpyIRC::PreferencesWin::on_comboBoxSkin_currentIndexChanged(int index)
 {
     if (index < 0)
         return;
@@ -402,29 +448,29 @@ void GrumpyIRC::PreferencesWin::on_comboBox_currentIndexChanged(int index)
         throw new Exception("Invalid skin_ptr", BOOST_CURRENT_FUNCTION);
 
     this->highlighted_skin = Skin::SkinList[index];
-    this->ui->lineEdit_SkinFont->setText(this->highlighted_skin->FontFamily);
-    this->ui->lineEdit_SkinSz->setText(QString::number(this->highlighted_skin->TextSize));
-    this->ui->lineEdit_SkinName->setText(this->highlighted_skin->Name);
-    this->ui->lineEdit_Image->setText(this->highlighted_skin->BackgroundImage);
-    this->ui->horizontalSlider->setValue(this->highlighted_skin->Opacity);
+    this->ui->lineEditSkinFontFamily->setText(this->highlighted_skin->FontFamily);
+    this->ui->lineEditSkinTextSize->setText(QString::number(this->highlighted_skin->TextSize));
+    this->ui->lineEditSkinName->setText(this->highlighted_skin->Name);
+    this->ui->lineEditSkinBackgroundImage->setText(this->highlighted_skin->BackgroundImage);
+    this->ui->sliderSkinOpacity->setValue(this->highlighted_skin->Opacity);
 
     // This is to save us some coding, it's a little bit slower but scales much better:
     // We put a pointer to every button and color of current skin into a hash table
     // then we let the functions pair them
     this->skin_ht.clear();
-    this->skin_ht.insert(this->ui->pushButton_4, &this->highlighted_skin->BackgroundColor);
-    this->skin_ht.insert(this->ui->pushButton_5, &this->highlighted_skin->TextColor);
-    this->skin_ht.insert(this->ui->pushButton_SC, &this->highlighted_skin->SystemColor);
-    this->skin_ht.insert(this->ui->pushButton_AC, &this->highlighted_skin->UserListAwayColor);
-    this->skin_ht.insert(this->ui->pushButton_EC, &this->highlighted_skin->Error);
-    this->skin_ht.insert(this->ui->pushButton_HC, &this->highlighted_skin->HighligtedColor);
-    this->skin_ht.insert(this->ui->pushButton_IC, &this->highlighted_skin->SystemInfo);
-    this->skin_ht.insert(this->ui->pushButton_UC, &this->highlighted_skin->Unread);
-    this->skin_ht.insert(this->ui->pushButton_WC, &this->highlighted_skin->Warning);
-    this->skin_ht.insert(this->ui->pushButton_TC, &this->highlighted_skin->Timestamp);
-    this->skin_ht.insert(this->ui->pushButton_UC_2, &this->highlighted_skin->UserColor);
-    this->skin_ht.insert(this->ui->pushButton_LC, &this->highlighted_skin->LinkColor);
-    //this->skin_ht.insert(this->ui->pushButton_CA, &this->highlighted_skin->)
+    this->skin_ht.insert(this->ui->pushButtonSkinBackgroundColor, &this->highlighted_skin->BackgroundColor);
+    this->skin_ht.insert(this->ui->pushButtonSkinTextColor, &this->highlighted_skin->TextColor);
+    this->skin_ht.insert(this->ui->pushButtonSkinSystemColor, &this->highlighted_skin->SystemColor);
+    this->skin_ht.insert(this->ui->pushButtonSkinAwayColor, &this->highlighted_skin->UserListAwayColor);
+    this->skin_ht.insert(this->ui->pushButtonSkinErrorColor, &this->highlighted_skin->Error);
+    this->skin_ht.insert(this->ui->pushButtonSkinHighlightColor, &this->highlighted_skin->HighligtedColor);
+    this->skin_ht.insert(this->ui->pushButtonSkinSystemInfoColor, &this->highlighted_skin->SystemInfo);
+    this->skin_ht.insert(this->ui->pushButtonSkinUnreadColor, &this->highlighted_skin->Unread);
+    this->skin_ht.insert(this->ui->pushButtonSkinWarningColor, &this->highlighted_skin->Warning);
+    this->skin_ht.insert(this->ui->pushButtonSkinTimestampColor, &this->highlighted_skin->Timestamp);
+    this->skin_ht.insert(this->ui->pushButtonSkinUserColor, &this->highlighted_skin->UserColor);
+    this->skin_ht.insert(this->ui->pushButtonSkinLinkColor, &this->highlighted_skin->LinkColor);
+    //this->skin_ht.insert(this->ui->pushButtonSkinModeAColor, &this->highlighted_skin->)
 
     foreach (QPushButton *button, this->skin_ht.keys())
         UpdateButton(button, *this->skin_ht[button]);
@@ -433,19 +479,12 @@ void GrumpyIRC::PreferencesWin::on_comboBox_currentIndexChanged(int index)
     //this->ui->lineEdit_SkinBk->setText(skin->BackgroundColor);
 }
 
-void GrumpyIRC::PreferencesWin::on_pushButton_clicked()
+void GrumpyIRC::PreferencesWin::on_pushButtonSaveSkin_clicked()
 {
-    if (this->highlighted_skin->IsDefault())
-        return;
-
-    this->highlighted_skin->Name = this->ui->lineEdit_SkinName->text();
-    this->highlighted_skin->TextSize = this->ui->lineEdit_SkinSz->text().toInt();
-    this->highlighted_skin->FontFamily = this->ui->lineEdit_SkinFont->text();
-    this->highlighted_skin->BackgroundImage = this->ui->lineEdit_Image->text();
-    this->highlighted_skin->Opacity = this->ui->horizontalSlider->value();
+    this->saveSkinChanges();
 }
 
-void GrumpyIRC::PreferencesWin::on_pushButton_3_clicked()
+void GrumpyIRC::PreferencesWin::on_pushButtonRemoveSkin_clicked()
 {
     if (this->highlighted_skin->IsDefault())
         return;
@@ -455,13 +494,13 @@ void GrumpyIRC::PreferencesWin::on_pushButton_3_clicked()
     this->updateSkin();
 }
 
-void GrumpyIRC::PreferencesWin::on_pushButton_2_clicked()
+void GrumpyIRC::PreferencesWin::on_pushButtonDuplicateSkin_clicked()
 {
     new Skin(this->highlighted_skin);
     this->updateSkin();
 
     // Now that we created a new skin we can switch it
-    this->ui->comboBox->setCurrentIndex(this->ui->comboBox->count() - 1);
+    this->ui->comboBoxSkin->setCurrentIndex(this->ui->comboBoxSkin->count() - 1);
 }
 
 static QColor GetColorUsingPicker(QColor color)
@@ -488,162 +527,162 @@ void PreferencesWin::updateColor()
     UpdateButton((QPushButton*)QObject::sender(), *this->skin_ht[(QPushButton*)QObject::sender()]);
 }
 
-void GrumpyIRC::PreferencesWin::on_pushButton_4_clicked()
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinBackgroundColor_clicked()
 {
     this->updateColor();
 }
 
-void GrumpyIRC::PreferencesWin::on_pushButton_5_clicked()
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinTextColor_clicked()
 {
     this->updateColor();
 }
 
-void GrumpyIRC::PreferencesWin::on_pushButton_SC_clicked()
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinSystemColor_clicked()
 {
     this->updateColor();
 }
 
-void GrumpyIRC::PreferencesWin::on_pushButton_WC_clicked()
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinWarningColor_clicked()
 {
     this->updateColor();
 }
 
-void GrumpyIRC::PreferencesWin::on_pushButton_EC_clicked()
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinErrorColor_clicked()
 {
     this->updateColor();
 }
 
-void GrumpyIRC::PreferencesWin::on_pushButton_IC_clicked()
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinSystemInfoColor_clicked()
 {
     this->updateColor();
 }
 
-void GrumpyIRC::PreferencesWin::on_pushButton_AC_clicked()
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinAwayColor_clicked()
 {
     this->updateColor();
 }
 
-void GrumpyIRC::PreferencesWin::on_pushButton_CQ_clicked()
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinModeQColor_clicked()
 {
 
 }
 
-void GrumpyIRC::PreferencesWin::on_pushButton_CA_clicked()
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinModeAColor_clicked()
 {
 
 }
 
-void GrumpyIRC::PreferencesWin::on_pushButton_CO_clicked()
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinModeOColor_clicked()
 {
 
 }
 
-void GrumpyIRC::PreferencesWin::on_pushButton_CH_clicked()
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinModeHColor_clicked()
 {
 
 }
 
-void GrumpyIRC::PreferencesWin::on_pushButton_CV_clicked()
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinModeVColor_clicked()
 {
 
 }
 
-void GrumpyIRC::PreferencesWin::on_pushButton_UC_clicked()
-{
-    this->updateColor();
-}
-
-void GrumpyIRC::PreferencesWin::on_pushButton_HC_clicked()
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinUnreadColor_clicked()
 {
     this->updateColor();
 }
 
-void GrumpyIRC::PreferencesWin::on_pushButton_C1_clicked()
-{
-
-}
-
-void GrumpyIRC::PreferencesWin::on_pushButton_C2_clicked()
-{
-
-}
-
-void GrumpyIRC::PreferencesWin::on_pushButton_C3_clicked()
-{
-
-}
-
-void GrumpyIRC::PreferencesWin::on_pushButton_C4_clicked()
-{
-
-}
-
-void GrumpyIRC::PreferencesWin::on_pushButton_C5_clicked()
-{
-
-}
-
-void GrumpyIRC::PreferencesWin::on_pushButton_C6_clicked()
-{
-
-}
-
-void GrumpyIRC::PreferencesWin::on_pushButton_C7_clicked()
-{
-
-}
-
-void GrumpyIRC::PreferencesWin::on_pushButton_C8_clicked()
-{
-
-}
-
-void GrumpyIRC::PreferencesWin::on_pushButton_C9_clicked()
-{
-
-}
-
-void GrumpyIRC::PreferencesWin::on_pushButton_C10_clicked()
-{
-
-}
-
-void GrumpyIRC::PreferencesWin::on_pushButton_C11_clicked()
-{
-
-}
-
-void GrumpyIRC::PreferencesWin::on_pushButton_C12_clicked()
-{
-
-}
-
-void GrumpyIRC::PreferencesWin::on_pushButton_C13_clicked()
-{
-
-}
-
-void GrumpyIRC::PreferencesWin::on_pushButton_C14_clicked()
-{
-
-}
-
-void GrumpyIRC::PreferencesWin::on_pushButton_C15_clicked()
-{
-
-}
-
-void GrumpyIRC::PreferencesWin::on_pushButton_TC_clicked()
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinHighlightColor_clicked()
 {
     this->updateColor();
 }
 
-void GrumpyIRC::PreferencesWin::on_pushButton_UC_2_clicked()
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinPaletteColor1_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinPaletteColor2_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinPaletteColor3_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinPaletteColor4_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinPaletteColor5_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinPaletteColor6_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinPaletteColor7_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinPaletteColor8_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinPaletteColor9_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinPaletteColor10_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinPaletteColor11_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinPaletteColor12_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinPaletteColor13_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinPaletteColor14_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinPaletteColor15_clicked()
+{
+
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinTimestampColor_clicked()
 {
     this->updateColor();
 }
 
-void GrumpyIRC::PreferencesWin::on_pushButton_LC_clicked()
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinUserColor_clicked()
+{
+    this->updateColor();
+}
+
+void GrumpyIRC::PreferencesWin::on_pushButtonSkinLinkColor_clicked()
 {
     this->updateColor();
 }
