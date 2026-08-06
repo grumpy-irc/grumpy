@@ -57,6 +57,7 @@ if (GRUMPY_PROFILER)
 endif()
 if (UNIT_TESTS)
     SET(QT_USE_QTTEST TRUE)
+    enable_testing()
 endif()
 if (QT6_BUILD)
     find_package(Qt6 REQUIRED COMPONENTS Core Widgets Xml Network Qml Sql)
@@ -66,11 +67,6 @@ elseif (QT5_BUILD)
     set(QT_LIBRARIES Qt5::Core Qt5::Widgets Qt5::Xml Qt5::Network Qt5::Qml Qt5::Sql)
 endif()
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
-
-# Unit test
-if (UNIT_TESTS)
-    add_subdirectory (tests)
-endif()
 
 # Libraries
 add_subdirectory (libirc2htmlcode)
@@ -83,6 +79,10 @@ add_subdirectory (libcore)
 add_subdirectory (grumpyd)
 add_subdirectory (GrumpyIRC)
 
+# Unit test
+if (UNIT_TESTS)
+    add_subdirectory (tests)
+endif()
 
 # Packaging code
 SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Petr Bena")

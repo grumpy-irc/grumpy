@@ -1,7 +1,8 @@
 #include <QString>
 #include <QCoreApplication>
 #include <QtTest>
-#include <QtScript>
+#include <QJSEngine>
+#include <QJSValue>
 #include "../../libcore/exception.h"
 #include "../../libcore/configuration.h"
 #include "../../libcore/commandprocessor.h"
@@ -32,14 +33,14 @@ LibcoreTest::LibcoreTest()
 
 void LibcoreTest::syntaxCheck(QString path)
 {
-    QScriptEngine syntax_check;
-    QScriptSyntaxCheckResult s = syntax_check.checkSyntax(GrumpyIRC::Resources::GetSource(path));
-    if (s.state() != QScriptSyntaxCheckResult::Valid)
+    QJSEngine syntax_check;
+    QJSValue result = syntax_check.evaluate(GrumpyIRC::Resources::GetSource(path), path);
+    if (result.isError())
     {
-        // Debug
-        qWarning() << path + ": l" + QString::number(s.errorLineNumber()) + " c" + QString::number(s.errorColumnNumber()) + ": " + s.errorMessage();
+        qWarning() << path + ": l" + result.property("lineNumber").toString() + " c" +
+                      result.property("columnNumber").toString() + ": " + result.toString();
     }
-    QVERIFY2(s.state() == QScriptSyntaxCheckResult::Valid, "syntax check");
+    QVERIFY2(!result.isError(), "syntax check");
 }
 
 void LibcoreTest::initTestCase()

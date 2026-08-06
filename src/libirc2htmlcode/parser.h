@@ -56,6 +56,7 @@ namespace irc2htmlcode
             QHash<unsigned int, QString> TextColors;
 
         private:
+            QString encodeHtmlAttribute(QString text);
             QString linkUrl(QString source, QString protocol);
             QString linkUrls(QString source);
             QString linkChannels(QString source);

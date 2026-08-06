@@ -14,6 +14,28 @@
 
 using namespace irc2htmlcode;
 
+static bool startsHtmlDelimiterEntity(const QString &source, int position)
+{
+    return source.mid(position, 6) == "&quot;" ||
+           source.mid(position, 5) == "&#39;" ||
+           source.mid(position, 4) == "&lt;" ||
+           source.mid(position, 4) == "&gt;";
+}
+
+static int htmlEntityLengthAt(const QString &source, int position)
+{
+    if (source.mid(position, 6) == "&quot;" ||
+        source.mid(position, 6) == "&nbsp;")
+        return 6;
+    if (source.mid(position, 5) == "&amp;" ||
+        source.mid(position, 5) == "&#39;")
+        return 5;
+    if (source.mid(position, 4) == "&lt;" ||
+        source.mid(position, 4) == "&gt;")
+        return 4;
+    return 0;
+}
+
 Parser::Parser()
 {
     this->TextColor = "#FFFFFF";
@@ -88,11 +110,19 @@ FormattedItem Parser::Process(const QString &format, const QDateTime &time, cons
 
 QString Parser::EncodeHtml(QString text)
 {
+    text.replace("&", "&amp;");
     text.replace("<", "&lt;");
     text.replace(">", "&gt;");
+    text.replace("\"", "&quot;");
+    text.replace("'", "&#39;");
     text.replace("  ", "&nbsp;&nbsp;");
 
     return text;
+}
+
+QString Parser::encodeHtmlAttribute(QString text)
+{
+    return this->EncodeHtml(text);
 }
 
 QString Parser::GetStyle()
@@ -120,6 +150,8 @@ QString Parser::linkUrl(QString source, QString protocol)
         int end = position;
         while (++end < source.size())
         {
+            if (startsHtmlDelimiterEntity(source, end))
+                break;
             char current_symbol = source[end].toLatin1();
             if ((this->SeparateOnDotSpace && current_symbol == '.') || (this->SeparateOnTrailingPunctuation && this->Punctuation.contains(current_symbol)))
             {
@@ -134,7 +166,7 @@ QString Parser::linkUrl(QString source, QString protocol)
                 break;
         }
         QString lx = source.mid(position, end - position);
-        QString linked_lx = "<a style=\"color:" + this->LinkColor + ";\" href=\"" + lx + "\">" + lx + "</a>";
+        QString linked_lx = "<a style=\"color:" + this->encodeHtmlAttribute(this->LinkColor) + ";\" href=\"" + lx + "\">" + lx + "</a>";
         source.remove(position, lx.size());
         source.insert(position, linked_lx);
         position += linked_lx.size();
@@ -156,6 +188,22 @@ QString Parser::linkChannels(QString source)
     while (current_pos < source.size())
     {
         char current = source[current_pos].toLatin1();
+        if (current == '<')
+        {
+            int tag_end = source.indexOf('>', current_pos + 1);
+            if (tag_end < 0)
+                break;
+            current_pos = tag_end + 1;
+            word_start = current_pos;
+            continue;
+        }
+        int entity_length = htmlEntityLengthAt(source, current_pos);
+        if (entity_length > 0)
+        {
+            current_pos += entity_length;
+            word_start = current_pos;
+            continue;
+        }
         if (current == ChannelSymbol)
         {
             // This is likely a channel, but only if the preceeding symbol was a separator OR this is a first symbol
@@ -171,6 +219,8 @@ QString Parser::linkChannels(QString source)
             int channel_end = current_pos;
             while (++channel_end < source.size())
             {
+                if (startsHtmlDelimiterEntity(source, channel_end))
+                    break;
                 char current_symbol = source[channel_end].toLatin1();
                 if ((this->SeparateOnDotSpace && current_symbol == '.') || (this->SeparateOnTrailingPunctuation && this->Punctuation.contains(current_symbol)))
                 {
@@ -187,7 +237,7 @@ QString Parser::linkChannels(QString source)
                 }
             }
             QString channel_name = source.mid(word_start, channel_end - word_start);
-            QString channel_link = "<a style=\"color:" + this->LinkColor + ";\" href=\"irc_join://" + channel_name + "\">" + channel_name + "</a>";
+            QString channel_link = "<a style=\"color:" + this->encodeHtmlAttribute(this->LinkColor) + ";\" href=\"irc_join://" + channel_name + "\">" + channel_name + "</a>";
             // Now we need to cut the original channel from source
             source.remove(word_start, channel_end - word_start);
             source.insert(word_start, channel_link);
@@ -211,8 +261,10 @@ static bool isNumber(QChar input)
 QString Parser::replaceSpecials(QString source)
 {
     char underline = 1;
+    char underline_textual = 31;
     char bold = 2;
     char italic = 16;
+    char italic_textual = 29;
     char color = 3;
     char terminated = 15;
     int current_pos = 0;
@@ -220,133 +272,124 @@ QString Parser::replaceSpecials(QString source)
     bool close_i = false;
     bool close_u = false;
     bool close_k = false;
+    QString active_color;
+    QString output;
+
+    auto closeActive = [&]() {
+        if (close_k)
+            output += "</font>";
+        if (close_i)
+            output += "</i>";
+        if (close_u)
+            output += "</u>";
+        if (close_b)
+            output += "</b>";
+    };
+
+    auto openActive = [&]() {
+        if (close_b)
+            output += "<b>";
+        if (close_u)
+            output += "<u>";
+        if (close_i)
+            output += "<i>";
+        if (close_k)
+            output += "<font color=\"" + this->encodeHtmlAttribute(active_color) + "\">";
+    };
+
     while (current_pos < source.size())
     {
         char current_symbol = source[current_pos].toLatin1();
         if (current_symbol == terminated)
         {
-            source = source.remove(current_pos, 1);
-            if (close_b)
-                source.insert(current_pos, "</b>");
-            if (close_u)
-                source.insert(current_pos, "</u>");
-            if (close_k)
-                source.insert(current_pos, "</font>");
-            if (close_i)
-                source.insert(current_pos, "</i>");
+            closeActive();
             close_b = false;
             close_u = false;
             close_k = false;
             close_i = false;
+            active_color.clear();
         } else if (current_symbol == bold)
         {
-            // replace
-            source = source.remove(current_pos, 1);
-            if (close_b)
-                source.insert(current_pos, "</b>");
-            else
-                source.insert(current_pos, "<b>");
+            closeActive();
             close_b = !close_b;
-        } else if (current_symbol == underline)
+            openActive();
+        } else if (current_symbol == underline || current_symbol == underline_textual)
         {
-            source = source.remove(current_pos, 1);
-            if (close_u)
-                source.insert(current_pos, "</u>");
-            else
-                source.insert(current_pos, "<u>");
+            closeActive();
             close_u = !close_u;
+            openActive();
         } else if (current_symbol == color)
         {
-            // check if next symbol is a color number
-            int color_code = -10;
-            if (source.size() <= current_pos + 1)
+            QString color_scode;
+            int replace_len = 1;
+            if ((source.size() > current_pos + 1) && isNumber(source[current_pos + 1]))
             {
-                // There is nothing else to colorize, if this is closing, we close it, otherwise ignore
-                if (close_k)
-                {
-                    source = source.remove(current_pos, 1);
-                    close_k = !close_k;
-                    source.insert(current_pos, "</font>");
-                }
-            } else if (source.size() > current_pos)
-            {
-                // Check if next 2 are numbers
-                QString color_scode;
-                // How many characters we need to remove from original string,
-                // this varies on size of color code string
-                int replace_len = 1;
-                if ((source.size() > current_pos + 1) && isNumber(source[current_pos + 1]))
-                {
-                    replace_len++;
-                    color_scode += source[current_pos + 1];
-                }
-                if ((source.size() > current_pos + 2) && isNumber(source[current_pos + 2]))
-                {
-                    replace_len++;
-                    color_scode += source[current_pos + 2];
-                }
-                if (!color_scode.isEmpty())
-                {
-                    color_code = color_scode.toInt();
-                    QString color = "";
-                    if (color_code < 0 || color_code > 15)
-                    {
-                        // broken color code
-                        // emit some warning?
-                        color = "green";
-                    } else
-                    {
-                        color = this->TextColors[color_code];
-                    }
-                    source = source.remove(current_pos, replace_len);
-                    QString result_string = "<font color=\"" + color + "\">";
-                    if (close_k)
-                    {
-                        // someone wants to change the color but the previous color was not closed
-                        result_string = "</font>" + result_string;
-                    }
-                    close_k = true;
-                    source.insert(current_pos, result_string);
-                } else if (close_k)
-                {
-                    source = source.remove(current_pos, 1);
-                    close_k = !close_k;
-                    source.insert(current_pos, "</font>");
-                }
+                replace_len++;
+                color_scode += source[current_pos + 1];
             }
-        } else if (current_symbol == italic)
+            if ((source.size() > current_pos + 2) && isNumber(source[current_pos + 2]))
+            {
+                replace_len++;
+                color_scode += source[current_pos + 2];
+            }
+            if (!color_scode.isEmpty())
+            {
+                if ((source.size() > current_pos + replace_len) && source[current_pos + replace_len].toLatin1() == ',')
+                {
+                    replace_len++;
+                    if ((source.size() > current_pos + replace_len) && isNumber(source[current_pos + replace_len]))
+                    {
+                        replace_len++;
+                        if ((source.size() > current_pos + replace_len) && isNumber(source[current_pos + replace_len]))
+                            replace_len++;
+                    }
+                }
+
+                int color_code = color_scode.toInt();
+                closeActive();
+                if (color_code < 0 || color_code > 15)
+                    active_color = "green";
+                else
+                    active_color = this->TextColors[color_code];
+                close_k = true;
+                openActive();
+                current_pos += replace_len;
+                continue;
+            }
+
+            if (close_k)
+            {
+                closeActive();
+                close_k = false;
+                active_color.clear();
+                openActive();
+            }
+        } else if (current_symbol == italic || current_symbol == italic_textual)
         {
-            source = source.remove(current_pos, 1);
-            if (close_i)
-                source.insert(current_pos, "</i>");
-            else
-                source.insert(current_pos, "<i>");
+            closeActive();
             close_i = !close_i;
+            openActive();
+        } else
+        {
+            output += source[current_pos];
         }
         current_pos++;
     }
-    if (close_k)
-        source += "</font>";
-    if (close_b)
-        source += "</b>";
-    if (close_u)
-        source += "</u>";
-    if (close_i)
-        source += "</i>";
-    return source;
+    closeActive();
+    return output;
 }
 
 QString Parser::formatTime(const QDateTime &time)
 {
-    return "<font color=\"" + this->TimeColor + "\">" + this->EncodeHtml(time.toString()) + "</font>";
+    return "<font color=\"" + this->encodeHtmlAttribute(this->TimeColor) + "\">" + this->EncodeHtml(time.toString()) + "</font>";
 }
 
 QString Parser::formatUser(const QString &user)
 {
-    return "<font color=\"" + this->UserColor + "\">" + this->EncodeHtml(user) + "</font>";
+    return "<font color=\"" + this->encodeHtmlAttribute(this->UserColor) + "\">" + this->EncodeHtml(user) + "</font>";
 }
 
 QString Parser::formatText(const QString &text, const QString &color)
 {
-    return "<font color=\"" + color + "\">" + this->replaceSpecials(this->linkChannels(this->linkUrls(this->EncodeHtml(text)))) + "</font>";
+    return "<font color=\"" + this->encodeHtmlAttribute(color) + "\">" + this->replaceSpecials(this->linkChannels(this->linkUrls(this->EncodeHtml(text)))) + "</font>";
 }
