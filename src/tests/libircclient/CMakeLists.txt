@@ -50,3 +50,5 @@ elseif (QT5_BUILD)
 endif()
 TARGET_LINK_LIBRARIES(libircclient_ut ircclient ${QT_LIBRARIES})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+
+add_test(NAME libircclient_ut COMMAND libircclient_ut)

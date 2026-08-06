@@ -51,3 +51,5 @@ elseif (QT5_BUILD)
 endif()
 TARGET_LINK_LIBRARIES(grumpyd_ut grumpycore ${QT_LIBRARIES})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+
+add_test(NAME grumpyd_ut COMMAND grumpyd_ut)
