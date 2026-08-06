@@ -1,0 +1,89 @@
+name: Unit Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  unit-tests:
+    name: ${{ matrix.platform }} Qt ${{ matrix.qt }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: Linux
+            runner: ubuntu-24.04
+            qt: 5
+          - platform: Linux
+            runner: ubuntu-24.04
+            qt: 6
+          - platform: macOS
+            runner: macos-13
+            qt: 5
+            qt-version: 5.15.2
+          - platform: macOS
+            runner: macos-13
+            qt: 6
+            qt-version: 6.8.*
+
+    steps:
+      - name: Check out sources
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Linux Qt 5 dependencies
+        if: runner.os == 'Linux' && matrix.qt == 5
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            ninja-build \
+            qtbase5-dev \
+            qtdeclarative5-dev \
+            qtmultimedia5-dev \
+            libqt5sql5-sqlite
+
+      - name: Install Linux Qt 6 dependencies
+        if: runner.os == 'Linux' && matrix.qt == 6
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            ninja-build \
+            qt6-base-dev \
+            qt6-declarative-dev \
+            qt6-multimedia-dev \
+            libqt6sql6-sqlite
+
+      - name: Install macOS Qt
+        if: runner.os == 'macOS'
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ matrix.qt-version }}
+          archives: qtbase qtdeclarative
+          modules: qtmultimedia
+          cache: true
+
+      - name: Install macOS build tools
+        if: runner.os == 'macOS'
+        run: brew install ninja
+
+      - name: Configure
+        run: >
+          cmake -S src -B build
+          -G Ninja
+          -DUNIT_TESTS=true
+          -DQT5_BUILD=${{ matrix.qt == 5 && 'true' || 'false' }}
+          -DQT6_BUILD=${{ matrix.qt == 6 && 'true' || 'false' }}
+          -DCMAKE_BUILD_TYPE=Release
+          -Wno-dev
+
+      - name: Build
+        run: cmake --build build --parallel 2
+
+      - name: Run tests
+        run: ctest --test-dir build --output-on-failure

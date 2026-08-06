@@ -59,3 +59,5 @@ endif()
 
 TARGET_LINK_LIBRARIES(core_ut grumpycore ${QT_LIBRARIES})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+
+add_test(NAME core_ut COMMAND core_ut)
