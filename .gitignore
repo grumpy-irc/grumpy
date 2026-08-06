@@ -65,3 +65,24 @@ compile_commands.json
 
 # Packed lib
 src/sqlite/*
+
+# Debian packaging build artifacts
+debian/.debhelper/
+debian/build/
+debian/tmp/
+debian/debhelper-build-stamp
+debian/files
+debian/*.substvars
+debian/*.debhelper.log
+debian/*.build
+debian/*.buildinfo
+debian/*.changes
+debian/grumpy/
+debian/grumpy-dbgsym/
+debian/grumpyd/
+debian/grumpyd-dbgsym/
+debian/grumpy-common/
+debian/grumpy-common-dbgsym/
+
+# Packaging outputs
+packaging/output/

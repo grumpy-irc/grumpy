@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=GrumpyChat
+GenericName=IRC Client
+Comment=IRC client with distributed core and JavaScript scripting
+Exec=grumpy
+Icon=grumpy
+StartupNotify=true
+Terminal=false
+Type=Application
+Categories=Network;IRCClient;

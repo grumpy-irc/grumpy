@@ -10,6 +10,12 @@ option(EXTREME_DEBUG "Enable some resource expensive and slowing debug info" fal
 option(UNIT_TESTS "Enable unit tests" false)
 option(GRUMPY_PROFILER "Build internal profiler (extreme slowdown)" false)
 
+if(QT5_BUILD AND QT6_BUILD)
+    message(FATAL_ERROR "Select only one Qt version: QT5_BUILD or QT6_BUILD")
+elseif(NOT QT5_BUILD AND NOT QT6_BUILD)
+    message(FATAL_ERROR "Enable QT5_BUILD or QT6_BUILD")
+endif()
+
 if(APPLE)
     if(QT6_BUILD)
         # Qt 6 headers rely on std::filesystem APIs that are only available in
@@ -22,6 +28,7 @@ if(APPLE)
 endif()
 
 project(GrumpyIRC)
+include(GNUInstallDirs)
 if(WIN32)
     if (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 3.0)
         add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/MP>)
@@ -38,9 +45,9 @@ if(WIN32)
     endif()
 else()
     if (QT6_BUILD)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++17")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
     else()
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++11")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
     endif()
 endif()
 

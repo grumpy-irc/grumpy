@@ -1,0 +1,15 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: GrumpyChat
+Source: https://github.com/grumpy-irc
+
+Files: *
+Copyright: Petr Bena
+License: GPL-3+
+
+License: GPL-3+
+ This program is free software: you can redistribute it and/or modify it
+ under the terms of the GNU General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or any later version.
+ .
+ On Debian systems, the complete text of the GNU General Public License
+ version 3 can be found in /usr/share/common-licenses/GPL-3.

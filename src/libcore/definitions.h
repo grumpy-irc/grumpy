@@ -40,9 +40,5 @@ typedef unsigned int scrollback_id_t;
 #if defined _WIN64 || defined _WIN32
     #define GRUMPY_WIN
 #endif
-#if QT_VERSION < 0x050000
-    #define qintptr int
-#endif
 
 #endif // DEFINITIONS_H
-

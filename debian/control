@@ -1,0 +1,39 @@
+Source: grumpy
+Section: net
+Priority: optional
+Maintainer: Petr Bena <petr@bena.rocks>
+Build-Depends: debhelper-compat (= 12),
+ cmake,
+ pkg-config,
+ qt6-base-dev | qtbase5-dev,
+ qt6-declarative-dev | qtdeclarative5-dev,
+ qt6-multimedia-dev | qtmultimedia5-dev
+Standards-Version: 4.6.2
+Rules-Requires-Root: no
+Homepage: https://github.com/grumpy-irc
+
+Package: grumpy-common
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: shared private libraries for GrumpyChat
+ GrumpyChat is a Qt IRC client with distributed-core support.
+ .
+ This package provides private shared libraries used by the GrumpyChat
+ desktop client and daemon.
+
+Package: grumpy
+Architecture: any
+Depends: grumpy-common (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: Qt IRC client with distributed-core support
+ GrumpyChat is an IRC client with a distributed core and JavaScript scripting
+ support.
+ .
+ This package provides the desktop client.
+
+Package: grumpyd
+Architecture: any
+Depends: grumpy-common (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: GrumpyChat distributed-core daemon
+ GrumpyChat can use a daemon as a distributed IRC core.
+ .
+ This package provides the optional daemon.

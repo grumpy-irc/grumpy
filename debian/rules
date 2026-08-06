@@ -1,0 +1,48 @@
+#!/usr/bin/make -f
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+GRUMPY_QT_MAJOR ?= $(shell \
+	if dpkg-query -W -f='$${Status}' qt6-base-dev qt6-declarative-dev qt6-multimedia-dev 2>/dev/null | grep -q "install ok installed"; then \
+		echo 6; \
+	elif dpkg-query -W -f='$${Status}' qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev 2>/dev/null | grep -q "install ok installed"; then \
+		echo 5; \
+	else \
+		echo 6; \
+	fi)
+GRUMPY_BUILD_JOBS ?= $(shell nproc)
+
+ifeq ($(GRUMPY_QT_MAJOR),6)
+QT5_BUILD = false
+QT6_BUILD = true
+else
+QT5_BUILD = true
+QT6_BUILD = false
+endif
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	cmake -S src -B debian/build \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DQT5_BUILD=$(QT5_BUILD) \
+		-DQT6_BUILD=$(QT6_BUILD) \
+		-Wno-dev
+
+override_dh_auto_build:
+	cmake --build debian/build --parallel $(GRUMPY_BUILD_JOBS)
+
+override_dh_auto_install:
+	DESTDIR=$(CURDIR)/debian/tmp cmake --install debian/build
+	install -Dm644 packaging/data/grumpy.desktop debian/tmp/usr/share/applications/grumpy.desktop
+	install -Dm644 snap/gui/icon.png debian/tmp/usr/share/icons/hicolor/256x256/apps/grumpy.png
+
+override_dh_shlibdeps:
+	dh_shlibdeps -- -l$(CURDIR)/debian/grumpy-common/usr/lib -l$(CURDIR)/debian/grumpy/usr/lib
+
+override_dh_clean:
+	rm -rf debian/build
+	dh_clean

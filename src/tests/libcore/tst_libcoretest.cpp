@@ -69,10 +69,6 @@ void LibcoreTest::testCaseEmbeddedScriptSyntaxCheck()
     syntaxCheck("/grumpy_core/ecma/grumpy.js");
 }
 
-#if QT_VERSION >= 0x050000
 QTEST_GUILESS_MAIN(LibcoreTest)
-#else
-QTEST_MAIN(LibcoreTest)
-#endif
 
 #include "tst_libcoretest.moc"

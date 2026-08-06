@@ -1,0 +1,15 @@
+#!/bin/bash
+################################################################################
+# config - Shared configuration for GrumpyChat packaging scripts
+################################################################################
+
+APP_NAME="grumpy"
+APP_DAEMON_NAME="grumpyd"
+APP_COMMON_NAME="grumpy-common"
+APP_VERSION="1.0.0"
+MAINTAINER="Petr Bena <petr@bena.rocks>"
+DESCRIPTION="GrumpyChat IRC client with distributed core support"
+APP_HOMEPAGE_URL="https://github.com/grumpy-irc"
+
+APP_ICON_PATH="snap/gui/icon.png"
+APP_DESKTOP_PATH="packaging/data/grumpy.desktop"
